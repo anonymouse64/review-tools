@@ -36,6 +36,7 @@ redflagged_snap_types_overrides = {
                'freescale-ls1043a-kernel',  # @canonical.com kernels
                'hummingboard-kernel',
                'joule-linux',
+               'linux-generic-allwinner',
                'mako-kernel',
                'marvell-armada3700-kernel',
                'nxp-ls1043a-kernel',
@@ -63,7 +64,9 @@ redflagged_snap_types_overrides = {
                'hikey-snappy-gadget',
                'hummingboard',
                'joule',
+               'nanopi-neo',
                'nxp-ls1043ardb-gadget',
+               'orangepi-zero',
                'pi3-ondra',
                'pi3-unipi',
                'pi2kyle',
