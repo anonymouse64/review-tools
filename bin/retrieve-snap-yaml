@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+if [ ! -f "$1" ]; then
+    echo "`basename $0` <squashfs>" >&2
+    exit 1
+fi
+squash="$1"
+
+tmpdir=`mktemp -d`
+trap "rm -rf $tmpdir" EXIT HUP INT QUIT TERM
+
+squashroot="$tmpdir/squashfs-root"
+
+unsquashfs -d "$squashroot" "$squash" meta/snap.yaml
+cat "$squashroot/meta/snap.yaml"
