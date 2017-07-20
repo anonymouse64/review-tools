@@ -33,7 +33,9 @@ redflagged_snap_types_overrides = {
                'linux-generic-bbb',
                'pc-kernel',
                'pi2-kernel',
-               'freescale-ls1043a-kernel',  # @canonical.com kernels
+               'aws-kernel',  # @canonical.com kernels
+               'freescale-ls1043a-kernel',
+               'gke-kernel',
                'hummingboard-kernel',
                'joule-linux',
                'linux-generic-allwinner',
