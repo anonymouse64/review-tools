@@ -64,7 +64,8 @@ class SnapReviewLint(SnapReview):
 
         self._list_all_compiled_binaries()
 
-        self.redflagged_snap_types = ['kernel',
+        self.redflagged_snap_types = ['base',
+                                      'kernel',
                                       'gadget',
                                       'os',
                                       ]
@@ -1122,7 +1123,8 @@ class SnapReviewLint(SnapReview):
         # kernels ship a dangling lib/modules/.../build (like on desktop) but
         # also may have legitimate symlinks in lib/firmware, so just allow
         # them.
-        if 'type' in self.snap_yaml and (self.snap_yaml['type'] == 'os' or
+        if 'type' in self.snap_yaml and (self.snap_yaml['type'] == 'base' or
+                                         self.snap_yaml['type'] == 'os' or
                                          self.snap_yaml['type'] == 'kernel'):
             return
 
@@ -1313,13 +1315,11 @@ class SnapReviewLint(SnapReview):
             self._add_result(t, n, s, link=link)
 
     def check_grade(self):
-        '''Check confinement'''
+        '''Check grade'''
         if not self.is_snap2 or 'grade' not in self.snap_yaml:
             return
 
         allowed = ['stable', 'devel']
-# We may reintroduce this, but for now, grade may be used with all snaps
-#         use_with = ['app', 'gadget', 'kernel', 'os']
 
         t = 'info'
         n = self._get_check_name('grade_valid')
@@ -1332,11 +1332,6 @@ class SnapReviewLint(SnapReview):
             t = 'error'
             s = "malformed 'grade': '%s' should be one of '%s'" % (
                 self.snap_yaml['grade'], ", ".join(allowed))
-#         elif self.snap_yaml['type'] not in use_with:
-#             # "devel" grade os-snap should be avoided.
-#             t = 'warn'
-#             s = "'grade' should not be used with 'type: %s'" % \
-#                 self.snap_yaml['type']
         self._add_result(t, n, s)
 
     def _verify_env(self, env, app=None):
@@ -1572,3 +1567,23 @@ class SnapReviewLint(SnapReview):
                 continue
 
             self._verify_value_is_file(app, key)
+
+    def check_base(self):
+        '''Check base'''
+        if not self.is_snap2 or 'base' not in self.snap_yaml:
+            return
+
+        use_with = ['app']
+
+        t = 'info'
+        n = self._get_check_name('base_valid')
+        s = 'OK'
+        if not isinstance(self.snap_yaml['base'], str):
+            t = 'error'
+            s = "malformed 'base': %s (not a string)" % (
+                self.snap_yaml['base'])
+        elif self.snap_yaml['type'] not in use_with:
+            t = 'error'
+            s = "'base' should not be used with 'type: %s'" % \
+                self.snap_yaml['type']
+        self._add_result(t, n, s)

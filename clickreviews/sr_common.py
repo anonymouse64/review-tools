@@ -46,6 +46,7 @@ class SnapReview(Review):
     snappy_optional = ['apps',
                        'assumes',
                        'architectures',
+                       'base',
                        'confinement',
                        'description',
                        'environment',
@@ -88,6 +89,7 @@ class SnapReview(Review):
     # - gadget
     # - os (deprecated)
     valid_snap_types = ['app',
+                        'base',
                         'core',
                         'kernel',
                         'gadget',

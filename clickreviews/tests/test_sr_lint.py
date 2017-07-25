@@ -517,6 +517,17 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected['info'][name] = {"text": "OK (override 'pc' for 'type: gadget')"}
         self.check_results(r, expected=expected)
 
+    def test_check_type_redflagged_base(self):
+        '''Test check_type_redflagged - base'''
+        self.set_test_snap_yaml("type", "base")
+        c = SnapReviewLint(self.test_name)
+        c.check_type_redflagged()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+        name = c._get_check_name('snap_type_redflag')
+        self.check_manual_review(r, name)
+
     def test_check_type_unknown(self):
         '''Test check_type - unknown'''
         self.set_test_snap_yaml("type", "nonexistent")
@@ -3241,6 +3252,76 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             expected_counts = {'info': None, 'warn': 0, 'error': 1}
             self.check_results(r, expected_counts)
 
+    def test_check_base(self):
+        '''Test check_base'''
+        self.set_test_snap_yaml("base", "bare")
+        c = SnapReviewLint(self.test_name)
+        c.check_base()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = {
+            'error': {},
+            'warn': {},
+            'info': {
+                'lint-snap-v2:base_valid': {
+                    "text": "OK"
+                },
+            },
+        }
+        self.check_results(r, expected=expected)
+
+    def test_check_base_bad(self):
+        '''Test check_base - bad values'''
+        bad_values = (
+            True,
+            [],
+        )
+        for v in bad_values:
+            self.set_test_snap_yaml("base", v)
+            c = SnapReviewLint(self.test_name)
+            c.check_base()
+            r = c.click_report
+            expected_counts = {'info': None, 'warn': 0, 'error': 1}
+            self.check_results(r, expected_counts)
+
+    def test_check_base_missing(self):
+        '''Test check_base - missing'''
+        self.set_test_snap_yaml("base", None)
+        c = SnapReviewLint(self.test_name)
+        c.check_base()
+        r = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_base_with_invalid_type(self):
+        '''Test check_grade - kernel'''
+        bad_types = (
+            "base",
+            "core",
+            "gadget",
+            "kernel",
+            "os",
+        )
+        for v in bad_types:
+            self.set_test_snap_yaml("base", "bare")
+            self.set_test_snap_yaml("type", v)
+            c = SnapReviewLint(self.test_name)
+            c.check_base()
+            r = c.click_report
+
+            expected = {
+                'info': {},
+                'warn': {},
+                'error': {
+                    'lint-snap-v2:base_valid': {
+                        "text": "'base' should not be used with 'type: %s'" % v
+                    },
+                },
+            }
+        self.check_results(r, expected=expected)
+
     def test_check_environment(self):
         '''Test check_environment'''
         env = {'ENV1': "value",
@@ -3569,6 +3650,28 @@ type: os
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
+    def test_check_external_symlinks_base(self):
+        '''Test check_external_symlinks() - base'''
+        output_dir = self.mkdtemp()
+        path = os.path.join(output_dir, 'snap.yaml')
+        content = '''
+name: test
+version: 0.1
+summary: some thing
+description: some desc
+type: base
+'''
+        with open(path, 'w') as f:
+            f.write(content)
+
+        package = utils.make_snap2(output_dir=output_dir,
+                                   extra_files=['%s:meta/snap.yaml' % path]
+                                   )
+        c = SnapReviewLint(package)
+        c.check_external_symlinks()
+        r = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
     def test_check_architecture_all(self):
         '''Test check_architecture_all()'''
         package = utils.make_snap2(output_dir=self.mkdtemp())

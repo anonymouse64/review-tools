@@ -43,10 +43,6 @@ class SnapReviewSecurity(SnapReview):
         if not self.is_snap2:
             return
 
-        self.sec_skipped_types = ['oem',
-                                  'os',
-                                  'kernel']  # these don't need security items
-
     def _unsquashfs_lls(self, snap_pkg):
         '''Run unsquashfs -lls on a snap package'''
         return cmd(['unsquashfs', '-lls', snap_pkg])
@@ -214,9 +210,11 @@ class SnapReviewSecurity(SnapReview):
         repack_sum = out.split()[0]
 
         if orig_sum != repack_sum:
-            if 'type' in self.snap_yaml and self.snap_yaml['type'] == 'os':
+            if 'type' in self.snap_yaml and \
+                    (self.snap_yaml['type'] == 'base' or
+                     self.snap_yaml['type'] == 'os'):
                 t = 'info'
-                s = 'checksums do not match (expected for os snap)'
+                s = 'checksums do not match (expected for base/os snap)'
             else:
                 # FIXME: turn this into an error once the squashfs-tools bugs
                 # are fixed
@@ -314,7 +312,7 @@ class SnapReviewSecurity(SnapReview):
                                   (mode, fname))
                     continue
             else:
-                if snap_type != 'os':
+                if snap_type != 'base' and snap_type != 'os':
                     errors.append("file type '%s' not allowed (%s)" % (ftype,
                                                                        fname))
                     continue
@@ -326,7 +324,8 @@ class SnapReviewSecurity(SnapReview):
                 continue
             (user, group) = tmp[1].split('/')
             # we enforce 'root/root'
-            if snap_type != 'os' and (user != 'root' or group != 'root'):
+            if snap_type != 'base' and snap_type != 'os' and \
+                    (user != 'root' or group != 'root'):
                 errors.append("unusual user/group '%s' for '%s'" % (tmp[1],
                                                                     fname))
                 continue

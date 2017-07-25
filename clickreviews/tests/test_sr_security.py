@@ -425,6 +425,26 @@ short
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
+    def test_check_squashfs_files_mode_suid_bare_sudo(self):
+        '''Test check_squashfs_files() - mode - sudo suid on bare'''
+        out = '''Parallel unsquashfs: Using 4 processors
+8 inodes (8 blocks) to write
+
+-rwsr-xr-x root/root                38 2016-03-11 12:25 squashfs-root/usr/bin/sudo
+'''
+        self.set_test_unsquashfs_lls(out)
+        self.set_test_snap_yaml("name", "bare")
+        c = SnapReviewSecurity(self.test_name)
+        c.check_squashfs_files()
+        report = c.click_report
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'security-snap-v2:squashfs_files'
+        expected['error'][name] = {"text": "found errors in file output: unusual mode 'rwsr-xr-x' for entry './usr/bin/sudo'"}
+        self.check_results(report, expected=expected)
+
     def test_check_squashfs_files_mode_suid_chrome_test_sandbox(self):
         '''Test check_squashfs_files() - mode - chrome-sandbox with chrome-test
         '''
@@ -523,6 +543,21 @@ brw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
 '''
         self.set_test_unsquashfs_lls(out)
         self.set_test_snap_yaml("type", "os")
+        c = SnapReviewSecurity(self.test_name)
+        c.check_squashfs_files()
+        report = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(report, expected_counts)
+
+    def test_check_squashfs_files_type_block_base(self):
+        '''Test check_squashfs_files() - type - block os'''
+        out = '''Parallel unsquashfs: Using 4 processors
+8 inodes (8 blocks) to write
+
+brw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
+'''
+        self.set_test_unsquashfs_lls(out)
+        self.set_test_snap_yaml("type", "base")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.click_report

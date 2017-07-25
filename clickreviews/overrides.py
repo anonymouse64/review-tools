@@ -90,6 +90,8 @@ redflagged_snap_types_overrides = {
                'telig',
                'tsimx6-gadget',
                ],
+    'base': ['bare',  # Canonical base snaps
+             ],
 }
 
 # List of snaps that may specify an interface that requires a desktop file but
@@ -101,6 +103,7 @@ desktop_file_exception = ['ffscreencast']
 #
 # Files with unusual that we'll allow for certain snaps
 sec_mode_overrides = {
+    'bare': {},
     'core': {
         './bin/mount': 'rwsr-xr-x',
         './bin/ping': 'rwsr-xr-x',
