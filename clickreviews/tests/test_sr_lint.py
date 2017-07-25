@@ -3672,6 +3672,7 @@ type: base
         r = c.click_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
+
     def test_check_architecture_all(self):
         '''Test check_architecture_all()'''
         package = utils.make_snap2(output_dir=self.mkdtemp())
