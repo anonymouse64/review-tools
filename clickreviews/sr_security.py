@@ -347,19 +347,19 @@ class SnapReviewSecurity(SnapReview):
 
                 try:
                     int(major)
-                except:
+                except Exception:
                     malformed.append("major '%s' malformed for '%s'" %
                                      (major, fname))
                 try:
                     int(minor)
-                except:
+                except Exception:
                     malformed.append("minor '%s' malformed for '%s'" %
                                      (minor, fname))
             else:
                 size = tmp[2]
                 try:
                     int(size)
-                except:
+                except Exception:
                     malformed.append("size '%s' malformed for '%s'" % (size,
                                                                        fname))
                     continue
