@@ -3322,6 +3322,50 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             }
         self.check_results(r, expected=expected)
 
+    def test_check_base_interfaces_none(self):
+        '''Test check_base_interfaces - no plugs or slots'''
+        self.set_test_snap_yaml("type", "base")
+        c = SnapReviewLint(self.test_name)
+        c.check_base_interfaces()
+        r = c.click_report
+        expected_counts = {'info': 4, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_base_interfaces_top(self):
+        '''Test check_base_interfaces - top plugs and slots'''
+        self.set_test_snap_yaml("type", "base")
+        plugs = self._create_top_plugs()
+        self.set_test_snap_yaml("plugs", plugs)
+        slots = self._create_top_slots()
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewLint(self.test_name)
+        c.check_base_interfaces()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 2}
+        self.check_results(r, expected_counts)
+
+    def test_check_base_interfaces_apps_plugs(self):
+        '''Test check_base_interfaces - apps plugs'''
+        self.set_test_snap_yaml("type", "base")
+        apps_plugs = self._create_apps_plugs()
+        self.set_test_snap_yaml("apps", apps_plugs)
+        c = SnapReviewLint(self.test_name)
+        c.check_base_interfaces()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 4}
+        self.check_results(r, expected_counts)
+
+    def test_check_base_interfaces_apps_slots(self):
+        '''Test check_base_interfaces - apps slots'''
+        self.set_test_snap_yaml("type", "base")
+        apps_slots = self._create_apps_slots()
+        self.set_test_snap_yaml("apps", apps_slots)
+        c = SnapReviewLint(self.test_name)
+        c.check_base_interfaces()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 3}
+        self.check_results(r, expected_counts)
+
     def test_check_environment(self):
         '''Test check_environment'''
         env = {'ENV1': "value",

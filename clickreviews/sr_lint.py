@@ -1587,3 +1587,31 @@ class SnapReviewLint(SnapReview):
             s = "'base' should not be used with 'type: %s'" % \
                 self.snap_yaml['type']
         self._add_result(t, n, s)
+
+    def check_base_interfaces(self):
+        '''Check base interfaces'''
+        if not self.is_snap2 or \
+                'type' not in self.snap_yaml or \
+                self.snap_yaml['type'] != 'base':
+            return
+
+        for i in ['plugs', 'slots']:
+            t = 'info'
+            n = self._get_check_name('base_interfaces', extra=i)
+            s = 'OK'
+            if i in self.snap_yaml:
+                t = 'error'
+                s = "'%s' not allowed with base snaps" % i
+            self._add_result(t, n, s)
+
+            if 'apps' in self.snap_yaml:
+                for app in self.snap_yaml['apps']:
+                    for j in ['plugs', 'slots']:
+                        t = 'info'
+                        n = self._get_check_name('base_interfaces', app=app,
+                                                 extra=j)
+                        s = 'OK'
+                        if j in self.snap_yaml['apps'][app]:
+                            t = 'error'
+                            s = "'%s' not allowed with base snaps" % j
+                        self._add_result(t, n, s)
