@@ -1280,6 +1280,7 @@ class SnapReviewLint(SnapReview):
             n = self._get_check_name('confinement_classic')
             s = 'OK'
             manual_review = False
+            link = None
             if self.overrides is not None and \
                     'snap_allow_classic' in self.overrides and \
                     self.overrides['snap_allow_classic']:
@@ -1287,11 +1288,12 @@ class SnapReviewLint(SnapReview):
                     self.snap_yaml['confinement']
             else:
                 t = 'error'
-                s = "(NEEDS REVIEW) confinement '%s' not allowed" % \
+                s = "(NEEDS REVIEW) confinement '%s' not allowed. If your snap needs classic confinement to function, please make a request for this snap to use classic by creating a new topic in the forum using the 'store' category and detail the technical reasons why classic is required." % \
                     self.snap_yaml['confinement']
                 manual_review = True
+                link = 'https://forum.snapcraft.io/t/process-for-reviewing-classic-confinement-snaps/1460'
 
-            self._add_result(t, n, s, manual_review=manual_review)
+            self._add_result(t, n, s, manual_review=manual_review, link=link)
 
             t = 'info'
             n = self._get_check_name('confinement_classic_with_interfaces')

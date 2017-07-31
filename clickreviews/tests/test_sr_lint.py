@@ -2946,7 +2946,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'lint-snap-v2:confinement_classic'
-        expected['error'][name] = {"text": "(NEEDS REVIEW) confinement 'classic' not allowed"}
+        expected['error'][name] = {"text": "(NEEDS REVIEW) confinement 'classic' not allowed. If your snap needs classic confinement to function, please make a request for this snap to use classic by creating a new topic in the forum using the 'store' category and detail the technical reasons why classic is required."}
         self.check_results(r, expected=expected)
 
     def test_check_confinement_classic_allowed(self):

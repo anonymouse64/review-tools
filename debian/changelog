@@ -9,6 +9,7 @@ click-reviewers-tools (0.47) UNRELEASED; urgency=medium
     - update desktop file error output for clarity
     - add completer checks
     - update for base snaps
+    - update text for classic confinement
   * sr_declarationl.py: improve the browser-support error message
   * sr_common.py:
     - don't traceback if toplevel plugs/slots is not dict

@@ -127,9 +127,12 @@ lint-snap-v2:apps_unknown|
 lint-snap-v2:architecture_specified_needed|
 lint-snap-v2:architecture_valid|
 lint-snap-v2:assumes_valid|
+lint-snap-v2:base_interfaces|
+lint-snap-v2:base_valid|
 lint-snap-v2:command|
+lint-snap-v2:completer|
 lint-snap-v2:config_hook_executable|
-lint-snap-v2:confinement_classic|
+lint-snap-v2:confinement_classic|https://forum.snapcraft.io/t/process-for-reviewing-classic-confinement-snaps/1460
 lint-snap-v2:confinement_classic_with_interfaces|https://launchpad.net/bugs/1655369
 lint-snap-v2:confinement_valid|
 lint-snap-v2:daemon|
@@ -153,12 +156,14 @@ lint-snap-v2:icon_absolute_path|
 lint-snap-v2:icon_empty|
 lint-snap-v2:icon_exists|
 lint-snap-v2:icon_present|
+lint-snap-v2:iffy_files|
 lint-snap-v2:listen-stream|
 lint-snap-v2:listen-stream_matches_name|
 lint-snap-v2:meta_gui_desktop|
 lint-snap-v2:name_valid|
 lint-snap-v2:plugs|
 lint-snap-v2:plugs_attributes|
+lint-snap-v2:plugs_required_attributes|
 lint-snap-v2:ports|
 lint-snap-v2:ports_ext1_format|
 lint-snap-v2:ports_ext2_format|
@@ -169,6 +174,7 @@ lint-snap-v2:post-stop-command|
 lint-snap-v2:restart-condition|
 lint-snap-v2:slots|
 lint-snap-v2:slots_attributes|
+lint-snap-v2:slots_required_attributes|
 lint-snap-v2:snap_type_redflag|
 lint-snap-v2:snap_type_valid|
 lint-snap-v2:socket|
