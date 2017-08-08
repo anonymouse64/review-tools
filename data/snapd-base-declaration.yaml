@@ -46,11 +46,22 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  avahi-control:
+    allow-installation:
+      slot-snap-type:
+        - app
+        - core
+    deny-auto-connection: true
+    deny-connection:
+      on-classic: false
   avahi-observe:
     allow-installation:
       slot-snap-type:
+        - app
         - core
     deny-auto-connection: true
+    deny-connection:
+      on-classic: false
   bluetooth-control:
     allow-installation:
       slot-snap-type:
@@ -67,6 +78,11 @@
       slot-snap-type:
         - core
         - gadget
+    deny-auto-connection: true
+  broadcom-asic-control:
+    allow-installation:
+      slot-snap-type:
+        - core
     deny-auto-connection: true
   browser-support:
     allow-installation:
@@ -221,6 +237,11 @@
         - core
     deny-auto-connection: true
   kubernetes-support:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
+  kvm:
     allow-installation:
       slot-snap-type:
         - core
