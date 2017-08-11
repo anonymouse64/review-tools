@@ -597,7 +597,8 @@ class SnapReviewDeclaration(SnapReview):
                          "the internal sandbox (eg, use --no-sandbox) and " + \
                          "remove the 'allow-sandbox' attribute instead. " + \
                          "For Oxide webviews, export OXIDE_NO_SANDBOX=1 " + \
-                         "to disable its internal sandbox."
+                         "to disable its internal sandbox. Similarly for " + \
+                         "QtWebEngine, use QTWEBENGINE_DISABLE_SANDBOX=1."
 
             return s
 

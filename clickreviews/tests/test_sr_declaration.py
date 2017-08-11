@@ -3496,7 +3496,7 @@ slots:
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'declaration-snap-v2:plugs_deny-connection:iface:browser-support'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'plug-attributes' from base declaration. If using a chromium webview, you can disable the internal sandbox (eg, use --no-sandbox) and remove the 'allow-sandbox' attribute instead. For Oxide webviews, export OXIDE_NO_SANDBOX=1 to disable its internal sandbox."}
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'plug-attributes' from base declaration. If using a chromium webview, you can disable the internal sandbox (eg, use --no-sandbox) and remove the 'allow-sandbox' attribute instead. For Oxide webviews, export OXIDE_NO_SANDBOX=1 to disable its internal sandbox. Similarly for QtWebEngine, use QTWEBENGINE_DISABLE_SANDBOX=1."}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_browser_support_simple_override(self):
