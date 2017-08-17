@@ -465,6 +465,12 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  spi:
+    allow-installation:
+      slot-snap-type:
+        - core
+        - gadget
+    deny-auto-connection: true
   storage-framework-service:
     allow-installation:
       slot-snap-type:
@@ -551,6 +557,10 @@
         - app
     deny-connection:
       on-classic: false
+  wayland:
+    allow-installation:
+      slot-snap-type:
+        - core
   x11:
     allow-installation:
       slot-snap-type:
