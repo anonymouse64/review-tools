@@ -193,14 +193,21 @@ class SnapReview(Review):
         except Exception:  # pragma: nocover
             error("Could not load snap.yaml. Is it properly formatted?")
 
+        local_copy = None
+        if 'SNAP' in os.environ:
+            snap_fn = os.path.join(os.environ['SNAP'],
+                                   'data/snapd-base-declaration.yaml')
+            if os.path.exists(snap_fn):
+                local_copy = snap_fn
+
         # If local_copy is None, then this will check the server to see if
         # we are up to date. However, if we are working within the development
         # tree, use it unconditionally.
-        local_copy = None
         branch_fn = os.path.join(os.path.dirname(__file__),
                                  '../data/snapd-base-declaration.yaml')
-        if os.path.exists(branch_fn):
+        if local_copy is None and os.path.exists(branch_fn):
             local_copy = branch_fn
+
         p = snapd_base_declaration.SnapdBaseDeclaration(local_copy)
         # FIXME: don't hardcode series
         self.base_declaration_series = "16"
