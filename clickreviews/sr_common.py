@@ -143,6 +143,7 @@ class SnapReview(Review):
                                           'usb-vendor/slots': 0,
                                           'usb-product/slots': 0,
                                           },
+                          'spi': {'path/slots': ""},
                           }
 
     # interfaces_required[iface] lists required attributes as combinations.
