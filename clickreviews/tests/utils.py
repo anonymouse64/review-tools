@@ -26,7 +26,7 @@ import tempfile
 
 def make_snap2(name='test', pkgfmt_type='snap', pkgfmt_version='16.04',
                version='1.0', summary="An application", extra_files=None,
-               output_dir=None):
+               output_dir=None, yaml=None):
     '''Return the path to a snap v2 package with the given data.
 
     Caller is responsible for deleting the output_dir afterwards.
@@ -41,7 +41,8 @@ def make_snap2(name='test', pkgfmt_type='snap', pkgfmt_version='16.04',
                            extra_files=extra_files)
         write_icon(build_dir)
         description = summary
-        write_meta_data2(build_dir, name, version, summary, description)
+        write_meta_data2(build_dir, name, version, summary, description,
+                         yaml=yaml)
         pkg_path = build_package(build_dir, name, version, pkgfmt_type,
                                  pkgfmt_version, output_dir=output_dir)
     finally:

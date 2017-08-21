@@ -1,4 +1,4 @@
-'''sr_skeleton.py: click skeleton'''
+'''sr_skeleton.py: snap skeleton'''
 #
 # Copyright (C) 2014-2015 Canonical Ltd.
 #
@@ -19,7 +19,7 @@ from clickreviews.sr_common import SnapReview
 
 
 class SnapReviewSkeleton(SnapReview):
-    '''This class represents click lint reviews'''
+    '''This class represents snap lint reviews'''
     def __init__(self, fn, overrides=None):
         SnapReview.__init__(self, fn, "skeleton-snap-v2", overrides=overrides)
 
