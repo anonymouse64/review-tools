@@ -703,7 +703,7 @@ class TestClickReviewLint(cr_tests.TestClickReview):
         self.check_results(r, expected_counts)
         # ensure no local fn is provided when reading frameworks
         mock_read_cr_file.assert_called_once_with(
-            USER_DATA_FILE, FRAMEWORKS_DATA_URL)
+            USER_DATA_FILE, FRAMEWORKS_DATA_URL, local_copy_fn=None)
 
     def test_check_framework_bad(self):
         '''Test check_framework() - bad'''

@@ -33,8 +33,15 @@ class Frameworks(object):
     AVAILABLE_FRAMEWORKS = []
 
     def __init__(self, overrides=None):
+        local_copy_fn = None
+        if 'SNAP' in os.environ:
+            fn = os.path.join(os.environ['SNAP'], 'data/click-frameworks.json')
+            if os.path.exists(fn):
+                local_copy_fn = fn
+
         self.FRAMEWORKS = clickreviews.remote.read_cr_file(USER_DATA_FILE,
-                                                           FRAMEWORKS_DATA_URL)
+                                                           FRAMEWORKS_DATA_URL,
+                                                           local_copy_fn=local_copy_fn)
         if overrides is not None:
             self.FRAMEWORKS.update(overrides)
 

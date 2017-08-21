@@ -18,6 +18,7 @@ click-reviewers-tools (0.47) UNRELEASED; urgency=medium
   * data/snapd-base-declaration.yaml: update for latest snapd releases
   * sr_security.py: update for base snaps
   * cr_security.py: look for data in $SNAP/data
+  * frameworks.py: look for data in $SNAP/data
 
  -- Jamie Strandboge <jamie@ubuntu.com>  Sat, 19 Aug 2017 07:22:47 -0500
 
