@@ -56,7 +56,6 @@ class ClickReviewSecurity(ClickReview):
 
         local_copy = None
         if 'SNAP' in os.environ:
-            print("JAMIE2")
             snap_fn = os.path.join(os.environ['SNAP'],
                                    'data/apparmor-easyprof-ubuntu.json')
             if os.path.exists(snap_fn):
@@ -68,7 +67,6 @@ class ClickReviewSecurity(ClickReview):
         branch_fn = os.path.join(os.path.dirname(__file__),
                                  '../data/apparmor-easyprof-ubuntu.json')
         if local_copy is None and os.path.exists(branch_fn):
-            print("JAMIE1")
             local_copy = branch_fn
 
         p = apparmor_policy.ApparmorPolicy(local_copy)
