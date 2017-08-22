@@ -217,7 +217,7 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'security-snap-v2:daemon_with_browser-support:app1'
-        expected['info'][name] = {"text": "OK (allowing 'daemon' with 'browser-support'"}
+        expected['info'][name] = {"text": "OK (allowing 'daemon' with 'browser-support')"}
         self.check_results(report, expected=expected)
 
     def test_check_apparmor_profile_name_length(self):

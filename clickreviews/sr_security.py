@@ -87,7 +87,7 @@ class SnapReviewSecurity(SnapReview):
                     if self.snap_yaml['name'] in \
                             sec_browser_support_overrides:
                         t = 'info'
-                        s = "OK (allowing 'daemon' with 'browser-support'"
+                        s = "OK (allowing 'daemon' with 'browser-support')"
                     else:
                         t = 'warn'
                         s = "(NEEDS REVIEW) 'daemon' should not be used " + \
