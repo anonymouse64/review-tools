@@ -113,16 +113,47 @@ class TestSnapReviewFunctionalNoMock(TestCase):
         c.pkg_bin_files = [fn]
         c.check_execstack()
         report = c.click_report
-        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        expected_counts = {'info': None, 'warn': 1, 'error': 0}
         self.check_results(report, expected_counts)
 
         # with how we mocked, we have the absolute path of the file in the
-        # tmpdir, so verify beginning of error only
-        self.assertTrue('error' in report)
+        # tmpdir, so verify beginning of warn only
+        self.assertTrue('warn' in report)
         name = 'functional-snap-v2:execstack'
-        self.assertTrue(name in report['error'])
-        self.assertTrue('text' in report['error'][name])
-        self.assertTrue(report['error'][name]['text'].startswith("Found files with executable stack"))
+        self.assertTrue(name in report['warn'])
+        self.assertTrue('text' in report['warn'][name])
+        self.assertTrue(report['warn'][name]['text'].startswith("Found files with executable stack"))
+
+    def test_check_execstack_found_binary_devmode(self):
+        '''Test check_execstack() - execstack found execstack binary - devmode'''
+        output_dir = self.mkdtemp()
+        fn = os.path.join(output_dir, "hasexecstack.bin")
+        shutil.copyfile('/bin/ls', fn)
+        # create a /bin/ls with executable stack
+        cmd(['execstack', '--set-execstack', fn])
+
+        yaml = """architectures: [ all ]
+name: test
+version: 1.0
+summary: An application
+description: An application
+confinement: devmode
+"""
+        package = utils.make_snap2(output_dir=output_dir, yaml=yaml)
+        c = SnapReviewFunctional(package)
+        c.pkg_bin_files = [fn]
+        c.check_execstack()
+        report = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(report, expected_counts)
+
+        # with how we mocked, we have the absolute path of the file in the
+        # tmpdir, so verify beginning of info only
+        self.assertTrue('info' in report)
+        name = 'functional-snap-v2:execstack'
+        self.assertTrue(name in report['info'])
+        self.assertTrue('text' in report['info'][name])
+        self.assertTrue(report['info'][name]['text'].startswith("Found files with executable stack"))
 
     def test_check_execstack_os(self):
         '''Test check_execstack() - os snap'''

@@ -60,8 +60,14 @@ class SnapReviewFunctional(SnapReview):
                 bins.append(os.path.relpath(i, self.unpack_dir))
 
         if len(bins) > 0:
-            t = 'error'
+            t = 'warn'
             s = "Found files with executable stack. This adds PROT_EXEC to mmap(2) during mediation which may cause security denials. Either adjust your program to not require an executable stack or strip it with 'execstack --clear-execstack ...'. Affected files: %s" % ", ".join(bins)
-            link = 'https://forum.snapcraft.io/t/file-mmap-of-dev-zero-is-currently-blocked/1426/21'
+            link = 'https://forum.snapcraft.io/t/snap-and-executable-stacks/1812'
+
+        # Only warn for strict mode snaps, since they are the ones that will
+        # break
+        if 'confinement' in self.snap_yaml and \
+                self.snap_yaml['confinement'] != 'strict':
+            t = 'info'
 
         self._add_result(t, n, s, link=link)
