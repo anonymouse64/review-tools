@@ -155,6 +155,34 @@ confinement: devmode
         self.assertTrue('text' in report['info'][name])
         self.assertTrue(report['info'][name]['text'].startswith("Found files with executable stack"))
 
+    def test_check_execstack_found_binary_override(self):
+        '''Test check_execstack() - execstack found execstack binary - override'''
+        output_dir = self.mkdtemp()
+        fn = os.path.join(output_dir, "hasexecstack.bin")
+        shutil.copyfile('/bin/ls', fn)
+        # create a /bin/ls with executable stack
+        cmd(['execstack', '--set-execstack', fn])
+
+        package = utils.make_snap2(output_dir=output_dir)
+        c = SnapReviewFunctional(package)
+        c.pkg_bin_files = [fn]
+
+        # update overrides for our snap
+        from clickreviews.overrides import func_execstack_overrides
+        func_execstack_overrides.append("test")
+        c.check_execstack()
+        report = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(report, expected_counts)
+
+        # with how we mocked, we have the absolute path of the file in the
+        # tmpdir, so verify beginning of info only
+        self.assertTrue('info' in report)
+        name = 'functional-snap-v2:execstack'
+        self.assertTrue(name in report['info'])
+        self.assertTrue('text' in report['info'][name])
+        self.assertTrue(report['info'][name]['text'].startswith("OK (allowing files with executable stack:"))
+
     def test_check_execstack_os(self):
         '''Test check_execstack() - os snap'''
         output_dir = self.mkdtemp()

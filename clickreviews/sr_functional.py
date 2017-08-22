@@ -21,6 +21,9 @@ from clickreviews.sr_common import (
 from clickreviews.common import (
     cmd,
 )
+from clickreviews.overrides import (
+    func_execstack_overrides,
+)
 import os
 
 
@@ -60,14 +63,18 @@ class SnapReviewFunctional(SnapReview):
                 bins.append(os.path.relpath(i, self.unpack_dir))
 
         if len(bins) > 0:
-            t = 'warn'
-            s = "Found files with executable stack. This adds PROT_EXEC to mmap(2) during mediation which may cause security denials. Either adjust your program to not require an executable stack or strip it with 'execstack --clear-execstack ...'. Affected files: %s" % ", ".join(bins)
-            link = 'https://forum.snapcraft.io/t/snap-and-executable-stacks/1812'
-
-        # Only warn for strict mode snaps, since they are the ones that will
-        # break
-        if 'confinement' in self.snap_yaml and \
-                self.snap_yaml['confinement'] != 'strict':
-            t = 'info'
+            if self.snap_yaml['name'] in func_execstack_overrides:
+                t = 'info'
+                s = 'OK (allowing files with executable stack: %s)' % \
+                    ", ".join(bins)
+            else:
+                t = 'warn'
+                # Only warn for strict mode snaps, since they are the ones that
+                # will break
+                if 'confinement' in self.snap_yaml and \
+                        self.snap_yaml['confinement'] != 'strict':
+                    t = 'info'
+                s = "Found files with executable stack. This adds PROT_EXEC to mmap(2) during mediation which may cause security denials. Either adjust your program to not require an executable stack or strip it with 'execstack --clear-execstack ...'. Affected files: %s" % ", ".join(bins)
+                link = 'https://forum.snapcraft.io/t/snap-and-executable-stacks/1812'
 
         self._add_result(t, n, s, link=link)

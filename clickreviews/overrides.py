@@ -200,3 +200,7 @@ sec_mode_overrides = {
 # grants more privileges than intended.
 sec_browser_support_overrides = ['screencloudplayer',
                                  'webdemo']
+
+# Snaps that have legitimate need for executable stack but otherwise work fine
+# in strict mode
+func_execstack_overrides = []
