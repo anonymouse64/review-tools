@@ -484,7 +484,7 @@ def _unpack_snap_squashfs(snap_pkg, dest):
     '''Unpack a squashfs based snap package to dest'''
     size = _calculate_snap_unsquashfs_uncompressed_size(snap_pkg)
 
-    max = 20 * 1024 * 1024 * 1024  # arbitrary upper limit of 20G
+    max = 25 * 1024 * 1024 * 1024  # arbitrary upper limit of 25G
 
     st = os.statvfs(snap_pkg)
     avail = st.f_bsize * st.f_bavail * .9  # 90% of available space
