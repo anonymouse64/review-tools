@@ -1,6 +1,6 @@
 '''common.py: common classes and functions'''
 #
-# Copyright (C) 2013-2016 Canonical Ltd.
+# Copyright (C) 2013-2017 Canonical Ltd.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 from __future__ import print_function
 import atexit
 import codecs
+import glob
 import inspect
 import json
 import logging
@@ -27,6 +28,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import types
 
 
@@ -34,6 +36,8 @@ DEBUGGING = False
 UNPACK_DIR = None
 RAW_UNPACK_DIR = None
 TMP_DIR = None
+MKDTEMP_PREFIX = "review-tools-"
+MKDTEMP_DIR = None
 VALID_SYSCALL = r'^[a-z0-9_]{2,64}$'
 # This needs to match up with snapcraft
 MKSQUASHFS_OPTS = ['-noappend', '-comp', 'xz', '-all-root', '-no-xattrs']
@@ -67,6 +71,21 @@ def cleanup_unpack():
     if TMP_DIR is not None and os.path.isdir(TMP_DIR):
         recursive_rm(TMP_DIR)
         TMP_DIR = None
+
+    # Also cleanup any stale review directories
+    global MKDTEMP_PREFIX
+    global MKDTEMP_DIR
+    tmpdir = tempfile.gettempdir()
+    maxage = 60 * 60 * 3  # remove stale review directories older than 3 hours
+    maxage = 10
+    if MKDTEMP_DIR is not None:
+        tmpdir = MKDTEMP_DIR
+    for d in glob.glob("%s/%s*" % (tmpdir, MKDTEMP_PREFIX)):
+        if not os.path.isdir(d):
+            continue
+        if time.time() - os.path.getmtime(d) > maxage:
+            msg("Removing old review '%s'" % d)
+            recursive_rm(os.path.join(d))
 
 
 atexit.register(cleanup_unpack)
@@ -107,6 +126,11 @@ class Review(object):
             self.stage_report[r] = dict()
 
         self.click_report_output = "json"
+
+        global MKDTEMP_DIR
+        if MKDTEMP_DIR is None and 'SNAP_USER_COMMON' in os.environ and \
+                os.path.exists(os.environ['SNAP_USER_COMMON']):
+            MKDTEMP_DIR = os.environ['SNAP_USER_COMMON']
 
         global UNPACK_DIR
         if UNPACK_DIR is None:
@@ -471,13 +495,17 @@ def _unpack_snap_squashfs(snap_pkg, dest):
         error("uncompressed snap is too large for available space (%dM > %dM)" %
               (size / 1024 / 1024, avail / 1024 / 1024))
 
-    d = tempfile.mkdtemp(prefix='review-')
+    global MKDTEMP_PREFIX
+    global MKDTEMP_DIR
+    d = tempfile.mkdtemp(prefix=MKDTEMP_PREFIX, dir=MKDTEMP_DIR)
     return _unpack_cmd(['unsquashfs', '-f', '-d', d,
                         os.path.abspath(snap_pkg)], d, dest)
 
 
 def _unpack_click_deb(pkg, dest):
-    d = tempfile.mkdtemp(prefix='review-')
+    global MKDTEMP_PREFIX
+    global MKDTEMP_DIR
+    d = tempfile.mkdtemp(prefix=MKDTEMP_PREFIX, dir=MKDTEMP_DIR)
     return _unpack_cmd(['dpkg-deb', '-R',
                         os.path.abspath(pkg), d], d, dest)
 
@@ -521,7 +549,9 @@ def raw_unpack_pkg(fn, dest=None):
     if dest is not None and os.path.exists(dest):
         error("'%s' exists. Aborting." % dest)
 
-    d = tempfile.mkdtemp(prefix='review-')
+    global MKDTEMP_PREFIX
+    global MKDTEMP_DIR
+    d = tempfile.mkdtemp(prefix=MKDTEMP_PREFIX, dir=MKDTEMP_DIR)
 
     curdir = os.getcwd()
     os.chdir(d)
@@ -544,8 +574,10 @@ def raw_unpack_pkg(fn, dest=None):
 def create_tempdir():
     '''Create/reuse a temporary directory that is automatically cleaned up'''
     global TMP_DIR
+    global MKDTEMP_PREFIX
+    global MKDTEMP_DIR
     if TMP_DIR is None:
-        TMP_DIR = tempfile.mkdtemp(prefix='review-')
+        TMP_DIR = tempfile.mkdtemp(prefix=MKDTEMP_PREFIX, dir=MKDTEMP_DIR)
     return TMP_DIR
 
 
