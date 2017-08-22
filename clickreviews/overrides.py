@@ -204,3 +204,22 @@ sec_browser_support_overrides = ['screencloudplayer',
 # Snaps that have legitimate need for executable stack but otherwise work fine
 # in strict mode
 func_execstack_overrides = []
+
+# Some files from staged packages are known to have execstack, so don't flag
+# snaps with these since they may have incidentally included them. IMPORTANT:
+# some files in the archive have execstack but should have it stripped, so
+# don't include those here.
+func_execstack_skipped_pats = ['boot/.*',
+                               'lib/klibc.*',
+                               'usr/bin/.*-mingw.*-gnat.*',
+                               'usr/bin/gnat.*',
+                               'usr/bin/.*gnat.*-[0-9]$',
+                               'usr/bin/grub.*',
+                               'usr/lib/debug/.*',
+                               'usr/lib/grub/.*',
+                               'usr/lib/libatlas-test/.*',
+                               'usr/.*/libgnat.*',
+                               'usr/lib.*/.*nvidia.*',
+                               'usr/lib/syslinux/modules/.*',
+                               'usr/share/dpdk/test/.*',
+                               ]

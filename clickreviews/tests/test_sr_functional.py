@@ -162,14 +162,13 @@ confinement: devmode
         shutil.copyfile('/bin/ls', fn)
         # create a /bin/ls with executable stack
         cmd(['execstack', '--set-execstack', fn])
-
-        package = utils.make_snap2(output_dir=output_dir)
+        package = utils.make_snap2(name='test-override', output_dir=output_dir)
         c = SnapReviewFunctional(package)
         c.pkg_bin_files = [fn]
 
         # update overrides for our snap
         from clickreviews.overrides import func_execstack_overrides
-        func_execstack_overrides.append("test")
+        func_execstack_overrides.append("test-override")
         c.check_execstack()
         report = c.click_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
@@ -215,3 +214,79 @@ type: os
         report = c.click_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
+
+    def test_check_execstack_binary_skip(self):
+        '''Test check_execstack() - execstack found only skipped execstack
+           binaries'''
+        test_files = ['boot/memtest86+_multiboot.bin',
+                      'lib/klibc-T5LXP1hTwH_ezt-1EUSxPbNR_es.so',
+                      'usr/alpha-linux-gnu/lib/libgnatprj.so.6',
+                      'usr/bin/aarch64-linux-gnu-gnatmake-5',
+                      'usr/bin/gnatcheck',
+                      'usr/bin/grub-emu',
+                      'usr/bin/i686-w64-mingw32-gnatclean-posix',
+                      'usr/lib/debug/usr/bin/iac',
+                      'usr/lib/grub/i386-coreboot/kernel.exec',
+                      'usr/lib/i386-linux-gnu/libgnatprj.so.6',
+                      'usr/lib/klibc/bin/cat',
+                      'usr/lib/libatlas-test/xcblat1',
+                      'usr/lib/nvidia-340/bin/nvidia-cuda-mps-control',
+                      'usr/lib/syslinux/modules/bios/gfxboot.c32',
+                      'usr/share/dpdk/test/test',
+                      ]
+        output_dir = self.mkdtemp()
+
+        pkg_bin_files = []
+        for f in test_files:
+            dir = os.path.join(output_dir, os.path.dirname(f))
+            if not os.path.exists(dir):
+                os.makedirs(dir, 0o0755)
+            fn = os.path.join(output_dir, f)
+            shutil.copyfile('/bin/ls', fn)
+            # create a /bin/ls with executable stack
+            cmd(['execstack', '--set-execstack', fn])
+            pkg_bin_files.append(fn)
+
+        package = utils.make_snap2(output_dir=output_dir)
+        c = SnapReviewFunctional(package)
+        c.pkg_bin_files = pkg_bin_files
+        c.check_execstack()
+        report = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(report, expected_counts)
+
+    def test_check_execstack_found_with_binary_skip(self):
+        '''Test check_execstack() - execstack found skipped execstack binary'''
+        test_files = ['hasexecstack.bin',
+                      'usr/lib/klibc/bin/cat',
+                      ]
+        output_dir = self.mkdtemp()
+
+        pkg_bin_files = []
+        for f in test_files:
+            dir = os.path.join(output_dir, os.path.dirname(f))
+            if not os.path.exists(dir):
+                os.makedirs(dir, 0o0755)
+            fn = os.path.join(output_dir, f)
+            shutil.copyfile('/bin/ls', fn)
+            # create a /bin/ls with executable stack
+            cmd(['execstack', '--set-execstack', fn])
+            pkg_bin_files.append(fn)
+
+        package = utils.make_snap2(output_dir=output_dir)
+        c = SnapReviewFunctional(package)
+        c.pkg_bin_files = pkg_bin_files
+        c.check_execstack()
+        report = c.click_report
+        expected_counts = {'info': None, 'warn': 1, 'error': 0}
+        self.check_results(report, expected_counts)
+
+        # with how we mocked, we have the absolute path of the file in the
+        # tmpdir, so verify beginning of warn only
+        self.assertTrue('warn' in report)
+        name = 'functional-snap-v2:execstack'
+        self.assertTrue(name in report['warn'])
+        self.assertTrue('text' in report['warn'][name])
+        self.assertTrue(report['warn'][name]['text'].startswith("Found files with executable stack"))
+        self.assertTrue('hasexecstack.bin' in report['warn'][name]['text'])
+        self.assertTrue('klibc' not in report['warn'][name]['text'])

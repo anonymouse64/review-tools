@@ -23,8 +23,10 @@ from clickreviews.common import (
 )
 from clickreviews.overrides import (
     func_execstack_overrides,
+    func_execstack_skipped_pats,
 )
 import os
+import re
 
 
 class SnapReviewFunctional(SnapReview):
@@ -52,14 +54,24 @@ class SnapReviewFunctional(SnapReview):
                 return True
             return False
 
+        def in_patterns(pats, f):
+            for pat in pats:
+                if pat.search(f):
+                    return True
+            return False
+
         t = 'info'
         n = self._get_check_name('execstack')
         s = "OK"
         link = None
         bins = []
 
+        skipped_pats = []
+        for p in func_execstack_skipped_pats:
+            skipped_pats.append(re.compile(r'%s' % p))
+
         for i in self.pkg_bin_files:
-            if has_execstack(i):
+            if has_execstack(i) and not in_patterns(skipped_pats, i):
                 bins.append(os.path.relpath(i, self.unpack_dir))
 
         if len(bins) > 0:
@@ -74,7 +86,7 @@ class SnapReviewFunctional(SnapReview):
                 if 'confinement' in self.snap_yaml and \
                         self.snap_yaml['confinement'] != 'strict':
                     t = 'info'
-                s = "Found files with executable stack. This adds PROT_EXEC to mmap(2) during mediation which may cause security denials. Either adjust your program to not require an executable stack or strip it with 'execstack --clear-execstack ...'. Affected files: %s" % ", ".join(bins)
+                s = "Found files with executable stack. This adds PROT_EXEC to mmap(2) during mediation which may cause security denials. Either adjust your program to not require an executable stack, strip it with 'execstack --clear-execstack ...' or remove the affected file from your snap. Affected files: %s" % ", ".join(bins)
                 link = 'https://forum.snapcraft.io/t/snap-and-executable-stacks/1812'
 
         self._add_result(t, n, s, link=link)

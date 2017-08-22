@@ -61,6 +61,7 @@ framework:policy|
 framework:policy_metadata|
 framework:policy_unknown|
 framework:policy_valid_name|
+functional-snap-v2:execstack|https://forum.snapcraft.io/t/snap-and-executable-stacks/1812
 lint:architecture_specified_needed|
 lint:click_local_extensions|
 lint:control_architecture_match|
