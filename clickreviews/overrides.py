@@ -67,6 +67,7 @@ redflagged_snap_types_overrides = {
                'hikey-snappy-gadget',
                'hummingboard',
                'joule',
+               'nanopi-air',
                'nanopi-neo',
                'nxp-ls1043ardb-gadget',
                'odroid-xu4',
