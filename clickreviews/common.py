@@ -438,8 +438,39 @@ def _unpack_cmd(cmd_args, d, dest):
     return dest
 
 
+def _calculate_snap_unsquashfs_uncompressed_size(snap_pkg):
+    '''Calculate size of the uncompressed snap'''
+    (rc, out) = cmd(['unsquashfs', '-lls', snap_pkg])
+    if rc != 0:
+        error("unsquashfs -lls '%s' failed: %s" % (snap_pkg, out))
+
+    size = 0
+    for line in out.splitlines():
+        if not line.startswith('-'):  # skip non-regular files
+            continue
+        try:
+            size += int(line.split()[2])
+        except ValueError:  # skip non-numbers
+            continue
+
+    return size
+
+
 def _unpack_snap_squashfs(snap_pkg, dest):
     '''Unpack a squashfs based snap package to dest'''
+    size = _calculate_snap_unsquashfs_uncompressed_size(snap_pkg)
+
+    max = 21 * 1024 * 1024 * 1024  # arbitrary upper limit
+
+    st = os.statvfs(snap_pkg)
+    avail = st.f_bsize * st.f_bavail * .9  # 90% of available space
+    if size > max:
+        error("uncompressed snap is too large (%dM > %dM)" %
+              (size / 1024 / 1024, max / 1024 / 1024))
+    elif size > avail * .9:
+        error("uncompressed snap is too large for available space (%dM > %dM)" %
+              (size / 1024 / 1024, avail / 1024 / 1024))
+
     d = tempfile.mkdtemp(prefix='review-')
     return _unpack_cmd(['unsquashfs', '-f', '-d', d,
                         os.path.abspath(snap_pkg)], d, dest)

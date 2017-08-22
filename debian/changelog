@@ -20,6 +20,7 @@ click-reviewers-tools (0.47) UNRELEASED; urgency=medium
   * cr_security.py: look for data in $SNAP/data
   * frameworks.py: look for data in $SNAP/data
   * add sr_functional.py for execstack checks
+  * common.py: calculate uncompressed squashfs size and error if too big
 
  -- Jamie Strandboge <jamie@ubuntu.com>  Sat, 19 Aug 2017 07:22:47 -0500
 
