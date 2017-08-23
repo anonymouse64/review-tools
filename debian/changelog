@@ -24,6 +24,7 @@ click-reviewers-tools (0.47) UNRELEASED; urgency=medium
     - calculate uncompressed squashfs size and error if too big
     - use $SNAP_USER_COMMON for tmpdir if it is set
     - clean out stale review directories
+    - adjust recursive_rm() to chmod the directory if receive PermissionError
 
  -- Jamie Strandboge <jamie@ubuntu.com>  Sat, 19 Aug 2017 07:22:47 -0500
 
