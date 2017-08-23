@@ -77,7 +77,6 @@ def cleanup_unpack():
     global MKDTEMP_DIR
     tmpdir = tempfile.gettempdir()
     maxage = 60 * 60 * 3  # remove stale review directories older than 3 hours
-    maxage = 10
     if MKDTEMP_DIR is not None:
         tmpdir = MKDTEMP_DIR
     for d in glob.glob("%s/%s*" % (tmpdir, MKDTEMP_PREFIX)):
@@ -605,10 +604,15 @@ def recursive_rm(dirPath, contents_only=False):
 
     for name in names:
         path = os.path.join(dirPath, name)
-        if os.path.islink(path) or not os.path.isdir(path):
-            os.unlink(path)
+        if os.path.isdir(path):
+            try:
+                recursive_rm(path)
+            except PermissionError:
+                os.chmod(path, 0o0755)
+                recursive_rm(path)
         else:
-            recursive_rm(path)
+            os.unlink(path)
+
     if contents_only is False:
         os.rmdir(dirPath)
 
