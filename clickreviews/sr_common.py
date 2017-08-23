@@ -67,6 +67,7 @@ class SnapReview(Review):
                      'completer',
                      'daemon',
                      'environment',
+                     'reload-command',
                      'stop-command',
                      'stop-timeout',
                      'restart-condition',

@@ -492,6 +492,19 @@ class SnapReviewLint(SnapReview):
 
             self._verify_value_is_file(app, key)
 
+    def check_apps_reload_command(self):
+        '''Check apps - reload-command'''
+        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+            return
+
+        for app in self.snap_yaml['apps']:
+            key = 'reload-command'
+            if key not in self.snap_yaml['apps'][app]:
+                # We check for required elsewhere
+                continue
+
+            self._verify_value_is_file(app, key)
+
     def check_apps_stop_command(self):
         '''Check apps - stop-command'''
         if not self.is_snap2 or 'apps' not in self.snap_yaml:

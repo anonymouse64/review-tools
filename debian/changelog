@@ -10,6 +10,7 @@ click-reviewers-tools (0.47) UNRELEASED; urgency=medium
     - add completer checks
     - update for base snaps
     - update text for classic confinement
+    - add checks for reload-command
   * sr_declarationl.py: improve the browser-support error message
   * sr_common.py:
     - don't traceback if toplevel plugs/slots is not dict
