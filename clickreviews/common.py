@@ -27,6 +27,7 @@ import re
 import shutil
 import subprocess
 import sys
+import syslog
 import tempfile
 import time
 import types
@@ -84,7 +85,15 @@ def cleanup_unpack():
             continue
         if time.time() - os.path.getmtime(d) > maxage:
             debug("Removing old review '%s'" % d)
-            recursive_rm(os.path.join(d))
+            try:
+                recursive_rm(os.path.join(d))
+            except Exception:
+                # Just log that something weird happened
+                syslog.openlog(ident="review-tools",
+                               logoption=syslog.LOG_PID,
+                               facility=syslog.LOG_USER | syslog.LOG_INFO)
+                syslog.syslog("Could not remove '%s'" % d)
+                syslog.closelog()
 
 
 atexit.register(cleanup_unpack)
