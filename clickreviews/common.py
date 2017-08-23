@@ -608,7 +608,7 @@ def recursive_rm(dirPath, contents_only=False):
             try:
                 recursive_rm(path)
             except PermissionError:
-                os.chmod(path, 0o0755)
+                os.chmod(path, 0o0755)  # LP: #1712476
                 recursive_rm(path)
         else:
             os.unlink(path)
