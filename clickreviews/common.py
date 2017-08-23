@@ -83,7 +83,7 @@ def cleanup_unpack():
         if not os.path.isdir(d):
             continue
         if time.time() - os.path.getmtime(d) > maxage:
-            msg("Removing old review '%s'" % d)
+            debug("Removing old review '%s'" % d)
             recursive_rm(os.path.join(d))
 
 
@@ -611,6 +611,7 @@ def recursive_rm(dirPath, contents_only=False):
                 recursive_rm(path)
             except PermissionError:
                 os.chmod(path, 0o0755)  # LP: #1712476
+                recursive_rm(path)
 
     if contents_only is False:
         os.rmdir(dirPath)
