@@ -604,14 +604,13 @@ def recursive_rm(dirPath, contents_only=False):
 
     for name in names:
         path = os.path.join(dirPath, name)
-        if os.path.isdir(path):
+        if os.path.islink(path) or not os.path.isdir(path):
+            os.unlink(path)
+        else:
             try:
                 recursive_rm(path)
             except PermissionError:
                 os.chmod(path, 0o0755)  # LP: #1712476
-                recursive_rm(path)
-        else:
-            os.unlink(path)
 
     if contents_only is False:
         os.rmdir(dirPath)
