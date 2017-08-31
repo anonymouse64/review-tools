@@ -38,6 +38,7 @@ redflagged_snap_types_overrides = {
                'gke-kernel',
                'hummingboard-kernel',
                'joule-linux',
+               'joule-linux-lool',
                'linux-generic-allwinner',
                'mako-kernel',
                'marvell-armada3700-kernel',
