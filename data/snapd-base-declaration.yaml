@@ -71,8 +71,10 @@
     allow-installation:
       slot-snap-type:
         - app
-    deny-connection: true
+        - core
     deny-auto-connection: true
+    deny-connection:
+      on-classic: false
   bool-file:
     allow-installation:
       slot-snap-type:
@@ -137,6 +139,14 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  desktop:
+    allow-installation:
+      slot-snap-type:
+        - core
+  desktop-legacy:
+    allow-installation:
+      slot-snap-type:
+        - core
   docker:
     allow-installation: false
     deny-connection: true
