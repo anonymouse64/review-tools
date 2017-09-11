@@ -12,6 +12,8 @@ click-reviewers-tools (0.47) UNRELEASED; urgency=medium
     - update text for classic confinement
     - add checks for reload-command
     - add preliminary checks for license
+    - show deprecation messages for using aliases in snap.yaml at 'info' level.
+      In the future, we'll change this to 'warn'
   * sr_declarationl.py: improve the browser-support error message
   * sr_common.py:
     - don't traceback if toplevel plugs/slots is not dict
