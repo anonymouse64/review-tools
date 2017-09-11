@@ -3540,6 +3540,14 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': 5, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'lint-snap-v2:aliases_valid:app1'
+        expected['info'][name] = {"text": "DEPRECATED: support for using 'aliases' in the yaml is being removed and will be replaced with snap declarations. Please request a snap declaration via the forum."}
+        self.check_results(r, expected=expected)
+
     def test_check_apps_aliases_empty(self):
         '''Test check_apps_aliases (empty)'''
         apps = {'app1': {'aliases': []}}

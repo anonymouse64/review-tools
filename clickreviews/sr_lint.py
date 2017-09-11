@@ -1437,13 +1437,23 @@ class SnapReviewLint(SnapReview):
             t = 'info'
             n = self._get_check_name('aliases_valid', app=app)
             s = 'OK'
+            link = None
             if not isinstance(aliases, list):
                 t = 'error'
                 s = "invalid aliases: %s (not a list)" % aliases
             elif len(aliases) == 0:
                 t = 'error'
                 s = 'invalid aliases (empty)'
-            self._add_result(t, n, s)
+            else:
+                # aliases are now deprectated:
+                # https://forum.snapcraft.io/t/improving-the-aliases-implementation/18/38
+                t = 'info'  # for now, soon will use WARN
+                s = "DEPRECATED: support for using 'aliases' in the yaml " + \
+                    "is being removed and will be replaced with snap " + \
+                    "declarations. Please request a snap declaration via " + \
+                    "the forum."
+                link = "https://forum.snapcraft.io/t/process-for-reviewing-aliases-auto-connections-and-track-requests/455"
+            self._add_result(t, n, s, link=link)
 
             # from validate.go in snapd
             pat = re.compile(r'^[a-zA-Z0-9][-_.a-zA-Z0-9]*$')
