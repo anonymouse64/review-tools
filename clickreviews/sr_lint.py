@@ -1630,3 +1630,21 @@ class SnapReviewLint(SnapReview):
                             t = 'error'
                             s = "'%s' not allowed with base snaps" % j
                         self._add_result(t, n, s)
+
+    def check_license(self):
+        '''Check license'''
+        if not self.is_snap2 or 'license' not in self.snap_yaml:
+            return
+
+        t = 'info'
+        n = self._get_check_name('license_valid')
+        s = 'OK'
+        if not isinstance(self.snap_yaml['license'], str):
+            t = 'error'
+            s = "malformed 'license': %s (not a string)" % (
+                self.snap_yaml['license'])
+        elif len(self.snap_yaml['license']) == 0:
+            t = 'error'
+            s = "invalid license entry (empty)"
+        # TODO: validateSpdx (from snapd)
+        self._add_result(t, n, s)

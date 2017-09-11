@@ -11,11 +11,13 @@ click-reviewers-tools (0.47) UNRELEASED; urgency=medium
     - update for base snaps
     - update text for classic confinement
     - add checks for reload-command
+    - add preliminary checks for license
   * sr_declarationl.py: improve the browser-support error message
   * sr_common.py:
     - don't traceback if toplevel plugs/slots is not dict
     - add 'completer' (LP: #1689578)
     - look for data in $SNAP/data
+    - add 'license'
   * data/snapd-base-declaration.yaml: update for latest snapd releases
   * sr_security.py: update for base snaps
   * cr_security.py: look for data in $SNAP/data
@@ -27,7 +29,7 @@ click-reviewers-tools (0.47) UNRELEASED; urgency=medium
     - clean out stale review directories
     - adjust recursive_rm() to chmod the directory if receive PermissionError
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Sat, 19 Aug 2017 07:22:47 -0500
+ -- Jamie Strandboge <jamie@ubuntu.com>  Mon, 11 Sep 2017 12:37:36 -0500
 
 click-reviewers-tools (0.46) zesty; urgency=medium
 

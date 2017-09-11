@@ -158,6 +158,7 @@ lint-snap-v2:icon_empty|
 lint-snap-v2:icon_exists|
 lint-snap-v2:icon_present|
 lint-snap-v2:iffy_files|
+lint-snap-v2:license_valid|
 lint-snap-v2:listen-stream|
 lint-snap-v2:listen-stream_matches_name|
 lint-snap-v2:meta_gui_desktop|
@@ -172,6 +173,7 @@ lint-snap-v2:ports_int1_format|
 lint-snap-v2:ports_unknown_key|
 lint-snap-v2:ports_unknown_subkey|
 lint-snap-v2:post-stop-command|
+lint-snap-v2:reload-command|
 lint-snap-v2:restart-condition|
 lint-snap-v2:slots|
 lint-snap-v2:slots_attributes|
