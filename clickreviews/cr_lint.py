@@ -324,6 +324,12 @@ class ClickReviewLint(ClickReview):
         except Exception:
             s = "SKIPPED (could not import apt_pkg)"
             self._add_result(t, n, s)
+
+            # for blackbox tests
+            t = 'info'
+            n = self._get_check_name('control_installed_size')
+            s = "SKIPPED (could not import apt_pkg)"
+            self._add_result(t, n, s)
             return
 
         if apt_pkg.version_compare(
