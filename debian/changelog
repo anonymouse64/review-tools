@@ -30,6 +30,7 @@ click-reviewers-tools (0.47) UNRELEASED; urgency=medium
     - use $SNAP_USER_COMMON for tmpdir if it is set
     - clean out stale review directories
     - adjust recursive_rm() to chmod the directory if receive PermissionError
+    - adjust to output json for errors
 
  -- Jamie Strandboge <jamie@ubuntu.com>  Mon, 11 Sep 2017 12:37:36 -0500
 
