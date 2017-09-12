@@ -114,7 +114,7 @@ lint:snappy_type_redflag|https://developer.ubuntu.com/en/snappy/guides/framework
 lint:snappy_type_valid|
 lint:snappy_unknown|
 lint:snappy_version_valid|
-lint-snap-v2:aliases_valid|
+lint-snap-v2:aliases_valid|https://forum.snapcraft.io/t/process-for-reviewing-aliases-auto-connections-and-track-requests/455
 lint-snap-v2:alias_valid|
 lint-snap-v2:app_plugs|
 lint-snap-v2:app_plugs_plug_reference|

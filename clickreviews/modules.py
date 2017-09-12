@@ -63,11 +63,11 @@ def find_main_class(module_name):
     return init_object
 
 
-def init_main_class(module_name, click_file, overrides=None):
+def init_main_class(module_name, click_file, overrides=None, report_type=None):
     '''
     This function will instantiate the main Click*Review
     class of a given module and instantiate it with the
-    location of the .click file we want to inspect.
+    location of the file we want to inspect.
     '''
 
     init_object = find_main_class(module_name)
@@ -75,6 +75,8 @@ def init_main_class(module_name, click_file, overrides=None):
         return None
     try:
         ob = init_object(click_file, overrides)
+        # set the report_type separately since it is in the common class
+        ob.set_report_type(report_type)
     except TypeError as e:
         print('Could not init %s: %s' % (init_object, str(e)))
         raise

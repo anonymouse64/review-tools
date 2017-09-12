@@ -34,6 +34,8 @@ import types
 
 
 DEBUGGING = False
+REPORT_OUTPUT = "json"
+RESULT_TYPES = ['info', 'warn', 'error']
 UNPACK_DIR = None
 RAW_UNPACK_DIR = None
 TMP_DIR = None
@@ -128,12 +130,10 @@ class Review(object):
         self.click_report = dict()
         self.stage_report = dict()
 
-        self.result_types = ['info', 'warn', 'error']
-        for r in self.result_types:
+        global RESULT_TYPES
+        for r in RESULT_TYPES:
             self.click_report[r] = dict()
             self.stage_report[r] = dict()
-
-        self.click_report_output = "json"
 
         global MKDTEMP_DIR
         if MKDTEMP_DIR is None and 'SNAP_USER_COMMON' in os.environ and \
@@ -185,6 +185,11 @@ class Review(object):
         self.overrides = overrides if overrides is not None else {}
 
         self.override_result_type = None
+
+    def set_report_type(self, t):
+        global REPORT_OUTPUT
+        if t is not None and t in ["console", "json"]:
+            REPORT_OUTPUT = t
 
     def _check_innerpath_executable(self, fn):
         '''Check that the provided path exists and is executable'''
@@ -290,17 +295,18 @@ class Review(object):
                     manual_review=False, override_result_type=None,
                     stage=False):
         '''Add result to report'''
+        global RESULT_TYPES
         if stage:
             report = self.stage_report
         else:
             report = self.click_report
 
-        if result_type not in self.result_types:
+        if result_type not in RESULT_TYPES:
             error("Invalid result type '%s'" % result_type)
 
         prefix = ""
         if override_result_type is not None:
-            if override_result_type not in self.result_types:
+            if override_result_type not in RESULT_TYPES:
                 error("Invalid override result type '%s'" %
                       override_result_type)
             prefix = "[%s] " % result_type.upper()
@@ -326,8 +332,9 @@ class Review(object):
 
     def _apply_staged_results(self):
         '''Merge the staged report into the main report'''
+        global RESULT_TYPES
         for result_type in self.stage_report:
-            if result_type not in self.result_types:
+            if result_type not in RESULT_TYPES:
                 error("Invalid result type '%s'" % result_type)
 
             for review_name in self.stage_report[result_type]:
@@ -339,18 +346,16 @@ class Review(object):
             # reset the staged report
             self.stage_report[result_type] = dict()
 
+    # Only called by ./bin/* individually, not 'click-review'
     def do_report(self):
         '''Print report'''
-        if self.click_report_output == "console":
-            # TODO: format better
+        global REPORT_OUTPUT
+
+        if REPORT_OUTPUT == "json":
+            jsonmsg(self.click_report)
+        else:
             import pprint
             pprint.pprint(self.click_report)
-        elif self.click_report_output == "json":
-            import json
-            msg(json.dumps(self.click_report,
-                           sort_keys=True,
-                           indent=2,
-                           separators=(',', ': ')))
 
         rc = 0
         if len(self.click_report['error']):
@@ -381,8 +386,21 @@ class Review(object):
 
 def error(out, exit_code=1, do_exit=True):
     '''Print error message and exit'''
+    global REPORT_OUTPUT
+    global RESULT_TYPES
+
     try:
-        print("ERROR: %s" % (out), file=sys.stderr)
+        if REPORT_OUTPUT == "json":
+            # mock up regular output, but only but the error in there
+            report = dict()
+            for r in RESULT_TYPES:
+                report[r] = dict()
+            report['error']['name'] = "RUNTIME ERROR"
+            report['error']['text'] = out
+
+            jsonmsg(report)
+        else:
+            print("ERROR: %s" % (out), file=sys.stderr)
     except IOError:
         pass
 
@@ -414,6 +432,14 @@ def debug(out):
             print("DEBUG: %s" % (out), file=sys.stderr)
         except IOError:
             pass
+
+
+def jsonmsg(out):
+    '''Format out as json'''
+    msg(json.dumps(out,
+                   sort_keys=True,
+                   indent=2,
+                   separators=(',', ': ')))
 
 
 def cmd(command):

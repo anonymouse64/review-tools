@@ -86,7 +86,7 @@ class Results(object):
         if output['error'] or output['warn']:
             self.rc = 1
 
-    def _run_module_checks(self, module, overrides):
+    def _run_module_checks(self, module, overrides, report_type):
         # What we are doing here is basically what all the
         # ./bin/click-check-* scripts do as well, so for
         # example something like:
@@ -99,7 +99,8 @@ class Results(object):
         section = section.replace('sr_', 'snap.v2_')
         try:
             review = modules.init_main_class(module, self.pkg_fn,
-                                             overrides=overrides)
+                                             overrides=overrides,
+                                             report_type=report_type)
 
             if review:
                 review.do_checks()
@@ -112,14 +113,23 @@ class Results(object):
         return None
 
     def run_all_checks(self, overrides):
+        report_type = None
+
         if self.args.sdk:
             for module in self.modules:
-                section = self._run_module_checks(module, overrides)
+                section = self._run_module_checks(module,
+                                                  overrides,
+                                                  report_type)
                 if section:
                     self._report_module(section)
         else:
+            # put runtime errors in json if --json is specified, otherwise
+            # output to console
+            report_type = "console"
+            if self.args.json:
+                report_type = "json"
             for module in self.modules:
-                self._run_module_checks(module, overrides)
+                self._run_module_checks(module, overrides, report_type)
             self._complete_report()
 
 
@@ -159,7 +169,7 @@ def main():
     args = parser.parse_args()
 
     if not os.path.exists(args.filename):
-        print(".click file '%s' does not exist." % args.filename)
+        print("file '%s' does not exist." % args.filename)
         sys.exit(1)
 
     results = Results(args)
