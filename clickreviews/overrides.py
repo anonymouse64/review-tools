@@ -102,7 +102,8 @@ redflagged_snap_types_overrides = {
 # List of snaps that may specify an interface that requires a desktop file but
 # not supply a desktop file itself.
 desktop_file_exception = ['ffscreencast',
-                          'pulsemixer',]
+                          'pulsemixer',
+                          ]
 
 #
 # sr_security.py overrides
