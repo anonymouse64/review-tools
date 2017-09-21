@@ -35,6 +35,7 @@ redflagged_snap_types_overrides = {
                'pi2-kernel',
                'aws-kernel',  # @canonical.com kernels
                'freescale-ls1043a-kernel',
+               'gcp-kernel',
                'gke-kernel',
                'hummingboard-kernel',
                'joule-linux',
