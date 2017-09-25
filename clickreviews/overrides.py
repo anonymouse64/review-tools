@@ -154,7 +154,7 @@ sec_mode_overrides = {
         './opt/google/chrome/chrome-sandbox': 'rwsr-xr-x',
     },
     'chromium': {  # chromium from Canonical
-        './usr/lib/chromium-browser/chrome-sandbox': 'rwsr-xr-x',
+        './usr/lib/chromium-browser/chrome-sandbox': 'r-sr-xr-x',
     },
     'openwrt': {  # demo from Canonical
         './rootfs/tmp': 'rwxrwxrwt',
