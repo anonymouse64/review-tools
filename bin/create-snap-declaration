@@ -9,6 +9,7 @@ import sys
 import clickreviews.snapd_base_declaration as snapd_base_declaration
 
 decl = {}
+printed_review_header = False
 
 # If local_copy is None, then this will check the server to see if
 # we are up to date. However, if we are working within the development
@@ -102,6 +103,29 @@ def add_interface(side, iface, key, value):
         raise Exception("'%s' already specified for '%s'" % (key, iface))
 
 
+# FIXME: we should be able to handle interface attributes directly
+def add_interface_dbus(name):
+    side = 'slots'
+    if side not in decl:
+        decl[side] = {}
+
+    iface = 'dbus'
+    if iface not in decl[side]:
+        decl[side][iface] = {}
+
+    key = 'deny-auto-connection'
+    if key not in decl[side][iface]:
+        decl[side][iface][key] = bool2str(True)
+    else:
+        raise Exception("'%s' already specified for '%s'" % (key, iface))
+
+    key = 'allow-connection'
+    if key not in decl[side][iface]:
+        decl[side][iface][key] = {'slot-attributes': {'name': name}}
+    else:
+        raise Exception("'%s' already specified for '%s'" % (key, iface))
+
+
 def add_missing():
     for side in ["slots", "plugs"]:
         if side not in decl:
@@ -111,6 +135,10 @@ def add_missing():
 
         for iface in decl[side]:
             if iface not in base_decl[side]:
+                continue
+
+            # TODO: properly support interface attributes
+            if iface == "dbus":
                 continue
 
             # TODO: support alternate constraints
@@ -139,9 +167,9 @@ def print_decl():
     def _print_key(key):
         print(json.dumps(decl[key], sort_keys=True, indent=2))
     if "slots" in decl:
-        print("slots:")
+        print("Paste into slots:")
         _print_key("slots")
-    if "plugs" in decl:
+    if "Paste into plugs" in decl:
         print("plugs:")
         _print_key("plugs")
     if "auto-aliases" in decl:
@@ -160,6 +188,32 @@ def print_decl():
         _print_key("refresh-control")
 
 
+def print_review_text():
+    def _print_header():
+        global printed_review_header
+        if not printed_review_header:
+            printed_review_header = True
+            print("\nReview text to paste:")
+
+    for side in ["slots", "plugs"]:
+        if side not in decl:
+            continue
+
+        for iface in decl[side]:
+            for const in decl[side][iface]:
+                key = "%s-attributes" % side[0:-1]
+                if key in decl[side][iface][const]:
+                    for attr in decl[side][iface][const][key]:
+                        # dbus
+                        if side == 'slots' and \
+                                iface == 'dbus' and \
+                                const == 'allow-connection' and \
+                                key == 'slot-attributes' and \
+                                attr == 'name':
+                            _print_header()
+                            print("Granting use of the well-known DBus name '%s' to this snap.\n" % decl[side][iface][const][key][attr])
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog='create-snap-declaration',
@@ -169,6 +223,8 @@ def main():
                         help='list of interfaces to allow installation')
     parser.add_argument('--slot-connection', type=str,
                         help='list of interfaces to allow connection')
+    parser.add_argument('--slot-dbus-connection', type=str,
+                        help='well-known DBus name to allow')
     parser.add_argument('--slot-auto-connection', type=str,
                         help='list of interfaces to allow auto-connection')
     parser.add_argument('--plug-installation', type=str,
@@ -216,9 +272,15 @@ def main():
         for i in args.refresh_control.split(','):
             add_refresh_control(i)
 
+    if args.slot_dbus_connection:
+        add_interface_dbus(args.slot_dbus_connection)
+
     add_missing()
 
     print_decl()
+
+    print_review_text()
+
 
 if __name__ == '__main__':
     try:
