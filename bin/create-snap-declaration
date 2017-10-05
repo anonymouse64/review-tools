@@ -169,8 +169,8 @@ def print_decl():
     if "slots" in decl:
         print("Paste into slots:")
         _print_key("slots")
-    if "Paste into plugs" in decl:
-        print("plugs:")
+    if "plugs" in decl:
+        print("Paste into plugs:")
         _print_key("plugs")
     if "auto-aliases" in decl:
         print("aliases (v2):")
