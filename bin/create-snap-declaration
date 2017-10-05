@@ -104,8 +104,7 @@ def add_interface(side, iface, key, value):
 
 
 # FIXME: we should be able to handle interface attributes directly
-def add_interface_dbus(name):
-    side = 'slots'
+def add_interface_dbus(side, name):
     if side not in decl:
         decl[side] = {}
 
@@ -113,17 +112,33 @@ def add_interface_dbus(name):
     if iface not in decl[side]:
         decl[side][iface] = {}
 
-    key = 'deny-auto-connection'
-    if key not in decl[side][iface]:
-        decl[side][iface][key] = bool2str(True)
-    else:
-        raise Exception("'%s' already specified for '%s'" % (key, iface))
+    if side == 'slots':
+        key = 'deny-auto-connection'
+        if key not in decl[side][iface]:
+            decl[side][iface][key] = bool2str(True)
+        else:
+            raise Exception("'%s' already specified for '%s'" % (key, iface))
 
-    key = 'allow-connection'
-    if key not in decl[side][iface]:
-        decl[side][iface][key] = {'slot-attributes': {'name': name}}
-    else:
-        raise Exception("'%s' already specified for '%s'" % (key, iface))
+        key = 'allow-connection'
+        if key not in decl[side][iface]:
+            decl[side][iface][key] = {'slot-attributes': {'name': name}}
+        else:
+            raise Exception("'%s' already specified for '%s'" % (key, iface))
+    elif side == 'plugs':
+        key = 'allow-auto-connection'
+        if key not in decl[side][iface]:
+            decl[side][iface][key] = []
+        else:
+            raise Exception("'%s' already specified for '%s'" % (key, iface))
+
+        for c in decl[side][iface][key]:
+            ckey = 'slot-attributes'
+            if ckey in c and 'name' in c[ckey] and name == c[ckey]['name']:
+                raise Exception("'%s' already specified for '%s'" % (ckey, name))
+
+        decl[side][iface][key].append({
+            'slot-attributes': {'name': name},
+            'plug-attributes': {'name': '$SLOT(name)'}})
 
 
 def add_missing():
@@ -225,6 +240,8 @@ def main():
                         help='list of interfaces to allow connection')
     parser.add_argument('--slot-dbus-connection', type=str,
                         help='well-known DBus name to allow')
+    parser.add_argument('--plug-dbus-auto-connection', type=str,
+                        help='well-known DBus name to allow')
     parser.add_argument('--slot-auto-connection', type=str,
                         help='list of interfaces to allow auto-connection')
     parser.add_argument('--plug-installation', type=str,
@@ -273,7 +290,10 @@ def main():
             add_refresh_control(i)
 
     if args.slot_dbus_connection:
-        add_interface_dbus(args.slot_dbus_connection)
+        add_interface_dbus("slots", args.slot_dbus_connection)
+
+    if args.plug_dbus_auto_connection:
+        add_interface_dbus("plugs", args.plug_dbus_auto_connection)
 
     add_missing()
 
