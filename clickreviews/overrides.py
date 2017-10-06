@@ -66,6 +66,7 @@ redflagged_snap_types_overrides = {
                'pi2',
                'pi3',
                'cm3-ondra',  # @canonical.com gadgets
+               'cm3-openhab',
                'hikey-snappy-gadget',
                'hummingboard',
                'joule',
@@ -75,6 +76,7 @@ redflagged_snap_types_overrides = {
                'odroid-xu4',
                'orangepi-zero',
                'pi3-ondra',
+               'pi3-openhab',
                'pi3-unipi',
                'pi2kyle',
                'pi3testbootsplash',
