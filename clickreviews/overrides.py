@@ -98,7 +98,8 @@ redflagged_snap_types_overrides = {
                'telig',
                'tsimx6-gadget',
                ],
-    'base': ['bare',  # Canonical base snaps
+    'base': ['bare',            # Canonical base snaps
+             'test-snapd-base',
              ],
 }
 
