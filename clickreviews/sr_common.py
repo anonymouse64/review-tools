@@ -76,10 +76,7 @@ class SnapReview(Review):
                      'plugs',
                      'slots',
                      'ports',
-                     'socket',
-                     'listen-stream',
-                     'socket-user',
-                     'socket-group',
+                     'sockets',
                      ]
     hooks_required = []
     hooks_optional = ['plugs']

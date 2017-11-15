@@ -14,6 +14,8 @@ click-reviewers-tools (0.47) UNRELEASED; urgency=medium
     - add preliminary checks for license
     - show deprecation messages for using aliases in snap.yaml at 'info' level.
       In the future, we'll change this to 'warn'
+    - remove non-existent 'socket', 'listen-stream', 'socket-user' and
+      'socket-group' for v2 snaps
   * sr_declarationl.py: improve the browser-support error message
   * sr_common.py:
     - don't traceback if toplevel plugs/slots is not dict
