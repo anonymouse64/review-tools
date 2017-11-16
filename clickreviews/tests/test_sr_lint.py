@@ -3316,6 +3316,15 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
+    def test_check_license_invalid(self):
+        '''Test check_license - invalid'''
+        self.set_test_snap_yaml("license", [])
+        c = SnapReviewLint(self.test_name)
+        c.check_license()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
     def test_check_sockets_valid_listen_stream_snap_data(self):
         '''Test check_apps_sockets() - valid listen-stream SNAP_DATA'''
         self.set_test_snap_yaml("apps", {
