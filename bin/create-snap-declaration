@@ -176,6 +176,10 @@ def add_missing():
                           % (cstr, iface))
                     decl[side][iface][cstr_b] = \
                         bool2str(base_decl[side][iface][cstr_b])
+                    if isinstance(decl[side][iface][cstr_b], dict):
+                        for key in decl[side][iface][cstr_b]:
+                            if key.endswith('-snap-type'):
+                                decl[side][iface][cstr_b][key] = ["<ADJUST_TO_SNAP_TYPE_OF_SNAP, eg 'app'>"]
 
 
 def print_decl():
