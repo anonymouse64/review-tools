@@ -3316,6 +3316,353 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
+    def test_check_sockets_valid_listen_stream_snap_data(self):
+        '''Test check_apps_sockets() - valid listen-stream SNAP_DATA'''
+        self.set_test_snap_yaml("apps", {
+            "foo": {
+                "sockets": {
+                    "sock1": {
+                        "listen-stream": "$SNAP_DATA/sock"
+                    }
+                }
+            }
+        })
+
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_sockets()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_sockets_valid_listen_stream_snap_common(self):
+        '''Test check_apps_sockets() - valid listen-stream SNAP_COMMON'''
+        self.set_test_snap_yaml("apps", {
+            "foo": {
+                "sockets": {
+                    "sock1": {
+                        "listen-stream": "$SNAP_COMMON/sock"
+                    }
+                }
+            }
+        })
+
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_sockets()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_sockets_valid_listen_stream_abstract(self):
+        '''Test check_apps_sockets() - valid listen-stream abstract'''
+        self.set_test_snap_yaml("apps", {
+            "foo": {
+                "sockets": {
+                    "sock1": {
+                        "listen-stream": "@snap.foo.bar"
+                    }
+                }
+            }
+        })
+
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_sockets()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_sockets_valid_listen_stream_port(self):
+        '''Test check_apps_sockets() - valid listen-stream port'''
+        self.set_test_snap_yaml("apps", {
+            "foo": {
+                "sockets": {
+                    "sock1": {
+                        "listen-stream": 8080
+                    }
+                }
+            }
+        })
+
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_sockets()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_sockets_valid_listen_stream_port_str(self):
+        '''Test check_apps_sockets() - valid listen-stream port as str'''
+        self.set_test_snap_yaml("apps", {
+            "foo": {
+                "sockets": {
+                    "sock1": {
+                        "listen-stream": "8080"
+                    }
+                }
+            }
+        })
+
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_sockets()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_sockets_invalid_sockname(self):
+        '''Test check_apps_sockets() - bad sockname'''
+        self.set_test_snap_yaml("apps", {
+            "foo": {
+                "sockets": {
+                    "b@d": {
+                        "listen-stream": 8080
+                    }
+                }
+            }
+        })
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_sockets()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_sockets_invalid_listen_stream_typ(self):
+        '''Test check_apps_sockets() - bad listen-stream type'''
+        self.set_test_snap_yaml("apps", {"foo": {"sockets": []}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_sockets()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_sockets_listen_stream_missing(self):
+        '''Test check_apps_sockets() - listen-stream missing'''
+        self.set_test_snap_yaml("apps", {
+            "foo": {
+                "sockets": {
+                    "sock1": {
+                        "socket-mode": "0666"
+                    }
+                }
+            }
+        })
+
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_sockets()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_sockets_invalid_listen_stream_port_str(self):
+        '''Test check_apps_sockets() - invalid listen-stream port as str'''
+        self.set_test_snap_yaml("apps", {
+            "foo": {
+                "sockets": {
+                    "sock1": {
+                        "listen-stream": "bad"
+                    }
+                }
+            }
+        })
+
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_sockets()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_sockets_invalid_listen_stream_port_empty(self):
+        '''Test check_apps_sockets() - invalid listen-stream port empty'''
+        self.set_test_snap_yaml("apps", {
+            "foo": {
+                "sockets": {
+                    "sock1": {
+                        "listen-stream": ""
+                    }
+                }
+            }
+        })
+
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_sockets()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_sockets_invalid_listen_stream_port_range(self):
+        '''Test check_apps_sockets() - invalid listen-stream port range'''
+        self.set_test_snap_yaml("apps", {
+            "foo": {
+                "sockets": {
+                    "sock1": {
+                        "listen-stream": 0
+                    },
+                    "sock2": {
+                        "listen-stream": 65536
+                    }
+                }
+            }
+        })
+
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_sockets()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 2}
+        self.check_results(r, expected_counts)
+
+    def test_check_sockets_invalid_listen_stream_port_type(self):
+        '''Test check_apps_sockets() - invalid listen-stream port type'''
+        self.set_test_snap_yaml("apps", {
+            "foo": {
+                "sockets": {
+                    "sock1": {
+                        "listen-stream": []
+                    }
+                }
+            }
+        })
+
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_sockets()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_sockets_invalid_listen_stream_path_dotdot(self):
+        '''Test check_apps_sockets() - invalid listen-stream path ..'''
+        self.set_test_snap_yaml("apps", {
+            "foo": {
+                "sockets": {
+                    "sock1": {
+                        "listen-stream": "$SNAP_DATA/../sock"
+                    }
+                }
+            }
+        })
+
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_sockets()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_sockets_invalid_listen_stream_path_abspath(self):
+        '''Test check_apps_sockets() - invalid listen-stream abspath'''
+        self.set_test_snap_yaml("apps", {
+            "foo": {
+                "sockets": {
+                    "sock1": {
+                        "listen-stream": "/run/sock"
+                    }
+                }
+            }
+        })
+
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_sockets()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_sockets_invalid_listen_stream_abstract(self):
+        '''Test check_apps_sockets() - invalid listen-stream abstract'''
+        self.set_test_snap_yaml("apps", {
+            "foo": {
+                "sockets": {
+                    "sock1": {
+                        "listen-stream": "@snap.other.bar"
+                    }
+                }
+            }
+        })
+
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_sockets()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_sockets_invalid_socket_mode_type(self):
+        '''Test check_apps_sockets() - listen-stream type'''
+        self.set_test_snap_yaml("apps", {
+            "foo": {
+                "sockets": {
+                    "sock1": {
+                        "listen-stream": "$SNAP_DATA/sock",
+                        "socket-mode": []
+                    }
+                }
+            }
+        })
+
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_sockets()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_sockets_invalid_socket_mode_empty(self):
+        '''Test check_apps_sockets() - socket-mode empty'''
+        self.set_test_snap_yaml("apps", {
+            "foo": {
+                "sockets": {
+                    "sock1": {
+                        "listen-stream": "$SNAP_DATA/sock",
+                        "socket-mode": ""
+                    }
+                }
+            }
+        })
+
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_sockets()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_sockets_invalid_socket_mode_range(self):
+        '''Test check_apps_sockets() - socket-mode range'''
+        self.set_test_snap_yaml("apps", {
+            "foo": {
+                "sockets": {
+                    "sock1": {
+                        "listen-stream": "$SNAP_DATA/sock",
+                        "socket-mode": 0
+                    },
+                    "sock2": {
+                        "listen-stream": "$SNAP_DATA/sock",
+                        "socket-mode": "778"
+                    }
+                }
+            }
+        })
+
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_sockets()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 2}
+        self.check_results(r, expected_counts)
+
+    def test_check_sockets_invalid_socket_mode_not_with_file(self):
+        '''Test check_apps_sockets() - socket-mode not with file'''
+        self.set_test_snap_yaml("apps", {
+            "foo": {
+                "sockets": {
+                    "sock1": {
+                        "listen-stream": "@snap.foo.cmd",
+                        "socket-mode": "666"
+                    },
+                    "sock2": {
+                        "listen-stream": "127.0.0.1:8080",
+                        "socket-mode": "666"
+                    }
+                }
+            }
+        })
+
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_sockets()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 2}
+        self.check_results(r, expected_counts)
+
 
 class TestSnapReviewLintNoMock(TestCase):
     """Tests without mocks where they are not needed."""

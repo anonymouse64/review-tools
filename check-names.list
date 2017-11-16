@@ -178,6 +178,10 @@ lint-snap-v2:slots_attributes|
 lint-snap-v2:slots_required_attributes|
 lint-snap-v2:snap_type_redflag|
 lint-snap-v2:snap_type_valid|
+lint-snap-v2:sockets|
+lint-snap-v2:sockets_listen_stream|
+lint-snap-v2:sockets_socket-mode|
+lint-snap-v2:sockets_type|
 lint-snap-v2:stop-command|
 lint-snap-v2:stop-timeout|
 lint-snap-v2:stop-timeout_range|

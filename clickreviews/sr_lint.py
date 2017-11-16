@@ -1518,3 +1518,125 @@ class SnapReviewLint(SnapReview):
             s = "invalid license entry (empty)"
         # TODO: validateSpdx (from snapd)
         self._add_result(t, n, s)
+
+    def check_apps_sockets(self):
+        '''Check apps - sockets'''
+        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+            return
+
+        for app in self.snap_yaml['apps']:
+            key = 'sockets'
+            if key not in self.snap_yaml['apps'][app]:
+                # We check for required elsewhere
+                continue
+
+            if not isinstance(self.snap_yaml['apps'][app][key], dict):
+                t = 'error'
+                n = self._get_check_name('%s_type' % key, app=app)
+                s = "invalid %s entry: %s (not a dict)" % \
+                    (key, self.snap_yaml['apps'][app][key])
+                self._add_result(t, n, s)
+                continue
+
+            for sockname in self.snap_yaml['apps'][app][key]:
+                t = 'info'
+                n = self._get_check_name(key, app=app, extra=sockname)
+                s = "OK"
+                # see validateSocketName() in snap/validate.go
+                valid = True
+                if not self._verify_pkgname(sockname):
+                    t = 'error'
+                    s = "malformed socket name: '%s' " % sockname + \
+                        "(may be only lower case, digits and hyphens)"
+                    valid = False
+                self._add_result(t, n, s)
+                if not valid:
+                    continue
+
+                # listen-stream
+                # Per snap/validate.go, these are valid:
+                # - $SNAP_DATA/...
+                # - $SNAP_COMMON/...
+                # - @snap.$SNAP_NAME....
+                # - PORT (eg, 8080)
+                # - 127.0.0.1|[::]|[::1]:PORT
+                t = 'info'
+                n = self._get_check_name('%s_listen_stream' % key, app=app,
+                                         extra=sockname)
+                s = "OK"
+
+                if 'listen-stream' not in self.snap_yaml['apps'][app][key][sockname]:
+                    t = 'error'
+                    s = "missing required 'listen-stream'"
+                    self._add_result(t, n, s)
+                    continue
+
+                st_isfile = False
+                st = self.snap_yaml['apps'][app][key][sockname]['listen-stream']
+                port = None
+                try:
+                    port = int(st)
+                except Exception:
+                    pass
+
+                if port is not None:
+                    if port < 1 or port > 65535:
+                        t = 'error'
+                        s = "port '%d' is not within 1-65535" % st
+                elif not isinstance(st, str) or st == "":  # invalid
+                    t = 'error'
+                    s = "malformed listen-stream '%s' should use one of PORT, ADDR:PORT, @abstract-socket, or PATH" % st
+                elif st.startswith("/") or st.startswith("$"):  # file
+                    st_isfile = True
+                    if st != os.path.normpath(st):
+                        t = 'error'
+                        s = "malformed listen-stream '%s' (rewrite as '%s')" % \
+                            (st, os.path.normpath(st))
+                    elif not re.search(r'^\$SNAP_(DATA|COMMON)/.+', st):
+                        t = 'error'
+                        s = "listen-stream '%s' filesystem paths does not start with $SNAP_DATA/... or $SNAP_COMMON/..." % st
+                elif st.startswith("@"):  # abstract
+                    if not st.startswith("@snap.%s." % self.snap_yaml['name']):
+                        t = 'error'
+                        s = "abstract socket '%s' does not start with 'snap.%s.'" % (st, self.snap_yaml['name'])
+                else:  # network
+                    if not re.search(r'^(127\.0\.0\.1|\[::\]|\[::1\]):[0-9]+', st):
+                        t = 'error'
+                        s = "network socket '%s' should use one of: 127.0.0.1:PORT, [::]:PORT, [::1]:PORT" % st
+                self._add_result(t, n, s)
+
+                # socket-mode
+                t = 'info'
+                n = self._get_check_name('%s_socket-mode' % key, app=app,
+                                         extra=sockname)
+                s = "OK"
+                if 'socket-mode' not in self.snap_yaml['apps'][app][key][sockname]:
+                    continue
+
+                sm = self.snap_yaml['apps'][app][key][sockname]['socket-mode']
+
+                if not isinstance(sm, int) and not isinstance(sm, str):
+                    t = 'error'
+                    s = "socket-mode '%s' should be an integer (eg, 0666)" % sm
+                    self._add_result(t, n, s)
+                    continue
+
+                mode = None
+                if isinstance(sm, str):
+                    try:
+                        mode = int(sm, 8)
+                    except Exception:
+                        t = 'error'
+                        s = "socket-mode '%s' should be an integer (eg, 0666)" % sm
+                        self._add_result(t, n, s)
+                        continue
+                else:
+                    mode = sm
+
+                if mode < 0o1 or mode > 0o777:
+                    t = 'error'
+                    s = "socket-mode '%s' must be within 1-777 octal" % format(mode, 'o')
+                elif not st_isfile:
+                    t = 'error'
+                    s = "socket-mode should not be specified with abstract or network sockets"
+                self._add_result(t, n, s)

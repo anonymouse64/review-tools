@@ -16,6 +16,7 @@ click-reviewers-tools (0.47) UNRELEASED; urgency=medium
       In the future, we'll change this to 'warn'
     - remove non-existent 'socket', 'listen-stream', 'socket-user' and
       'socket-group' for v2 snaps
+    - add tests for new socket activation yaml
   * sr_declarationl.py: improve the browser-support error message
   * sr_common.py:
     - don't traceback if toplevel plugs/slots is not dict
@@ -37,7 +38,7 @@ click-reviewers-tools (0.47) UNRELEASED; urgency=medium
     - output review text
     - handle dbus name assignment
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Mon, 11 Sep 2017 12:37:36 -0500
+ -- Jamie Strandboge <jamie@ubuntu.com>  Thu, 16 Nov 2017 08:23:59 -0600
 
 click-reviewers-tools (0.46) zesty; urgency=medium
 
