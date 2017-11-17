@@ -391,12 +391,14 @@ def error(out, exit_code=1, do_exit=True):
 
     try:
         if REPORT_OUTPUT == "json":
-            # mock up regular output, but only but the error in there
+            # mock up regular output, but only put the error in there in the
+            # expected json format
             report = dict()
+            report["runtime-errors"] = dict()
             for r in RESULT_TYPES:
-                report[r] = dict()
-            report['error']['name'] = "RUNTIME ERROR"
-            report['error']['text'] = out
+                report["runtime-errors"][r] = dict()
+            report["runtime-errors"]['error']['name'] = "RUNTIME ERROR"
+            report["runtime-errors"]['error']['text'] = out
 
             jsonmsg(report)
         else:
