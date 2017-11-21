@@ -144,7 +144,6 @@ sec_mode_overrides = {
         './usr/bin/wall': 'rwxr-sr-x',
         './usr/lib/dbus-1.0/dbus-daemon-launch-helper': 'rwsr-xr--',
         './usr/lib/openssh/ssh-keysign': 'rwsr-xr-x',
-        './usr/lib/snapd/snap-confine': 'rwsr-xr-x',
         './usr/lib/snapd/snap-confine': 'rwsr-sr-x',
         './usr/local/lib/python3.5': 'rwxrwsr-x',
         './usr/local/lib/python3.5/dist-packages': 'rwxrwsr-x',
