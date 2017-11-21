@@ -25,6 +25,7 @@ import magic
 import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import syslog
@@ -59,6 +60,12 @@ AA_PROFILE_NAME_MAXLEN = 230  # 245 minus a bit for child profiles
 AA_PROFILE_NAME_ADVLEN = 100
 # Store enforces this length for snap v2
 STORE_PKGNAME_SNAPV2_MAXLEN = 40
+# Per noise: "07:33 < noise> jdstrand: yeah, i think 5GB compressed would be a
+# good/reasonable limit for now
+# https://forum.snapcraft.io/t/max-snap-size-and-getting-software-to-consumers/2913/2
+MAX_COMPRESSED_SIZE = 5
+# 90% of disk but not larger than this
+MAX_UNCOMPRESSED_SIZE = 25
 
 
 def cleanup_unpack():
@@ -520,7 +527,7 @@ def _unpack_snap_squashfs(snap_pkg, dest):
     '''Unpack a squashfs based snap package to dest'''
     size = _calculate_snap_unsquashfs_uncompressed_size(snap_pkg)
 
-    max = 25 * 1024 * 1024 * 1024  # arbitrary upper limit of 25G
+    max = MAX_UNCOMPRESSED_SIZE * 1024 * 1024 * 1024
 
     st = os.statvfs(snap_pkg)
     avail = st.f_bsize * st.f_bavail * .9  # 90% of available space
@@ -556,6 +563,13 @@ def unpack_pkg(fn, dest=None):
 
     if dest is not None and os.path.exists(dest):
         error("'%s' exists. Aborting." % dest)
+
+    # Limit the maximimum size of the package
+    size = os.stat(pkg)[stat.ST_SIZE]
+    max = MAX_COMPRESSED_SIZE * 1024 * 1024 * 1024
+    if size > max:
+        error("compressed file is too large (%dM > %dM)" %
+              (size / 1024 / 1024, max / 1024 / 1024))
 
     # check if its a squashfs based snap
     if is_squashfs(pkg):
