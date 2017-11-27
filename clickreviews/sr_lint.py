@@ -24,7 +24,8 @@ from clickreviews.common import (
 )
 from clickreviews.overrides import (
     redflagged_snap_types_overrides,
-    desktop_file_exception
+    desktop_file_exception,
+    lint_redflagged_base_dep_override,
 )
 import glob
 import os
@@ -1472,6 +1473,20 @@ class SnapReviewLint(SnapReview):
             s = "'base' should not be used with 'type: %s'" % \
                 self.snap_yaml['type']
         self._add_result(t, n, s)
+
+        if isinstance(self.snap_yaml['base'], str) and \
+                self.snap_yaml['base'] in lint_redflagged_base_dep_override:
+            t = 'info'
+            n = self._get_check_name('base_allowed')
+            s = 'OK'
+            manual_review = False
+            if self.snap_yaml['name'] not in \
+                    lint_redflagged_base_dep_override[self.snap_yaml['base']]:
+                t = 'error'
+                s = "(NEEDS REVIEW) not allowed to specify 'base: %s'" % \
+                    self.snap_yaml['base']
+                manual_review = True
+            self._add_result(t, n, s, manual_review=manual_review)
 
     def check_base_interfaces(self):
         '''Check base interfaces'''

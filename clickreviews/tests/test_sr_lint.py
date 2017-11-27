@@ -3672,6 +3672,44 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 2}
         self.check_results(r, expected_counts)
 
+    def test_check_base_allowed(self):
+        '''Test check_base - allowed'''
+        self.set_test_snap_yaml("base", "allowed")
+        c = SnapReviewLint(self.test_name)
+        c.check_base()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_base_redflagged(self):
+        '''Test check_base - redflagged'''
+        self.set_test_snap_yaml("base", "solus-runtime-gaming")
+        c = SnapReviewLint(self.test_name)
+        c.check_base()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+        name = c._get_check_name('base_allowed')
+        self.check_manual_review(r, name)
+
+    def test_check_base_redflagged_whitelisted(self):
+        '''Test check_base - redflagged base, whitelisted app'''
+        self.set_test_snap_yaml("base", "solus-runtime-gaming")
+        self.set_test_snap_yaml("name", "linux-steam-integration")
+        c = SnapReviewLint(self.test_name)
+        c.check_base()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'lint-snap-v2:base_allowed'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
 
 class TestSnapReviewLintNoMock(TestCase):
     """Tests without mocks where they are not needed."""

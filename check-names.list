@@ -128,6 +128,7 @@ lint-snap-v2:apps_unknown|
 lint-snap-v2:architecture_specified_needed|
 lint-snap-v2:architecture_valid|
 lint-snap-v2:assumes_valid|
+lint-snap-v2:base_allowed|
 lint-snap-v2:base_interfaces|
 lint-snap-v2:base_valid|
 lint-snap-v2:command|

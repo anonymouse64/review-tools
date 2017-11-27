@@ -252,3 +252,15 @@ func_execstack_skipped_pats = ['boot/.*',
                                'usr/lib/syslinux/modules/.*',
                                'usr/share/dpdk/test/.*',
                                ]
+
+# By default we don't regulate which snaps specify which base snaps, but some
+# base snaps are highly specialized, so we limit what can use them. Base snaps
+# whose name is not a key in this dict don't flag for review. For base snaps
+# whose name is a key in this dict, snaps not listed in the list for the base
+# snap are flagged for manual review.
+# https://forum.snapcraft.io/t/manual-review-of-base-snaps/2839/9
+lint_redflagged_base_dep_override = {
+    'solus-runtime-gaming': [
+        'linux-steam-integration',
+    ],
+}
