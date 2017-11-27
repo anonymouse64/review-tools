@@ -98,8 +98,10 @@ redflagged_snap_types_overrides = {
                'telig',
                'tsimx6-gadget',
                ],
-    'base': ['bare',            # Canonical base snaps
+    'base': ['bare',                  # Canonical base snaps
+             'base-18',
              'test-snapd-base',
+             'solus-runtime-gaming',  # Community base snaps
              ],
 }
 
@@ -115,6 +117,26 @@ desktop_file_exception = ['ffscreencast',
 # Files with unusual that we'll allow for certain snaps
 sec_mode_overrides = {
     'bare': {},
+    'base-18': {
+        './bin/mount': 'rwsr-xr-x',
+        './bin/su': 'rwsr-xr-x',
+        './bin/umount': 'rwsr-xr-x',
+        './sbin/pam_extrausers_chkpwd': 'rwxr-sr-x',
+        './sbin/unix_chkpwd': 'rwxr-sr-x',
+        './tmp': 'rwxrwxrwt',
+        './usr/bin/chage': 'rwxr-sr-x',
+        './usr/bin/chfn': 'rwsr-xr-x',
+        './usr/bin/chsh': 'rwsr-xr-x',
+        './usr/bin/expiry': 'rwxr-sr-x',
+        './usr/bin/gpasswd': 'rwsr-xr-x',
+        './usr/bin/newgrp': 'rwsr-xr-x',
+        './usr/bin/passwd': 'rwsr-xr-x',
+        './usr/bin/wall': 'rwxr-sr-x',
+        './usr/lib/dbus-1.0/dbus-daemon-launch-helper': 'rwsr-xr--',
+        './var/local': 'rwxrwsr-x',
+        './var/mail': 'rwxrwsr-x',
+        './var/tmp': 'rwxrwxrwt',
+    },
     'core': {
         './bin/mount': 'rwsr-xr-x',
         './bin/ping': 'rwsr-xr-x',
