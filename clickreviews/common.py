@@ -398,14 +398,29 @@ def error(out, exit_code=1, do_exit=True):
 
     try:
         if REPORT_OUTPUT == "json":
-            # mock up regular output, but only put the error in there in the
-            # expected json format
+            # mock up expected json format:
+            #  {
+            #    "test-family": {
+            #      "error": {
+            #        "test-name": {
+            #          "manual_review": ...,
+            #          "text": ...
+            #        }
+            #      },
+            #      "info": {},
+            #      "warn": {}
+            #    }
+            #  }
+            family = "runtime-errors"
+            name = "msg"
+
             report = dict()
-            report["runtime-errors"] = dict()
+            report[family] = dict()
             for r in RESULT_TYPES:
-                report["runtime-errors"][r] = dict()
-            report["runtime-errors"]['error']['name'] = "RUNTIME ERROR"
-            report["runtime-errors"]['error']['text'] = out
+                report[family][r] = dict()
+            report[family]['error'][name] = dict()
+            report[family]['error'][name]['text'] = out
+            report[family]['error'][name]['manual_review'] = True
 
             jsonmsg(report)
         else:
