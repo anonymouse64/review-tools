@@ -19,7 +19,8 @@ import clickreviews.remote
 USER_DATA_FILE = os.path.join(clickreviews.remote.DATA_DIR,
                               'apparmor-easyprof-ubuntu.json')
 
-# XXX: This is a hack and will be gone, as soon as myapps has an API for this.
+# This is a hack that shouldn't be here, but myapps doesn't have an API for
+# this.
 AA_POLICY_DATA_URL = \
     "http://bazaar.launchpad.net/~store-reviewers/click-reviewers-tools/trunk/download/head:/apparmoreasyprofubun-20140711222314-oeohtxzvf9a58fa6-1/apparmor-easyprof-ubuntu.json"
 

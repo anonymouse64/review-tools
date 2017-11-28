@@ -20,9 +20,10 @@ coverage-report:
 	python3 -m coverage report --show-missing --omit="*skeleton*,*/dist-packages/*"
 
 syntax-check: clean
+	python -mjson.tool ./data/*.json >/dev/null
 	CHECK_CLICK_FILES=1 ./run-pyflakes
 	CHECK_CLICK_FILES=1 ./run-pep8
-	python -mjson.tool ./data/*.json >/dev/null
+	CHECK_CLICK_FILES=1 ./run-pylint
 
 check-names:
 	# make sure check-names.list is up to date

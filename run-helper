@@ -2,9 +2,15 @@
 set -e
 
 exe=
+args=
 case "$1" in
-    pep8|pyflakes3|pylint3)
+    pep8|pyflakes3)
         exe="$1"
+        ;;
+    pylint3)
+        exe="$1"
+        # for now, only errors
+        args="-E"
         ;;
     *)
         echo "run-helper pep8|pyflakes3|pylint3"
@@ -22,7 +28,7 @@ for i in ./clickreviews/*py \
         continue
     fi
     echo "Checking $i"
-    "$exe" "$i"
+    "$exe" $args "$i"
 done
 
 if [ -z "$CHECK_CLICK_FILES" ]; then
@@ -34,6 +40,10 @@ for i in ./clickreviews/cr_*py \
          ./bin/click-check-* \
          ./bin/click-show-files \
          ./bin/update-* ; do
+    extra_args=
+    if [ "$exe" = "pylint3" ]; then
+        extra_args="--disable=no-member"
+    fi
     echo "Checking $i"
-    "$exe" "$i"
+    "$exe" $args $extra_args "$i"
 done

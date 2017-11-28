@@ -564,8 +564,8 @@ class SnapReviewLint(SnapReview):
             t = 'info'
             n = self._get_check_name('%s_range' % key, app=app)
             s = "OK"
-            st = int(str(self.snap_yaml['apps'][app][key]).rstrip(r'(%s)' %
-                                                                  suffix))
+            st = int(re.sub(r'%s' % suffix, '',
+                            str(self.snap_yaml['apps'][app][key])))
             if st < 0:
                 t = 'error'
                 s = "stop-timeout '%s' should be a positive" % \
