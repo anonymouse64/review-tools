@@ -210,9 +210,12 @@ class Review(object):
             return None
         return st
 
-    def _extract_file(self, rel):
+    def _extract_file(self, fn):
         '''Extract file'''
-        fn = os.path.join(self.unpack_dir, rel)
+        if not fn.startswith('/'):
+            error("_extract_file() expects absolute path")
+        rel = os.path.relpath(fn, self.unpack_dir)
+
         if not os.path.isfile(fn):
             error("Could not find '%s'" % rel)
         return open_file_read(fn)
