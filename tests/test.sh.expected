@@ -4241,14 +4241,14 @@ busybox-static-mvo_2.snap: pass
   }
 }
 
-=  chrome-test_52.0.2743.116-1+jdstrand17_amd64.snap =
+=  chrome-test_52.0.2743.116-1+test1_amd64.snap =
 Errors
 ------
  - declaration-snap-v2:plugs_deny-connection:browser-sandbox:browser-support
 	human review required due to 'deny-connection' constraint for 'plug-attributes' from base declaration. If using a chromium webview, you can disable the internal sandbox (eg, use --no-sandbox) and remove the 'allow-sandbox' attribute instead. For Oxide webviews, export OXIDE_NO_SANDBOX=1 to disable its internal sandbox. Similarly for QtWebEngine, use QTWEBENGINE_DISABLE_SANDBOX=1.
-chrome-test_52.0.2743.116-1+jdstrand17_amd64.snap: FAIL
+chrome-test_52.0.2743.116-1+test1_amd64.snap: FAIL
 
-= --sdk chrome-test_52.0.2743.116-1+jdstrand17_amd64.snap =
+= --sdk chrome-test_52.0.2743.116-1+test1_amd64.snap =
 = click,snap.v1_bin_path =
 {
   "error": {},
@@ -4567,7 +4567,7 @@ chrome-test_52.0.2743.116-1+jdstrand17_amd64.snap: FAIL
   "warn": {}
 }
 
-= --json chrome-test_52.0.2743.116-1+jdstrand17_amd64.snap =
+= --json chrome-test_52.0.2743.116-1+test1_amd64.snap =
 {
   "click,snap.v1_bin_path": {
     "error": {},
@@ -4872,14 +4872,14 @@ chrome-test_52.0.2743.116-1+jdstrand17_amd64.snap: FAIL
   }
 }
 
-=  classic_16.04+jdstrand1_all.snap =
+=  classic_16.04+test1_all.snap =
 Errors
 ------
  - declaration-snap-v2:plugs_allow-installation:classic-support:classic-support
 	human review required due to 'allow-installation' constraint from base declaration
-classic_16.04+jdstrand1_all.snap: FAIL
+classic_16.04+test1_all.snap: FAIL
 
-= --sdk classic_16.04+jdstrand1_all.snap =
+= --sdk classic_16.04+test1_all.snap =
 = click,snap.v1_bin_path =
 {
   "error": {},
@@ -5149,7 +5149,7 @@ classic_16.04+jdstrand1_all.snap: FAIL
   "warn": {}
 }
 
-= --json classic_16.04+jdstrand1_all.snap =
+= --json classic_16.04+test1_all.snap =
 {
   "click,snap.v1_bin_path": {
     "error": {},
@@ -5846,14 +5846,14 @@ devmode-home_0.1_amd64.snap: pass
   }
 }
 
-=  firefox_48.0+build2-0ubuntu0.16.04.1+jdstrand3_amd64.snap =
+=  firefox_48.0+build2-0ubuntu0.16.04.1+test1_amd64.snap =
 Errors
 ------
  - declaration-snap-v2:plugs_deny-connection:browser-sandbox:browser-support
 	human review required due to 'deny-connection' constraint for 'plug-attributes' from base declaration. If using a chromium webview, you can disable the internal sandbox (eg, use --no-sandbox) and remove the 'allow-sandbox' attribute instead. For Oxide webviews, export OXIDE_NO_SANDBOX=1 to disable its internal sandbox. Similarly for QtWebEngine, use QTWEBENGINE_DISABLE_SANDBOX=1.
-firefox_48.0+build2-0ubuntu0.16.04.1+jdstrand3_amd64.snap: FAIL
+firefox_48.0+build2-0ubuntu0.16.04.1+test1_amd64.snap: FAIL
 
-= --sdk firefox_48.0+build2-0ubuntu0.16.04.1+jdstrand3_amd64.snap =
+= --sdk firefox_48.0+build2-0ubuntu0.16.04.1+test1_amd64.snap =
 = click,snap.v1_bin_path =
 {
   "error": {},
@@ -6252,16 +6252,15 @@ firefox_48.0+build2-0ubuntu0.16.04.1+jdstrand3_amd64.snap: FAIL
       "manual_review": false,
       "text": "OK"
     },
-    "security-snap-v2:squashfs_resquash_1555305": {
-      "link": "https://launchpad.net/bugs/1555305",
+    "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "cannot reproduce squashfs"
+      "text": "OK"
     }
   },
   "warn": {}
 }
 
-= --json firefox_48.0+build2-0ubuntu0.16.04.1+jdstrand3_amd64.snap =
+= --json firefox_48.0+build2-0ubuntu0.16.04.1+test1_amd64.snap =
 {
   "click,snap.v1_bin_path": {
     "error": {},
@@ -6645,10 +6644,9 @@ firefox_48.0+build2-0ubuntu0.16.04.1+jdstrand3_amd64.snap: FAIL
         "manual_review": false,
         "text": "OK"
       },
-      "security-snap-v2:squashfs_resquash_1555305": {
-        "link": "https://launchpad.net/bugs/1555305",
+      "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "cannot reproduce squashfs"
+        "text": "OK"
       }
     },
     "warn": {}
@@ -12278,16 +12276,16 @@ hello-world_25.snap: pass
   }
 }
 
-=  network-manager_r10.snap =
+=  network-manager_1.2.2-1+test1_amd64.snap =
 Errors
 ------
  - declaration-snap-v2:slots_deny-connection:service:network-manager
 	human review required due to 'deny-connection' constraint for 'on-classic' from base declaration
  - lint-snap-v2:external_symlinks
 	package contains external symlinks: usr/lib/systemd/system/network-online.target.wants/NetworkManager-wait-online.service
-network-manager_r10.snap: FAIL
+network-manager_1.2.2-1+test1_amd64.snap: FAIL
 
-= --sdk network-manager_r10.snap =
+= --sdk network-manager_1.2.2-1+test1_amd64.snap =
 = click,snap.v1_bin_path =
 {
   "error": {},
@@ -12572,7 +12570,7 @@ network-manager_r10.snap: FAIL
   "warn": {}
 }
 
-= --json network-manager_r10.snap =
+= --json network-manager_1.2.2-1+test1_amd64.snap =
 {
   "click,snap.v1_bin_path": {
     "error": {},
@@ -13637,10 +13635,10 @@ pc.canonical_5.snap: pass
   }
 }
 
-=  quagga_2.snap =
-quagga_2.snap: pass
+=  quagga_1.0.20160315-alpha2-git.c6fadc4+test1_amd64.snap =
+quagga_1.0.20160315-alpha2-git.c6fadc4+test1_amd64.snap: pass
 
-= --sdk quagga_2.snap =
+= --sdk quagga_1.0.20160315-alpha2-git.c6fadc4+test1_amd64.snap =
 = click,snap.v1_bin_path =
 {
   "error": {},
@@ -14898,16 +14896,15 @@ quagga_2.snap: pass
       "manual_review": false,
       "text": "OK"
     },
-    "security-snap-v2:squashfs_resquash_1555305": {
-      "link": "https://launchpad.net/bugs/1555305",
+    "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "cannot reproduce squashfs"
+      "text": "OK"
     }
   },
   "warn": {}
 }
 
-= --json quagga_2.snap =
+= --json quagga_1.0.20160315-alpha2-git.c6fadc4+test1_amd64.snap =
 {
   "click,snap.v1_bin_path": {
     "error": {},
@@ -16150,10 +16147,9 @@ quagga_2.snap: pass
         "manual_review": false,
         "text": "OK"
       },
-      "security-snap-v2:squashfs_resquash_1555305": {
-        "link": "https://launchpad.net/bugs/1555305",
+      "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "cannot reproduce squashfs"
+        "text": "OK"
       }
     },
     "warn": {}
@@ -34378,10 +34374,10 @@ test-x11-no-desktop_0.1_all.snap: FAIL
   }
 }
 
-=  ubuntu-core_352.snap =
-ubuntu-core_352.snap: pass
+=  ubuntu-core_16.04.1+test1_amd64.snap =
+ubuntu-core_16.04.1+test1_amd64.snap: pass
 
-= --sdk ubuntu-core_352.snap =
+= --sdk ubuntu-core_16.04.1+test1_amd64.snap =
 = click,snap.v1_bin_path =
 {
   "error": {},
@@ -34558,7 +34554,7 @@ ubuntu-core_352.snap: pass
   "warn": {}
 }
 
-= --json ubuntu-core_352.snap =
+= --json ubuntu-core_16.04.1+test1_amd64.snap =
 {
   "click,snap.v1_bin_path": {
     "error": {},
@@ -34721,10 +34717,10 @@ ubuntu-core_352.snap: pass
   }
 }
 
-=  vlc_1.snap =
-vlc_1.snap: pass
+=  vlc_daily+test1_amd64.snap =
+vlc_daily+test1_amd64.snap: pass
 
-= --sdk vlc_1.snap =
+= --sdk vlc_daily+test1_amd64.snap =
 = click,snap.v1_bin_path =
 {
   "error": {},
@@ -35026,16 +35022,15 @@ vlc_1.snap: pass
       "manual_review": false,
       "text": "OK"
     },
-    "security-snap-v2:squashfs_resquash_1555305": {
-      "link": "https://launchpad.net/bugs/1555305",
+    "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "cannot reproduce squashfs"
+      "text": "OK"
     }
   },
   "warn": {}
 }
 
-= --json vlc_1.snap =
+= --json vlc_daily+test1_amd64.snap =
 {
   "click,snap.v1_bin_path": {
     "error": {},
@@ -35322,10 +35317,9 @@ vlc_1.snap: pass
         "manual_review": false,
         "text": "OK"
       },
-      "security-snap-v2:squashfs_resquash_1555305": {
-        "link": "https://launchpad.net/bugs/1555305",
+      "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "cannot reproduce squashfs"
+        "text": "OK"
       }
     },
     "warn": {}
