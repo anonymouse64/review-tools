@@ -1,0 +1,26 @@
+#!/bin/sh
+set -e
+
+exe=
+case "$1" in
+    pep8|pyflakes3|pylint3)
+        exe="$1"
+        ;;
+    *)
+        echo "run-helper pep8|pyflakes3|pylint3"
+        exit 1
+        ;;
+esac
+
+echo "= $exe ="
+for i in ./clickreviews/*py \
+         ./clickreviews/tests/*py \
+         ./bin/update-* \
+         ./bin/click-check-* \
+         ./bin/click-show-files \
+         ./bin/click-review \
+         ./bin/create-snap-declaration \
+         ./bin/snap-check-* ; do
+    echo "Checking $i"
+    "$exe" $i
+done

@@ -1,13 +1,4 @@
 #!/bin/sh
 set -e
 
-echo "= pep8 ="
-for i in ./clickreviews/*py \
-         ./clickreviews/tests/*py \
-         ./bin/update-* \
-         ./bin/click-check-* \
-         ./bin/click-show-files \
-         ./bin/click-review ; do
-    echo "Checking $i"
-    pep8 $i
-done
+./run-helper pep8

@@ -1,9 +1,4 @@
 #!/bin/sh
 set -e
 
-echo "= pyflakes3 ="
-for i in ./bin/update-* ./bin/click-check-* ./bin/click-show-files ./bin/click-review \
-	 ./clickreviews/*py ./clickreviews/tests/*py ; do
-    echo "Checking $i"
-    pyflakes3 $i
-done
+./run-helper pyflakes3
