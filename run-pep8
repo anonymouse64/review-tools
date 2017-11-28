@@ -1,4 +1,10 @@
 #!/bin/sh
 set -e
 
+if which pycodestyle >/dev/null 2>&1 ; then
+    sed 's/^\[pep8\]$/[pycodestyle]/' ./setup.cfg.in > ./setup.cfg
+else
+    cp -f ./setup.cfg.in ./setup.cfg
+fi
+
 ./run-helper pep8
