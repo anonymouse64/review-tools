@@ -35,15 +35,16 @@ if [ -z "$CHECK_CLICK_FILES" ]; then
     echo "Use CHECK_CLICK_FILES=1 to check click support"
     exit 0
 fi
+
+extra_args=
+if [ "$exe" = "pylint3" ]; then
+    extra_args="--disable=no-member"
+fi
 for i in ./clickreviews/cr_*py \
          ./clickreviews/tests/test_cr_*py \
          ./bin/click-check-* \
          ./bin/click-show-files \
          ./bin/update-* ; do
-    extra_args=
-    if [ "$exe" = "pylint3" ]; then
-        extra_args="--disable=no-member"
-    fi
     echo "Checking $i"
     "$exe" $args $extra_args "$i"
 done

@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+
+# eventually
+#make check
+
+make coverage
+make coverage-report
+make syntax-check
+make check-names
