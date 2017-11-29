@@ -10,7 +10,7 @@ case "$1" in
     pylint3)
         exe="$1"
         # for now, only errors
-        args="-E"
+        args="-E --disable=no-member"
         ;;
     *)
         echo "run-helper pep8|pyflakes3|pylint3"
@@ -36,15 +36,11 @@ if [ -z "$CHECK_CLICK_FILES" ]; then
     exit 0
 fi
 
-extra_args=
-if [ "$exe" = "pylint3" ]; then
-    extra_args="--disable=no-member"
-fi
 for i in ./clickreviews/cr_*py \
          ./clickreviews/tests/test_cr_*py \
          ./bin/click-check-* \
          ./bin/click-show-files \
          ./bin/update-* ; do
     echo "Checking $i"
-    "$exe" $args $extra_args "$i"
+    "$exe" $args "$i"
 done
