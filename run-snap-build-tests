@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e
 
+# needed when run from snapcraft
+export PYTHONPATH=./
+
 # eventually
 #make check
 
