@@ -10,4 +10,6 @@ export PYTHONPATH=./
 make coverage
 make coverage-report
 make syntax-check
-make check-names
+
+# eventually
+#make check-names
