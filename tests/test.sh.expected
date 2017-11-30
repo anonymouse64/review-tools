@@ -25753,7 +25753,7 @@ test-base-disallowed_0_all.snap: FAIL
   }
 }
 
-=  test-base_1.0_all.snap =
+=  test-base-slots-plugs_1.0_all.snap =
 Errors
 ------
  - declaration-snap-v2:slots_allow-installation:dbus:dbus
@@ -25764,9 +25764,9 @@ Errors
 	'slots' not allowed with base snaps
  - lint-snap-v2:snap_type_redflag
 	(NEEDS REVIEW) type 'base' not allowed
-test-base_1.0_all.snap: FAIL
+test-base-slots-plugs_1.0_all.snap: FAIL
 
-= --sdk test-base_1.0_all.snap =
+= --sdk test-base-slots-plugs_1.0_all.snap =
 = click,snap.v1_bin_path =
 {
   "error": {},
@@ -26013,7 +26013,7 @@ test-base_1.0_all.snap: FAIL
   "warn": {}
 }
 
-= --json test-base_1.0_all.snap =
+= --json test-base-slots-plugs_1.0_all.snap =
 {
   "click,snap.v1_bin_path": {
     "error": {},
