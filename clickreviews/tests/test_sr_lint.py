@@ -16,6 +16,7 @@
 
 from unittest import TestCase
 import os
+import platform
 import shutil
 import tempfile
 
@@ -3933,7 +3934,10 @@ architectures: [ amd64 ]
         c = SnapReviewLint(package)
         c.check_architecture_all()
         r = c.click_report
-        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        if platform.machine() == 'x86_64':
+            expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        else:  # ignore test on non-amd64
+            expected_counts = {'info': None, 'warn': 0, 'error': None}
         self.check_results(r, expected_counts)
 
     def test_check_architecture_all_skips_pyc(self):
@@ -3978,7 +3982,10 @@ type: gadget
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'lint-snap-v2:valid_contents_for_architecture'
-        expected['info'][name] = {"text": "found binaries for architecture 'all': ls (ok for 'type: gadget')"}
+        if platform.machine() == 'x86_64':
+            expected['info'][name] = {"text": "found binaries for architecture 'all': ls (ok for 'type: gadget')"}
+        else:  # ignore test on non-amd64
+            pass
         self.check_results(r, expected=expected)
 
     def test_check_architecture_specified_needed_has_binary(self):
