@@ -141,6 +141,12 @@ class SnapReviewSecurity(SnapReview):
             return
         fstime = out.strip()
 
+        resquash_t = 'info'
+        enforce = False
+        if 'SNAP_ENFORCE_RESQUASHFS' in os.environ:
+            enforce = True
+            resquash_t = 'error'
+
         # For now, skip the checks on if have symlinks due to LP: #1555305
         (rc, out) = cmd(['unsquashfs', '-lls', fn])
         if rc != 0:
@@ -149,7 +155,7 @@ class SnapReviewSecurity(SnapReview):
             s = 'could not list contents of squashfs'
             self._add_result(t, n, s)
             return
-        elif 'lrwxrwxrwx' in out:
+        elif not enforce and 'lrwxrwxrwx' in out:
             t = 'info'
             n = self._get_check_name('squashfs_resquash_1555305')
             s = 'cannot reproduce squashfs'
@@ -216,10 +222,7 @@ class SnapReviewSecurity(SnapReview):
                 t = 'info'
                 s = 'checksums do not match (expected for base/os snap)'
             else:
-                # FIXME: turn this into an error once the squashfs-tools bugs
-                # are fixed
-                # t = 'error'
-                t = 'info'
+                t = resquash_t
                 s = "checksums do not match. Please ensure the snap is " + \
                     "created with either 'snapcraft snap <DIR>' or " + \
                     "'mksquashfs <dir> <snap> %s'" % " ".join(MKSQUASHFS_OPTS)

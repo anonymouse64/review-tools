@@ -1106,11 +1106,51 @@ exit 0
         c.check_squashfs_resquash()
         os.environ['PATH'] = old_path
         report = c.click_report
-        # FIXME: this should error but we've turned it into an info until the
-        # squashfs-tools bugs can be fixed
-        # expected_counts = {'info': None, 'warn': 0, 'error': 1}
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
+
+    def test_check_squashfs_resquash_sha512sum_mismatch_enforce(self):
+        '''Test check_squashfs_resquash() - sha512sum mismatch - enforce'''
+        output_dir = self.mkdtemp()
+        package = utils.make_snap2(output_dir=output_dir)
+        c = SnapReviewSecurity(package)
+
+        # fake sha512sum
+        sha512sum = os.path.join(output_dir, 'sha512sum')
+        content = '''#!/bin/sh
+bn=`basename "$1"`
+if [ "$bn" = "test_1.0_all.snap" ]; then
+    echo beefeeee $1
+else
+    echo deadbeef $1
+fi
+exit 0
+'''
+        with open(sha512sum, 'w') as f:
+            f.write(content)
+        os.chmod(sha512sum, 0o775)
+
+        old_path = os.environ['PATH']
+        if old_path:
+            os.environ['PATH'] = "%s:%s" % (output_dir, os.environ['PATH'])
+        else:
+            os.environ['PATH'] = output_dir  # pragma: nocover
+
+        os.environ['SNAP_ENFORCE_RESQUASHFS'] = "1"
+        c.check_squashfs_resquash()
+        os.environ.pop('SNAP_ENFORCE_RESQUASHFS')
+        os.environ['PATH'] = old_path
+        report = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'security-snap-v2:squashfs_repack_checksum'
+        expected['error'][name] = {"text": "checksums do not match. Please ensure the snap is created with either 'snapcraft snap <DIR>' or 'mksquashfs <dir> <snap> -noappend -comp xz -all-root -no-xattrs'"}
+        self.check_results(report, expected=expected)
 
     def test_check_squashfs_resquash_sha512sum_mismatch_os(self):
         '''Test check_squashfs_resquash() - sha512sum mismatch - os snap'''
@@ -1179,6 +1219,18 @@ exit 0
         name = 'security-snap-v2:squashfs_resquash_1555305'
         expected['info'][name] = {"link": "https://launchpad.net/bugs/1555305"}
         self.check_results(report, expected=expected)
+
+    def test_check_squashfs_resquash_1555305_enforce(self):
+        '''Test check_squashfs_resquash() - enforce'''
+        package = utils.make_snap2(output_dir=self.mkdtemp(),
+                                   extra_files=['/some/where,outside'])
+        c = SnapReviewSecurity(package)
+        os.environ['SNAP_ENFORCE_RESQUASHFS'] = "1"
+        c.check_squashfs_resquash()
+        os.environ.pop('SNAP_ENFORCE_RESQUASHFS')
+        report = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(report, expected_counts)
 
     def test_check_squashfs_resquash_unsquashfs_fail_1555305(self):
         '''Test check_squashfs_resquash() - unsquashfs failure'''
