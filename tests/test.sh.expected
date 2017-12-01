@@ -25080,10 +25080,433 @@ test-all-gadget_3_all.snap: FAIL
   }
 }
 
-=  test-bad-desktop-file_0_all.snap =
+=  test-app-devnull_1.0_all.snap =
+Errors
+------
+ - security-snap-v2:squashfs_files
+	found errors in file output: file type 'c' not allowed (./dev/null)
+ - security-snap-v2:squashfs_resquash_has_devices
+	cannot reproduce squashfs with device files
+test-app-devnull_1.0_all.snap: FAIL
+
+= --sdk test-app-devnull_1.0_all.snap =
+= click,snap.v1_bin_path =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= click,snap.v1_content_hub =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= click,snap.v1_desktop =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= click,snap.v1_framework =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= click,snap.v1_functional =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= click,snap.v1_lint =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= click,snap.v1_online_accounts =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= click,snap.v1_push_helper =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= click,snap.v1_scope =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= click,snap.v1_security =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= click,snap.v1_systemd =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= click,snap.v1_url_dispatcher =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= snap.v2_declaration =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= snap.v2_functional =
+{
+  "error": {},
+  "info": {
+    "functional-snap-v2:execstack": {
+      "manual_review": false,
+      "text": "OK"
+    }
+  },
+  "warn": {}
+}
+= snap.v2_lint =
+{
+  "error": {},
+  "info": {
+    "lint-snap-v2:apps": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_entry:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_present": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_required:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_unknown:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:architecture_valid": {
+      "manual_review": false,
+      "text": "OK (architectures not specified)"
+    },
+    "lint-snap-v2:assumes_valid": {
+      "manual_review": false,
+      "text": "OK (assumes not specified)"
+    },
+    "lint-snap-v2:command:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:confinement_valid": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:daemon_required:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:description_present": {
+      "manual_review": false,
+      "text": "OK (optional description field not specified)"
+    },
+    "lint-snap-v2:external_symlinks": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:grade_valid": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:hooks_present": {
+      "manual_review": false,
+      "text": "OK (optional hooks field not specified)"
+    },
+    "lint-snap-v2:iffy_files": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:name_valid": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:snap_type_redflag": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:snap_type_valid": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:summary": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:summary_present": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:unknown_field": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:valid_contents_for_architecture": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:vcs_files": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:version_valid": {
+      "manual_review": false,
+      "text": "OK"
+    }
+  },
+  "warn": {}
+}
+= snap.v2_security =
+{
+  "error": {
+    "security-snap-v2:squashfs_files": {
+      "manual_review": false,
+      "text": "found errors in file output: file type 'c' not allowed (./dev/null)"
+    },
+    "security-snap-v2:squashfs_resquash_has_devices": {
+      "manual_review": false,
+      "text": "cannot reproduce squashfs with device files"
+    }
+  },
+  "info": {
+    "security-snap-v2:profile_name_length:env": {
+      "manual_review": false,
+      "text": "OK"
+    }
+  },
+  "warn": {}
+}
+
+= --json test-app-devnull_1.0_all.snap =
+{
+  "click,snap.v1_bin_path": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "click,snap.v1_content_hub": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "click,snap.v1_desktop": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "click,snap.v1_framework": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "click,snap.v1_functional": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "click,snap.v1_lint": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "click,snap.v1_online_accounts": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "click,snap.v1_push_helper": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "click,snap.v1_scope": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "click,snap.v1_security": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "click,snap.v1_systemd": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "click,snap.v1_url_dispatcher": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "snap.v2_declaration": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "snap.v2_functional": {
+    "error": {},
+    "info": {
+      "functional-snap-v2:execstack": {
+        "manual_review": false,
+        "text": "OK"
+      }
+    },
+    "warn": {}
+  },
+  "snap.v2_lint": {
+    "error": {},
+    "info": {
+      "lint-snap-v2:apps": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_entry:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_present": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_required:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_unknown:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:architecture_valid": {
+        "manual_review": false,
+        "text": "OK (architectures not specified)"
+      },
+      "lint-snap-v2:assumes_valid": {
+        "manual_review": false,
+        "text": "OK (assumes not specified)"
+      },
+      "lint-snap-v2:command:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:confinement_valid": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:daemon_required:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:description_present": {
+        "manual_review": false,
+        "text": "OK (optional description field not specified)"
+      },
+      "lint-snap-v2:external_symlinks": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:grade_valid": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:hooks_present": {
+        "manual_review": false,
+        "text": "OK (optional hooks field not specified)"
+      },
+      "lint-snap-v2:iffy_files": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:name_valid": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:snap_type_redflag": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:snap_type_valid": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:summary": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:summary_present": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:unknown_field": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:valid_contents_for_architecture": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:vcs_files": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:version_valid": {
+        "manual_review": false,
+        "text": "OK"
+      }
+    },
+    "warn": {}
+  },
+  "snap.v2_security": {
+    "error": {
+      "security-snap-v2:squashfs_files": {
+        "manual_review": false,
+        "text": "found errors in file output: file type 'c' not allowed (./dev/null)"
+      },
+      "security-snap-v2:squashfs_resquash_has_devices": {
+        "manual_review": false,
+        "text": "cannot reproduce squashfs with device files"
+      }
+    },
+    "info": {
+      "security-snap-v2:profile_name_length:env": {
+        "manual_review": false,
+        "text": "OK"
+      }
+    },
+    "warn": {}
+  }
+}
+
+=  test-bad-desktop-file_1_all.snap =
 ERROR: Could not find 'meta/gui/env.desktop'
 
-= --sdk test-bad-desktop-file_0_all.snap =
+= --sdk test-bad-desktop-file_1_all.snap =
 = click,snap.v1_bin_path =
 {
   "error": {},
@@ -25191,7 +25614,7 @@ ERROR: Could not find 'meta/gui/env.desktop'
   }
 }
 
-= --json test-bad-desktop-file_0_all.snap =
+= --json test-bad-desktop-file_1_all.snap =
 {
   "runtime-errors": {
     "error": {
@@ -25304,6 +25727,361 @@ ERROR: Invalid top-level 'plugs' (not a dict)
       }
     },
     "info": {},
+    "warn": {}
+  }
+}
+
+=  test-base-devnull_1.0_all.snap =
+Errors
+------
+ - lint-snap-v2:snap_type_redflag
+	(NEEDS REVIEW) type 'base' not allowed
+test-base-devnull_1.0_all.snap: FAIL
+
+= --sdk test-base-devnull_1.0_all.snap =
+= click,snap.v1_bin_path =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= click,snap.v1_content_hub =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= click,snap.v1_desktop =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= click,snap.v1_framework =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= click,snap.v1_functional =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= click,snap.v1_lint =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= click,snap.v1_online_accounts =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= click,snap.v1_push_helper =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= click,snap.v1_scope =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= click,snap.v1_security =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= click,snap.v1_systemd =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= click,snap.v1_url_dispatcher =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= snap.v2_declaration =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= snap.v2_functional =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= snap.v2_lint =
+{
+  "error": {
+    "lint-snap-v2:snap_type_redflag": {
+      "manual_review": true,
+      "text": "(NEEDS REVIEW) type 'base' not allowed"
+    }
+  },
+  "info": {
+    "lint-snap-v2:apps_present": {
+      "manual_review": false,
+      "text": "OK (optional apps field not specified)"
+    },
+    "lint-snap-v2:architecture_valid": {
+      "manual_review": false,
+      "text": "OK (architectures not specified)"
+    },
+    "lint-snap-v2:assumes_valid": {
+      "manual_review": false,
+      "text": "OK (assumes not specified)"
+    },
+    "lint-snap-v2:base_interfaces:plugs": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:base_interfaces:slots": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:description_present": {
+      "manual_review": false,
+      "text": "OK (optional description field not specified)"
+    },
+    "lint-snap-v2:grade_valid": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:hooks_present": {
+      "manual_review": false,
+      "text": "OK (optional hooks field not specified)"
+    },
+    "lint-snap-v2:iffy_files": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:name_valid": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:snap_type_valid": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:summary": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:summary_present": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:unknown_field": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:valid_contents_for_architecture": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:vcs_files": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:version_valid": {
+      "manual_review": false,
+      "text": "OK"
+    }
+  },
+  "warn": {}
+}
+= snap.v2_security =
+{
+  "error": {},
+  "info": {
+    "security-snap-v2:squashfs_files": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "security-snap-v2:squashfs_resquash_has_devices": {
+      "manual_review": false,
+      "text": "cannot reproduce squashfs with device files (ok for base/os snap)"
+    }
+  },
+  "warn": {}
+}
+
+= --json test-base-devnull_1.0_all.snap =
+{
+  "click,snap.v1_bin_path": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "click,snap.v1_content_hub": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "click,snap.v1_desktop": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "click,snap.v1_framework": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "click,snap.v1_functional": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "click,snap.v1_lint": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "click,snap.v1_online_accounts": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "click,snap.v1_push_helper": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "click,snap.v1_scope": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "click,snap.v1_security": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "click,snap.v1_systemd": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "click,snap.v1_url_dispatcher": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "snap.v2_declaration": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "snap.v2_functional": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "snap.v2_lint": {
+    "error": {
+      "lint-snap-v2:snap_type_redflag": {
+        "manual_review": true,
+        "text": "(NEEDS REVIEW) type 'base' not allowed"
+      }
+    },
+    "info": {
+      "lint-snap-v2:apps_present": {
+        "manual_review": false,
+        "text": "OK (optional apps field not specified)"
+      },
+      "lint-snap-v2:architecture_valid": {
+        "manual_review": false,
+        "text": "OK (architectures not specified)"
+      },
+      "lint-snap-v2:assumes_valid": {
+        "manual_review": false,
+        "text": "OK (assumes not specified)"
+      },
+      "lint-snap-v2:base_interfaces:plugs": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:base_interfaces:slots": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:description_present": {
+        "manual_review": false,
+        "text": "OK (optional description field not specified)"
+      },
+      "lint-snap-v2:grade_valid": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:hooks_present": {
+        "manual_review": false,
+        "text": "OK (optional hooks field not specified)"
+      },
+      "lint-snap-v2:iffy_files": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:name_valid": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:snap_type_valid": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:summary": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:summary_present": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:unknown_field": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:valid_contents_for_architecture": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:vcs_files": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:version_valid": {
+        "manual_review": false,
+        "text": "OK"
+      }
+    },
+    "warn": {}
+  },
+  "snap.v2_security": {
+    "error": {},
+    "info": {
+      "security-snap-v2:squashfs_files": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "security-snap-v2:squashfs_resquash_has_devices": {
+        "manual_review": false,
+        "text": "cannot reproduce squashfs with device files (ok for base/os snap)"
+      }
+    },
     "warn": {}
   }
 }
@@ -34545,10 +35323,9 @@ ubuntu-core_16.04.1+test1_amd64.snap: pass
       "manual_review": false,
       "text": "OK"
     },
-    "security-snap-v2:squashfs_resquash_1555305": {
-      "link": "https://launchpad.net/bugs/1555305",
+    "security-snap-v2:squashfs_resquash_has_devices": {
       "manual_review": false,
-      "text": "cannot reproduce squashfs"
+      "text": "cannot reproduce squashfs with device files (ok for base/os snap)"
     }
   },
   "warn": {}
@@ -34707,10 +35484,9 @@ ubuntu-core_16.04.1+test1_amd64.snap: pass
         "manual_review": false,
         "text": "OK"
       },
-      "security-snap-v2:squashfs_resquash_1555305": {
-        "link": "https://launchpad.net/bugs/1555305",
+      "security-snap-v2:squashfs_resquash_has_devices": {
         "manual_review": false,
-        "text": "cannot reproduce squashfs"
+        "text": "cannot reproduce squashfs with device files (ok for base/os snap)"
       }
     },
     "warn": {}

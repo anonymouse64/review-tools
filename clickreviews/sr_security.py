@@ -147,7 +147,6 @@ class SnapReviewSecurity(SnapReview):
             enforce = True
             resquash_t = 'error'
 
-        # For now, skip the checks on if have symlinks due to LP: #1555305
         (rc, out) = cmd(['unsquashfs', '-lls', fn])
         if rc != 0:
             t = 'error'
@@ -155,7 +154,27 @@ class SnapReviewSecurity(SnapReview):
             s = 'could not list contents of squashfs'
             self._add_result(t, n, s)
             return
-        elif not enforce and 'lrwxrwxrwx' in out:
+
+        # unsquashfs will mknod device files when run as root, but the snap
+        # security policy does not allow it, so info if base or os snap, but
+        # error otherwise
+        lines = out.splitlines()
+        for line in lines[2:]:
+            if len(line) > 0 and \
+                    line[0] not in ['d', '-', 'l']:  # pragma: nocover
+                t = 'error'
+                s = 'cannot reproduce squashfs with device files: %s' % line
+                if 'type' in self.snap_yaml and \
+                        (self.snap_yaml['type'] == 'base' or
+                         self.snap_yaml['type'] == 'os'):
+                    t = 'info'
+                    s += ' (ok for base/os snap)'
+                n = self._get_check_name('squashfs_resquash_has_devices')
+                self._add_result(t, n, s)
+                return
+
+        # For now, skip the checks on if have symlinks due to LP: #1555305
+        if not enforce and 'lrwxrwxrwx' in out:
             t = 'info'
             n = self._get_check_name('squashfs_resquash_1555305')
             s = 'cannot reproduce squashfs'
