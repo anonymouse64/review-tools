@@ -249,10 +249,8 @@ security-snap-v2:squashfs_files|
 security-snap-v2:squashfs_files_malformed_line|
 security-snap-v2:squashfs_files_malformed output|
 security-snap-v2:squashfs_files_unsquash|
-security-snap-v2:squashfs_lls|
 security-snap-v2:squashfs_repack_checksum|
 security-snap-v2:squashfs_resquash|
-security-snap-v2:squashfs_resquash_1555305|https://launchpad.net/bugs/1555305
 security-snap-v2:squashfs_supports_fstime|
 security:template_account_provider|
 security:template_account_qml_plugin|

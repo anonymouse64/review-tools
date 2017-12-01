@@ -17,6 +17,7 @@
 from __future__ import print_function
 from unittest import TestCase
 import os
+import re
 import shutil
 import tempfile
 
@@ -1137,7 +1138,9 @@ exit 0
             os.environ['PATH'] = output_dir  # pragma: nocover
 
         os.environ['SNAP_ENFORCE_RESQUASHFS'] = "1"
+        os.environ['SNAP_DEBUG_RESQUASHFS'] = "1"
         c.check_squashfs_resquash()
+        os.environ.pop('SNAP_DEBUG_RESQUASHFS')
         os.environ.pop('SNAP_ENFORCE_RESQUASHFS')
         os.environ['PATH'] = old_path
         report = c.click_report
@@ -1152,11 +1155,10 @@ exit 0
         expected['error'][name] = {"text": "checksums do not match. Please ensure the snap is created with either 'snapcraft snap <DIR>' or 'mksquashfs <dir> <snap> -noappend -comp xz -all-root -no-xattrs'"}
         self.check_results(report, expected=expected)
 
-    def test_check_squashfs_resquash_sha512sum_mismatch_os(self):
-        '''Test check_squashfs_resquash() - sha512sum mismatch - os snap'''
+    def test_check_squashfs_resquash_sha512sum_mismatch_enforce_os(self):
+        '''Test check_squashfs_resquash() - sha512sum mismatch - enforce os'''
         output_dir = self.mkdtemp()
         package = utils.make_snap2(output_dir=output_dir)
-
         sy_path = os.path.join(output_dir, 'snap.yaml')
         content = '''
 name: test
@@ -1196,53 +1198,73 @@ exit 0
         else:
             os.environ['PATH'] = output_dir  # pragma: nocover
 
+        os.environ['SNAP_ENFORCE_RESQUASHFS'] = "1"
         c.check_squashfs_resquash()
+        os.environ.pop('SNAP_ENFORCE_RESQUASHFS')
         os.environ['PATH'] = old_path
         report = c.click_report
-        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
-        self.check_results(report, expected_counts)
-
-    def test_check_squashfs_resquash_1555305(self):
-        '''Test check_squashfs_resquash()'''
-        package = utils.make_snap2(output_dir=self.mkdtemp(),
-                                   extra_files=['/some/where,outside'])
-        c = SnapReviewSecurity(package)
-        c.check_squashfs_resquash()
-        report = c.click_report
-        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
         expected = dict()
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'security-snap-v2:squashfs_resquash_1555305'
-        expected['info'][name] = {"link": "https://launchpad.net/bugs/1555305"}
+        name = 'security-snap-v2:squashfs_repack_checksum'
+        expected['error'][name] = {"text": "checksums do not match. Please ensure the snap is created with either 'snapcraft snap <DIR>' or 'mksquashfs <dir> <snap> -noappend -comp xz'"}
         self.check_results(report, expected=expected)
 
-# TODO: this fails only intermittently, so uncomment when LP: 1555305 is fixed
-#     def test_check_squashfs_resquash_1555305_enforce(self):
-#         '''Test check_squashfs_resquash() - enforce'''
-#         package = utils.make_snap2(output_dir=self.mkdtemp(),
-#                                    extra_files=['/some/where,outside'])
-#         c = SnapReviewSecurity(package)
-#         os.environ['SNAP_ENFORCE_RESQUASHFS'] = "1"
-#         c.check_squashfs_resquash()
-#         os.environ.pop('SNAP_ENFORCE_RESQUASHFS')
-#         report = c.click_report
-#         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
-#         self.check_results(report, expected_counts)
-
-    def test_check_squashfs_resquash_unsquashfs_fail_1555305(self):
-        '''Test check_squashfs_resquash() - unsquashfs failure'''
+    def test_check_debug_resquashfs(self):
+        '''Test check_debug_resquashfs()'''
         output_dir = self.mkdtemp()
         package = utils.make_snap2(output_dir=output_dir)
+        repackage = utils.make_snap2(output_dir=output_dir)
+        c = SnapReviewSecurity(package)
+
+        r = c._debug_resquashfs(output_dir, package, repackage)
+        self.assertTrue("squash fstime for test_1.0_all.snap" in r)
+        self.assertTrue("unsquashfs -lls test_1.0_all.snap:" in r)
+        self.assertTrue("diff -au " in r)
+
+    def test_check_debug_resquashfs_bad_fstime(self):
+        '''Test check_debug_resquashfs() - bad unsquashfs -fstime'''
+        output_dir = self.mkdtemp()
+        package = utils.make_snap2(output_dir=output_dir)
+        repackage = utils.make_snap2(output_dir=output_dir)
         c = SnapReviewSecurity(package)
 
         # fake unsquashfs
         unsquashfs = os.path.join(output_dir, 'unsquashfs')
         content = '''#!/bin/sh
-if [ "$1" = "-fstime" ] || [ "$1" = "-lls" ]; then
+echo test error: unsquashfs failure
+exit 1
+'''
+        with open(unsquashfs, 'w') as f:
+            f.write(content)
+        os.chmod(unsquashfs, 0o775)
+
+        old_path = os.environ['PATH']
+        if old_path:
+            os.environ['PATH'] = "%s:%s" % (output_dir, os.environ['PATH'])
+        else:
+            os.environ['PATH'] = output_dir  # pragma: nocover
+
+        r = c._debug_resquashfs(output_dir, package, repackage)
+        os.environ['PATH'] = old_path
+        self.assertTrue(re.search(r"unsquashfs -fstime .*\.snap' failed", r))
+
+    def test_check_debug_resquashfs_bad_lls(self):
+        '''Test check_debug_resquashfs() - bad unsquashfs -lls'''
+        output_dir = self.mkdtemp()
+        package = utils.make_snap2(output_dir=output_dir)
+        repackage = utils.make_snap2(output_dir=output_dir)
+        c = SnapReviewSecurity(package)
+
+        # fake unsquashfs
+        unsquashfs = os.path.join(output_dir, 'unsquashfs')
+        content = '''#!/bin/sh
+if [ "$1" = "-fstime" ]; then
+    echo mocked
     exit 0
 fi
 echo test error: unsquashfs failure
@@ -1258,11 +1280,9 @@ exit 1
         else:
             os.environ['PATH'] = output_dir  # pragma: nocover
 
-        c.check_squashfs_resquash()
+        r = c._debug_resquashfs(output_dir, package, repackage)
         os.environ['PATH'] = old_path
-        report = c.click_report
-        expected_counts = {'info': None, 'warn': 0, 'error': 1}
-        self.check_results(report, expected_counts)
+        self.assertTrue(re.search(r"unsquashfs -lls .*\.snap' failed", r))
 
     def test_check_squashfs_files(self):
         '''Test check_squashfs_files()'''

@@ -22,6 +22,7 @@ from clickreviews.sr_common import (
 from clickreviews.common import (
     cmd,
     create_tempdir,
+    open_file_write,
     ReviewException,
     AA_PROFILE_NAME_MAXLEN,
     AA_PROFILE_NAME_ADVLEN,
@@ -33,6 +34,7 @@ from clickreviews.overrides import (
 )
 import os
 import re
+import shutil
 
 
 class SnapReviewSecurity(SnapReview):
@@ -123,6 +125,45 @@ class SnapReviewSecurity(SnapReview):
                                                       app))
             self._add_result(t, n, s)
 
+    def _debug_resquashfs(self, tmpdir, orig, resq):
+        '''Provide debugging information on snap and repacked snap'''
+        debug_output = ""
+        orig_lls_fn = os.path.join(tmpdir, os.path.basename(orig) + '.lls')
+        resq_lls_fn = os.path.join(tmpdir, os.path.basename(resq) + '.lls')
+
+        error = False
+        for fn in [orig, resq]:
+            cmdline = ['unsquashfs', '-fstime', fn]
+            (rc, out) = cmd(cmdline)
+            if rc != 0:
+                debug_output += "'%s' failed" % " ".join(cmdline)
+                error = True
+                continue
+            debug_output += "squash fstime for %s: %s" % (os.path.basename(fn),
+                                                          out)
+
+            cmdline = ['unsquashfs', '-lls', fn]
+            (rc, out) = cmd(cmdline)
+            if rc != 0:
+                debug_output += "'%s' failed" % " ".join(cmdline)
+                error = True
+                continue
+            debug_output += "unsquashfs -lls %s:\n%s" % (os.path.basename(fn),
+                                                         out)
+
+            lls_fn = orig_lls_fn
+            if fn == resq:
+                lls_fn = resq_lls_fn
+            with open_file_write(lls_fn) as f:
+                f.write(out)
+
+        if not error:
+            cmdline = ['diff', '-au', orig_lls_fn, resq_lls_fn]
+            (rc, out) = cmd(cmdline)
+            debug_output += "%s:\n%s" % (" ".join(cmdline), out)
+
+        return debug_output
+
     def check_squashfs_resquash(self):
         '''Check resquash of squashfs'''
         if not self.is_snap2:
@@ -141,64 +182,50 @@ class SnapReviewSecurity(SnapReview):
             return
         fstime = out.strip()
 
-        resquash_t = 'info'
         enforce = False
         if 'SNAP_ENFORCE_RESQUASHFS' in os.environ:
             enforce = True
-            resquash_t = 'error'
-
-        (rc, out) = cmd(['unsquashfs', '-lls', fn])
-        if rc != 0:
-            t = 'error'
-            n = self._get_check_name('squashfs_lls')
-            s = 'could not list contents of squashfs'
-            self._add_result(t, n, s)
-            return
-
-        # unsquashfs will mknod device files when run as root, but the snap
-        # security policy does not allow it, so info if base or os snap, but
-        # error otherwise
-        lines = out.splitlines()
-        for line in lines[2:]:
-            if len(line) > 0 and \
-                    line[0] not in ['d', '-', 'l']:  # pragma: nocover
-                t = 'error'
-                s = 'cannot reproduce squashfs with device files: %s' % line
-                if 'type' in self.snap_yaml and \
-                        (self.snap_yaml['type'] == 'base' or
-                         self.snap_yaml['type'] == 'os'):
-                    t = 'info'
-                    s += ' (ok for base/os snap)'
-                n = self._get_check_name('squashfs_resquash_has_devices')
-                self._add_result(t, n, s)
-                return
-
-        # For now, skip the checks on if have symlinks due to LP: #1555305
-        if not enforce and 'lrwxrwxrwx' in out:
-            t = 'info'
-            n = self._get_check_name('squashfs_resquash_1555305')
-            s = 'cannot reproduce squashfs'
-            link = 'https://launchpad.net/bugs/1555305'
-            self._add_result(t, n, s, link=link)
-            return
-        # end LP: #1555305 workaround
 
         tmpdir = create_tempdir()  # this is autocleaned
         tmp_unpack = os.path.join(tmpdir, 'squashfs-root')
         tmp_repack = os.path.join(tmpdir, 'repack.snap')
+        fakeroot_env = os.path.join(tmpdir, 'fakeroot.env')
+        mksquashfs_ignore_opts = ['-all-root', '-no-xattrs']
 
         curdir = os.getcwd()
         os.chdir(tmpdir)
         # ensure we don't alter the permissions from the unsquashfs
         old_umask = os.umask(000)
 
+        if shutil.which('fakeroot') is None:  # pragma: nocover
+            if enforce:
+                t = 'error'
+            else:
+                t = 'info'
+            n = self._get_check_name('has_fakeroot')
+            s = "Could not find 'fakeroot' command"
+            self._add_result(t, n, s)
+            return
+
         try:
-            (rc, out) = cmd(['unsquashfs', '-d', tmp_unpack, fn])
+            # run unsquashfs under fakeroot, saving the session to be reused
+            # by mksquashfs and thus preserving uids/gids/devices/etc
+            (rc, out) = cmd(['fakeroot', '-s', fakeroot_env,
+                             'unsquashfs', '-d', tmp_unpack, fn])
             if rc != 0:
                 raise ReviewException("could not unsquash '%s': %s" %
                                       (os.path.basename(fn), out))
-            (rc, out) = cmd(['mksquashfs', tmp_unpack, tmp_repack,
-                             '-fstime', fstime] + MKSQUASHFS_OPTS)
+
+            # don't use -all-root with mksquashfs since the snap might have
+            # other users in it
+            mksquash_opts = []
+            for i in MKSQUASHFS_OPTS:
+                if i not in mksquashfs_ignore_opts:
+                    mksquash_opts.append(i)
+
+            (rc, out) = cmd(['fakeroot', '-i', fakeroot_env,
+                             'mksquashfs', tmp_unpack, tmp_repack,
+                             '-fstime', fstime] + mksquash_opts)
             if rc != 0:
                 raise ReviewException("could not mksquashfs '%s': %s" %
                                       (os.path.relpath(tmp_unpack, tmpdir),
@@ -235,16 +262,26 @@ class SnapReviewSecurity(SnapReview):
         repack_sum = out.split()[0]
 
         if orig_sum != repack_sum:
+            if 'SNAP_DEBUG_RESQUASHFS' in os.environ:
+                print(self._debug_resquashfs(tmpdir, fn, tmp_repack))
+
             if 'type' in self.snap_yaml and \
                     (self.snap_yaml['type'] == 'base' or
                      self.snap_yaml['type'] == 'os'):
-                t = 'info'
-                s = 'checksums do not match (expected for base/os snap)'
+                mksquash_opts = []
+                for i in MKSQUASHFS_OPTS:
+                    if i not in mksquashfs_ignore_opts:
+                        mksquash_opts.append(i)
             else:
-                t = resquash_t
+                mksquash_opts = MKSQUASHFS_OPTS
+
+            if enforce:
+                t = 'error'
                 s = "checksums do not match. Please ensure the snap is " + \
                     "created with either 'snapcraft snap <DIR>' or " + \
-                    "'mksquashfs <dir> <snap> %s'" % " ".join(MKSQUASHFS_OPTS)
+                    "'mksquashfs <dir> <snap> %s'" % " ".join(mksquash_opts)
+            else:
+                s = "checksums do not match (check not enforced)"
         self._add_result(t, n, s)
 
     def check_squashfs_files(self):

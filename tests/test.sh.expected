@@ -3666,7 +3666,7 @@ bare_1.snap: pass
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -3827,7 +3827,7 @@ bare_1.snap: pass
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -4040,7 +4040,7 @@ busybox-static-mvo_2.snap: pass
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -4234,7 +4234,7 @@ busybox-static-mvo_2.snap: pass
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -4561,7 +4561,7 @@ chrome-test_52.0.2743.116-1+test1_amd64.snap: FAIL
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -4865,7 +4865,7 @@ chrome-test_52.0.2743.116-1+test1_amd64.snap: FAIL
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -5143,7 +5143,7 @@ classic_16.04+test1_all.snap: FAIL
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -5398,7 +5398,7 @@ classic_16.04+test1_all.snap: FAIL
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -5628,7 +5628,7 @@ devmode-home_0.1_amd64.snap: pass
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -5839,7 +5839,7 @@ devmode-home_0.1_amd64.snap: pass
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -6254,7 +6254,7 @@ firefox_48.0+build2-0ubuntu0.16.04.1+test1_amd64.snap: FAIL
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -6646,7 +6646,7 @@ firefox_48.0+build2-0ubuntu0.16.04.1+test1_amd64.snap: FAIL
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -6985,7 +6985,7 @@ glance_ocata_amd64.snap: pass
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -7305,7 +7305,7 @@ glance_ocata_amd64.snap: pass
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -11955,7 +11955,7 @@ hello-world_25.snap: pass
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -12269,7 +12269,7 @@ hello-world_25.snap: pass
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -12561,10 +12561,9 @@ network-manager_1.2.2-1+test1_amd64.snap: FAIL
       "manual_review": false,
       "text": "OK"
     },
-    "security-snap-v2:squashfs_resquash_1555305": {
-      "link": "https://launchpad.net/bugs/1555305",
+    "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "cannot reproduce squashfs"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -12831,10 +12830,9 @@ network-manager_1.2.2-1+test1_amd64.snap: FAIL
         "manual_review": false,
         "text": "OK"
       },
-      "security-snap-v2:squashfs_resquash_1555305": {
-        "link": "https://launchpad.net/bugs/1555305",
+      "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "cannot reproduce squashfs"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -13066,10 +13064,9 @@ notify-send_1_amd64.snap: pass
       "manual_review": false,
       "text": "OK"
     },
-    "security-snap-v2:squashfs_resquash_1555305": {
-      "link": "https://launchpad.net/bugs/1555305",
+    "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "cannot reproduce squashfs"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -13282,10 +13279,9 @@ notify-send_1_amd64.snap: pass
         "manual_review": false,
         "text": "OK"
       },
-      "security-snap-v2:squashfs_resquash_1555305": {
-        "link": "https://launchpad.net/bugs/1555305",
+      "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "cannot reproduce squashfs"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -13463,10 +13459,9 @@ pc.canonical_5.snap: pass
       "manual_review": false,
       "text": "OK"
     },
-    "security-snap-v2:squashfs_resquash_1555305": {
-      "link": "https://launchpad.net/bugs/1555305",
+    "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "cannot reproduce squashfs"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -13625,10 +13620,9 @@ pc.canonical_5.snap: pass
         "manual_review": false,
         "text": "OK"
       },
-      "security-snap-v2:squashfs_resquash_1555305": {
-        "link": "https://launchpad.net/bugs/1555305",
+      "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "cannot reproduce squashfs"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -14898,7 +14892,7 @@ quagga_1.0.20160315-alpha2-git.c6fadc4+test1_amd64.snap: pass
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -16149,7 +16143,7 @@ quagga_1.0.20160315-alpha2-git.c6fadc4+test1_amd64.snap: pass
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -16373,10 +16367,9 @@ snap-test-arch-all-warning_1_all.snap: FAIL
       "manual_review": false,
       "text": "OK"
     },
-    "security-snap-v2:squashfs_resquash_1555305": {
-      "link": "https://launchpad.net/bugs/1555305",
+    "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "cannot reproduce squashfs"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -16577,10 +16570,9 @@ snap-test-arch-all-warning_1_all.snap: FAIL
         "manual_review": false,
         "text": "OK"
       },
-      "security-snap-v2:squashfs_resquash_1555305": {
-        "link": "https://launchpad.net/bugs/1555305",
+      "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "cannot reproduce squashfs"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -16806,7 +16798,7 @@ snappy-debug_20.snap: pass
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -17013,7 +17005,7 @@ snappy-debug_20.snap: pass
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -17283,7 +17275,7 @@ snappy-test-iface-attribs_0.1_all.snap: pass
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -17534,7 +17526,7 @@ snappy-test-iface-attribs_0.1_all.snap: pass
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -20339,7 +20331,7 @@ test-all-app_1_all.snap: FAIL
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -23087,7 +23079,7 @@ test-all-app_1_all.snap: FAIL
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -23721,7 +23713,7 @@ test-all-core_1_all.snap: FAIL
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "checksums do not match (expected for base/os snap)"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -24332,7 +24324,7 @@ test-all-core_1_all.snap: FAIL
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "checksums do not match (expected for base/os snap)"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -24714,7 +24706,7 @@ test-all-gadget_3_all.snap: FAIL
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -25073,7 +25065,7 @@ test-all-gadget_3_all.snap: FAIL
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -25085,8 +25077,6 @@ Errors
 ------
  - security-snap-v2:squashfs_files
 	found errors in file output: file type 'c' not allowed (./dev/null)
- - security-snap-v2:squashfs_resquash_has_devices
-	cannot reproduce squashfs with device files
 test-app-devnull_1.0_all.snap: FAIL
 
 = --sdk test-app-devnull_1.0_all.snap =
@@ -25288,16 +25278,16 @@ test-app-devnull_1.0_all.snap: FAIL
     "security-snap-v2:squashfs_files": {
       "manual_review": false,
       "text": "found errors in file output: file type 'c' not allowed (./dev/null)"
-    },
-    "security-snap-v2:squashfs_resquash_has_devices": {
-      "manual_review": false,
-      "text": "cannot reproduce squashfs with device files"
     }
   },
   "info": {
     "security-snap-v2:profile_name_length:env": {
       "manual_review": false,
       "text": "OK"
+    },
+    "security-snap-v2:squashfs_repack_checksum": {
+      "manual_review": false,
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -25487,16 +25477,16 @@ test-app-devnull_1.0_all.snap: FAIL
       "security-snap-v2:squashfs_files": {
         "manual_review": false,
         "text": "found errors in file output: file type 'c' not allowed (./dev/null)"
-      },
-      "security-snap-v2:squashfs_resquash_has_devices": {
-        "manual_review": false,
-        "text": "cannot reproduce squashfs with device files"
       }
     },
     "info": {
       "security-snap-v2:profile_name_length:env": {
         "manual_review": false,
         "text": "OK"
+      },
+      "security-snap-v2:squashfs_repack_checksum": {
+        "manual_review": false,
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -25911,9 +25901,9 @@ test-base-devnull_1.0_all.snap: FAIL
       "manual_review": false,
       "text": "OK"
     },
-    "security-snap-v2:squashfs_resquash_has_devices": {
+    "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "cannot reproduce squashfs with device files (ok for base/os snap)"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -26077,9 +26067,9 @@ test-base-devnull_1.0_all.snap: FAIL
         "manual_review": false,
         "text": "OK"
       },
-      "security-snap-v2:squashfs_resquash_has_devices": {
+      "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "cannot reproduce squashfs with device files (ok for base/os snap)"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -26313,7 +26303,7 @@ test-base-disallowed_0_all.snap: FAIL
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -26524,7 +26514,7 @@ test-base-disallowed_0_all.snap: FAIL
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -26785,7 +26775,7 @@ test-base-slots-plugs_1.0_all.snap: FAIL
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -27017,7 +27007,7 @@ test-base-slots-plugs_1.0_all.snap: FAIL
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -27277,7 +27267,7 @@ test-classic_0_all.snap: FAIL
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -27513,7 +27503,7 @@ test-classic_0_all.snap: FAIL
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -27775,7 +27765,7 @@ test-completion_1.0_all.snap: pass
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -28018,7 +28008,7 @@ test-completion_1.0_all.snap: pass
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -28239,7 +28229,7 @@ test-dir-perms_0_amd64.snap: pass
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -28441,7 +28431,7 @@ test-dir-perms_0_amd64.snap: pass
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -28774,7 +28764,7 @@ test-env_0.1_all.snap: pass
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -29088,7 +29078,7 @@ test-env_0.1_all.snap: pass
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -29315,7 +29305,7 @@ test-execstack_0_amd64.snap: FAIL
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -29518,7 +29508,7 @@ test-execstack_0_amd64.snap: FAIL
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -29739,7 +29729,7 @@ test-grade-and-confinement_0.1_all.snap: pass
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -29941,7 +29931,7 @@ test-grade-and-confinement_0.1_all.snap: pass
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -30400,10 +30390,9 @@ test-hello-dbus_2_amd64.snap: FAIL
       "manual_review": false,
       "text": "OK"
     },
-    "security-snap-v2:squashfs_resquash_1555305": {
-      "link": "https://launchpad.net/bugs/1555305",
+    "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "cannot reproduce squashfs"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -30837,10 +30826,9 @@ test-hello-dbus_2_amd64.snap: FAIL
         "manual_review": false,
         "text": "OK"
       },
-      "security-snap-v2:squashfs_resquash_1555305": {
-        "link": "https://launchpad.net/bugs/1555305",
+      "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "cannot reproduce squashfs"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -31128,7 +31116,7 @@ test-missing-required-attributes_0_all.snap: FAIL
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -31389,7 +31377,7 @@ test-missing-required-attributes_0_all.snap: FAIL
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -31639,7 +31627,7 @@ test-mpris-name-matches_0_amd64.snap: FAIL
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -31866,7 +31854,7 @@ test-mpris-name-matches_0_amd64.snap: FAIL
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -32116,7 +32104,7 @@ test-mpris-name-mismatch_0_amd64.snap: FAIL
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -32343,7 +32331,7 @@ test-mpris-name-mismatch_0_amd64.snap: FAIL
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -32577,7 +32565,7 @@ test-mpris_0_amd64.snap: pass
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -32792,7 +32780,7 @@ test-mpris_0_amd64.snap: pass
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -33094,10 +33082,9 @@ test-top-level-dbus-slot_1_amd64.snap: FAIL
       "manual_review": false,
       "text": "OK"
     },
-    "security-snap-v2:squashfs_resquash_1555305": {
-      "link": "https://launchpad.net/bugs/1555305",
+    "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "cannot reproduce squashfs"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -33374,10 +33361,9 @@ test-top-level-dbus-slot_1_amd64.snap: FAIL
         "manual_review": false,
         "text": "OK"
       },
-      "security-snap-v2:squashfs_resquash_1555305": {
-        "link": "https://launchpad.net/bugs/1555305",
+      "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "cannot reproduce squashfs"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -33619,7 +33605,7 @@ test-unity7-home_0.1_all.snap: pass
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -33842,7 +33828,7 @@ test-unity7-home_0.1_all.snap: pass
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -34055,7 +34041,7 @@ test-void-dir_0.1_all.snap: pass
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -34249,7 +34235,7 @@ test-void-dir_0.1_all.snap: pass
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -34487,7 +34473,7 @@ test-x11-home_0.1_all.snap: pass
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -34706,7 +34692,7 @@ test-x11-home_0.1_all.snap: pass
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -34937,7 +34923,7 @@ test-x11-no-desktop_0.1_all.snap: FAIL
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -35145,7 +35131,7 @@ test-x11-no-desktop_0.1_all.snap: FAIL
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -35323,9 +35309,9 @@ ubuntu-core_16.04.1+test1_amd64.snap: pass
       "manual_review": false,
       "text": "OK"
     },
-    "security-snap-v2:squashfs_resquash_has_devices": {
+    "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "cannot reproduce squashfs with device files (ok for base/os snap)"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -35484,9 +35470,9 @@ ubuntu-core_16.04.1+test1_amd64.snap: pass
         "manual_review": false,
         "text": "OK"
       },
-      "security-snap-v2:squashfs_resquash_has_devices": {
+      "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "cannot reproduce squashfs with device files (ok for base/os snap)"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -35800,7 +35786,7 @@ vlc_daily+test1_amd64.snap: pass
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -36095,7 +36081,7 @@ vlc_daily+test1_amd64.snap: pass
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}
@@ -36348,7 +36334,7 @@ test-classic_0_all.snap: pass
     },
     "security-snap-v2:squashfs_repack_checksum": {
       "manual_review": false,
-      "text": "OK"
+      "text": "checksums do not match (check not enforced)"
     }
   },
   "warn": {}
@@ -36582,7 +36568,7 @@ test-classic_0_all.snap: pass
       },
       "security-snap-v2:squashfs_repack_checksum": {
         "manual_review": false,
-        "text": "OK"
+        "text": "checksums do not match (check not enforced)"
       }
     },
     "warn": {}

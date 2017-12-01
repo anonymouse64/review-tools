@@ -659,6 +659,16 @@ def open_file_read(path):
     return orig
 
 
+def open_file_write(path):
+    '''Open specified file read-write'''
+    try:
+        orig = codecs.open(path, 'w', "UTF-8")
+    except Exception:
+        raise
+
+    return orig
+
+
 def recursive_rm(dirPath, contents_only=False):
     '''recursively remove directory'''
     try:
