@@ -197,7 +197,12 @@ class SnapReviewSecurity(SnapReview):
         # ensure we don't alter the permissions from the unsquashfs
         old_umask = os.umask(000)
 
-        if shutil.which('fakeroot') is None:  # pragma: nocover
+        # We could use -l $SNAP/usr/lib/... --faked $SNAP/usr/bin/faked if
+        # os.environ['SNAP'] is set, but instead we let the snap packaging
+        # make fakeroot work correctly and keep this simple.
+        fakeroot_cmd = ['fakeroot', '--unknown-is-real']
+
+        if shutil.which(fakeroot_cmd[0]) is None:  # pragma: nocover
             if enforce:
                 t = 'error'
             else:
@@ -210,7 +215,8 @@ class SnapReviewSecurity(SnapReview):
         try:
             # run unsquashfs under fakeroot, saving the session to be reused
             # by mksquashfs and thus preserving uids/gids/devices/etc
-            (rc, out) = cmd(['fakeroot', '-s', fakeroot_env,
+            (rc, out) = cmd(fakeroot_cmd +
+                            ['-s', fakeroot_env,
                              'unsquashfs', '-d', tmp_unpack, fn])
             if rc != 0:
                 raise ReviewException("could not unsquash '%s': %s" %
@@ -223,7 +229,8 @@ class SnapReviewSecurity(SnapReview):
                 if i not in mksquashfs_ignore_opts:
                     mksquash_opts.append(i)
 
-            (rc, out) = cmd(['fakeroot', '-i', fakeroot_env,
+            (rc, out) = cmd(fakeroot_cmd +
+                            ['-i', fakeroot_env,
                              'mksquashfs', tmp_unpack, tmp_repack,
                              '-fstime', fstime] + mksquash_opts)
             if rc != 0:
