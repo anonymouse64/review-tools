@@ -196,7 +196,12 @@ class SnapReviewSecurity(SnapReview):
 
         # Don't use -all-root since the snap might have other users in it
         # NOTE: adding -no-xattrs here causes resquashfs to fail (unsquashfs
-        # and mksquash use -xattrs by default and we don't support xattrs)
+        # and mksquash use -xattrs by default. By specifying -no-xattrs to
+        # unsquashfs/mksquashfs, we enforce not supportinging them since the
+        # checksums will always be different because the original squash would
+        # have them but the repack would not). If we ever decide to support
+        # xattrs in snaps, would have to see why thre requash fails with
+        # -xattrs.
         mksquashfs_ignore_opts = ['-all-root']
 
         curdir = os.getcwd()
