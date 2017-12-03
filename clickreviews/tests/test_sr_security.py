@@ -978,7 +978,9 @@ exit 1
         else:
             os.environ['PATH'] = output_dir  # pragma: nocover
 
+        os.environ['SNAP_ENFORCE_RESQUASHFS'] = "1"
         c.check_squashfs_resquash()
+        os.environ.pop('SNAP_ENFORCE_RESQUASHFS')
         os.environ['PATH'] = old_path
         report = c.click_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
@@ -1006,7 +1008,9 @@ exit 1
         else:
             os.environ['PATH'] = output_dir  # pragma: nocover
 
+        os.environ['SNAP_ENFORCE_RESQUASHFS'] = "1"
         c.check_squashfs_resquash()
+        os.environ.pop('SNAP_ENFORCE_RESQUASHFS')
         os.environ['PATH'] = old_path
         report = c.click_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
@@ -1038,7 +1042,9 @@ exit 0
         else:
             os.environ['PATH'] = output_dir  # pragma: nocover
 
+        os.environ['SNAP_ENFORCE_RESQUASHFS'] = "1"
         c.check_squashfs_resquash()
+        os.environ.pop('SNAP_ENFORCE_RESQUASHFS')
         os.environ['PATH'] = old_path
         report = c.click_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
@@ -1071,7 +1077,9 @@ exit 0
         else:
             os.environ['PATH'] = output_dir  # pragma: nocover
 
+        os.environ['SNAP_ENFORCE_RESQUASHFS'] = "1"
         c.check_squashfs_resquash()
+        os.environ.pop('SNAP_ENFORCE_RESQUASHFS')
         os.environ['PATH'] = old_path
         report = c.click_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}

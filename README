@@ -22,8 +22,15 @@ Runnable snap v2 tests:
 This gives an alternate view on bin/click-run-checks:
 - bin/click-review
 
-Running tests locally:
+Running checks locally:
 $ PYTHONPATH=$PWD ./bin/click-review /path/to/package
+
+Additional environment variables:
+SNAP_DEBUG=1               - show debu info
+SNAP_ENFORCE_RESQUASHFS=1  - enforce resquashfs tests
+SNAP_FAKEROOT_RESQUASHFS=1 - use fakeroot with resquashfs tests
+SNAP_DEBUG_RESQUASHFS=1    - show debug info with failed resquashfs tests
+SNAP_DEBUG_RESQUASHFS=2    - drop to a shell with failed resquashfs
 
 Importable tests:
 - clickreviews/sr_lint.py: lint tests

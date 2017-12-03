@@ -182,9 +182,12 @@ class SnapReviewSecurity(SnapReview):
             return
         fstime = out.strip()
 
-        enforce = False
-        if 'SNAP_ENFORCE_RESQUASHFS' in os.environ:
-            enforce = True
+        if 'SNAP_ENFORCE_RESQUASHFS' not in os.environ:
+            t = 'info'
+            n = self._get_check_name('squashfs_repack_checksum')
+            s = "OK (check not enforced)"
+            self._add_result(t, n, s)
+            return
 
         tmpdir = create_tempdir()  # this is autocleaned
         tmp_unpack = os.path.join(tmpdir, 'squashfs-root')
@@ -197,42 +200,53 @@ class SnapReviewSecurity(SnapReview):
         # ensure we don't alter the permissions from the unsquashfs
         old_umask = os.umask(000)
 
-        # We could use -l $SNAP/usr/lib/... --faked $SNAP/usr/bin/faked if
-        # os.environ['SNAP'] is set, but instead we let the snap packaging
-        # make fakeroot work correctly and keep this simple.
-        fakeroot_cmd = ['fakeroot', '--unknown-is-real']
+        fakeroot_cmd = []
+        if 'SNAP_FAKEROOT_RESQUASHFS' in os.environ:
+            # We could use -l $SNAP/usr/lib/... --faked $SNAP/usr/bin/faked if
+            # os.environ['SNAP'] is set, but instead we let the snap packaging
+            # make fakeroot work correctly and keep this simple.
+            fakeroot_cmd = ['fakeroot', '--unknown-is-real']
 
-        if shutil.which(fakeroot_cmd[0]) is None:  # pragma: nocover
-            if enforce:
+            if shutil.which(fakeroot_cmd[0]) is None:  # pragma: nocover
                 t = 'error'
-            else:
-                t = 'info'
-            n = self._get_check_name('has_fakeroot')
-            s = "Could not find 'fakeroot' command"
-            self._add_result(t, n, s)
-            return
+                n = self._get_check_name('has_fakeroot')
+                s = "Could not find 'fakeroot' command"
+                self._add_result(t, n, s)
+                return
 
         try:
-            # run unsquashfs under fakeroot, saving the session to be reused
-            # by mksquashfs and thus preserving uids/gids/devices/etc
-            (rc, out) = cmd(fakeroot_cmd +
-                            ['-s', fakeroot_env,
-                             'unsquashfs', '-d', tmp_unpack, fn])
+            fakeroot_args = []
+            mksquash_opts = MKSQUASHFS_OPTS
+            if 'SNAP_FAKEROOT_RESQUASHFS' in os.environ:
+                # run unsquashfs under fakeroot, saving the session to be
+                # reused by mksquashfs and thus preserving
+                # uids/gids/devices/etc
+                fakeroot_args = ['-s', fakeroot_env]
+
+                # don't use -all-root with mksquashfs since the snap might have
+                # other users in it
+                mksquash_opts = []
+                for i in MKSQUASHFS_OPTS:
+                    if i not in mksquashfs_ignore_opts:
+                        mksquash_opts.append(i)
+
+            cmdline = fakeroot_cmd + fakeroot_args + \
+                ['unsquashfs', '-d', tmp_unpack, fn]
+
+            (rc, out) = cmd(cmdline)
             if rc != 0:
                 raise ReviewException("could not unsquash '%s': %s" %
                                       (os.path.basename(fn), out))
 
-            # don't use -all-root with mksquashfs since the snap might have
-            # other users in it
-            mksquash_opts = []
-            for i in MKSQUASHFS_OPTS:
-                if i not in mksquashfs_ignore_opts:
-                    mksquash_opts.append(i)
+            fakeroot_args = []
+            if 'SNAP_FAKEROOT_RESQUASHFS' in os.environ:
+                fakeroot_args = ['-i', fakeroot_env]
 
-            (rc, out) = cmd(fakeroot_cmd +
-                            ['-i', fakeroot_env,
-                             'mksquashfs', tmp_unpack, tmp_repack,
-                             '-fstime', fstime] + mksquash_opts)
+            cmdline = fakeroot_cmd + fakeroot_args + \
+                ['mksquashfs', tmp_unpack, tmp_repack, '-fstime', fstime] + \
+                mksquash_opts
+
+            (rc, out) = cmd(cmdline)
             if rc != 0:
                 raise ReviewException("could not mksquashfs '%s': %s" %
                                       (os.path.relpath(tmp_unpack, tmpdir),
@@ -272,6 +286,12 @@ class SnapReviewSecurity(SnapReview):
             if 'SNAP_DEBUG_RESQUASHFS' in os.environ:
                 print(self._debug_resquashfs(tmpdir, fn, tmp_repack))
 
+                if os.environ['SNAP_DEBUG_RESQUASHFS'] == "2":
+                    import subprocess
+                    print("\nIn debug shell. tmpdir=%s, orig=%s, repack=%s" %
+                          (tmpdir, fn, tmp_repack))
+                    subprocess.call(['bash'])
+
             if 'type' in self.snap_yaml and \
                     (self.snap_yaml['type'] == 'base' or
                      self.snap_yaml['type'] == 'os'):
@@ -282,13 +302,10 @@ class SnapReviewSecurity(SnapReview):
             else:
                 mksquash_opts = MKSQUASHFS_OPTS
 
-            if enforce:
-                t = 'error'
-                s = "checksums do not match. Please ensure the snap is " + \
-                    "created with either 'snapcraft snap <DIR>' or " + \
-                    "'mksquashfs <dir> <snap> %s'" % " ".join(mksquash_opts)
-            else:
-                s = "checksums do not match (check not enforced)"
+            t = 'error'
+            s = "checksums do not match. Please ensure the snap is " + \
+                "created with either 'snapcraft snap <DIR>' or " + \
+                "'mksquashfs <dir> <snap> %s'" % " ".join(mksquash_opts)
         self._add_result(t, n, s)
 
     def check_squashfs_files(self):
