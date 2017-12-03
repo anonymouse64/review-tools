@@ -34,7 +34,6 @@ import time
 import types
 
 
-DEBUGGING = False
 REPORT_OUTPUT = "json"
 RESULT_TYPES = ['info', 'warn', 'error']
 UNPACK_DIR = None
@@ -453,8 +452,7 @@ def msg(out, output=sys.stdout):
 
 def debug(out):
     '''Print debug message'''
-    global DEBUGGING
-    if DEBUGGING:
+    if 'SNAP_DEBUG' in os.environ:
         try:
             print("DEBUG: %s" % (out), file=sys.stderr)
         except IOError:
@@ -471,7 +469,7 @@ def jsonmsg(out):
 
 def cmd(command):
     '''Try to execute the given command.'''
-    debug(command)
+    debug(" ".join(command))
     try:
         sp = subprocess.Popen(command, stdout=subprocess.PIPE,
                               stderr=subprocess.STDOUT)
