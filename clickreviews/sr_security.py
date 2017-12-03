@@ -193,7 +193,11 @@ class SnapReviewSecurity(SnapReview):
         tmp_unpack = os.path.join(tmpdir, 'squashfs-root')
         tmp_repack = os.path.join(tmpdir, 'repack.snap')
         fakeroot_env = os.path.join(tmpdir, 'fakeroot.env')
-        mksquashfs_ignore_opts = ['-all-root', '-no-xattrs']
+
+        # Don't use -all-root since the snap might have other users in it
+        # NOTE: adding -no-xattrs here causes resquashfs to fail (unsquashfs
+        # and mksquash use -xattrs by default and we don't support xattrs)
+        mksquashfs_ignore_opts = ['-all-root']
 
         curdir = os.getcwd()
         os.chdir(tmpdir)
@@ -223,8 +227,6 @@ class SnapReviewSecurity(SnapReview):
                 # uids/gids/devices/etc
                 fakeroot_args = ['-s', fakeroot_env]
 
-                # don't use -all-root with mksquashfs since the snap might have
-                # other users in it
                 mksquash_opts = []
                 for i in MKSQUASHFS_OPTS:
                     if i not in mksquashfs_ignore_opts:
