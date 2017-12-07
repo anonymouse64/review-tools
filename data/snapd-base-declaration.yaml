@@ -177,11 +177,21 @@
         - app
     deny-connection: true
     deny-auto-connection: true
+  gnome-online-accounts-service:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   gpio:
     allow-installation:
       slot-snap-type:
         - core
         - gadget
+    deny-auto-connection: true
+  gpio-memory-control:
+    allow-installation:
+      slot-snap-type:
+        - core
     deny-auto-connection: true
   greengrass-support:
     allow-installation:
