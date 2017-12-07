@@ -17,6 +17,7 @@ click-reviewers-tools (0.47) UNRELEASED; urgency=medium
     - remove non-existent 'socket', 'listen-stream', 'socket-user' and
       'socket-group' for v2 snaps
     - add tests for new socket activation yaml
+    - add check for redflagged base snaps
   * sr_declarationl.py: improve the browser-support error message
   * sr_common.py:
     - don't traceback if toplevel plugs/slots is not dict
@@ -24,7 +25,10 @@ click-reviewers-tools (0.47) UNRELEASED; urgency=medium
     - look for data in $SNAP/data
     - add 'license'
   * data/snapd-base-declaration.yaml: update for latest snapd releases
-  * sr_security.py: update for base snaps
+  * sr_security.py:
+    - update for base snaps
+    - use fakeroot for resquashfs tests and refactor
+    - put resquashfs enforcement behind env var
   * cr_security.py: look for data in $SNAP/data
   * frameworks.py: look for data in $SNAP/data
   * add sr_functional.py for execstack checks
@@ -35,11 +39,20 @@ click-reviewers-tools (0.47) UNRELEASED; urgency=medium
     - clean out stale review directories
     - adjust recursive_rm() to chmod the directory if receive PermissionError
     - adjust to output json for errors
+    - use SNAP_DEBUG in debug()
   * bin/create-snap-declaration:
     - output review text
     - handle dbus name assignment
+  * testsuite changes:
+    - add functional teststuite
+    - refactor various scripts into run-helper and only checkc snap v2 files by
+      default (use CHECK_CLICK_FILES=1 for snap v1 and click)
+    - create setup.cfg based on pep8 vs pycodestyle
+    - add pylint3 checks (for now just pylint3 -E)
+    - add run-snap-build-tests
+    - use python3 with json tool
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Thu, 16 Nov 2017 08:23:59 -0600
+ -- Jamie Strandboge <jamie@ubuntu.com>  Thu, 07 Dec 2017 07:40:38 -0600
 
 click-reviewers-tools (0.46) zesty; urgency=medium
 
