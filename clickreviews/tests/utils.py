@@ -34,6 +34,7 @@ def make_snap2(name='test', pkgfmt_type='snap', pkgfmt_version='16.04',
     assert(pkgfmt_type == "snap" and pkgfmt_version != "15.04")
 
     build_dir = tempfile.mkdtemp()
+    os.chmod(build_dir, 0o775)
 
     try:
         make_dir_structure(build_dir, pkgfmt_type=pkgfmt_type,

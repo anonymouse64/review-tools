@@ -892,6 +892,30 @@ brw-rw-rw- root/root                8,12a 2016-03-11 12:25 squashfs-root/foo
         expected['error'][name] = {"text": "malformed lines in unsquashfs output: 'time 'z2:25' malformed for './foo''"}
         self.check_results(report, expected=expected)
 
+    def test_check_zz_squashfs_files_bad_squashfs_root(self):
+        '''Test check_squashfs_files() - bad squashfs-root and meta'''
+        out = '''Parallel unsquashfs: Using 4 processors
+8 inodes (8 blocks) to write
+
+drwx------ root/root                38 2016-03-11 12:25 squashfs-root
+drwx------ root/root                48 2016-03-11 12:26 squashfs-root/meta
+-rw-rw-r-- root/root               813 2016-03-11 12:26 squashfs-root/meta/snap.yaml
+'''
+        self.set_test_unsquashfs_lls(out)
+        c = SnapReviewSecurity(self.test_name)
+        c.check_squashfs_files()
+        report = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'security-snap-v2:squashfs_files'
+        expected['error'][name] = {"text": "found errors in file output: unable to read or access files in 'squashfs-root' due to mode 'rwx------', unable to read or access files in 'squashfs-root/meta' due to mode 'rwx------'"}
+        self.check_results(report, expected=expected)
+
 
 class TestSnapReviewSecurityNoMock(TestCase):
     """Tests without mocks where they are not needed."""

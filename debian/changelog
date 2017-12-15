@@ -29,6 +29,8 @@ click-reviewers-tools (0.47) UNRELEASED; urgency=medium
     - update for base snaps
     - use fakeroot for resquashfs tests and refactor
     - put resquashfs enforcement behind env var
+    - add check for unreadable/inaccessible squashfs-root and
+      squashfs-root/meta
   * cr_security.py: look for data in $SNAP/data
   * frameworks.py: look for data in $SNAP/data
   * add sr_functional.py for execstack checks

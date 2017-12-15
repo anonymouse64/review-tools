@@ -346,10 +346,11 @@ class SnapReviewSecurity(SnapReview):
         malformed = []
         errors = []
 
-        fname_pat = re.compile(r'.* squashfs-root')
+        fname_pat = re.compile(r'.* (squashfs-root)')
         date_pat = re.compile(r'^\d\d\d\d-\d\d-\d\d$')
         time_pat = re.compile(r'^\d\d:\d\d$')
         mknod_pat_full = re.compile(r'.,.')
+        readdir_pat = re.compile(r'^r.xr.xr.x')
         count = 0
 
         for line in out.splitlines():
@@ -365,6 +366,7 @@ class SnapReviewSecurity(SnapReview):
                 continue
 
             fname = fname_pat.sub('.', line)
+            fname_full = fname_pat.sub('\\1', line)
             ftype = tmp[0][0]
 
             # Also see 'info ls', but we list only the Linux ones
@@ -380,6 +382,14 @@ class SnapReviewSecurity(SnapReview):
                 malformed.append("mode '%s' malformed for '%s'" % (mode,
                                                                    fname))
                 continue
+
+            # https://forum.snapcraft.io/t/incorrect-permissions-in-meta-snap-yaml/1161/8
+            if fname_full in ['squashfs-root', 'squashfs-root/meta']:
+                if not readdir_pat.search(mode):
+                    errors.append("unable to read or access files in '%s' "
+                                  "due to mode '%s'" % (fname_full, mode))
+                    continue
+
             if ftype == 'd' or ftype == '-':
                 perms = ['r', 'w', 'x', '-']
                 if ftype == 'd':  # allow sticky directories for stage-packages
