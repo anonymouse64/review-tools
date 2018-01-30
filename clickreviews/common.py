@@ -715,7 +715,7 @@ def run_check(cls):
     sys.exit(rc)
 
 
-def detect_package(fn, dir=None):
+def detect_package(fn, dir):
     '''Detect what type of package this is'''
     pkgtype = None
     pkgver = None
@@ -724,10 +724,9 @@ def detect_package(fn, dir=None):
         error("Could not find '%s'" % fn)
 
     if dir is None:
-        unpack_dir = unpack_pkg(fn)
-    else:
-        unpack_dir = dir
+        error("Invalid unpack directory 'None'")
 
+    unpack_dir = dir
     if not os.path.isdir(unpack_dir):
         error("Could not find '%s'" % unpack_dir)
 
