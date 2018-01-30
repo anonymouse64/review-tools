@@ -142,6 +142,7 @@ class SnapReview(Review):
                                           'usb-vendor/slots': 0,
                                           'usb-product/slots': 0,
                                           },
+                          'snapd-control': {'refresh-schedule/plugs': ""},
                           'spi': {'path/slots': ""},
                           }
 
