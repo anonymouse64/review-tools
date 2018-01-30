@@ -1184,7 +1184,7 @@ exit 0
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'security-snap-v2:squashfs_repack_checksum'
-        expected['error'][name] = {"text": "checksums do not match. Please ensure the snap is created with either 'snapcraft snap <DIR>' or 'mksquashfs <dir> <snap> -noappend -comp xz -all-root -no-xattrs'"}
+        expected['error'][name] = {"text": "checksums do not match. Please ensure the snap is created with either 'snapcraft snap <DIR>' or 'mksquashfs <dir> <snap> -noappend -comp xz -all-root -no-xattrs -no-fragments'"}
         self.check_results(report, expected=expected)
 
     def test_check_squashfs_resquash_sha512sum_mismatch_enforce_os(self):
@@ -1243,7 +1243,7 @@ exit 0
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'security-snap-v2:squashfs_repack_checksum'
-        expected['error'][name] = {"text": "checksums do not match. Please ensure the snap is created with either 'snapcraft snap <DIR>' or 'mksquashfs <dir> <snap> -noappend -comp xz -no-xattrs'"}
+        expected['error'][name] = {"text": "checksums do not match. Please ensure the snap is created with either 'snapcraft snap <DIR>' or 'mksquashfs <dir> <snap> -noappend -comp xz -no-xattrs -no-fragments'"}
         self.check_results(report, expected=expected)
 
     def test_check_debug_resquashfs(self):
