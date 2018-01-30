@@ -132,6 +132,7 @@ lint-snap-v2:base_allowed|
 lint-snap-v2:base_interfaces|
 lint-snap-v2:base_valid|
 lint-snap-v2:command|
+lint-snap-v2:common-id|
 lint-snap-v2:completer|
 lint-snap-v2:config_hook_executable|
 lint-snap-v2:confinement_classic|https://forum.snapcraft.io/t/process-for-reviewing-classic-confinement-snaps/1460
