@@ -92,7 +92,10 @@ def cleanup_unpack():
     for d in glob.glob("%s/%s*" % (tmpdir, MKDTEMP_PREFIX)):
         if not os.path.isdir(d):
             continue
-        if time.time() - os.path.getmtime(d) > maxage:
+        # since we tell unsquashfs to use UNPACK_DIR, unsquashfs sets the mtime
+        # to the mtime of squashfs-root in the snap after the unpack, so check
+        # the ctime instead of the mtime
+        if time.time() - os.path.getctime(d) > maxage:
             debug("Removing old review '%s'" % d)
             try:
                 recursive_rm(os.path.join(d))
