@@ -3711,6 +3711,25 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
+    def test_check_apps_common_id(self):
+        '''Test check_apps_common_id()'''
+        entry = "org.example.foo.desktop"
+        self.set_test_snap_yaml("apps", {"foo": {"common-id": entry}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_common_id()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_common_id_bad(self):
+        '''Test check_apps_common_id() - bad'''
+        self.set_test_snap_yaml("apps", {"foo": {"common-id": []}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_common_id()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
 
 class TestSnapReviewLintNoMock(TestCase):
     """Tests without mocks where they are not needed."""

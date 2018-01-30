@@ -65,18 +65,19 @@ class SnapReview(Review):
 
     apps_required = ['command']
     apps_optional = ['aliases',
+                     'common-id',
                      'completer',
                      'daemon',
                      'environment',
+                     'plugs',
+                     'ports',
+                     'post-stop-command',
                      'reload-command',
+                     'restart-condition',
+                     'slots',
+                     'sockets',
                      'stop-command',
                      'stop-timeout',
-                     'restart-condition',
-                     'post-stop-command',
-                     'plugs',
-                     'slots',
-                     'ports',
-                     'sockets',
                      ]
     hooks_required = []
     hooks_optional = ['plugs']

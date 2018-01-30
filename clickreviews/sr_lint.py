@@ -1655,3 +1655,23 @@ class SnapReviewLint(SnapReview):
                     t = 'error'
                     s = "socket-mode should not be specified with abstract or network sockets"
                 self._add_result(t, n, s)
+
+    def check_apps_common_id(self):
+        '''Check apps - common-id'''
+        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+            return
+
+        for app in self.snap_yaml['apps']:
+            key = 'common-id'
+            if key not in self.snap_yaml['apps'][app]:
+                # We check for required elsewhere
+                continue
+
+            t = 'info'
+            n = self._get_check_name('%s' % key, app=app)
+            s = 'OK'
+            if not isinstance(self.snap_yaml['apps'][app][key], str):
+                t = 'error'
+                s = "%s '%s' (not a str)" % (key,
+                                             self.snap_yaml['apps'][app][key])
+            self._add_result(t, n, s)
