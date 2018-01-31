@@ -71,6 +71,9 @@ slots:
     deny-connection:
       plug-attributes:
         allow-sandbox: true
+    deny-auto-connection:
+      plug-attributes:
+        allow-sandbox: true
   network:
     allow-installation:
       slot-snap-type:
@@ -4039,4 +4042,32 @@ slots:
         expected['info'] = dict()
         name = 'declaration-snap-v2:slots:iface:serial-port'
         expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_plugs_uses_iface_reference(self):
+        '''Test check_declaration - plugs iface reference'''
+        plugs = {'iface': {'interface': 'browser-support',
+                           'allow-sandbox': True}}
+        self.set_test_snap_yaml("plugs", plugs)
+        overrides = {
+            'snap_decl_plugs': {
+                'iface': {
+                    'allow-connection': True
+                }
+            }
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs_deny-connection:iface:browser-support'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'plug-attributes' from base declaration. If using a chromium webview, you can disable the internal sandbox (eg, use --no-sandbox) and remove the 'allow-sandbox' attribute instead. For Oxide webviews, export OXIDE_NO_SANDBOX=1 to disable its internal sandbox. Similarly for QtWebEngine, use QTWEBENGINE_DISABLE_SANDBOX=1."}
         self.check_results(r, expected=expected)
