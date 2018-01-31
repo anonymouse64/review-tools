@@ -132,8 +132,8 @@ lint-snap-v2:base_allowed|
 lint-snap-v2:base_interfaces|
 lint-snap-v2:base_valid|
 lint-snap-v2:command|
+lint-snap-v2:common-id|
 lint-snap-v2:completer|
-lint-snap-v2:config_hook_executable|
 lint-snap-v2:confinement_classic|https://forum.snapcraft.io/t/process-for-reviewing-classic-confinement-snaps/1460
 lint-snap-v2:confinement_classic_with_interfaces|https://launchpad.net/bugs/1655369
 lint-snap-v2:confinement_valid|
@@ -148,6 +148,7 @@ lint-snap-v2:environment_value_valid|
 lint-snap-v2:epoch_valid|
 lint-snap-v2:external_symlinks|
 lint-snap-v2:grade_valid|
+lint-snap-v2:hook_executable|
 lint-snap-v2:hook_plugs|
 lint-snap-v2:hook_plugs_plug_reference|
 lint-snap-v2:hooks|
@@ -189,6 +190,7 @@ lint-snap-v2:stop-timeout_range|
 lint-snap-v2:summary|
 lint-snap-v2:summary_present|
 lint-snap-v2:unknown_field|
+lint-snap-v2:unknown_hook|
 lint-snap-v2:valid_contents_for_architecture|
 lint-snap-v2:vcs_files|
 lint-snap-v2:version_valid|

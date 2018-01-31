@@ -93,6 +93,9 @@
     deny-connection:
       plug-attributes:
         allow-sandbox: true
+    deny-auto-connection:
+      plug-attributes:
+        allow-sandbox: true
   camera:
     allow-installation:
       slot-snap-type:
@@ -178,6 +181,16 @@
     deny-connection: true
     deny-auto-connection: true
   gnome-online-accounts-service:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
+  gpg-keys:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
+  gpg-public-keys:
     allow-installation:
       slot-snap-type:
         - core
@@ -491,6 +504,16 @@
         - core
         - gadget
     deny-auto-connection: true
+  ssh-keys:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
+  ssh-public-keys:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   storage-framework-service:
     allow-installation:
       slot-snap-type:
@@ -580,7 +603,12 @@
   wayland:
     allow-installation:
       slot-snap-type:
+        - app
         - core
+    deny-connection:
+      on-classic: false
+    deny-auto-connection:
+      on-classic: false
   x11:
     allow-installation:
       slot-snap-type:

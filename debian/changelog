@@ -18,12 +18,18 @@ click-reviewers-tools (0.47) UNRELEASED; urgency=medium
       'socket-group' for v2 snaps
     - add tests for new socket activation yaml
     - add check for redflagged base snaps
+    - add check for unreadable/inaccessible squashfs-root and
+      squashfs-root/meta
+    - add executable and known checks for all hooks
   * sr_declarationl.py: improve the browser-support error message
   * sr_common.py:
     - don't traceback if toplevel plugs/slots is not dict
     - add 'completer' (LP: #1689578)
     - look for data in $SNAP/data
     - add 'license'
+    - mksquashfs should use -no-fragments
+    - add 'refresh-schedule'
+    - add 'common-id'
   * data/snapd-base-declaration.yaml: update for latest snapd releases
   * sr_security.py:
     - update for base snaps
@@ -53,8 +59,9 @@ click-reviewers-tools (0.47) UNRELEASED; urgency=medium
     - add pylint3 checks (for now just pylint3 -E)
     - add run-snap-build-tests
     - use python3 with json tool
+  * remove unused bin/detect-package and refactor detect_package
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Thu, 07 Dec 2017 07:40:38 -0600
+ -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 30 Jan 2018 14:43:50 -0600
 
 click-reviewers-tools (0.46) zesty; urgency=medium
 

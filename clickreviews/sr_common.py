@@ -65,18 +65,19 @@ class SnapReview(Review):
 
     apps_required = ['command']
     apps_optional = ['aliases',
+                     'common-id',
                      'completer',
                      'daemon',
                      'environment',
+                     'plugs',
+                     'ports',
+                     'post-stop-command',
                      'reload-command',
+                     'restart-condition',
+                     'slots',
+                     'sockets',
                      'stop-command',
                      'stop-timeout',
-                     'restart-condition',
-                     'post-stop-command',
-                     'plugs',
-                     'slots',
-                     'ports',
-                     'sockets',
                      ]
     hooks_required = []
     hooks_optional = ['plugs']
@@ -93,6 +94,19 @@ class SnapReview(Review):
                         'kernel',
                         'gadget',
                         'os',
+                        ]
+
+    # snap/hooktypes.go
+    valid_hook_types = ['configure',
+                        'connect-plug-',
+                        'connect-slot-',
+                        'install',
+                        'post-refresh',
+                        'pre-refresh',
+                        'prepare-device',
+                        'prepare-plug-',
+                        'prepare-slot-',
+                        'remove',
                         ]
 
     # https://docs.google.com/document/d/1Q5_T00yTq0wobm_nHzCV-KV8R4jdk-PXcrtm80ETTLU/edit#
@@ -142,6 +156,7 @@ class SnapReview(Review):
                                           'usb-vendor/slots': 0,
                                           'usb-product/slots': 0,
                                           },
+                          'snapd-control': {'refresh-schedule/plugs': ""},
                           'spi': {'path/slots': ""},
                           }
 

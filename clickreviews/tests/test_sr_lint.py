@@ -784,28 +784,6 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': 0, 'warn': 1, 'error': 0}
         self.check_results(r, expected_counts)
 
-    def test_check_config(self):
-        '''Test check_config()'''
-        c = SnapReviewLint(self.test_name)
-        self.set_test_unpack_dir("/nonexistent")
-        c.pkg_files.append(os.path.join(c._get_unpack_dir(),
-                           'meta/hooks/config'))
-        c.check_config()
-        r = c.click_report
-        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
-        self.check_results(r, expected_counts)
-
-    def test_check_config_nonexecutable(self):
-        '''Test check_config() - not executable'''
-        c = SnapReviewLint(self.test_name)
-        self.set_test_unpack_dir("/nonexistent.nonexec")
-        c.pkg_files.append(os.path.join(c._get_unpack_dir(),
-                           'meta/hooks/config'))
-        c.check_config()
-        r = c.click_report
-        expected_counts = {'info': None, 'warn': 0, 'error': 1}
-        self.check_results(r, expected_counts)
-
     def test_check_description(self):
         '''Test check_description'''
         self.set_test_snap_yaml("description", "This is a test description")
@@ -3711,6 +3689,25 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
+    def test_check_apps_common_id(self):
+        '''Test check_apps_common_id()'''
+        entry = "org.example.foo.desktop"
+        self.set_test_snap_yaml("apps", {"foo": {"common-id": entry}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_common_id()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_common_id_bad(self):
+        '''Test check_apps_common_id() - bad'''
+        self.set_test_snap_yaml("apps", {"foo": {"common-id": []}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_common_id()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
 
 class TestSnapReviewLintNoMock(TestCase):
     """Tests without mocks where they are not needed."""
@@ -4062,6 +4059,75 @@ architectures: [ amd64 ]
         c.check_vcs()
         r = c.click_report
         expected_counts = {'info': None, 'warn': 1, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_valid_hook_configure(self):
+        '''Test check_valid_hook() - configure'''
+        output_dir = self.mkdtemp()
+        package = utils.make_snap2(output_dir=output_dir,
+                                   extra_files=['meta/hooks/configure?755']
+                                   )
+        c = SnapReviewLint(package)
+        c.check_valid_hook()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_valid_hook_configure_nonexecutable(self):
+        '''Test check_valid_hook() - configure not executable'''
+        package = utils.make_snap2(output_dir=self.mkdtemp(),
+                                   extra_files=['meta/hooks/configure']
+                                   )
+        c = SnapReviewLint(package)
+        c.check_valid_hook()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_valid_hook_install(self):
+        '''Test check_valid_hook() - install'''
+        output_dir = self.mkdtemp()
+        package = utils.make_snap2(output_dir=output_dir,
+                                   extra_files=['meta/hooks/install?755']
+                                   )
+        c = SnapReviewLint(package)
+        c.check_valid_hook()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_valid_hook_install_nonexecutable(self):
+        '''Test check_valid_hook() - install not executable'''
+        package = utils.make_snap2(output_dir=self.mkdtemp(),
+                                   extra_files=['meta/hooks/install']
+                                   )
+        c = SnapReviewLint(package)
+        c.check_valid_hook()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_valid_hook_unknown(self):
+        '''Test check_valid_hook() - unknown'''
+        package = utils.make_snap2(output_dir=self.mkdtemp(),
+                                   extra_files=['meta/hooks/unknown?755']
+                                   )
+        c = SnapReviewLint(package)
+        c.check_valid_hook()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 1, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_valid_hook_connect_plug_home(self):
+        '''Test check_valid_hook() - connect-plug-home'''
+        output_dir = self.mkdtemp()
+        package = utils.make_snap2(output_dir=output_dir,
+                                   extra_files=['meta/hooks/connect-plug-home?755']
+                                   )
+        c = SnapReviewLint(package)
+        c.check_valid_hook()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
     def test_check_iffy(self):

@@ -43,7 +43,8 @@ MKDTEMP_PREFIX = "review-tools-"
 MKDTEMP_DIR = None
 VALID_SYSCALL = r'^[a-z0-9_]{2,64}$'
 # This needs to match up with snapcraft
-MKSQUASHFS_OPTS = ['-noappend', '-comp', 'xz', '-all-root', '-no-xattrs']
+MKSQUASHFS_OPTS = ['-noappend', '-comp', 'xz', '-all-root', '-no-xattrs',
+                   '-no-fragments']
 # There are quite a few kernel interfaces that can cause problems with
 # long profile names. These are outlined in
 # https://launchpad.net/bugs/1499544. The big issue is that the audit
@@ -91,7 +92,10 @@ def cleanup_unpack():
     for d in glob.glob("%s/%s*" % (tmpdir, MKDTEMP_PREFIX)):
         if not os.path.isdir(d):
             continue
-        if time.time() - os.path.getmtime(d) > maxage:
+        # since we tell unsquashfs to use UNPACK_DIR, unsquashfs sets the mtime
+        # to the mtime of squashfs-root in the snap after the unpack, so check
+        # the ctime instead of the mtime
+        if time.time() - os.path.getctime(d) > maxage:
             debug("Removing old review '%s'" % d)
             try:
                 recursive_rm(os.path.join(d))
@@ -711,7 +715,7 @@ def run_check(cls):
     sys.exit(rc)
 
 
-def detect_package(fn, dir=None):
+def detect_package(fn, dir):
     '''Detect what type of package this is'''
     pkgtype = None
     pkgver = None
@@ -720,10 +724,9 @@ def detect_package(fn, dir=None):
         error("Could not find '%s'" % fn)
 
     if dir is None:
-        unpack_dir = unpack_pkg(fn)
-    else:
-        unpack_dir = dir
+        error("Invalid unpack directory 'None'")
 
+    unpack_dir = dir
     if not os.path.isdir(unpack_dir):
         error("Could not find '%s'" % unpack_dir)
 
