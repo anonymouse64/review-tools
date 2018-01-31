@@ -278,21 +278,43 @@ class SnapReviewLint(SnapReview):
             s = "malformed 'version': '%s'" % self.snap_yaml['version']
         self._add_result(t, n, s)
 
-    def check_config(self):
-        '''Check config'''
+    def check_valid_hook(self):
+        '''Check valid hook'''
         if not self.is_snap2:
             return
 
-        fn = os.path.join(self._get_unpack_dir(), 'meta/hooks/config')
-        if fn not in self.pkg_files:
+        hooks = glob.glob("%s/meta/hooks/*" % self._get_unpack_dir())
+        if len(hooks) == 0:
             return
 
+        unknown = []
+        for fn in hooks:
+            hook = os.path.basename(fn)
+            rel = os.path.relpath(fn, self._get_unpack_dir())
+            t = 'info'
+            n = self._get_check_name('hook_executable', app=hook)
+            s = 'OK'
+            if not self._check_innerpath_executable(fn):
+                t = 'error'
+                s = '%s is not executable' % rel
+            self._add_result(t, n, s)
+
+            found = False
+            for valid in self.valid_hook_types:
+                if hook == valid or \
+                        (('-plug-' in hook or '-slot-' in hook) and
+                         hook.startswith(valid)):
+                    found = True
+            if not found:
+                unknown.append(hook)
+
         t = 'info'
-        n = self._get_check_name('config_hook_executable')
+        n = self._get_check_name('unknown_hook')
         s = 'OK'
-        if not self._check_innerpath_executable(fn):
-            t = 'error'
-            s = 'meta/hooks/config is not executable'
+        if len(unknown) > 0:
+            t = 'warn'
+            s = "unknown hooks in meta/hooks: '%s'" % \
+                (",".join(sorted(unknown)))
         self._add_result(t, n, s)
 
     def check_icon(self):

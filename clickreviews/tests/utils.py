@@ -97,6 +97,7 @@ def make_dir_structure(path, pkgfmt_type, pkgfmt_version, extra_files=None):
        extra_files:
          path/to/file                   create empty file in path
          path/to/dir/                   create empty dir in path
+         path/to/file?PERM              create file/dir with PERM in octal
          path/to/source,path/to/link    create symlink in path
          path/to/source:path/to/link    copy source to path
 
@@ -115,6 +116,8 @@ def make_dir_structure(path, pkgfmt_type, pkgfmt_version, extra_files=None):
             extra = extra_file.split(',', 1)[1]
         elif ':' in extra_file:
             extra = extra_file.split(':', 1)[1]
+        elif '?' in extra_file:
+            extra = extra_file.split('?', 1)[0]
         else:
             extra = extra_file
 
@@ -138,10 +141,13 @@ def make_dir_structure(path, pkgfmt_type, pkgfmt_version, extra_files=None):
 
         source_link = None
         source_path = None
+        perm = None
         if ',' in extra_file:
             (source_link, target_path) = extra_file.split(',', 1)
         elif ':' in extra_file:
             (source_path, target_path) = extra_file.split(':', 1)
+        elif '?' in extra_file:
+            (target_path, perm) = extra_file.split('?', 1)
         else:
             target_path = extra_file
 
@@ -162,6 +168,9 @@ def make_dir_structure(path, pkgfmt_type, pkgfmt_version, extra_files=None):
             else:
                 with open(os.path.join(path, target_path), 'wb'):
                     pass
+
+            if perm is not None:
+                os.chmod(os.path.join(path, target_path), int(perm, 8))
 
 
 def write_icon(path):

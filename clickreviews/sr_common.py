@@ -96,6 +96,19 @@ class SnapReview(Review):
                         'os',
                         ]
 
+    # snap/hooktypes.go
+    valid_hook_types = ['configure',
+                        'connect-plug-',
+                        'connect-slot-',
+                        'install',
+                        'post-refresh',
+                        'pre-refresh',
+                        'prepare-device',
+                        'prepare-plug-',
+                        'prepare-slot-',
+                        'remove',
+                        ]
+
     # https://docs.google.com/document/d/1Q5_T00yTq0wobm_nHzCV-KV8R4jdk-PXcrtm80ETTLU/edit#
     # 'plugs':
     #    'interface': name
