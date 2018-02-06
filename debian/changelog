@@ -60,8 +60,12 @@ click-reviewers-tools (0.47) UNRELEASED; urgency=medium
     - add run-snap-build-tests
     - use python3 with json tool
   * remove unused bin/detect-package and refactor detect_package
+  * debian/control:
+    - add fakeroot to Build-Depends and Depends
+    - sync Build-Depends and Depends
+    - add jq to Build-Depends
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 30 Jan 2018 14:43:50 -0600
+ -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 06 Feb 2018 13:06:10 -0600
 
 click-reviewers-tools (0.46) zesty; urgency=medium
 
