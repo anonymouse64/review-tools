@@ -1,0 +1,59 @@
+#!/bin/sh
+#
+# Copyright (C) 2017 Canonical Ltd.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+MKSQUASHFS_OPTS=$(python3 -c 'from clickreviews.common import MKSQUASHFS_OPTS; print(" ".join(MKSQUASHFS_OPTS))' | sed 's/ -all-root//')
+if ! echo "$MKSQUASHFS_OPTS" | grep -q '\-comp' ; then
+    echo "Could not determine mksquashfs options. Is PYTHONPATH set?"
+    exit 1
+fi
+
+tmpdir=$(mktemp -d review-tools.snap-repack-XXXXXX)
+unpack_dir="$tmpdir/squashfs-root"
+fakeroot_env="$tmpdir/fakeroot.env"
+
+usage() {
+    echo "snap-repack orig.snap repack.snap"
+}
+
+repacked="$2"
+if [ -z "$repacked" ]; then
+    usage
+    exit 1
+elif [ -e "$repacked" ]; then
+    echo "'$repacked' already exists"
+    exit 1
+fi
+
+orig="$1"
+if [ -z "$orig" ]; then
+    usage
+    exit 1
+elif [ ! -e "$orig" ]; then
+    echo "'$orig' does not exist"
+    exit 1
+fi
+
+echo "Obtaining the fstime"
+fstime=$(unsquashfs -fstime "$orig")
+echo "fstime: $fstime"
+
+echo "Unpacking '$orig' to '$unpack_dir'..."
+fakeroot --unknown-is-real -s "$fakeroot_env" unsquashfs -d "$unpack_dir" "$orig"
+
+echo "Repacking '$unpack_dir' to '$repacked'"
+fakeroot -i "$fakeroot_env" mksquashfs "$unpack_dir" "$repacked" -fstime "$fstime" $MKSQUASHFS_OPTS
+
+rm -rf "$tmpdir"
