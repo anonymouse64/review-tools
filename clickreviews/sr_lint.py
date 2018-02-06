@@ -1055,6 +1055,7 @@ class SnapReviewLint(SnapReview):
                 continue
             x_binaries.append(os.path.relpath(i, self._get_unpack_dir()))
         if len(x_binaries) > 0:
+            x_binaries.sort()
             # gadget snap is specified with 'all' but has binaries. Don't complain
             # about that
             t = 'error'

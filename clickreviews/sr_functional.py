@@ -75,6 +75,7 @@ class SnapReviewFunctional(SnapReview):
                 bins.append(os.path.relpath(i, self.unpack_dir))
 
         if len(bins) > 0:
+            bins.sort()
             if self.snap_yaml['name'] in func_execstack_overrides:
                 t = 'info'
                 s = 'OK (allowing files with executable stack: %s)' % \
