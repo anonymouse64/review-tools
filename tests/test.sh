@@ -32,9 +32,9 @@ for i in ./tests/*.click ./tests/*.snap ; do
         snap=$(basename "$i")
         echo "= $j $snap ="
         if [ "$testtype" = "snap-review" ]; then
-            review-tools.snap-review $j "$i" 2>&1 | sed -e 's#./tests/##g' -e 's/"text": "SKIPPED (could not import apt_pkg)"/"text": "OK"/' -e 's/"text": "checksums do not match. Please ensure the snap .*"/"text": "OK"/' | tee "$tmpjson"
+            review-tools.snap-review $j "$i" 2>&1 | sed -e 's#./tests/##g' -e 's/"text": "SKIPPED (could not import apt_pkg)"/"text": "OK"/' | tee "$tmpjson"
         else
-            PYTHONPATH=./ ./bin/click-review $j "$i" 2>&1 | sed -e 's#./tests/##g' -e 's/"text": "checksums do not match. Please ensure the snap .*"/"text": "OK"/' | tee "$tmpjson"
+            PYTHONPATH=./ ./bin/click-review $j "$i" 2>&1 | sed -e 's#./tests/##g' | tee "$tmpjson"
         fi
 
         if [ "$j" = "--json" ]; then
@@ -53,9 +53,9 @@ for i in ./tests/test-classic*.snap ; do
         snap=$(basename "$i")
         echo "= --allow-classic $j $snap ="
         if [ "$testtype" = "snap-review" ]; then
-            review-tools.snap-review --allow-classic $j "$i" 2>&1 | sed -e 's#./tests/##g' -e 's/"text": "SKIPPED (could not import apt_pkg)"/"text": "OK"/' -e 's/"text": "checksums do not match. Please ensure the snap .*"/"text": "OK"/' | tee "$tmpjson"
+            review-tools.snap-review --allow-classic $j "$i" 2>&1 | sed -e 's#./tests/##g' -e 's/"text": "SKIPPED (could not import apt_pkg)"/"text": "OK"/' | tee "$tmpjson"
         else
-            PYTHONPATH=./ ./bin/click-review --allow-classic $j "$i" 2>&1 | sed -e 's#./tests/##g' -e 's/"text": "checksums do not match. Please ensure the snap .*"/"text": "OK"/' | tee "$tmpjson"
+            PYTHONPATH=./ ./bin/click-review --allow-classic $j "$i" 2>&1 | sed -e 's#./tests/##g' | tee "$tmpjson"
         fi
 
         if [ "$j" = "--json" ]; then
