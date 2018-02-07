@@ -1,6 +1,6 @@
 '''sr_security.py: snap security checks'''
 #
-# Copyright (C) 2013-2016 Canonical Ltd.
+# Copyright (C) 2013-2018 Canonical Ltd.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -313,6 +313,22 @@ class SnapReviewSecurity(SnapReview):
             s = "checksums do not match. Please ensure the snap is " + \
                 "created with either 'snapcraft snap <DIR>' or " + \
                 "'mksquashfs <dir> <snap> %s'" % " ".join(mksquash_opts)
+            # FIXME: fakeroot sporadically fails and saves the wrong
+            # uid/gid/mode into its save file, thus causing the mksquashfs to
+            # create the wrong file/perms/ownership. We want to not ignore this
+            # error when using fakeroot. We need fakeroot or something like it
+            # for unsquashfs to create devices, perms and ownership as
+            # non-root, but only base and os snaps are allowed to have devices
+            # and not use -all-root. Therefore, when not using fakeroot, only
+            # enforce resquash for non-os/base snaps. Eventually we'll fix
+            # fakeroot or do something else so we can use this for all snaps,
+            # with or without -all-root.
+            if 'SNAP_FAKEROOT_RESQUASHFS' not in os.environ and \
+                    'type' in self.snap_yaml and \
+                    (self.snap_yaml['type'] == 'base' or
+                     self.snap_yaml['type'] == 'os'):
+                t = 'info'
+                s = "OK (check not enforced for base and os snaps): " + s
         self._add_result(t, n, s)
 
     def check_squashfs_files(self):
