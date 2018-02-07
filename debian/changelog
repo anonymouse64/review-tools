@@ -21,6 +21,7 @@ click-reviewers-tools (0.47) UNRELEASED; urgency=medium
     - add check for unreadable/inaccessible squashfs-root and
       squashfs-root/meta
     - add executable and known checks for all hooks
+    - add checks for updated content interface slot attributes
   * sr_declarationl.py: improve the browser-support error message
   * sr_common.py:
     - don't traceback if toplevel plugs/slots is not dict
@@ -33,7 +34,7 @@ click-reviewers-tools (0.47) UNRELEASED; urgency=medium
   * data/snapd-base-declaration.yaml: update for latest snapd releases
   * sr_security.py:
     - update for base snaps
-    - use fakeroot for resquashfs tests and refactor
+    - use fakeroot (behind env var) for resquashfs tests and refactor
     - put resquashfs enforcement behind env var
     - add check for unreadable/inaccessible squashfs-root and
       squashfs-root/meta

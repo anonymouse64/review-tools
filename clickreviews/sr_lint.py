@@ -1,6 +1,6 @@
 '''sr_lint.py: lint checks'''
 #
-# Copyright (C) 2013-2017 Canonical Ltd.
+# Copyright (C) 2013-2018 Canonical Ltd.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1698,3 +1698,74 @@ class SnapReviewLint(SnapReview):
                 s = "%s '%s' (not a str)" % (key,
                                              self.snap_yaml['apps'][app][key])
             self._add_result(t, n, s)
+
+    def check_interface_content_slot_source(self):
+        '''Check content interface slot source'''
+        if not self.is_snap2 or 'slots' not in self.snap_yaml:
+            return
+
+        for slot in self.snap_yaml['slots']:
+            iname = slot
+            if 'interface' in self.snap_yaml['slots'][iname]:
+                iname = self.snap_yaml['slots'][iname]['interface']
+
+            if iname != 'content':
+                continue
+
+            iface = self.snap_yaml['slots'][slot]
+
+            if 'source' not in iface:
+                continue
+            elif not isinstance(iface['source'], dict):
+                t = 'error'
+                n = self._get_check_name('%s_source_valid' % iname)
+                s = "invalid content key: source (not a dict)"
+                self._add_result(t, n, s)
+                continue
+
+            only_valid = True
+            for key in iface['source'].keys():
+                t = 'info'
+                n = self._get_check_name('%s_source' % iname, app=key)
+                s = 'OK'
+                if key not in ['read', 'write']:
+                    t = 'error'
+                    n = self._get_check_name('%s' % iname, app=key)
+                    s = "unknown content source key '%s'" % key
+                elif not isinstance(iface['source'][key], list):
+                    t = 'error'
+                    n = self._get_check_name('%s_source_key_valid' % iname,
+                                             app=key)
+                    s = "invalid content source key: %s (not a list)" % (key)
+                    self._add_result(t, n, s)
+                    only_valid = False
+                    continue
+                else:
+                    for i in iface['source'][key]:
+                        if not isinstance(i, str):
+                            t = 'error'
+                            n = self._get_check_name('%s_source_item_valid' %
+                                                     iname, app=key)
+                            s = "content source %s values are not str" % key
+                            self._add_result(t, n, s)
+                            only_valid = False
+                            break
+                self._add_result(t, n, s)
+
+            if not only_valid:
+                continue
+
+            if 'read' in iface['source'] and 'write' in iface['source']:
+                both = []
+                for i in iface['source']['read']:
+                    if i in iface['source']['write']:
+                        both.append(i)
+
+                t = 'info'
+                n = self._get_check_name('%s_source_in_both' % iname)
+                s = 'OK'
+                if len(both) > 0:
+                    t = 'error'
+                    s = "paths found in both read and write: %s" % \
+                        ", ".join(both)
+                    self._add_result(t, n, s)

@@ -132,6 +132,7 @@ class SnapReview(Review):
                           'browser-support': {'allow-sandbox/plugs': False},
                           'content': {'read/slots': [],
                                       'write/slots': [],
+                                      'source/slots': {},
                                       'target/plugs': "",
                                       'default-provider/plugs': "",
                                       'content/plugs': "",
@@ -165,7 +166,10 @@ class SnapReview(Review):
     # This is to avoid situations like:
     # https://forum.snapcraft.io/t/broken-snap-breaking-snapd/401/8
     interfaces_required = {'bool-file': {'slots': ['path']},
-                           'content': {'slots': ['read', 'write'],
+                           'content': {'slots': ['read/!source',
+                                                 'write/!source',
+                                                 'read/write/!source',
+                                                 'source/!read/!write'],
                                        'plugs': ['target'],
                                        },
                            'dbus': {'slots': ['name/bus'],

@@ -66,6 +66,13 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                  'iface-content': {'interface': 'content',
                                    'read': ['/path/to/somewhere'],
                                    'write': ['/path/to/somewhere/else']},
+                 'iface-content-modern': {'interface': 'content',
+                                          'source': {'read': ['$SNAP/a',
+                                                              '$SNAP/b',
+                                                              ],
+                                                     'write': ['$SNAP/c'],
+                                                     },
+                                          },
                  'iface-serial-port': {'interface': 'serial-port',
                                        'path': '/path/to/something'},
                  }
@@ -2328,7 +2335,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.check_slots()
         r = c.click_report
-        expected_counts = {'info': 13, 'warn': 0, 'error': 0}
+        expected_counts = {'info': 16, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
     def test_check_slots_bad_interface(self):
@@ -2363,12 +2370,143 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
     def test_check_slots_wrong_attrib_content(self):
         '''Test check_slots() - content (used plug attrib with slot)'''
-        plugs = {'test': {'interface': 'content',
+        slots = {'test': {'interface': 'content',
                           'read': ['lib0'],
                           'target': '/path/to/something'}}
-        self.set_test_snap_yaml("slots", plugs)
+        self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_slots()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_slots_wrong_attrib_content_source_with_read(self):
+        '''Test check_slots() - content (used 'source' with 'read')'''
+        slots = {'test': {'interface': 'content',
+                          'read': ['lib0'],
+                          'source': {'read': ['$SNAP/a']}}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewLint(self.test_name)
+        c.check_slots()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_slots_wrong_attrib_content_source_with_write(self):
+        '''Test check_slots() - content (used 'source' with 'write')'''
+        slots = {'test': {'interface': 'content',
+                          'write': ['lib0'],
+                          'source': {'write': ['$SNAP/a']}}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewLint(self.test_name)
+        c.check_slots()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_slots_content_legacy(self):
+        '''Test check_slots() - content (legacy)'''
+        slots = {'test': {'interface': 'content',
+                          'write': ['lib0']}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewLint(self.test_name)
+        c.check_interface_content_slot_source()
+        r = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_slots_content_source_read(self):
+        '''Test check_slots() - content (source read)'''
+        slots = {'test': {'interface': 'content',
+                          'source': {'read': ['$SNAP/a']}}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewLint(self.test_name)
+        c.check_interface_content_slot_source()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_slots_content_source_write(self):
+        '''Test check_slots() - content (source write)'''
+        slots = {'test': {'interface': 'content',
+                          'source': {'write': ['$SNAP/a']}}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewLint(self.test_name)
+        c.check_interface_content_slot_source()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_slots_content_source_read_write(self):
+        '''Test check_slots() - content (source read and write)'''
+        # mpris just for testing it is ignored
+        slots = {'mpris': {'interface': 'mpris'},
+                 'test': {'interface': 'content',
+                          'source': {'read': ['$SNAP/a',
+                                              '$SNAP/b'],
+                                     'write': ['$SNAP/c',
+                                               '$SNAP/d']}}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewLint(self.test_name)
+        c.check_interface_content_slot_source()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_slots_content_source_bad(self):
+        '''Test check_slots() - content (source bad)'''
+        slots = {'test': {'interface': 'content',
+                          'source': []}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewLint(self.test_name)
+        c.check_interface_content_slot_source()
+        r = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_slots_content_source_unknown(self):
+        '''Test check_slots() - content (source unknown)'''
+        slots = {'test': {'interface': 'content',
+                          'source': {'unknown': ['$SNAP/a']}}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewLint(self.test_name)
+        c.check_interface_content_slot_source()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_slots_content_source_bad_read(self):
+        '''Test check_slots() - content (bad read)'''
+        slots = {'test': {'interface': 'content',
+                          'source': {'read': {}}}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewLint(self.test_name)
+        c.check_interface_content_slot_source()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_slots_content_source_bad_read_value(self):
+        '''Test check_slots() - content (bad read)'''
+        slots = {'test': {'interface': 'content',
+                          'source': {'read': [{}]}}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewLint(self.test_name)
+        c.check_interface_content_slot_source()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_slots_content_source_read_in_write(self):
+        '''Test check_slots() - content (read in write)'''
+        slots = {'test': {'interface': 'content',
+                          'source': {'read': ['$SNAP/a',
+                                              '$SNAP/b'],
+                                     'write': ['$SNAP/c',
+                                               '$SNAP/b']}}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewLint(self.test_name)
+        c.check_interface_content_slot_source()
         r = c.click_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
