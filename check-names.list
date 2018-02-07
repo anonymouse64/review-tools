@@ -137,6 +137,12 @@ lint-snap-v2:completer|
 lint-snap-v2:confinement_classic|https://forum.snapcraft.io/t/process-for-reviewing-classic-confinement-snaps/1460
 lint-snap-v2:confinement_classic_with_interfaces|https://launchpad.net/bugs/1655369
 lint-snap-v2:confinement_valid|
+lint-snap-v2:content|
+lint-snap-v2:content_source|
+lint-snap-v2:content_source_in_both|
+lint-snap-v2:content_source_item_valid|
+lint-snap-v2:content_source_key_valid|
+lint-snap-v2:content_source_valid|
 lint-snap-v2:daemon|
 lint-snap-v2:daemon_required|
 lint-snap-v2:description|
