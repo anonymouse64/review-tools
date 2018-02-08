@@ -1,6 +1,6 @@
 '''overrides.py: overrides for various functions'''
 #
-# Copyright (C) 2017 Canonical Ltd.
+# Copyright (C) 2017-2018 Canonical Ltd.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ redflagged_snap_types_overrides = {
                'marvell-armada3700-kernel',
                'nxp-ls1043a-kernel',
                'odroidxu4-kernel',
+               'pi2-kernel-rt',
                'roseapple-pi-kernel',
                'roseapple-pi-kernel-ondra',
                'artik5-linux',  # 3rd party vendor kernels
