@@ -315,6 +315,19 @@ class SnapReview(Review):
             return True
         return False
 
+    def _verify_pkgversion(self, v):
+        '''Verify package version'''
+        if not isinstance(v, (str, int, float)):
+            return False
+
+        # see https://forum.snapcraft.io/t/3974, or
+        # http://people.canonical.com/~john/snap_version_validator_regexp.svg
+        _re_valid_version = re.compile(r"^[a-zA-Z0-9](?:[a-zA-Z0-9:.+~-]{0,30}[a-zA-Z0-9+~])?$")
+        if _re_valid_version.match(str(v)):
+            return True
+
+        return False
+
     def _verify_appname(self, n):
         '''Verify app name'''
         pat = re.compile(r'^[a-zA-Z0-9](?:-?[a-zA-Z0-9])*$')

@@ -285,14 +285,14 @@ class Review(object):
             name += ':' + extra
         return name
 
-    # see https://forum.snapcraft.io/t/3974, or
-    # http://people.canonical.com/~john/snap_version_validator_regexp.svg
-    _re_valid_version  = re.compile(r"^[a-zA-Z0-9](?:[a-zA-Z0-9:.+~-]{0,30}[a-zA-Z0-9+~])?$")
     def _verify_pkgversion(self, v):
-        '''Verify package version'''
+        '''Verify package name'''
         if not isinstance(v, (str, int, float)):
             return False
-        if self._re_valid_version.match(str(v)):
+        re_valid_version = re.compile(r'^((\d+):)?'              # epoch
+                                      '([A-Za-z0-9.+:~-]+?)'     # upstream
+                                      '(-([A-Za-z0-9+.~]+))?$')  # debian
+        if re_valid_version.match(str(v)):
             return True
         return False
 
