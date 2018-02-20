@@ -1,6 +1,7 @@
 click-reviewers-tools (0.48) UNRELEASED; urgency=medium
 
-  * 
+  * sr_common:py: update the pkgversion regexp, add tests. Patch from John R.
+    Lenton
 
  -- Jamie Strandboge <jamie@ubuntu.com>  Wed, 07 Feb 2018 16:44:14 -0600
 
