@@ -366,6 +366,15 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
+    def test_check_version_bad5(self):
+        '''Test check_version - too long'''
+        self.set_test_snap_yaml("version", "1.0.20160315-alpha2-git.c6fadc4+test1")
+        c = SnapReviewLint(self.test_name)
+        c.check_version()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
     def test_check_version_missing(self):
         '''Test check_version - missing'''
         self.set_test_snap_yaml("version", None)

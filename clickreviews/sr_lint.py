@@ -273,6 +273,11 @@ class SnapReviewLint(SnapReview):
         if 'version' not in self.snap_yaml:
             t = 'error'
             s = "could not find 'version' in yaml"
+        elif isinstance(self.snap_yaml['version'], (str, int, float)) and \
+                len(str(self.snap_yaml['version'])) > 32:
+            t = 'error'
+            s = "malformed 'version': '%s' (should be < 32 characters)" % \
+                self.snap_yaml['version']
         elif not self._verify_pkgversion(self.snap_yaml['version']):
             t = 'error'
             s = "malformed 'version': '%s'" % self.snap_yaml['version']
