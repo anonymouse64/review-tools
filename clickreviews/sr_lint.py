@@ -1774,3 +1774,94 @@ class SnapReviewLint(SnapReview):
                     s = "paths found in both read and write: %s" % \
                         ", ".join(both)
                     self._add_result(t, n, s)
+
+    def check_layout(self):
+        '''Check layout'''
+        if not self.is_snap2 or 'layout' not in self.snap_yaml:
+            return
+
+        def _verify_layout_target(p):
+            if '\0' in p or os.path.normpath(p) != p:
+                return False
+            return True
+
+        def _verify_layout_source(p, allowed):
+            if not _verify_layout_target(p):
+                return False
+
+            # we can't os.path.split a non-absolute path
+            top = p.split('/')[0]
+            if top not in allowed:
+                return False
+
+            return True
+
+        key = 'layout'
+        t = 'info'
+        n = self._get_check_name(key)
+        s = 'OK'
+        if not isinstance(self.snap_yaml[key], dict):
+            t = 'error'
+            s = "invalid %s entry: %s (not a dict)" % (key,
+                                                       self.snap_yaml[key])
+            self._add_result(t, n, s)
+            return
+        elif len(self.snap_yaml[key].keys()) < 1:
+            t = 'error'
+            s = "invalid %s entry (empty)" % (key)
+            self._add_result(t, n, s)
+            return
+        self._add_result(t, n, s)
+
+        for target in self.snap_yaml[key]:
+            t = 'info'
+            n = self._get_check_name('%s_target' % key, app=target)
+            s = 'OK'
+
+            if not isinstance(self.snap_yaml[key][target], dict):
+                t = 'error'
+                s = "invalid entry: %s (not a dict)" % (
+                    self.snap_yaml[key][target])
+                self._add_result(t, n, s)
+                continue
+            elif len(self.snap_yaml[key][target].keys()) < 1:
+                t = 'error'
+                s = "invalid target '%s' (empty)" % (target)
+                self._add_result(t, n, s)
+                continue
+            elif not _verify_layout_target(target):
+                t = 'error'
+                s = "invalid target mount: '%s'" % target
+                self._add_result(t, n, s)
+                continue
+            self._add_result(t, n, s)
+
+            known = ['bind', 'bind-file', 'symlink']
+            for ltype in self.snap_yaml[key][target]:
+                t = 'info'
+                n = self._get_check_name('%s_type' % key, app=target,
+                                         extra=ltype)
+                s = 'OK'
+
+                if ltype not in known:
+                    t = 'error'
+                    s = "invalid layout type: '%s' (should be one of %s)" % \
+                        (ltype, ", ".join(known))
+                self._add_result(t, n, s)
+
+                source = self.snap_yaml[key][target][ltype]
+                t = 'info'
+                n = self._get_check_name('%s_source' % key, app=target,
+                                         extra=source)
+                s = 'OK'
+
+                layout_prefixes = ["$SNAP", "$SNAP_COMMON", "$SNAP_DATA"]
+                if not isinstance(source, str):
+                    t = 'error'
+                    s = "invalid source: %s (not a str)" % source
+                elif not _verify_layout_source(source, layout_prefixes):
+                    t = 'error'
+                    s = "invalid source mount: '%s'" % source + "(should " + \
+                        "be a legal path and start with one of: %s" % \
+                        ", ".join(layout_prefixes)
+                self._add_result(t, n, s)

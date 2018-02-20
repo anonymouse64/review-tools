@@ -3855,6 +3855,144 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
+    def test_check_layout(self):
+        '''Test check_layout()'''
+        self.set_test_snap_yaml(
+            "layout", {
+                '/etc/demo': {
+                    'bind': '$SNAP_COMMON/etc/demo'
+                },
+                '/etc/demo.cfg': {
+                    'symlink': '$SNAP_COMMON/etc/demo.conf'
+                },
+                '/etc/demo.conf': {
+                    'bind-file': '$SNAP_COMMON/etc/demo.conf'
+                },
+                '/opt/demo': {
+                    'bind': '$SNAP/opt/demo'
+                },
+                '/usr/share/demo': {
+                    'bind': '$SNAP/usr/share/demo'
+                },
+                '/var/cache/demo': {
+                    'bind': '$SNAP_DATA/var/cache/demo'
+                },
+                '/var/lib/demo': {
+                    'bind': '$SNAP_DATA/var/lib/demo'
+                },
+            })
+        c = SnapReviewLint(self.test_name)
+        c.check_layout()
+        r = c.click_report
+        expected_counts = {'info': 22, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_layout_bad(self):
+        '''Test check_layout() - bad (list)'''
+        self.set_test_snap_yaml("layout", [])
+        c = SnapReviewLint(self.test_name)
+        c.check_layout()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_layout_empty(self):
+        '''Test check_layout() - bad (empty)'''
+        self.set_test_snap_yaml("layout", {})
+        c = SnapReviewLint(self.test_name)
+        c.check_layout()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_layout_target_bad_val(self):
+        '''Test check_layout() - bad target (list)'''
+        self.set_test_snap_yaml("layout", {'/etc/demo': []})
+        c = SnapReviewLint(self.test_name)
+        c.check_layout()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_layout_target_bad_empty(self):
+        '''Test check_layout() - bad target (empty)'''
+        self.set_test_snap_yaml("layout", {'/etc/demo': {}})
+        c = SnapReviewLint(self.test_name)
+        c.check_layout()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_layout_target_bad(self):
+        '''Test check_layout() - bad target (normpath)'''
+        self.set_test_snap_yaml(
+            "layout", {
+                '/etc/../demo': {
+                    'bind': '$SNAP_COMMON/etc/demo'
+                },
+            })
+        c = SnapReviewLint(self.test_name)
+        c.check_layout()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_layout_source_bad_prefix(self):
+        '''Test check_layout() - bad source (prefix)'''
+        self.set_test_snap_yaml(
+            "layout", {
+                '/etc/demo': {
+                    'bind': '/bad/etc/demo'
+                },
+            })
+        c = SnapReviewLint(self.test_name)
+        c.check_layout()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_layout_source_bad_val(self):
+        '''Test check_layout() - bad source (list)'''
+        self.set_test_snap_yaml(
+            "layout", {
+                '/etc/demo': {
+                    'bind': []
+                },
+            })
+        c = SnapReviewLint(self.test_name)
+        c.check_layout()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_layout_source_bad(self):
+        '''Test check_layout() - bad source (normpath)'''
+        self.set_test_snap_yaml(
+            "layout", {
+                '/etc/demo': {
+                    'bind': '$SNAP_COMMON/etc/../demo'
+                },
+            })
+        c = SnapReviewLint(self.test_name)
+        c.check_layout()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_layout_source_bad_type(self):
+        '''Test check_layout() - bad source (type)'''
+        self.set_test_snap_yaml(
+            "layout", {
+                '/etc/demo': {
+                    'nonexistent': '$SNAP_COMMON/etc/demo'
+                },
+            })
+        c = SnapReviewLint(self.test_name)
+        c.check_layout()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
 
 class TestSnapReviewLintNoMock(TestCase):
     """Tests without mocks where they are not needed."""

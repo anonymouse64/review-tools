@@ -166,6 +166,10 @@ lint-snap-v2:icon_empty|
 lint-snap-v2:icon_exists|
 lint-snap-v2:icon_present|
 lint-snap-v2:iffy_files|
+lint-snap-v2:layout|
+lint-snap-v2:layout_source|
+lint-snap-v2:layout_target|
+lint-snap-v2:layout_type|
 lint-snap-v2:license_valid|
 lint-snap-v2:meta_gui_desktop|
 lint-snap-v2:name_valid|
