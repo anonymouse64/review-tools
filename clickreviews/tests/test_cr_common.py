@@ -117,6 +117,36 @@ class ClickReviewTestCase(cr_tests.TestClickReview):
         self.assertTrue('disallowed' in d.keys())
         self.assertTrue('urls' in d['disallowed'][self.default_appname])
 
+    def test_verify_pkgversion(self):
+        '''Check _verify_pkgversion'''
+        for ok in [
+                "0",
+                "v1.0",
+                "0.12+16.04.20160126-0ubuntu1",
+                "1:6.0.1+r16-3",
+                "1.0~",
+                "1.0+",
+                "README.~1~",
+                "a+++++++++++++++++++++++++++++++",
+                "AZaz:.+~-123",
+                ]:
+            self.assertTrue(self.review._verify_pkgversion(ok))
+        for nok in [
+                "~foo",
+                "+foo",
+                "foo:",
+                "foo.",
+                "foo-",
+                "horrible_underscores",
+                "foo($bar^baz$)meep",
+                "árbol",
+                "日本語",
+                "한글",
+                "ру́сский язы́к",
+                "~foo$bar:",
+                ]:
+            self.assertFalse(self.review._verify_pkgversion(nok))
+
     def test_get_check_name(self):
         name = self.review._get_check_name('prefix')
         self.assertEqual(name, 'review_type:prefix')
