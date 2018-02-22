@@ -30,6 +30,7 @@ from clickreviews.overrides import (
 import glob
 import os
 import re
+import shlex
 
 
 class SnapReviewLint(SnapReview):
@@ -484,28 +485,37 @@ class SnapReviewLint(SnapReview):
             return
         self._verify_apps_and_hooks(hook=True)
 
-    def _verify_value_is_file(self, app, key):
-            t = 'info'
-            n = self._get_check_name('%s' % key, app=app)
-            s = 'OK'
-            if not isinstance(self.snap_yaml['apps'][app][key], str):
-                t = 'error'
-                s = "%s '%s' (not a str)" % (key,
-                                             self.snap_yaml['apps'][app][key])
-                self._add_result(t, n, s)
-            elif len(self.snap_yaml['apps'][app][key]) < 1:
-                t = 'error'
-                s = "invalid %s (empty)" % (key)
-                self._add_result(t, n, s)
-            else:
-                fn = self._path_join(self._get_unpack_dir(),
-                                     os.path.normpath(
-                                         self.snap_yaml['apps'][app][key]))
-                if fn not in self.pkg_files:
-                    t = 'error'
-                    s = "%s does not exist" % (
-                        self.snap_yaml['apps'][app][key])
+    def _verify_value_is_file(self, app, key, use_shell_quoting=False):
+        t = 'info'
+        n = self._get_check_name('%s' % key, app=app)
+        s = 'OK'
+        if not isinstance(self.snap_yaml['apps'][app][key], str):
+            t = 'error'
+            s = "%s '%s' (not a str)" % (key,
+                                         self.snap_yaml['apps'][app][key])
             self._add_result(t, n, s)
+        elif len(self.snap_yaml['apps'][app][key]) < 1:
+            t = 'error'
+            s = "invalid %s (empty)" % (key)
+            self._add_result(t, n, s)
+        else:
+            if use_shell_quoting:
+                try:
+                    val = shlex.split(self.snap_yaml['apps'][app][key])[0]
+                except ValueError:
+                    t = 'error'
+                    s = "invalid %s (unmatched quotes)" % (key)
+                    self._add_result(t, n, s)
+                    return
+            else:
+                val = self.snap_yaml['apps'][app][key]
+            fn = self._path_join(self._get_unpack_dir(),
+                                 os.path.normpath(val))
+            if fn not in self.pkg_files:
+                t = 'error'
+                s = "%s does not exist" % (
+                    self.snap_yaml['apps'][app][key])
+        self._add_result(t, n, s)
 
     def check_apps_command(self):
         '''Check apps - command'''
@@ -518,7 +528,7 @@ class SnapReviewLint(SnapReview):
                 # We check for required elsewhere
                 continue
 
-            self._verify_value_is_file(app, key)
+            self._verify_value_is_file(app, key, True)
 
     def check_apps_reload_command(self):
         '''Check apps - reload-command'''
@@ -531,7 +541,7 @@ class SnapReviewLint(SnapReview):
                 # We check for required elsewhere
                 continue
 
-            self._verify_value_is_file(app, key)
+            self._verify_value_is_file(app, key, True)
 
     def check_apps_stop_command(self):
         '''Check apps - stop-command'''
@@ -544,7 +554,7 @@ class SnapReviewLint(SnapReview):
                 # We check for required elsewhere
                 continue
 
-            self._verify_value_is_file(app, key)
+            self._verify_value_is_file(app, key, True)
 
     def check_apps_post_stop_command(self):
         '''Check apps - post-stop-command'''
@@ -557,7 +567,7 @@ class SnapReviewLint(SnapReview):
                 # We check for required elsewhere
                 continue
 
-            self._verify_value_is_file(app, key)
+            self._verify_value_is_file(app, key, True)
 
     def check_apps_stop_timeout(self):
         '''Check apps - stop-timeout'''

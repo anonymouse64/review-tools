@@ -2,7 +2,9 @@ click-reviewers-tools (0.48) UNRELEASED; urgency=medium
 
   * sr_common:py: update the pkgversion regexp, add tests. Patch from John R.
     Lenton
-  * sr_lint.py: add checks for 'layout'
+  * sr_lint.py:
+    - add checks for 'layout'
+    - when checking app command, ignore arguments
 
  -- Jamie Strandboge <jamie@ubuntu.com>  Wed, 07 Feb 2018 16:44:14 -0600
 

@@ -1270,6 +1270,57 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
+    def test_check_apps_one_command_with_args(self):
+        '''Test check_apps() - one command with args'''
+        cmd = "bin/foo"
+        self.set_test_snap_yaml("apps", {"foo": {"command": "%s -c bar" % cmd}})
+        c = SnapReviewLint(self.test_name)
+        c.pkg_files.append(os.path.join('/fake', cmd))
+        c.check_apps_command()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_one_command_with_space(self):
+        '''Test check_apps() - one command with space'''
+        cmd = "bin/foo bar"
+        self.set_test_snap_yaml("apps", {"foo": {"command": "'%s'" % cmd}})
+        c = SnapReviewLint(self.test_name)
+        c.pkg_files.append(os.path.join('/fake', cmd))
+        c.check_apps_command()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_one_command_with_space_with_args(self):
+        '''Test check_apps() - one command with space with args'''
+        cmd = "bin/foo bar"
+        self.set_test_snap_yaml("apps", {"foo": {"command": "'%s' -c foo" % cmd}})
+        c = SnapReviewLint(self.test_name)
+        c.pkg_files.append(os.path.join('/fake', cmd))
+        c.check_apps_command()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_one_command_with_unmatched_startquote(self):
+        '''Test check_apps() - one command with unmatched startquote'''
+        self.set_test_snap_yaml("apps", {"foo": {"command": "'bin/foo bar"}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_command()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_one_command_with_unmatched_midquote(self):
+        '''Test check_apps() - one command with unmatched midquote'''
+        self.set_test_snap_yaml("apps", {"foo": {"command": "bin/foo'bar"}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_command()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
     def test_check_apps_completer(self):
         '''Test check_apps_completer()'''
         cmd = "bin/foo"
