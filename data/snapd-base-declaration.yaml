@@ -180,7 +180,7 @@
         - app
     deny-connection: true
     deny-auto-connection: true
-  gnome-online-accounts-service:
+  accounts-service:
     allow-installation:
       slot-snap-type:
         - core
