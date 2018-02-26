@@ -160,7 +160,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.check_results(r, expected=expected)
 
     def test_check_name_toplevel_efficient(self):
-        '''Test check_name - toplevel'''
+        '''Test check_name - toplevel is efficient'''
         self.set_test_snap_yaml("name", "u-94903713687486543234157734673284536758")
         c = SnapReviewLint(self.test_name)
         c.check_name()
@@ -249,6 +249,15 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
+    def test_check_name_bad6b(self):
+        '''Test check_name - bad - startswith -'''
+        self.set_test_snap_yaml("name", "-foo-bar")
+        c = SnapReviewLint(self.test_name)
+        c.check_name()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
     def test_check_name_bad7(self):
         '''Test check_name - bad - cap'''
         self.set_test_snap_yaml("name", "foo-Bar")
@@ -261,6 +270,15 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
     def test_check_name_bad8(self):
         '''Test check_name - bad - all numbers'''
         self.set_test_snap_yaml("name", "01")
+        c = SnapReviewLint(self.test_name)
+        c.check_name()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_name_bad9(self):
+        '''Test check_name - bad - all numbers and dashes'''
+        self.set_test_snap_yaml("name", "0-1")
         c = SnapReviewLint(self.test_name)
         c.check_name()
         r = c.click_report

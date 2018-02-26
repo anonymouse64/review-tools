@@ -310,11 +310,11 @@ class SnapReview(Review):
         # but this regex is very inefficient and certain names will make python
         # work extremely hard. Instead we use this and make sure the name isn't
         # all digits.
-        pat = re.compile(r'^[a-z0-9](?:-?[a-z0-9])*$')
-
-        if pat.search(n) and not n.isnumeric():
-            return True
-        return False
+        if re.match(r'^[a-z0-9-]*[a-z][a-z0-9-]*$', n) is None:
+            return False
+        if n[0] == '-' or n[-1] == '-' or '--' in n:
+            return False
+        return True
 
     def _verify_pkgversion(self, v):
         '''Verify package version'''
