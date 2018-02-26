@@ -3,6 +3,7 @@ click-reviewers-tools (0.48) UNRELEASED; urgency=medium
   * sr_common:py:
     - update the pkgversion regexp, add tests. Patch from John R. Lenton
     - update the pkgname checks, add tests. Patch from John R. Lenton
+      (LP: #1751447)
   * sr_lint.py:
     - add checks for 'layout'
     - when checking app command, ignore arguments
