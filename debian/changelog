@@ -5,6 +5,7 @@ click-reviewers-tools (0.48) UNRELEASED; urgency=medium
   * sr_lint.py:
     - add checks for 'layout'
     - when checking app command, ignore arguments
+    - 'common-id' is valid with non-daemon commands
   * rename gnome-online-accounts-service to accounts-service
 
  -- Jamie Strandboge <jamie@ubuntu.com>  Wed, 07 Feb 2018 16:44:14 -0600

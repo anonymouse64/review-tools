@@ -655,7 +655,7 @@ class SnapReviewLint(SnapReview):
         # Certain options require 'daemon' so list the keys that are shared
         # by services and binaries
         ok_keys = ['command', 'completer', 'environment', 'plugs', 'slots',
-                   'aliases']
+                   'aliases', 'common-id']
 
         for app in self.snap_yaml['apps']:
             needs_daemon = []
