@@ -236,7 +236,7 @@ sec_browser_support_overrides = ['screencloudplayer',
 
 # Snaps that have legitimate need for executable stack but otherwise work fine
 # in strict mode
-func_execstack_overrides = []
+func_execstack_overrides = ['checkbox-snappy']
 
 # Some files from staged packages are known to have execstack, so don't flag
 # snaps with these since they may have incidentally included them. IMPORTANT:
