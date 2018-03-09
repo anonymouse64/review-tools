@@ -3953,7 +3953,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.check_layout()
         r = c.click_report
-        expected_counts = {'info': 22, 'warn': 0, 'error': 0}
+        expected_counts = {'info': 21, 'warn': 1, 'error': 0}
         self.check_results(r, expected_counts)
 
     def test_check_layout_bad(self):
@@ -3980,7 +3980,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.check_layout()
         r = c.click_report
-        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        expected_counts = {'info': None, 'warn': 1, 'error': 1}
         self.check_results(r, expected_counts)
 
     def test_check_layout_target_bad_empty(self):
@@ -3989,7 +3989,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.check_layout()
         r = c.click_report
-        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        expected_counts = {'info': None, 'warn': 1, 'error': 1}
         self.check_results(r, expected_counts)
 
     def test_check_layout_target_bad(self):
@@ -4003,7 +4003,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.check_layout()
         r = c.click_report
-        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        expected_counts = {'info': None, 'warn': 1, 'error': 1}
         self.check_results(r, expected_counts)
 
     def test_check_layout_source_bad_prefix(self):
@@ -4017,7 +4017,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.check_layout()
         r = c.click_report
-        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        expected_counts = {'info': None, 'warn': 1, 'error': 1}
         self.check_results(r, expected_counts)
 
     def test_check_layout_source_bad_val(self):
@@ -4031,7 +4031,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.check_layout()
         r = c.click_report
-        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        expected_counts = {'info': None, 'warn': 1, 'error': 1}
         self.check_results(r, expected_counts)
 
     def test_check_layout_source_bad(self):
@@ -4045,7 +4045,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.check_layout()
         r = c.click_report
-        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        expected_counts = {'info': None, 'warn': 1, 'error': 1}
         self.check_results(r, expected_counts)
 
     def test_check_layout_source_bad_type(self):
@@ -4059,7 +4059,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.check_layout()
         r = c.click_report
-        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        expected_counts = {'info': None, 'warn': 1, 'error': 1}
         self.check_results(r, expected_counts)
 
 

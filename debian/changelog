@@ -5,7 +5,8 @@ click-reviewers-tools (0.48) UNRELEASED; urgency=medium
     - update the pkgname checks, add tests. Patch from John R. Lenton
       (LP: #1751447)
   * sr_lint.py:
-    - add checks for 'layout'
+    - add checks for 'layout' (for now, default to 'warn' when in use at
+      request of the snapd team
     - when checking app command, ignore arguments
     - 'common-id' is valid with non-daemon commands
   * rename gnome-online-accounts-service to accounts-service
