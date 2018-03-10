@@ -67,6 +67,12 @@ MAX_COMPRESSED_SIZE = 5
 # 90% of disk but not larger than this
 MAX_UNCOMPRESSED_SIZE = 25
 
+# cache the expensive magic calls
+PKG_BIN_FILES = None
+
+# cache gathering all the files
+PKG_FILES = None
+
 
 def cleanup_unpack():
     global UNPACK_DIR
@@ -106,6 +112,12 @@ def cleanup_unpack():
                                facility=syslog.LOG_USER | syslog.LOG_INFO)
                 syslog.syslog("Could not remove '%s'" % d)
                 syslog.closelog()
+
+    # For the testsuite
+    global PKG_FILES
+    PKG_FILES = None
+    global PKG_BIN_FILES
+    PKG_BIN_FILES = None
 
 
 atexit.register(cleanup_unpack)
@@ -182,15 +194,14 @@ class Review(object):
 
         # Get a list of all unpacked files
         self.pkg_files = []
+        # self._list_all_files() sets self.pkg_files so we can mock it
         self._list_all_files()
 
         # Setup what is needed to get a list of all unpacked compiled binaries
-        self.mime = magic.open(magic.MAGIC_MIME)
-        self.mime.load()
         self.pkg_bin_files = []
-        # Don't run this here since only cr_lint.py and cr_functional.py need
-        # it now
-        # self._list_all_compiled_binaries()
+        # self._list_all_compiled_binaries() sets self.pkg_files so we can
+        # mock it
+        self._list_all_compiled_binaries()
 
         self.overrides = overrides if overrides is not None else {}
 
@@ -252,9 +263,14 @@ class Review(object):
 
     def _list_all_files(self):
         '''List all files included in this click package.'''
-        for root, dirnames, filenames in os.walk(self.unpack_dir):
-            for f in filenames:
-                self.pkg_files.append(os.path.join(root, f))
+        global PKG_FILES
+        if PKG_FILES is None:
+            PKG_FILES = []
+            for root, dirnames, filenames in os.walk(self.unpack_dir):
+                for f in filenames:
+                    PKG_FILES.append(os.path.join(root, f))
+
+        self.pkg_files = PKG_FILES
 
     def _check_if_message_catalog(self, fn):
         '''Check if file is a message catalog (.mo file).'''
@@ -264,18 +280,25 @@ class Review(object):
 
     def _list_all_compiled_binaries(self):
         '''List all compiled binaries in this click package.'''
-        for i in self.pkg_files:
-            try:
-                res = self.mime.file(i)
-            except Exception:  # pragma: nocover
-                # workaround for zesty python3-magic
-                debug("could not detemine mime type of '%s'" % i)
-                continue
+        global PKG_BIN_FILES
+        if PKG_BIN_FILES is None:
+            self.mime = magic.open(magic.MAGIC_MIME)
+            self.mime.load()
+            PKG_BIN_FILES = []
+            for i in self.pkg_files:
+                try:
+                    res = self.mime.file(i)
+                except Exception:  # pragma: nocover
+                    # workaround for zesty python3-magic
+                    debug("could not detemine mime type of '%s'" % i)
+                    continue
 
-            if res in self.magic_binary_file_descriptions and \
-               not self._check_if_message_catalog(i) and \
-               i not in self.pkg_bin_files:
-                self.pkg_bin_files.append(i)
+                if res in self.magic_binary_file_descriptions and \
+                   not self._check_if_message_catalog(i) and \
+                   i not in PKG_BIN_FILES:
+                    PKG_BIN_FILES.append(i)
+
+        self.pkg_bin_files = PKG_BIN_FILES
 
     def _get_check_name(self, name, app='', extra=''):
         name = ':'.join([self.review_type, name])

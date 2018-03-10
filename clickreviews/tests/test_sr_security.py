@@ -921,11 +921,11 @@ class TestSnapReviewSecurityNoMock(TestCase):
     """Tests without mocks where they are not needed."""
     def setUp(self):
         # XXX cleanup_unpack() is required because global variables
-        # UNPACK_DIR, RAW_UNPACK_DIR are initialised to None at module
-        # load time, but updated when a real (non-Mock) test runs, such as
-        # here. While, at the same time, two of the existing tests using
-        # mocks depend on both global vars being None. Ideally, those
-        # global vars should be refactored away.
+        # UNPACK_DIR, RAW_UNPACK_DIR, PKG_FILES and PKG_BIN_FILES are
+        # initialised to None at module load time, but updated when a real
+        # (non-Mock) test runs, such as here. While, at the same time, two of
+        # the existing tests using mocks depend on both global vars being None.
+        # Ideally, those global vars should be refactored away.
         self.addCleanup(cleanup_unpack)
         super().setUp()
 
