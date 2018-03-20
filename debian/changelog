@@ -4,6 +4,9 @@ click-reviewers-tools (0.48) UNRELEASED; urgency=medium
     - update the pkgversion regexp, add tests. Patch from John R. Lenton
     - update the pkgname checks, add tests. Patch from John R. Lenton
       (LP: #1751447)
+    - cache self.pkg_files() and self.pkg_bin_files() for >50% improvement in
+      speed. At this point, the test time is dominated by magic.py and
+      libmagic so further improvements would need investigating in that area
   * sr_lint.py:
     - add checks for 'layout' (for now, default to 'warn' when in use at
       request of the snapd team
