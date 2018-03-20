@@ -141,6 +141,10 @@ class Review(object):
         'application/x-executable; charset=binary',
         'application/x-sharedlib; charset=binary',
         'application/x-object; charset=binary',
+        # 18.04 and higher doesn't show the charset
+        'application/x-executable',
+        'application/x-sharedlib',
+        'application/x-object',
     ]
 
     def __init__(self, fn, review_type, overrides=None):
