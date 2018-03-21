@@ -101,6 +101,7 @@ redflagged_snap_types_overrides = {
                ],
     'base': ['bare',                  # Canonical base snaps
              'base-18',
+             'core18',
              'test-snapd-base',
              'solus-runtime-gaming',  # Community base snaps
              ],
@@ -141,6 +142,12 @@ sec_mode_overrides = {
         './var/mail': 'rwxrwsr-x',
         './var/tmp': 'rwxrwxrwt',
     },
+    'chrome-test': {  # chrome-test from Canonical
+        './opt/google/chrome/chrome-sandbox': 'rwsr-xr-x',
+    },
+    'chromium': {  # chromium from Canonical
+        './usr/lib/chromium-browser/chrome-sandbox': 'r-sr-xr-x',
+    },
     'core': {
         './bin/mount': 'rwsr-xr-x',
         './bin/ping': 'rwsr-xr-x',
@@ -179,11 +186,28 @@ sec_mode_overrides = {
         './var/spool/cron/crontabs': 'rwx-wx--T',
         './var/tmp': 'rwxrwxrwt',
     },
-    'chrome-test': {  # chrome-test from Canonical
-        './opt/google/chrome/chrome-sandbox': 'rwsr-xr-x',
-    },
-    'chromium': {  # chromium from Canonical
-        './usr/lib/chromium-browser/chrome-sandbox': 'r-sr-xr-x',
+    'core18': {
+        './bin/mount': 'rwsr-xr-x',
+        './bin/su': 'rwsr-xr-x',
+        './bin/umount': 'rwsr-xr-x',
+        './sbin/pam_extrausers_chkpwd': 'rwxr-sr-x',
+        './sbin/unix_chkpwd': 'rwxr-sr-x',
+        './tmp': 'rwxrwxrwt',
+        './usr/bin/chage': 'rwxr-sr-x',
+        './usr/bin/chfn': 'rwsr-xr-x',
+        './usr/bin/chsh': 'rwsr-xr-x',
+        './usr/bin/expiry': 'rwxr-sr-x',
+        './usr/bin/gpasswd': 'rwsr-xr-x',
+        './usr/bin/newgrp': 'rwsr-xr-x',
+        './usr/bin/passwd': 'rwsr-xr-x',
+        './usr/bin/ssh-agent': 'rwxr-sr-x',
+        './usr/bin/sudo': 'rwsr-xr-x',
+        './usr/bin/wall': 'rwxr-sr-x',
+        './usr/lib/dbus-1.0/dbus-daemon-launch-helper': 'rwsr-xr--',
+        './usr/lib/openssh/ssh-keysign': 'rwsr-xr-x',
+        './var/local': 'rwxrwsr-x',
+        './var/mail': 'rwxrwsr-x',
+        './var/tmp': 'rwxrwxrwt',
     },
     'openwrt': {  # demo from Canonical
         './rootfs/tmp': 'rwxrwxrwt',
