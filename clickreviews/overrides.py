@@ -34,6 +34,7 @@ redflagged_snap_types_overrides = {
                'pc-kernel',
                'pi2-kernel',
                'aws-kernel',  # @canonical.com kernels
+               'azure-kernel',
                'freescale-ls1043a-kernel',
                'gcp-kernel',
                'gke-kernel',
