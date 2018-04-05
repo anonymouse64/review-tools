@@ -288,6 +288,8 @@ func_execstack_skipped_pats = ['boot/.*',
                                'usr/lib.*/.*nvidia.*',
                                'usr/lib/syslinux/modules/.*',
                                'usr/share/dpdk/test/.*',
+                               # investigate
+                               'usr/lib/arm-linux-gnueabihf/libx264.so.148',
                                ]
 
 # By default we don't regulate which snaps specify which base snaps, but some
