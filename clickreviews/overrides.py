@@ -118,7 +118,9 @@ desktop_file_exception = ['emoj',
 #
 # sr_security.py overrides
 #
-# Files with unusual that we'll allow for certain snaps
+# Files with unusual modes that we'll allow for certain snaps.
+# NOTE: when SNAP_FAKEROOT_RESQUASHFS=0 adding setuid/setgid files here
+# will disable resquash enforcement.
 sec_mode_overrides = {
     'bare': {},
     'base-18': {

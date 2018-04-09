@@ -1110,7 +1110,7 @@ exit 0
         self.check_results(report, expected_counts)
 
     def test_check_squashfs_resquash_sha512sum_mismatch(self):
-        '''Test check_squashfs_resquash() - sha512sum mismatch'''
+        '''Test check_squashfs_resquash() - sha512sum mismatch (no enforce)'''
         output_dir = self.mkdtemp()
         package = utils.make_snap2(output_dir=output_dir)
         c = SnapReviewSecurity(package)
@@ -1136,7 +1136,9 @@ exit 0
         else:
             os.environ['PATH'] = output_dir  # pragma: nocover
 
+        os.environ['SNAP_ENFORCE_RESQUASHFS'] = "0"
         c.check_squashfs_resquash()
+        os.environ.pop('SNAP_ENFORCE_RESQUASHFS')
         os.environ['PATH'] = old_path
         report = c.click_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
@@ -1184,7 +1186,7 @@ exit 0
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'security-snap-v2:squashfs_repack_checksum'
-        expected['error'][name] = {"text": "checksums do not match. Please ensure the snap is created with either 'snapcraft snap <DIR>' or 'mksquashfs <dir> <snap> -noappend -comp xz -all-root -no-xattrs -no-fragments'"}
+        expected['error'][name] = {"text": "checksums do not match. Please ensure the snap is created with either 'snapcraft pack <DIR>' or 'mksquashfs <dir> <snap> -noappend -comp xz -all-root -no-xattrs -no-fragments'"}
         self.check_results(report, expected=expected)
 
     def test_check_squashfs_resquash_sha512sum_mismatch_enforce_os(self):
@@ -1243,7 +1245,67 @@ exit 0
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'security-snap-v2:squashfs_repack_checksum'
-        expected['info'][name] = {"text": "OK (check not enforced for base and os snaps): checksums do not match. Please ensure the snap is created with either 'snapcraft snap <DIR>' or 'mksquashfs <dir> <snap> -noappend -comp xz -no-xattrs -no-fragments'"}
+        expected['info'][name] = {"text": "OK (check not enforced for base and os snaps)"}
+        self.check_results(report, expected=expected)
+
+    def test_check_squashfs_resquash_sha512sum_mismatch_enforce_app_override(self):
+        '''Test check_squashfs_resquash() - sha512sum mismatch - enforce app
+           with override.
+        '''
+        output_dir = self.mkdtemp()
+        package = utils.make_snap2(output_dir=output_dir)
+        sy_path = os.path.join(output_dir, 'snap.yaml')
+        content = '''
+name: chromium
+version: 0.1
+summary: some thing
+description: some desc
+architectures: [ amd64 ]
+'''
+        with open(sy_path, 'w') as f:
+            f.write(content)
+
+        package = utils.make_snap2(output_dir=output_dir,
+                                   extra_files=['%s:meta/snap.yaml' % sy_path]
+                                   )
+
+        c = SnapReviewSecurity(package)
+
+        # fake sha512sum
+        sha512sum = os.path.join(output_dir, 'sha512sum')
+        content = '''#!/bin/sh
+bn=`basename "$1"`
+if [ "$bn" = "test_1.0_all.snap" ]; then
+    echo beefeeee $1
+else
+    echo deadbeef $1
+fi
+exit 0
+'''
+        with open(sha512sum, 'w') as f:
+            f.write(content)
+        os.chmod(sha512sum, 0o775)
+
+        old_path = os.environ['PATH']
+        if old_path:
+            os.environ['PATH'] = "%s:%s" % (output_dir, os.environ['PATH'])
+        else:
+            os.environ['PATH'] = output_dir  # pragma: nocover
+
+        os.environ['SNAP_ENFORCE_RESQUASHFS'] = "1"
+        c.check_squashfs_resquash()
+        os.environ.pop('SNAP_ENFORCE_RESQUASHFS')
+        os.environ['PATH'] = old_path
+        report = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'security-snap-v2:squashfs_repack_checksum'
+        expected['info'][name] = {"text": "OK (check not enforced for app snaps with setuid/setgid overrides)"}
         self.check_results(report, expected=expected)
 
     def test_check_debug_resquashfs(self):

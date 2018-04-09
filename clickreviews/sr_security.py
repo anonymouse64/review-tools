@@ -182,7 +182,7 @@ class SnapReviewSecurity(SnapReview):
             return
         fstime = out.strip()
 
-        if 'SNAP_ENFORCE_RESQUASHFS' not in os.environ or \
+        if 'SNAP_ENFORCE_RESQUASHFS' in os.environ and \
                 os.environ['SNAP_ENFORCE_RESQUASHFS'] == "0":
             t = 'info'
             n = self._get_check_name('squashfs_repack_checksum')
@@ -312,7 +312,7 @@ class SnapReviewSecurity(SnapReview):
 
             t = 'error'
             s = "checksums do not match. Please ensure the snap is " + \
-                "created with either 'snapcraft snap <DIR>' or " + \
+                "created with either 'snapcraft pack <DIR>' or " + \
                 "'mksquashfs <dir> <snap> %s'" % " ".join(mksquash_opts)
             # FIXME: fakeroot sporadically fails and saves the wrong
             # uid/gid/mode into its save file, thus causing the mksquashfs to
@@ -320,16 +320,29 @@ class SnapReviewSecurity(SnapReview):
             # error when using fakeroot. We need fakeroot or something like it
             # for unsquashfs to create devices, perms and ownership as
             # non-root, but only base and os snaps are allowed to have devices
-            # and not use -all-root. Therefore, when not using fakeroot, only
-            # enforce resquash for non-os/base snaps. Eventually we'll fix
-            # fakeroot or do something else so we can use this for all snaps,
-            # with or without -all-root.
-            if 'SNAP_FAKEROOT_RESQUASHFS' not in os.environ and \
-                    'type' in self.snap_yaml and \
-                    (self.snap_yaml['type'] == 'base' or
-                     self.snap_yaml['type'] == 'os'):
-                t = 'info'
-                s = "OK (check not enforced for base and os snaps): " + s
+            # and not use -all-root. Certain app snaps may also have
+            # sec_mode_overrides for setuid/setgid files. Therefore, when not
+            # using fakeroot, only enforce resquash for non-os/base snaps
+            # and other snaps without sec_mode_overrides that specify
+            # setuid/setgid. Eventually we'll fix fakeroot or do something else
+            # so we can use this for all snaps, with or without -all-root.
+            pkgname = self.snap_yaml['name']
+            if 'SNAP_FAKEROOT_RESQUASHFS' not in os.environ:
+                if self.snap_yaml['type'] in ['base', 'os']:
+                    t = 'info'
+                    s = "OK (check not enforced for base and os snaps)"
+                elif pkgname in sec_mode_overrides:
+                    has_sugid_override = False
+                    setugid_pat = re.compile(r'[sS]')
+                    for k in sec_mode_overrides[pkgname]:
+                        if setugid_pat.search(sec_mode_overrides[pkgname][k]):
+                            has_sugid_override = True
+                            break
+                    if has_sugid_override:
+                        t = 'info'
+                        s = "OK (check not enforced for app snaps with " + \
+                            "setuid/setgid overrides)"
+
         self._add_result(t, n, s)
 
     def check_squashfs_files(self):

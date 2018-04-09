@@ -27,7 +27,7 @@ $ PYTHONPATH=$PWD ./bin/click-review /path/to/package
 
 Additional environment variables:
 SNAP_DEBUG=1               - show debu info
-SNAP_ENFORCE_RESQUASHFS=1  - enforce resquashfs tests
+SNAP_ENFORCE_RESQUASHFS=0  - don't enforce resquashfs tests
 SNAP_FAKEROOT_RESQUASHFS=1 - use fakeroot with resquashfs tests
 SNAP_DEBUG_RESQUASHFS=1    - show debug info with failed resquashfs tests
 SNAP_DEBUG_RESQUASHFS=2    - drop to a shell with failed resquashfs
