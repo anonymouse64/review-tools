@@ -36,6 +36,11 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  accounts-service:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   alsa:
     allow-installation:
       slot-snap-type:
@@ -179,11 +184,6 @@
       slot-snap-type:
         - app
     deny-connection: true
-    deny-auto-connection: true
-  accounts-service:
-    allow-installation:
-      slot-snap-type:
-        - core
     deny-auto-connection: true
   gpg-keys:
     allow-installation:
