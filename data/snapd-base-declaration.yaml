@@ -240,8 +240,15 @@
     allow-installation:
       slot-snap-type:
         - core
+    deny-connection:
+      plug-attributes:
+        read: all
     deny-auto-connection:
-      on-classic: false
+      -
+        on-classic: false
+      -
+        plug-attributes:
+          read: all
   i2c:
     allow-installation:
       slot-snap-type:
