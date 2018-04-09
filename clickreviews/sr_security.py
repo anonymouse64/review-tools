@@ -182,7 +182,8 @@ class SnapReviewSecurity(SnapReview):
             return
         fstime = out.strip()
 
-        if 'SNAP_ENFORCE_RESQUASHFS' not in os.environ:
+        if 'SNAP_ENFORCE_RESQUASHFS' not in os.environ or \
+                os.environ['SNAP_ENFORCE_RESQUASHFS'] == "0":
             t = 'info'
             n = self._get_check_name('squashfs_repack_checksum')
             s = "OK (check not enforced)"
