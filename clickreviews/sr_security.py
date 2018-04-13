@@ -312,8 +312,9 @@ class SnapReviewSecurity(SnapReview):
 
             t = 'error'
             s = "checksums do not match. Please ensure the snap is " + \
-                "created with either 'snapcraft pack <DIR>' or " + \
-                "'mksquashfs <dir> <snap> %s'" % " ".join(mksquash_opts)
+                "created with either 'snapcraft pack <DIR>' (using " + \
+                "snapcraft >= 2.38) or 'mksquashfs <dir> <snap> %s'" % \
+                " ".join(mksquash_opts)
             # FIXME: fakeroot sporadically fails and saves the wrong
             # uid/gid/mode into its save file, thus causing the mksquashfs to
             # create the wrong file/perms/ownership. We want to not ignore this
