@@ -268,7 +268,7 @@ func_execstack_overrides = ['checkbox-balboa',
                             'checkbox-oem-qa',
                             'checkbox-plano',
                             'checkbox-plano-classic',
-                            'checkbox-snappy'
+                            'checkbox-snappy',
                             'checkbox-tillamook',
                             'store-checker',
                             ]
