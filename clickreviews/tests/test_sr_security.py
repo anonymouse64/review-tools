@@ -892,7 +892,7 @@ brw-rw-rw- root/root                8,12a 2016-03-11 12:25 squashfs-root/foo
         expected['error'][name] = {"text": "malformed lines in unsquashfs output: 'time 'z2:25' malformed for './foo''"}
         self.check_results(report, expected=expected)
 
-    def test_check_zz_squashfs_files_bad_squashfs_root(self):
+    def test_check_squashfs_files_bad_squashfs_root(self):
         '''Test check_squashfs_files() - bad squashfs-root and meta'''
         out = '''Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
@@ -958,6 +958,14 @@ class TestSnapReviewSecurityNoMock(TestCase):
         # fake unsquashfs
         unsquashfs = os.path.join(output_dir, 'unsquashfs')
         content = '''#!/bin/sh
+if [ "$1" = "-s" ]; then
+    cat <<EOM
+...
+Number of fragments 0
+...
+EOM
+    exit 0
+fi
 echo test error: -fstime failure
 exit 1
 '''
@@ -977,6 +985,86 @@ exit 1
         expected_counts = {'info': None, 'warn': 1, 'error': 0}
         self.check_results(report, expected_counts)
 
+    def test_check_squashfs_resquash_unsquash_fail_stat(self):
+        '''Test check_squashfs_resquash() - -s failure'''
+        output_dir = self.mkdtemp()
+        package = utils.make_snap2(output_dir=output_dir)
+        c = SnapReviewSecurity(package)
+
+        # fake unsquashfs
+        unsquashfs = os.path.join(output_dir, 'unsquashfs')
+        content = '''#!/bin/sh
+if [ "$1" = "-fstime" ]; then
+    exit 0
+fi
+echo test error: unsquashfs failure
+exit 1
+'''
+        with open(unsquashfs, 'w') as f:
+            f.write(content)
+        os.chmod(unsquashfs, 0o775)
+
+        old_path = os.environ['PATH']
+        if old_path:
+            os.environ['PATH'] = "%s:%s" % (output_dir, os.environ['PATH'])
+        else:
+            os.environ['PATH'] = output_dir  # pragma: nocover
+
+        c.check_squashfs_resquash()
+        os.environ['PATH'] = old_path
+        report = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(report, expected_counts)
+
+    def test_check_squashfs_resquash_unsquash_fail_fragments(self):
+        '''Test check_squashfs_resquash() - fragments'''
+        output_dir = self.mkdtemp()
+        package = utils.make_snap2(output_dir=output_dir)
+        c = SnapReviewSecurity(package)
+
+        # fake unsquashfs
+        unsquashfs = os.path.join(output_dir, 'unsquashfs')
+        content = '''#!/bin/sh
+if [ "$1" = "-fstime" ]; then
+    exit 0
+fi
+if [ "$1" = "-s" ]; then
+    cat <<EOM
+...
+Number of fragments 3
+...
+EOM
+    exit 0
+fi
+echo test error: unsquashfs failure
+exit 1
+'''
+        with open(unsquashfs, 'w') as f:
+            f.write(content)
+        os.chmod(unsquashfs, 0o775)
+
+        old_path = os.environ['PATH']
+        if old_path:
+            os.environ['PATH'] = "%s:%s" % (output_dir, os.environ['PATH'])
+        else:
+            os.environ['PATH'] = output_dir  # pragma: nocover
+
+        os.environ['SNAP_ENFORCE_RESQUASHFS'] = "1"
+        c.check_squashfs_resquash()
+        os.environ.pop('SNAP_ENFORCE_RESQUASHFS')
+        os.environ['PATH'] = old_path
+        report = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'security-snap-v2:squashfs_fragments'
+        expected['error'][name] = {"text": "The squashfs was built without '-no-fragments'. If using snapcraft, please upgrade to at least 2.38 and rebuild. Otherwise, please ensure the snap is built using 'mksquashfs <dir> <snap> -noappend -comp xz -all-root -no-xattrs -no-fragments'"}
+        self.check_results(report, expected=expected)
+
     def test_check_squashfs_resquash_unsquashfs_fail(self):
         '''Test check_squashfs_resquash() - unsquashfs failure'''
         output_dir = self.mkdtemp()
@@ -987,6 +1075,14 @@ exit 1
         unsquashfs = os.path.join(output_dir, 'unsquashfs')
         content = '''#!/bin/sh
 if [ "$1" = "-fstime" ]; then
+    exit 0
+fi
+if [ "$1" = "-s" ]; then
+    cat <<EOM
+...
+Number of fragments 0
+...
+EOM
     exit 0
 fi
 echo test error: unsquashfs failure

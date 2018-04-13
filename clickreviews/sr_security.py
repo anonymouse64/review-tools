@@ -171,6 +171,34 @@ class SnapReviewSecurity(SnapReview):
 
         fn = os.path.abspath(self.pkg_filename)
 
+        # Verify squashfs has no fragments. If it does, it will not resquash
+        # properly (LP: #1576763). This stat output for fragments has been
+        # stable for at least the last 7 years, so just parse it. If it changes
+        # we can consider examing the superblock directly.
+        oldlang = ""
+        if 'LANG' in os.environ:
+            oldlang = os.environ['LANG']
+        (rc, out) = cmd(['unsquashfs', '-s', fn])
+        os.environ['LANG'] = oldlang
+        if rc != 0:
+            t = 'error'
+            n = self._get_check_name('squashfs_stat')
+            s = 'could not stat squashfs'
+            self._add_result(t, n, s)
+            return
+        if '\nNumber of fragments 0\n' not in out and \
+                ('SNAP_ENFORCE_RESQUASHFS' not in os.environ or
+                 ('SNAP_ENFORCE_RESQUASHFS' in os.environ and
+                  os.environ['SNAP_ENFORCE_RESQUASHFS'] != "0")):
+            t = 'error'
+            n = self._get_check_name('squashfs_fragments')
+            s = "The squashfs was built without '-no-fragments'. If using " + \
+                "snapcraft, please upgrade to at least 2.38 and rebuild. " + \
+                "Otherwise, please ensure the snap is built using " \
+                "'mksquashfs <dir> <snap> %s'" % " ".join(MKSQUASHFS_OPTS)
+            self._add_result(t, n, s)
+            return
+
         # Verify squashfs supports the -fstime option, if not, warn (which
         # blocks in store)
         (rc, out) = cmd(['unsquashfs', '-fstime', fn])
