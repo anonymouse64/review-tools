@@ -1282,7 +1282,7 @@ exit 0
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'security-snap-v2:squashfs_repack_checksum'
-        expected['error'][name] = {"text": "checksums do not match. Please ensure the snap is created with either 'snapcraft pack <DIR>' (using snapcraft >= 2.38) or 'mksquashfs <dir> <snap> -noappend -comp xz -all-root -no-xattrs -no-fragments'"}
+        expected['error'][name] = {"text": "checksums do not match. Please ensure the snap is created with either 'snapcraft pack <DIR>' (using snapcraft >= 2.38) or 'mksquashfs <dir> <snap> -noappend -comp xz -all-root -no-xattrs -no-fragments'. If using electron-builder, please upgrade to (at least) 20.9.2 stable."}
         self.check_results(report, expected=expected)
 
     def test_check_squashfs_resquash_sha512sum_mismatch_enforce_os(self):
