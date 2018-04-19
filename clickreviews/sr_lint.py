@@ -654,6 +654,7 @@ class SnapReviewLint(SnapReview):
 
         # Certain options require 'daemon' so list the keys that are shared
         # by services and binaries
+        # TODO: make this apps_optional_shared
         ok_keys = ['command', 'completer', 'environment', 'plugs', 'slots',
                    'aliases', 'common-id']
 
@@ -1880,3 +1881,77 @@ class SnapReviewLint(SnapReview):
                         "be a legal path and start with one of: %s" % \
                         ", ".join(layout_prefixes)
                 self._add_result(t, n, s)
+
+    def check_apps_refresh_mode(self):
+        '''Check apps - refresh-mode'''
+        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+            return
+
+        unknown = []
+        for app in self.snap_yaml['apps']:
+            key = 'refresh-mode'
+            if key not in self.snap_yaml['apps'][app]:
+                # We check for required elsewhere
+                continue
+
+            t = 'info'
+            n = self._get_check_name('%s' % key, app=app)
+            s = 'OK'
+            if not isinstance(self.snap_yaml['apps'][app][key], str):
+                t = 'error'
+                s = "%s '%s' (not a str)" % (key,
+                                             self.snap_yaml['apps'][app][key])
+                self._add_result(t, n, s)
+                continue
+            self._add_result(t, n, s)
+
+            refresh_mode = self.snap_yaml['apps'][app][key]
+            if refresh_mode not in self.valid_refresh_modes and \
+                    refresh_mode not in unknown:
+                unknown.append(refresh_mode)
+
+        t = 'info'
+        n = self._get_check_name('unknown_refresh_mode')
+        s = 'OK'
+        if len(unknown) > 0:
+            t = 'warn'
+            s = "unknown refresh-mode: '%s'" % \
+                (",".join(sorted(unknown)))
+        self._add_result(t, n, s)
+
+    def check_apps_stop_mode(self):
+        '''Check apps - stop-mode'''
+        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+            return
+
+        unknown = []
+        for app in self.snap_yaml['apps']:
+            key = 'stop-mode'
+            if key not in self.snap_yaml['apps'][app]:
+                # We check for required elsewhere
+                continue
+
+            t = 'info'
+            n = self._get_check_name('%s' % key, app=app)
+            s = 'OK'
+            if not isinstance(self.snap_yaml['apps'][app][key], str):
+                t = 'error'
+                s = "%s '%s' (not a str)" % (key,
+                                             self.snap_yaml['apps'][app][key])
+                self._add_result(t, n, s)
+                continue
+            self._add_result(t, n, s)
+
+            stop_mode = self.snap_yaml['apps'][app][key]
+            if stop_mode not in self.valid_stop_modes and \
+                    stop_mode not in unknown:
+                unknown.append(stop_mode)
+
+        t = 'info'
+        n = self._get_check_name('unknown_stop_mode')
+        s = 'OK'
+        if len(unknown) > 0:
+            t = 'warn'
+            s = "unknown stop-mode: '%s'" % \
+                (",".join(sorted(unknown)))
+        self._add_result(t, n, s)

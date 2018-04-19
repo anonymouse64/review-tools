@@ -73,11 +73,13 @@ class SnapReview(Review):
                      'plugs',
                      'ports',
                      'post-stop-command',
+                     'refresh-mode',
                      'reload-command',
                      'restart-condition',
                      'slots',
                      'sockets',
                      'stop-command',
+                     'stop-mode',
                      'stop-timeout',
                      ]
     hooks_required = []
@@ -108,6 +110,22 @@ class SnapReview(Review):
                         'prepare-plug-',
                         'prepare-slot-',
                         'remove',
+                        ]
+
+    # snap/validate.go
+    valid_refresh_modes = ['endure',
+                           'restart',
+                           ]
+
+    # snap/info.go
+    valid_stop_modes = ['sigterm',
+                        'sigterm-all',
+                        'sighup',
+                        'sighup-all',
+                        'sigusr1',
+                        'sigusr1-all',
+                        'sigusr2',
+                        'sigusr2-all',
                         ]
 
     # https://docs.google.com/document/d/1Q5_T00yTq0wobm_nHzCV-KV8R4jdk-PXcrtm80ETTLU/edit#

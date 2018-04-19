@@ -183,6 +183,7 @@ lint-snap-v2:ports_int1_format|
 lint-snap-v2:ports_unknown_key|
 lint-snap-v2:ports_unknown_subkey|
 lint-snap-v2:post-stop-command|
+lint-snap-v2:refresh-mode|
 lint-snap-v2:reload-command|
 lint-snap-v2:restart-condition|
 lint-snap-v2:slots|
@@ -195,12 +196,15 @@ lint-snap-v2:sockets_listen_stream|
 lint-snap-v2:sockets_socket-mode|
 lint-snap-v2:sockets_type|
 lint-snap-v2:stop-command|
+lint-snap-v2:stop-mode|
 lint-snap-v2:stop-timeout|
 lint-snap-v2:stop-timeout_range|
 lint-snap-v2:summary|
 lint-snap-v2:summary_present|
 lint-snap-v2:unknown_field|
 lint-snap-v2:unknown_hook|
+lint-snap-v2:unknown_refresh_mode|
+lint-snap-v2:unknown_stop_mode|
 lint-snap-v2:valid_contents_for_architecture|
 lint-snap-v2:vcs_files|
 lint-snap-v2:version_valid|

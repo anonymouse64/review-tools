@@ -1720,6 +1720,26 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
+    def test_check_apps_nondaemon_refresh_mode(self):
+        '''Test check_apps_nondaemon() - refresh-mode'''
+        self.set_test_snap_yaml("apps", {"foo": {"command": "bin/bar",
+                                                 "refresh-mode": "endure"}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_nondaemon()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_nondaemon_stop_mode(self):
+        '''Test check_apps_nondaemon() - stop-mode'''
+        self.set_test_snap_yaml("apps", {"foo": {"command": "bin/bar",
+                                                 "stop-mode": "sigterm"}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_nondaemon()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
     def test_check_apps_restart_condition_always(self):
         '''Test check_apps_restart-condition() - always'''
         entry = "always"
@@ -4060,6 +4080,62 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c.check_layout()
         r = c.click_report
         expected_counts = {'info': None, 'warn': 1, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_refresh_mode(self):
+        '''Test check_apps_refresh_mode()'''
+        self.set_test_snap_yaml("apps", {"foo": {"refresh-mode": "endure"}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_refresh_mode()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_refresh_mode_bad(self):
+        '''Test check_apps_refresh_mode() - bad'''
+        self.set_test_snap_yaml("apps", {"foo": {"refresh-mode": []}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_refresh_mode()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_refresh_mode_unknown(self):
+        '''Test check_apps_refresh_mode() - unknown'''
+        self.set_test_snap_yaml("apps", {"foo": {"refresh-mode":
+                                                 "nonexistent"}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_refresh_mode()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 1, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_stop_mode(self):
+        '''Test check_apps_stop_mode()'''
+        self.set_test_snap_yaml("apps", {"foo": {"stop-mode": "sigterm"}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_stop_mode()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_stop_mode_bad(self):
+        '''Test check_apps_stop_mode() - bad'''
+        self.set_test_snap_yaml("apps", {"foo": {"stop-mode": []}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_stop_mode()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_stop_mode_unknown(self):
+        '''Test check_apps_stop_mode() - unknown'''
+        self.set_test_snap_yaml("apps", {"foo": {"stop-mode":
+                                                 "nonexistent"}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_stop_mode()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 1, 'error': 0}
         self.check_results(r, expected_counts)
 
 
