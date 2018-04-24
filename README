@@ -37,6 +37,7 @@ CRT_SEND_EMAIL=1           - enable sending emails
 CRT_EMAIL_FROM=<addr>      - override configured From address
 CRT_EMAIL_TO=<addr>        - override calculated To addresses
 CRT_EMAIL_SERVER=<server>  - use <server> instead of localhost
+CRT_EMAIL_NOPROMPT=1       - force sending of email without prompting
 
 Importable tests:
 - clickreviews/sr_lint.py: lint tests

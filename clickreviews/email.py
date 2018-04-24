@@ -67,13 +67,15 @@ def send(email_to_addr, subj, body):
         if 'CRT_EMAIL_SERVER' in os.environ:
             email_server = os.environ['CRT_EMAIL_SERVER']
 
-        print("Send report (subj='%s',to='%s',from='%s',server='%s')? (y|N) " %
-              (subj, email_to_addr, email_from_addr, email_server), end='')
-        sys.stdout.flush()
-        ans = sys.stdin.readline().lower().strip()
-        if ans != 'y' and ans != 'yes':
-            print("aborting email delivery for 'Subject: %s'" % subj)
-            return False
+        if 'CRT_EMAIL_NOPROMPT' not in os.environ or \
+                os.environ['CRT_EMAIL_NOPROMPT'] != "1":
+            print("Send (subj='%s',to='%s',from='%s',server='%s')? (y|N) " %
+                  (subj, email_to_addr, email_from_addr, email_server), end='')
+            sys.stdout.flush()
+            ans = sys.stdin.readline().lower().strip()
+            if ans != 'y' and ans != 'yes':
+                print("aborting email delivery for 'Subject: %s'" % subj)
+                return False
 
         # This can throw many exceptions so the caller needs to catch them and
         # skip updating seen_db
