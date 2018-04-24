@@ -176,6 +176,7 @@ class SnapReview(Review):
                           'serial-port': {'path/slots': "",
                                           'usb-vendor/slots': 0,
                                           'usb-product/slots': 0,
+                                          'usb-interface-number/slots': 0
                                           },
                           'snapd-control': {'refresh-schedule/plugs': ""},
                           'spi': {'path/slots': ""},
