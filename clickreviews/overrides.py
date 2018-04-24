@@ -305,3 +305,120 @@ lint_redflagged_base_dep_override = {
         'linux-steam-integration',
     ],
 }
+
+# Some publisher_emails represent a shared account. For snaps with a shared
+# email, also send to other addresses.
+canonical_desktop = ['ken.vandine@canonical.com',
+                     'sebastien.bacher@canonical.com',
+                     'will.cooke@canonical.com',
+                     ]
+
+canonical_enablement = ['snappy-canonical-enablement@canonical.com']
+
+canonical_foundations = ['daniel.watkins@canonical.com',
+                         'patricia.gaughen@canonical.com',
+                         'steve.langasek@canonical.com',
+                         ]
+
+canonical_kernel = ['brad.figg@canonical.com',
+                    'leann.ogasawara@canonical.com',
+                    'tyler.hicks@canonical.com',
+                    ]
+
+canonical_hwe = ['anthony.wong@canonical.com',
+                 'leann.ogasawara@canonical.com',
+                 ]
+
+canonical_juju = ['ian.booth@canonical.com',
+                  'nicholas.skaggs@canonical.com',
+                  'tim.penhey@canonical.com',
+                  ]
+
+canonical_lxd = ['david.britton@canonical.com',
+                 'stephane.graber@canonical.com',
+                 'tyler.hicks@canonical.com',
+                 ]
+
+canonical_mir = ['alan.griffiths@canonical.com',
+                 'gerry.boland@canonical.com',
+                 'michal.sawicz@canonical.com',
+                 ]
+
+canonical_security = ['emily.ratliff@canonical.com',
+                      'jamie@canonical.com',
+                      ]
+
+canonical_snapd = ['gustavo.niemeyer@canonical.com',
+                   'michael.vogt@canonical.com',
+                   ]
+
+canonical_snapcraft = ['evan.dandrea@canonical.com',
+                       'sergio.schvezov@canonical.com',
+                       ]
+
+update_publisher_overrides = {
+    'snappy-canonical-storeaccount@canonical.com': {
+        'aws-kernel': canonical_kernel,
+        'azure-kernel': canonical_kernel,
+        'base-18': canonical_snapd,
+        'caracalla-kernel': canonical_hwe,
+        'chromium': ['olivier.tilloy@canonical.com'] + canonical_desktop,
+        'conjure-up': canonical_juju,
+        'core': canonical_snapd,
+        'core18': canonical_snapd,
+        'dragonboard-kernel': canonical_kernel,
+        'eog': canonical_desktop,
+        'gcp-kernel': canonical_kernel,
+        'gedit': canonical_desktop,
+        'gke-kernel': canonical_kernel,
+        'gnome-3-26-1604': canonical_desktop,
+        'gnome-calculator': canonical_desktop,
+        'gnome-calendar': canonical_desktop,
+        'gnome-characters': canonical_desktop,
+        'gnome-clocks': canonical_desktop,
+        'gnome-contacts': canonical_desktop,
+        'gnome-dictionary': canonical_desktop,
+        'gnome-logs': canonical_desktop,
+        'gnome-sudoku': canonical_desktop,
+        'gnome-system-monitor': canonical_desktop,
+        'juju': canonical_juju,
+        'jq': canonical_snapd,
+        'libreoffice': canonical_desktop,
+        'lxd': canonical_lxd,
+        'mir-kiosk': canonical_mir,
+        'modem-manager': canonical_enablement,
+        'network-manager': canonical_enablement,
+        'pc-kernel': canonical_kernel,
+        'pi2-kernel': canonical_kernel,
+        'quadrapassel': canonical_desktop,
+        'snapcraft': canonical_snapcraft,
+        'snappy-debug': canonical_security,
+        'snapweb': canonical_enablement,
+        'stlouis-kernel': canonical_hwe,
+        'strace-static': canonical_snapd,
+        'subiquity': canonical_foundations,
+        'test-snapd-accounts-service': canonical_snapd,
+        'test-snapd-autopilot-consumer': canonical_snapd,
+        'test-snapd-cups-control-consumer': canonical_snapd,
+        'test-snapd-dbus-consumer': canonical_snapd,
+        'test-snapd-dbus-provider': canonical_snapd,
+        'test-snapd-fuse-consumer': canonical_snapd,
+        'test-snapd-go-webserver': canonical_snapd,
+        'test-snapd-gpio-memory-control': canonical_snapd,
+        'test-snapd-gsettings': canonical_snapd,
+        'test-snapd-hello-classic': canonical_snapd,
+        'test-snapd-kernel-module-consumer': canonical_snapd,
+        'test-snapd-location-control-provider': canonical_snapd,
+        'test-snapd-network-status-provider': canonical_snapd,
+        'test-snapd-openvswitch-support': canonical_snapd,
+        'test-snapd-password-manager-consumer': canonical_snapd,
+        'test-snapd-physical-memory-control': canonical_snapd,
+        'test-snapd-python-webserver': canonical_snapd,
+        'test-snapd-system-observe-consumer': canonical_snapd,
+        'test-snapd-uhid': canonical_snapd,
+        'test-snapd-upower-observe-consumer': canonical_snapd,
+        'ubuntu-image': canonical_foundations,
+        'wifi-ap': canonical_enablement,
+        'wifi-connect': canonical_enablement,
+    },
+}

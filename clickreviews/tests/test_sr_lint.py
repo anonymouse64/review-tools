@@ -85,6 +85,28 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                  }
         return slots
 
+    def _create_manifest_yaml(self):
+        m = {}
+        for i in "name", "version", "description", "summary":
+            m[i] = self.test_snap_yaml[i]
+        m['build-packages'] = []
+        m['build-snaps'] = []
+        m['image-info'] = {}
+        m['parts'] = {
+            'mypart': {
+                'build-packages': [],
+                'installed-packages': [],
+                'installed-snaps': [],
+                'plugin': 'nil',
+                'prime': [],
+                'stage': [],
+                'stage-packages': [],
+                'uname': 'Linux',
+            }
+        }
+
+        return m
+
     def test_all_checks_as_v2(self):
         '''Test snap v2 has checks'''
         self.set_test_pkgfmt("snap", "16.04")
@@ -4136,6 +4158,95 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c.check_apps_stop_mode()
         r = c.click_report
         expected_counts = {'info': None, 'warn': 1, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_snap_manifest(self):
+        '''Test check_snap_manifest()'''
+        m = self._create_manifest_yaml()
+        for f in m:
+            self.set_test_snap_manifest_yaml(f, m[f])
+        c = SnapReviewLint(self.test_name)
+        c.check_snap_manifest()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_snap_manifest_toplevel_missing(self):
+        '''Test check_snap_manifest() - missing toplevel key'''
+        m = self._create_manifest_yaml()
+        for f in m:
+            if f != 'build-packages':
+                self.set_test_snap_manifest_yaml(f, m[f])
+        c = SnapReviewLint(self.test_name)
+        c.check_snap_manifest()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_snap_manifest_toplevel_wrong(self):
+        '''Test check_snap_manifest() - wrong toplevel key type'''
+        m = self._create_manifest_yaml()
+        for f in m:
+            if f != 'build-packages':
+                self.set_test_snap_manifest_yaml(f, m[f])
+        self.set_test_snap_manifest_yaml('build-packages', {})
+        c = SnapReviewLint(self.test_name)
+        c.check_snap_manifest()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_snap_manifest_toplevel_optional_wrong(self):
+        '''Test check_snap_manifest() - wrong toplevel optional key type'''
+        m = self._create_manifest_yaml()
+        for f in m:
+            if f != 'parts':
+                self.set_test_snap_manifest_yaml(f, m[f])
+        self.set_test_snap_manifest_yaml('parts', "")
+        c = SnapReviewLint(self.test_name)
+        c.check_snap_manifest()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_snap_manifest_toplevel_unknown(self):
+        '''Test check_snap_manifest() - unknown toplevel key'''
+        m = self._create_manifest_yaml()
+        for f in m:
+            self.set_test_snap_manifest_yaml(f, m[f])
+        self.set_test_snap_manifest_yaml('unknown', {})
+        c = SnapReviewLint(self.test_name)
+        c.check_snap_manifest()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_snap_manifest_part_missing(self):
+        '''Test check_snap_manifest() - missing part key'''
+        m = self._create_manifest_yaml()
+        for f in m:
+            if f != 'parts':
+                self.set_test_snap_manifest_yaml(f, m[f])
+        del m['parts']['mypart']['build-packages']
+        self.set_test_snap_manifest_yaml('parts', m['parts'])
+        c = SnapReviewLint(self.test_name)
+        c.check_snap_manifest()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_snap_manifest_part_wrong(self):
+        '''Test check_snap_manifest() - wrong part key type'''
+        m = self._create_manifest_yaml()
+        for f in m:
+            if f != 'parts':
+                self.set_test_snap_manifest_yaml(f, m[f])
+        m['parts']['mypart']['build-packages'] = {}
+        self.set_test_snap_manifest_yaml('parts', m['parts'])
+        c = SnapReviewLint(self.test_name)
+        c.check_snap_manifest()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
 

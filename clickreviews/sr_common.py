@@ -1,6 +1,6 @@
 '''sr_common.py: common classes and functions'''
 #
-# Copyright (C) 2013-2016 Canonical Ltd.
+# Copyright (C) 2013-2018 Canonical Ltd.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -63,6 +63,29 @@ class SnapReview(Review):
                        'plugs',
                        'slots',
                        ]
+
+    snap_manifest_required = {'build-packages': [],
+                              }
+    snap_manifest_optional = {'adopt-info': "",
+                              'build-snaps': [],
+                              'common_id': "",
+                              'image-info': {},
+                              'parts': {},
+                              'version-script': "",
+                              }
+
+    # Parts can have arbitrary keys. These are the keys that are required and
+    # that we may use elsewhere
+    snap_manifest_parts_required = {'build-packages': [],
+                                    'plugin': "",
+                                    'prime': [],
+                                    'stage': [],
+                                    'stage-packages': [],
+                                    }
+    snap_manifest_parts_optional = {'installed-packages': [],
+                                    'installed-snaps': [],
+                                    'uname': "",
+                                    }
 
     apps_required = ['command']
     apps_optional = ['aliases',
@@ -197,10 +220,10 @@ class SnapReview(Review):
                                     'plugs': ['name/bus'],
                                     },
                            'gpio': {'slots': ['number']},
-                           'hidraw': {'slots': ['path',
-                                                'path/!usb-vendor/!usb-product',
-                                                'path/usb-vendor/usb-product'],
-                                      },
+                           'hidraw': {
+                               'slots': ['path',
+                                         'path/!usb-vendor/!usb-product',
+                                         'path/usb-vendor/usb-product']},
                            'i2c': {'slots': ['path']},
                            'iio': {'slots': ['path']},
                            'serial-port': {'slots': [
@@ -231,6 +254,17 @@ class SnapReview(Review):
             self.snap_yaml = yaml.safe_load(snap_yaml)
         except Exception:  # pragma: nocover
             error("Could not load snap.yaml. Is it properly formatted?")
+
+        self.snap_manifest_yaml = {}
+        manifest_yaml = self._extract_snap_manifest_yaml()
+        if manifest_yaml is not None:
+            try:
+                self.snap_manifest_yaml = yaml.safe_load(manifest_yaml)
+                if self.snap_manifest_yaml is None:
+                    self.snap_manifest_yaml = {}
+            except Exception:  # pragma: nocover
+                error("Could not load snap/manifest.yaml. Is it properly "
+                      "formatted?")
 
         local_copy = None
         if 'SNAP' in os.environ:
@@ -270,7 +304,8 @@ class SnapReview(Review):
                             iface in self.base_declaration[oside]:
                         # don't override anything in the base declaration
                         continue
-                    self.base_declaration[side][iface] = self.inprogress_interfaces[rel][side][iface]
+                    self.base_declaration[side][iface] = \
+                        self.inprogress_interfaces[rel][side][iface]
 
         # to simplify checks, gather up all the interfaces into one dict()
         for side in ['plugs', 'slots']:
@@ -304,7 +339,8 @@ class SnapReview(Review):
             for iface in self.snap_yaml[k]:
                 if not isinstance(self.snap_yaml[k], dict):
                     # eg, top-level "plugs: [ content ]"
-                    error("Invalid top-level '%s' (not a dict)" % k)  # pragma: nocover
+                    error("Invalid top-level '%s' "
+                          "(not a dict)" % k)  # pragma: nocover
                 if self.snap_yaml[k][iface] is None:
                     self.snap_yaml[k][iface] = {}
 
@@ -315,6 +351,15 @@ class SnapReview(Review):
         y = os.path.join(self.unpack_dir, "meta/snap.yaml")
         if not os.path.isfile(y):
             error("Could not find snap.yaml.")
+        return open_file_read(y)
+
+    # Since coverage is looked at via the testsuite and the testsuite mocks
+    # this out, don't cover this
+    def _extract_snap_manifest_yaml(self):  # pragma: nocover
+        '''Extract and read snap/manifest.yaml if it exists'''
+        y = os.path.join(self.unpack_dir, "snap/manifest.yaml")
+        if not os.path.isfile(y):
+            return None
         return open_file_read(y)
 
     # Since coverage is looked at via the testsuite and the testsuite mocks
@@ -343,7 +388,8 @@ class SnapReview(Review):
 
         # see https://forum.snapcraft.io/t/3974, or
         # http://people.canonical.com/~john/snap_version_validator_regexp.svg
-        _re_valid_version = re.compile(r"^[a-zA-Z0-9](?:[a-zA-Z0-9:.+~-]{0,30}[a-zA-Z0-9+~])?$")
+        _re_valid_version = re.compile(
+            r"^[a-zA-Z0-9](?:[a-zA-Z0-9:.+~-]{0,30}[a-zA-Z0-9+~])?$")
         if _re_valid_version.match(str(v)):
             return True
 
@@ -356,3 +402,76 @@ class SnapReview(Review):
         if pat.search(n):
             return True
         return False
+
+    def verify_snap_manifest(self, m):
+        '''Verify snap/manifest.yaml'''
+        def _verify_type(m, d, prefix=""):
+            for f in d:
+                if f in m:
+                    needed_type = type(d[f])
+                    if not isinstance(m[f], needed_type):
+                        t = 'error'
+                        s = "'%s%s' is '%s', not '%s'" % (
+                            prefix, f, type(m[f]).__name__,
+                            needed_type.__name__)
+                        return (False, t, s)
+            return (True, 'info', 'OK')
+
+        unknown = []
+        for f in m:
+            if f not in self.snappy_required + self.snappy_optional + \
+                    list(self.snap_manifest_required.keys()) + \
+                    list(self.snap_manifest_optional.keys()):
+                unknown.append(f)
+        if len(unknown) > 0:
+            t = 'error'
+            s = 'unknown keys in snap/manifest.yaml: %s' % \
+                ','.join(sorted(unknown))
+            return (False, t, s)
+
+        missing = []
+        for f in self.snappy_required + \
+                list(self.snap_manifest_required.keys()):
+            if f not in m:
+                missing.append(f)
+        if len(missing) > 0:
+            t = 'error'
+            s = 'missing keys in snap/manifest.yaml: %s' % \
+                ','.join(sorted(missing))
+            return (False, t, s)
+
+        (valid, t, s) = _verify_type(m, self.snap_manifest_required)
+        if not valid:
+            return (valid, t, s)
+
+        (valid, t, s) = _verify_type(m, self.snap_manifest_optional)
+        if not valid:
+            return (valid, t, s)
+
+        if 'parts' in m:
+            for p in m['parts']:
+                missing = []
+                for f in list(self.snap_manifest_parts_required):
+                    if f not in m['parts'][p]:
+                        missing.append(f)
+                if len(missing) > 0:
+                    t = 'error'
+                    s = "missing keys for part '%s' snap/manifest.yaml: %s" % \
+                        (p, ','.join(sorted(missing)))
+                    return (False, t, s)
+
+                (valid, t, s) = _verify_type(
+                    m['parts'][p],
+                    self.snap_manifest_parts_required,
+                    "parts/%s/" % p)
+                if not valid:
+                    return (valid, t, s)
+
+                (valid, t, s) = _verify_type(
+                    m['parts'][p],
+                    self.snap_manifest_parts_optional,
+                    "parts/%s/" % p)
+                if not valid:
+                    return (valid, t, s)
+
+        return (True, 'info', 'OK')

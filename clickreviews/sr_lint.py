@@ -1955,3 +1955,15 @@ class SnapReviewLint(SnapReview):
             s = "unknown stop-mode: '%s'" % \
                 (",".join(sorted(unknown)))
         self._add_result(t, n, s)
+
+    def check_snap_manifest(self):
+        '''Check snap/manifest.yaml'''
+        if not self.is_snap2 or len(self.snap_manifest_yaml) == 0:
+            return
+
+        t = 'info'
+        n = self._get_check_name('snap_manifest')
+        s = 'OK'
+
+        (valid, t, s) = self.verify_snap_manifest(self.snap_manifest_yaml)
+        self._add_result(t, n, s)

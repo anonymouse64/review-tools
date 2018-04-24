@@ -1,0 +1,221 @@
+= Test --seen-db updated =
+Emptying seen.db
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-1.db' --store-db='./tests/test-store-1.db'...
+From: Snap Store <noreply@canonical.com>
+To: olivier.tilloy@canonical.com, security@ubuntu.com
+Subject: 0ad contains outdated Ubuntu packages
+
+A scan of the this snap shows that the following revisions were
+built with packages from the Ubuntu archive that have since
+received security updates:
+
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * libtiff5: 3602-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * libtiff5: 3602-1
+
+Revision r13 (amd64; channels: edge)
+ * libtiff5: 3602-1
+
+Revision r14 (i386; channels: edge)
+ * libtiff5: 3602-1
+
+To resolve this, typically simply rebuilding the snap with
+snapcraft will pull in the security updates.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://usn.ubuntu.com/3602-1/
+
+
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-1.db' --store-db='./tests/test-store-1.db'...
+
+= Test multiple USNs with --seen-db updated =
+Emptying seen.db
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-1.db'...
+From: Snap Store <noreply@canonical.com>
+To: olivier.tilloy@canonical.com, security@ubuntu.com
+Subject: 0ad contains outdated Ubuntu packages
+
+A scan of the this snap shows that the following revisions were
+built with packages from the Ubuntu archive that have since
+received security updates:
+
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * libtiff5: 3602-1, 3606-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * libtiff5: 3602-1, 3606-1
+
+Revision r13 (amd64; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+
+Revision r14 (i386; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+
+To resolve this, typically simply rebuilding the snap with
+snapcraft will pull in the security updates.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://usn.ubuntu.com/3602-1/
+ * https://usn.ubuntu.com/3606-1/
+
+
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-1.db'...
+
+= Test previous USNs not reported with --seen-db updated =
+Emptying seen.db
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-2.db'...
+From: Snap Store <noreply@canonical.com>
+To: olivier.tilloy@canonical.com, security@ubuntu.com
+Subject: 0ad contains outdated Ubuntu packages
+
+A scan of the this snap shows that the following revisions were
+built with packages from the Ubuntu archive that have since
+received security updates:
+
+Revision r21 (amd64; channels: stable, candidate, beta)
+ * libtiff5: 3606-1
+
+Revision r22 (i386; channels: stable, candidate, beta)
+ * libtiff5: 3606-1
+
+Revision r23 (amd64; channels: edge)
+ * libtiff5: 3606-1
+
+Revision r24 (i386; channels: edge)
+ * libtiff5: 3606-1
+
+To resolve this, typically simply rebuilding the snap with
+snapcraft will pull in the security updates.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://usn.ubuntu.com/3606-1/
+
+
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-2.db'...
+
+= Test up to date with --seen-db updated =
+Emptying seen.db
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-3.db'...
+
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-3.db'...
+
+= Test real world =
+Emptying seen.db
+== one USN affects snap ==
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-1.db' --store-db='./tests/test-store-1.db'...
+From: Snap Store <noreply@canonical.com>
+To: olivier.tilloy@canonical.com, security@ubuntu.com
+Subject: 0ad contains outdated Ubuntu packages
+
+A scan of the this snap shows that the following revisions were
+built with packages from the Ubuntu archive that have since
+received security updates:
+
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * libtiff5: 3602-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * libtiff5: 3602-1
+
+Revision r13 (amd64; channels: edge)
+ * libtiff5: 3602-1
+
+Revision r14 (i386; channels: edge)
+ * libtiff5: 3602-1
+
+To resolve this, typically simply rebuilding the snap with
+snapcraft will pull in the security updates.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://usn.ubuntu.com/3602-1/
+
+
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-1.db' --store-db='./tests/test-store-1.db'...
+
+== two USNs affect snap ==
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-1.db'...
+From: Snap Store <noreply@canonical.com>
+To: olivier.tilloy@canonical.com, security@ubuntu.com
+Subject: 0ad contains outdated Ubuntu packages
+
+A scan of the this snap shows that the following revisions were
+built with packages from the Ubuntu archive that have since
+received security updates:
+
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * libtiff5: 3606-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * libtiff5: 3606-1
+
+Revision r13 (amd64; channels: edge)
+ * libtiff5: 3606-1
+
+Revision r14 (i386; channels: edge)
+ * libtiff5: 3606-1
+
+To resolve this, typically simply rebuilding the snap with
+snapcraft will pull in the security updates.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://usn.ubuntu.com/3606-1/
+
+
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-1.db'...
+
+== no USNs affect snap (snap updated) ==
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-3.db'...
+
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-3.db'...
+
+== two USNs affect snap (snap reverted) ==
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-1.db'...
+From: Snap Store <noreply@canonical.com>
+To: olivier.tilloy@canonical.com, security@ubuntu.com
+Subject: 0ad contains outdated Ubuntu packages
+
+A scan of the this snap shows that the following revisions were
+built with packages from the Ubuntu archive that have since
+received security updates:
+
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * libtiff5: 3602-1, 3606-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * libtiff5: 3602-1, 3606-1
+
+Revision r13 (amd64; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+
+Revision r14 (i386; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+
+To resolve this, typically simply rebuilding the snap with
+snapcraft will pull in the security updates.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://usn.ubuntu.com/3602-1/
+ * https://usn.ubuntu.com/3606-1/
+
+
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-1.db'...
+
+== no USNs affect snap (snap updated again) ==
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-3.db'...
+
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-3.db'...
+

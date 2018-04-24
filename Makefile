@@ -9,6 +9,7 @@ test:
 
 functest:
 	./tests/test.sh
+	./tests/test-updates-available.sh
 
 functest-system:
 	./tests/test.sh system

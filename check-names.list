@@ -189,6 +189,7 @@ lint-snap-v2:restart-condition|
 lint-snap-v2:slots|
 lint-snap-v2:slots_attributes|
 lint-snap-v2:slots_required_attributes|
+lint-snap-v2:snap_manifest|
 lint-snap-v2:snap_type_redflag|
 lint-snap-v2:snap_type_valid|
 lint-snap-v2:sockets|

@@ -15,6 +15,7 @@ click-reviewers-tools (0.48) UNRELEASED; urgency=medium
     - when checking app command, ignore arguments
     - 'common-id' is valid with non-daemon commands
     - add checks for refresh-mode and stop-mode
+    - verify snap/manifest.yaml if it exists
   * sr_security.py:
     - fix evaluation of SNAP_ENFORCE_RESQUASHFS so '0' turns it off
     - turn on resquash tests by default

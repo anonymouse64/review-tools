@@ -26,11 +26,17 @@ Running checks locally:
 $ PYTHONPATH=$PWD ./bin/click-review /path/to/package
 
 Additional environment variables:
-SNAP_DEBUG=1               - show debu info
+SNAP_DEBUG=1               - show debug info
 SNAP_ENFORCE_RESQUASHFS=0  - don't enforce resquashfs tests
 SNAP_FAKEROOT_RESQUASHFS=1 - use fakeroot with resquashfs tests
 SNAP_DEBUG_RESQUASHFS=1    - show debug info with failed resquashfs tests
 SNAP_DEBUG_RESQUASHFS=2    - drop to a shell with failed resquashfs
+
+For snap-updates-available:
+CRT_SEND_EMAIL=1           - enable sending emails
+CRT_EMAIL_FROM=<addr>      - override configured From address
+CRT_EMAIL_TO=<addr>        - override calculated To addresses
+CRT_EMAIL_SERVER=<server>  - use <server> instead of localhost
 
 Importable tests:
 - clickreviews/sr_lint.py: lint tests

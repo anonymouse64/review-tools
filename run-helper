@@ -23,6 +23,7 @@ for i in ./clickreviews/*py \
          ./clickreviews/tests/*py \
          ./bin/click-review \
          ./bin/create-snap-declaration \
+         ./bin/snap-updates-available \
          ./bin/snap-check-* ; do
     if echo "$i" | grep -q 'cr_.*\.py' ; then
         continue

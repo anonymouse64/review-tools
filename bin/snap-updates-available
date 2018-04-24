@@ -1,0 +1,565 @@
+#!/usr/bin/python3
+# Copyright (C) 2018 Canonical Ltd.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+#
+# NOTE: the initial implementation of this has no store integration support
+# and will look at:
+# - USN db for usn information (ie, only packages in main and restricted from
+#   Ubuntu are reported). The USN db will only move forward with USNs only
+#   being added and not removed.
+# - raw store db (contains only revisions that currently in a channel or
+#   track/channel). Because the store db contains only the current published
+#   revisions, as new snap revisions are published, old snap revisions will
+#   be removed. Note that only snaps built with snapcraft using
+#   SNAPCRAFT_BUILD_INFO=1 will appear in the raw store db.
+#
+# The overall intent of this implementation is to inform, not nag. As such:
+# - a new snap with no previous revisions will have all USNs that affect it
+#   reported. Nothing is reported if no USNs affect it
+# - a snap that previously had USNs reported where the revision is unchanged
+#   but a new USN affects it will only have the new USN reported
+# - a snap that is reverted to an older revision (ie, this revision, though
+#   older, is new in the raw store db) with USNs that affect it will have all
+#   USNs reported
+#
+# The 'seen db' will be used to control when reports are sent
+#
+
+import argparse
+import json
+import os
+import pprint
+import shutil
+import sys
+import tempfile
+import textwrap
+import yaml
+
+import clickreviews.common as common
+import clickreviews.debversion as debversion
+import clickreviews.email as email
+
+from clickreviews.common import (
+    debug,
+    error,
+    warn,
+)
+from clickreviews.sr_common import (
+    SnapReview,
+)
+from clickreviews.overrides import (
+    update_publisher_overrides,
+)
+
+snap_to_release = {'base-18': 'bionic',
+                   'core': 'xenial',
+                   'core18': 'bionic',
+                   }
+
+tracked_releases = ['xenial', 'bionic']
+
+# The From address for all emails
+email_from_addr = "Snap Store <noreply@canonical.com>"
+
+# Send via local SMTP server
+email_server = 'localhost'
+
+
+#
+# Helpers
+#
+def read_json_dict(fn):
+    # XXX: consider reading in as stream
+    debug("Loading: %s" % fn)
+    raw = {}
+    fd = common.open_file_read(fn)
+    try:
+        raw = json.load(fd)
+    except Exception:
+        raise
+        error("Could not load %s. Is it properly formatted?" % fn)
+
+    return raw
+
+
+# For fast checks:
+# usn_db[release][binary][usn][version]
+def read_usn_db(fn):
+    raw = read_json_dict(fn)
+
+    usn_db = {}
+    for usn in raw:
+        if "releases" not in raw[usn]:
+            continue
+        for rel in tracked_releases:
+            if rel not in raw[usn]["releases"]:
+                continue
+
+            # Now we have a USN for a tracked Ubuntu release
+            if rel not in usn_db:
+                usn_db[rel] = {}
+
+            if "sources" not in raw[usn]["releases"][rel]:
+                continue
+            # 'sources' always has only one entry
+            src = list(raw[usn]["releases"][rel]["sources"].keys())[0]
+
+            if "version" not in raw[usn]["releases"][rel]["sources"][src]:
+                continue
+            version = debversion.DebVersion(raw[usn]["releases"][rel]["sources"][src]["version"])
+
+            # Find the binaries from the arch URLs to work around lack of
+            # source_map, etc
+            if "archs" not in raw[usn]["releases"][rel]:
+                continue
+            for arch in raw[usn]["releases"][rel]["archs"]:
+                if "urls" not in raw[usn]["releases"][rel]["archs"][arch]:
+                    continue
+                for u in raw[usn]["releases"][rel]["archs"][arch]["urls"]:
+                    bin = os.path.basename(u).split('_')[0]
+                    if bin not in usn_db[rel]:
+                        usn_db[rel][bin] = {}
+                    if usn not in usn_db[rel][bin]:
+                        usn_db[rel][bin][usn] = version
+
+    return usn_db
+
+
+def get_snap_manifest(fn):
+    if 'SNAP_USER_COMMON' in os.environ and \
+            os.path.exists(os.environ['SNAP_USER_COMMON']):
+        common.MKDTEMP_DIR = os.environ['SNAP_USER_COMMON']
+    else:
+        common.MKDTEMP_DIR = tempfile.gettempdir()
+
+    man = "snap/manifest.yaml"
+    # common.unpack_pkg() fails if this exists, so this is safe
+    dir = tempfile.mktemp(prefix=common.MKDTEMP_PREFIX, dir=common.MKDTEMP_DIR)
+    common.unpack_pkg(fn, dir, man)
+
+    man_fn = os.path.join(dir, man)
+    if not os.path.isfile(man_fn):
+        common.recursive_rm(dir)
+        error("%s not in %s" % (man, fn))
+
+    fd = common.open_file_read(man_fn)
+    try:
+        man_yaml = yaml.safe_load(fd)
+    except Exception:
+        common.recursive_rm(dir)
+        error("Could not load snap/manifest.yaml. Is it properly formatted?")
+
+    common.recursive_rm(dir)
+
+    return man_yaml
+
+
+def verify_snap_manifest(m):
+    '''Verify snap manifest is well-formed and has everything we expect'''
+    (valid, level, msg) = SnapReview.verify_snap_manifest(SnapReview, m)
+    if not valid:
+        raise ValueError(msg)
+
+
+def get_ubuntu_release_from_manifest(m):
+    '''Determine the Ubuntu release from the manifest'''
+    if 'parts' not in m:
+        error("Could not determine Ubuntu release ('parts' not in manifest)")
+
+    installed_snaps = []
+    for part in m['parts']:
+        if 'installed-snaps' in m['parts'][part]:
+            for entry in m['parts'][part]['installed-snaps']:
+                if '=' not in entry:
+                    warn("'%s' not properly formatted. Skipping" % entry)
+                pkg = entry.split('=')[0]  # we don't care about the version
+
+                if pkg in snap_to_release and pkg not in installed_snaps:
+                    installed_snaps.append(pkg)
+
+    if len(installed_snaps) == 0:
+        default = "xenial"
+        debug("Could not determine Ubuntu release (no installed snaps). "
+              "Defaulting to '%s'" % default)
+        ubuntu_release = default
+    else:
+        # NOTE: this will have to change if a snap ever has multiple cores or
+        # base snaps installed
+        if len(installed_snaps) > 1:
+            error("Could not determine Ubuntu release (multiple core: %s" %
+                  ",".join(installed_snaps))
+
+        ubuntu_release = snap_to_release[installed_snaps[0]]
+
+    debug("Ubuntu release=%s" % ubuntu_release)
+
+    return ubuntu_release
+
+
+def get_staged_packages_from_manifest(m):
+    '''Obtain list of packages in stage-packages for various parts'''
+    if 'parts' not in m:
+        debug("Could not find 'parts' in manifest")
+        return None
+
+    d = {}
+    for part in m['parts']:
+        if 'stage-packages' in m['parts'][part]:
+            for entry in m['parts'][part]['stage-packages']:
+                if '=' not in entry:
+                    warn("'%s' not properly formatted. Skipping" % entry)
+                pkg, ver = entry.split('=')
+
+                if pkg not in d:
+                    d[pkg] = []
+                if ver not in d[pkg]:
+                    d[pkg].append(ver)
+
+    if len(d) == 0:
+        return None
+
+    debug("\n" + pprint.pformat(d))
+    return d
+
+
+def get_usns_for_manifest(m, usn_db):
+    '''Find new USNs for packages in the manifest'''
+    verify_snap_manifest(m)
+    debug("snap/manifest.yaml:\n" + pprint.pformat(m))
+
+    rel = get_ubuntu_release_from_manifest(m)
+    pkgs = get_staged_packages_from_manifest(m)
+    if rel not in usn_db:
+        error("'%s' not found in usn database" % rel)
+
+    pending_usns = {}
+
+    if pkgs is None:
+        debug("no stage-packages found")
+        return pending_usns
+
+    for pkg in pkgs:
+        if pkg in usn_db[rel]:
+            for v in pkgs[pkg]:
+                pkgversion = debversion.DebVersion(v)
+                for usn in usn_db[rel][pkg]:
+                    usnversion = usn_db[rel][pkg][usn]
+                    if debversion.compare(pkgversion, usnversion) < 0:
+                        debug('adding %s: %s (pkg:%s < usn:%s)' %
+                              (pkg, usn, pkgversion.full_version,
+                               usnversion.full_version))
+                        if pkg not in pending_usns:
+                            pending_usns[pkg] = []
+                        if usn not in pending_usns[pkg]:
+                            pending_usns[pkg].append(usn)
+                    else:
+                        debug('skipping %s: %s (pkg:%s >= usn:%s)' %
+                              (pkg, usn, pkgversion.full_version,
+                               usnversion.full_version))
+
+    return pending_usns
+
+
+def _add_error(pkgname, errors, msg):
+    if pkgname not in errors:
+        errors[pkgname] = []
+    errors[pkgname].append(msg)
+
+
+def get_pkg_revisions(item, usn_db, errors):
+    for i in ['name', 'publisher_email', 'revisions']:
+        if i not in item:
+            raise ValueError("required field '%s' not found" % i)
+
+    pkg_db = {}
+    pkg_db['revisions'] = {}
+
+    # we've already verified these are present
+    pkg_db['name'] = item['name']
+    pkg_db['publisher'] = email.sanitize_addr(item['publisher_email'])
+    if pkg_db['publisher'] == '':
+        _add_error(pkg_db['name'], errors, "publisher_email '%s' invalid" %
+                   pkg_db['publisher'])
+
+    for rev in item['revisions']:
+        if 'revision' not in rev:
+            _add_error(pkg_db['name'], errors, "no revisions found")
+            continue
+
+        r = str(rev['revision'])  # ensure yaml and json agree on type
+        debug("Checking %s r%s" % (item['name'], r))
+
+        if 'manifest_yaml' not in rev:
+            _add_error(pkg_db['name'], errors,
+                       "manifest_yaml missing for revision '%s'" % r)
+            continue
+
+        m = yaml.load(rev['manifest_yaml'])
+        try:
+            report = get_usns_for_manifest(m, usn_db)
+        except ValueError as e:
+            _add_error(pkg_db['name'], errors, "%s" % e)
+            continue
+
+        if r not in pkg_db['revisions']:
+            pkg_db['revisions'][r] = {}
+        pkg_db['revisions'][r]['channels'] = rev['channels']
+        pkg_db['revisions'][r]['architectures'] = rev['architectures']
+        pkg_db['revisions'][r]['usn-report'] = report
+        if 'uploaders' not in pkg_db:
+            pkg_db['uploaders'] = []
+        if 'uploader_email' in rev:
+            uploader = email.sanitize_addr(rev['uploader_email'])
+            if uploader == '':
+                # Don't treat this as fatal for this snap
+                _add_error(pkg_db['name'], errors,
+                           "uploader_email '%s' invalid" % uploader)
+            elif uploader != pkg_db['publisher'] and \
+                    uploader not in pkg_db['uploaders']:
+                pkg_db['uploaders'].append(uploader)
+
+        if 'additional' not in pkg_db:
+            pkg_db['additional'] = []
+        if pkg_db['publisher'] in update_publisher_overrides and \
+                pkg_db['name'] in \
+                update_publisher_overrides[pkg_db['publisher']]:
+            for eml in update_publisher_overrides[pkg_db['publisher']][pkg_db['name']]:
+                if eml != pkg_db['publisher'] and \
+                        eml not in pkg_db['uploaders'] and \
+                        eml not in pkg_db['additional']:
+                    pkg_db['additional'].append(eml)
+
+    return pkg_db
+
+
+def generate_report(pkg_db, seen_db):
+    '''Generate a report for this pkg, consulting seen_db'''
+    pkgname = pkg_db['name']
+
+    report = '''A scan of the this snap shows that the following revisions were
+built with packages from the Ubuntu archive that have since
+received security updates:
+'''
+
+    reference_urls = []
+
+    for r in pkg_db['revisions']:
+        if len(pkg_db['revisions'][r]['usn-report']) == 0:
+            continue
+
+        architectures = pkg_db['revisions'][r]['architectures']
+        architectures.sort()
+        architectures = ", ".join(architectures)
+
+        report += "\nRevision r%s (%s; channel%s: %s)" % \
+            (r, architectures,
+             "s" if len(pkg_db['revisions'][r]['channels']) > 0 else "",
+             ", ".join(pkg_db['revisions'][r]['channels']))
+        for p in pkg_db['revisions'][r]['usn-report']:
+            usns = []
+            for usn in pkg_db['revisions'][r]['usn-report'][p]:
+                # only report new USNs, unless we don't know about this
+                # revision
+                if pkgname in seen_db and r in seen_db[pkgname] and \
+                        usn in seen_db[pkgname][r]:
+                    continue
+                usns.append(usn)
+            usns.sort()
+
+            report += "\n * %s: %s" % (p, ", ".join(usns))
+
+            for usn in usns:
+                url = "https://usn.ubuntu.com/%s/" % usn
+                if url not in reference_urls:
+                    reference_urls.append(url)
+
+        report += "\n"
+
+    if len(reference_urls) == 0:
+        # nothing to report
+        return ""
+
+    report += '''
+To resolve this, typically simply rebuilding the snap with
+snapcraft will pull in the security updates.
+
+Thank you for your snap and for attending to this matter.
+'''
+
+    reference_urls.sort()
+    report += '''
+References:
+ * %s
+''' % "\n * ".join(reference_urls)
+
+    return report
+
+
+def email_report(pkg_db, seen_db):
+    '''Send email report for this pkgname'''
+    pkgname = pkg_db['name']
+
+    body = generate_report(pkg_db, seen_db)
+    if body == "":
+        return False
+
+    subj = "%s contains outdated Ubuntu packages" % pkgname
+
+    # Send to the publisher and any affected uploaders
+    email_to_addr = pkg_db['publisher']
+    if len(pkg_db['uploaders']) > 0:
+        email_to_addr += ", %s" % ", ".join(pkg_db['uploaders'])
+    if len(pkg_db['additional']) > 0:
+        email_to_addr += ", %s" % ", ".join(pkg_db['additional'])
+    email_to_addr += ", security@ubuntu.com"
+
+    email.send(email_to_addr, subj, body)
+
+    debug("Sent email for '%s'" % pkgname)
+    return True
+
+
+def read_seen_db(fn):
+    if not os.path.exists(fn):
+        # write out an empty seen_db
+        with common.open_file_write(fn) as fd:
+            fd.write('{}\n')
+            fd.close()
+
+    return read_json_dict(fn)
+
+
+def update_seen(seen_fn, seen_db, pkg_db):
+    pkgname = pkg_db['name']
+    if pkgname not in seen_db:
+        seen_db[pkgname] = {}
+
+    # update to add new revisions
+    for r in pkg_db['revisions']:
+        if len(pkg_db['revisions'][r]['usn-report']) == 0:
+            continue
+
+        if r not in seen_db[pkgname]:
+            seen_db[pkgname][r] = []
+
+        for p in pkg_db['revisions'][r]['usn-report']:
+            for usn in pkg_db['revisions'][r]['usn-report'][p]:
+                if usn not in seen_db[pkgname][r]:
+                    seen_db[pkgname][r].append(usn)
+        seen_db[pkgname][r].sort()
+
+    # remove old revisions
+    remove = []
+    for r in seen_db[pkgname]:
+        if r not in pkg_db['revisions']:
+            remove.append(r)
+    if len(remove) > 0:
+        for r in remove:
+            del seen_db[pkgname][r]
+
+    # TODO: update seen more efficiently (right now it is only 70k so not a
+    # huge deal, but should probably move to sqlite)
+    (fd, fn) = tempfile.mkstemp(prefix=common.MKDTEMP_PREFIX)
+    os.write(fd, bytes(json.dumps(seen_db), 'UTF-8'))
+    os.close(fd)
+
+    shutil.move(fn, seen_fn)
+
+
+def main():
+    common.REPORT_OUTPUT = "console"
+    parser = argparse.ArgumentParser(
+        prog='snap-updates-available',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description='Show report of available security updates',
+        epilog=textwrap.dedent('''\
+            Typical usage:
+            $ %s --usn-db=/usn/db --store-db=/store/db --seen-db=/seen/db
+        ''' % os.path.basename(sys.argv[0])))
+
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--snap', type=str,
+                       help='use manifest.yaml from snap')
+    group.add_argument('--store-db', type=str,
+                       help='Raw store db (json)')
+
+    parser.add_argument('--usn-db', type=str,
+                        help='USN database (json)',
+                        required=True)
+    parser.add_argument('--seen-db', type=str,
+                        help='Previously seen db (json)')
+    parser.add_argument('--pkg-name', type=str,
+                        help='Limit report to package name')
+    args = parser.parse_args()
+
+    if not args.snap and not args.store_db:
+        error("Must specify --snap or --store-db")
+
+    usn_db = read_usn_db(args.usn_db)
+
+    if args.snap:
+        m = get_snap_manifest(args.snap)
+
+        report = get_usns_for_manifest(m, usn_db)
+        if len(report) != 0:
+            pprint.pprint(report)
+    elif args.store_db:
+        store_db = read_json_dict(args.store_db)
+
+        if args.seen_db:
+            seen_db = read_seen_db(args.seen_db)
+        else:
+            seen_db = {}
+
+        errors = {}
+        # TODO: capture these continues errors at the end
+        for item in store_db:
+            if args.pkg_name and 'name' in item and \
+                    args.pkg_name != item['name']:
+                # debug("Skipping %s (--pkg-name=%s specified)" %
+                #       (pkgname, args.pkg_name))
+                continue
+
+            try:
+                pkg_db = get_pkg_revisions(item, usn_db, errors)
+            except ValueError as e:
+                if 'name' not in item:
+                    _add_error(item['name'], errors, "%s" % e)
+                continue
+
+            try:
+                rc = email_report(pkg_db, seen_db)
+            except Exception as e:
+                _add_error(pkg_db['name'], errors, "%s" % e)
+                continue
+
+            if rc is False:
+                debug("Skipped email for '%s': up to date" % pkg_db['name'])
+
+            if args.seen_db:
+                update_seen(args.seen_db, seen_db, pkg_db)
+
+        if len(errors) > 0:
+            for p in errors:
+                for e in errors[p]:
+                    warn("%s: %s" % (p, e))
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("Aborted.")
+        sys.exit(1)

@@ -570,7 +570,7 @@ def _calculate_snap_unsquashfs_uncompressed_size(snap_pkg):
     return size
 
 
-def _unpack_snap_squashfs(snap_pkg, dest):
+def _unpack_snap_squashfs(snap_pkg, dest, item=None):
     '''Unpack a squashfs based snap package to dest'''
     size = _calculate_snap_unsquashfs_uncompressed_size(snap_pkg)
 
@@ -588,8 +588,10 @@ def _unpack_snap_squashfs(snap_pkg, dest):
     global MKDTEMP_PREFIX
     global MKDTEMP_DIR
     d = tempfile.mkdtemp(prefix=MKDTEMP_PREFIX, dir=MKDTEMP_DIR)
-    return _unpack_cmd(['unsquashfs', '-f', '-d', d,
-                        os.path.abspath(snap_pkg)], d, dest)
+    cmd = ['unsquashfs', '-f', '-d', d, os.path.abspath(snap_pkg)]
+    if item is not None:
+        cmd.append(item)
+    return _unpack_cmd(cmd, d, dest)
 
 
 def _unpack_click_deb(pkg, dest):
@@ -600,7 +602,7 @@ def _unpack_click_deb(pkg, dest):
                         os.path.abspath(pkg), d], d, dest)
 
 
-def unpack_pkg(fn, dest=None):
+def unpack_pkg(fn, dest=None, item=None):
     '''Unpack package'''
     if not os.path.isfile(fn):
         error("Could not find '%s'" % fn)
@@ -620,7 +622,7 @@ def unpack_pkg(fn, dest=None):
 
     # check if its a squashfs based snap
     if is_squashfs(pkg):
-        return _unpack_snap_squashfs(fn, dest)
+        return _unpack_snap_squashfs(fn, dest, item)
 
     return _unpack_click_deb(fn, dest)
 

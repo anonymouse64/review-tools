@@ -26,6 +26,7 @@ from clickreviews.common import (
 
 # These should be set in the test cases
 TEST_SNAP_YAML = ""
+TEST_SNAP_MANIFEST_YAML = ""
 TEST_PKGFMT_TYPE = "snap"
 TEST_PKGFMT_VERSION = "16.04"
 TEST_UNPACK_DIR = "/fake"
@@ -42,8 +43,13 @@ def _mock_func(self):
 
 
 def _extract_snap_yaml(self):
-    '''Pretend we read the package.yaml file'''
+    '''Pretend we read the snap.yaml file'''
     return io.StringIO(TEST_SNAP_YAML)
+
+
+def _extract_snap_manifest_yaml(self):
+    '''Pretend we read the snap/manifest.yaml file'''
+    return io.StringIO(TEST_SNAP_MANIFEST_YAML)
 
 
 def _path_join(self, d, fn):
@@ -92,6 +98,9 @@ def create_patches():
         'clickreviews.sr_common.SnapReview._extract_snap_yaml',
         _extract_snap_yaml))
     patches.append(patch(
+        'clickreviews.sr_common.SnapReview._extract_snap_manifest_yaml',
+        _extract_snap_manifest_yaml))
+    patches.append(patch(
         'clickreviews.sr_common.SnapReview._path_join',
         _path_join))
     patches.append(patch('clickreviews.common.unpack_pkg', _mock_func))
@@ -120,8 +129,9 @@ def create_patches():
                    _pkgfmt_type))
 
     # sr_security
-    patches.append(patch("clickreviews.sr_security.SnapReviewSecurity._unsquashfs_lls",
-                   _unsquashfs_lls))
+    patches.append(patch(
+        "clickreviews.sr_security.SnapReviewSecurity._unsquashfs_lls",
+        _unsquashfs_lls))
 
     return patches
 
@@ -134,6 +144,7 @@ class TestSnapReview(TestCase):
 
     def _reset_test_data(self):
         self.test_snap_yaml = dict()
+        self.test_snap_manifest_yaml = dict()
         self.set_test_pkgfmt("snap", "16.04")
 
         self.set_test_snap_yaml("name", "foo")
@@ -157,6 +168,12 @@ class TestSnapReview(TestCase):
         TEST_SNAP_YAML = yaml.dump(self.test_snap_yaml,
                                    default_flow_style=False,
                                    indent=4)
+
+    def _update_test_snap_manifest_yaml(self):
+        global TEST_SNAP_MANIFEST_YAML
+        TEST_SNAP_MANIFEST_YAML = yaml.dump(self.test_snap_manifest_yaml,
+                                            default_flow_style=False,
+                                            indent=4)
 
     def _update_test_security_profiles(self):
         global TEST_SECURITY_PROFILES
@@ -193,6 +210,16 @@ class TestSnapReview(TestCase):
         else:
             self.test_snap_yaml[key] = value
         self._update_test_snap_yaml()
+
+    def set_test_snap_manifest_yaml(self, key, value):
+        '''Set key in snap/manifest.yaml to value. If value is None, remove
+           key'''
+        if value is None:
+            if key in self.test_snap_manifest_yaml:
+                self.test_snap_manifest_yaml.pop(key, None)
+        else:
+            self.test_snap_manifest_yaml[key] = value
+        self._update_test_snap_manifest_yaml()
 
     def set_test_security_profile(self, plug, key, policy):
         '''Set policy in security profile for key'''
@@ -237,6 +264,8 @@ class TestSnapReview(TestCase):
         '''Make sure we reset everything to known good values'''
         global TEST_SNAP_YAML
         TEST_SNAP_YAML = ""
+        global TEST_SNAP_MANIFEST_YAML
+        TEST_SNAP_MANIFEST_YAML = ""
         global TEST_SECURITY_PROFILES
         TEST_SECURITY_PROFILES = dict()
         global TEST_PKGFMT_TYPE
