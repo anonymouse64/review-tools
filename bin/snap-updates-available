@@ -392,8 +392,9 @@ received security updates:
         return ""
 
     report += '''
-To resolve this, typically simply rebuilding the snap with
-snapcraft will pull in the security updates.
+Typically simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a good
+time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 '''
