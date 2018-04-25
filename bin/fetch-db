@@ -29,7 +29,8 @@ sha256sum -c ./"$db".sha256
 if echo "$db" | grep -q 'bz2$' ; then
     echo ""
     echo "= Uncompressing $db ="
-    bzip2 -dc > ./"$db"
+    fn=$(basename "$db" .bz2)
+    bzip2 -dc ./"$db" > ./"$fn"
 fi
 
 echo "Download complete. File saved to '$(basename "$db" .bz2)'"
