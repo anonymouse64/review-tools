@@ -384,7 +384,7 @@ received security updates:
 
     reference_urls = []
 
-    for r in pkg_db['revisions']:
+    for r in sorted(pkg_db['revisions']):
         if len(pkg_db['revisions'][r]['usn-report']) == 0:
             continue
 
