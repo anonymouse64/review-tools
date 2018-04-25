@@ -41,6 +41,7 @@ import argparse
 import json
 import os
 import pprint
+import re
 import shutil
 import sys
 import tempfile
@@ -98,6 +99,7 @@ def read_json_dict(fn):
 # usn_db[release][binary][usn][version]
 def read_usn_db(fn):
     raw = read_json_dict(fn)
+    epoch_pat = re.compile(r'^[0-9]+:')
 
     usn_db = {}
     for usn in raw:
@@ -113,12 +115,18 @@ def read_usn_db(fn):
 
             if "sources" not in raw[usn]["releases"][rel]:
                 continue
-            # 'sources' always has only one entry
-            src = list(raw[usn]["releases"][rel]["sources"].keys())[0]
 
-            if "version" not in raw[usn]["releases"][rel]["sources"][src]:
+            # for checking epochs, later
+            source_versions = []
+            for src in raw[usn]["releases"][rel]["sources"]:
+                if "version" not in raw[usn]["releases"][rel]["sources"][src]:
+                    continue
+                sv = raw[usn]["releases"][rel]["sources"][src]["version"]
+                if sv not in source_versions:
+                    source_versions.append(sv)
+
+            if "binaries" not in raw[usn]["releases"][rel]:
                 continue
-            version = debversion.DebVersion(raw[usn]["releases"][rel]["sources"][src]["version"])
 
             # Find the binaries from the arch URLs to work around lack of
             # source_map, etc
@@ -128,7 +136,23 @@ def read_usn_db(fn):
                 if "urls" not in raw[usn]["releases"][rel]["archs"][arch]:
                     continue
                 for u in raw[usn]["releases"][rel]["archs"][arch]["urls"]:
-                    bin = os.path.basename(u).split('_')[0]
+                    # foo_1.2_amd64.deb
+                    tmp = os.path.basename(u).split('_')
+                    if len(tmp) < 3:
+                        continue
+                    bin = tmp[0]
+
+                    # obtain the version for this binary
+                    usn_version = tmp[1]
+                    # handle epochs
+                    if usn_version not in source_versions:
+                        for v in source_versions:
+                            if epoch_pat.search(v) and \
+                                    v.endswith(':%s' % usn_version):
+                                usn_version = v
+                                break
+                    version = debversion.DebVersion(usn_version)
+
                     if bin not in usn_db[rel]:
                         usn_db[rel][bin] = {}
                     if usn not in usn_db[rel][bin]:
