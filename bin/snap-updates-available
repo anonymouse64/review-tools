@@ -124,6 +124,7 @@ def read_usn_db(fn):
                 sv = raw[usn]["releases"][rel]["sources"][src]["version"]
                 if sv not in source_versions:
                     source_versions.append(sv)
+            source_versions.sort(reverse=True)
 
             if "binaries" not in raw[usn]["releases"][rel]:
                 continue
@@ -144,7 +145,11 @@ def read_usn_db(fn):
 
                     # obtain the version for this binary
                     usn_version = tmp[1]
-                    # handle epochs
+                    # handle epochs. source_versions is a reverse sorted list
+                    # which means we will always assume the snap has the higher
+                    # epoch (eg 2:1.2-1 over 1:1.2-1) which is technically
+                    # wrong but in practice we don't bump the epoch in security
+                    # updates so in practice this is not a problem.
                     if usn_version not in source_versions:
                         for v in source_versions:
                             if epoch_pat.search(v) and \
