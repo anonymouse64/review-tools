@@ -408,7 +408,8 @@ received security updates:
                 usns.append(usn)
             usns.sort()
 
-            report += "\n * %s: %s" % (p, ", ".join(usns))
+            if len(usns) > 0:
+                report += "\n * %s: %s" % (p, ", ".join(usns))
 
             for usn in usns:
                 url = "https://usn.ubuntu.com/%s/" % usn
