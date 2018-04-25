@@ -396,7 +396,7 @@ received security updates:
             (r, architectures,
              "s" if len(pkg_db['revisions'][r]['channels']) > 0 else "",
              ", ".join(pkg_db['revisions'][r]['channels']))
-        for p in pkg_db['revisions'][r]['usn-report']:
+        for p in sorted(pkg_db['revisions'][r]['usn-report']):
             usns = []
             for usn in pkg_db['revisions'][r]['usn-report'][p]:
                 # only report new USNs, unless we don't know about this
