@@ -34,21 +34,25 @@ reset_seen() {
     echo "{}" > "$seen"
 }
 
+# should show 3602-1 and 3501-1
 comment "= Test --seen-db updated ="
 reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-1.db test-store-1.db
 run "$tmp_seen" test-usn-1.db test-store-1.db
 
+# should show 3602-1, 3606-1 and 3501-1
 comment "= Test multiple USNs with --seen-db updated ="
 reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-2.db test-store-1.db
 run "$tmp_seen" test-usn-2.db test-store-1.db
 
+# should show 3606-1
 comment "= Test previous USNs not reported with --seen-db updated ="
 reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-2.db test-store-2.db
 run "$tmp_seen" test-usn-2.db test-store-2.db
 
+# should show nothing
 comment "= Test up to date with --seen-db updated ="
 reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-2.db test-store-3.db
@@ -56,22 +60,27 @@ run "$tmp_seen" test-usn-2.db test-store-3.db
 
 comment "= Test real world ="
 reset_seen "$tmp_seen"
+# should show 3602-1 and 3501-1
 comment "== one USN affects snap =="
 run "$tmp_seen" test-usn-1.db test-store-1.db
 run "$tmp_seen" test-usn-1.db test-store-1.db
 
+# should show 3606-1
 comment "== two USNs affect snap =="
 run "$tmp_seen" test-usn-2.db test-store-1.db
 run "$tmp_seen" test-usn-2.db test-store-1.db
 
+# should show nothing
 comment "== no USNs affect snap (snap updated) =="
 run "$tmp_seen" test-usn-2.db test-store-3.db
 run "$tmp_seen" test-usn-2.db test-store-3.db
 
+# should show 3602-1, 3606-1 and 3501-1
 comment "== two USNs affect snap (snap reverted) =="
 run "$tmp_seen" test-usn-2.db test-store-1.db
 run "$tmp_seen" test-usn-2.db test-store-1.db
 
+# should show nothing
 comment "== no USNs affect snap (snap updated again) =="
 run "$tmp_seen" test-usn-2.db test-store-3.db
 run "$tmp_seen" test-usn-2.db test-store-3.db

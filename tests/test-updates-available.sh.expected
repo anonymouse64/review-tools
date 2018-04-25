@@ -11,22 +11,28 @@ received security updates:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
  * libtiff5: 3602-1
+ * libxcursor1: 3501-1
 
 Revision r12 (i386; channels: stable, candidate, beta)
  * libtiff5: 3602-1
+ * libxcursor1: 3501-1
 
 Revision r13 (amd64; channels: edge)
  * libtiff5: 3602-1
+ * libxcursor1: 3501-1
 
 Revision r14 (i386; channels: edge)
  * libtiff5: 3602-1
+ * libxcursor1: 3501-1
 
-To resolve this, typically simply rebuilding the snap with
-snapcraft will pull in the security updates.
+Typically simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a good
+time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
 References:
+ * https://usn.ubuntu.com/3501-1/
  * https://usn.ubuntu.com/3602-1/
 
 
@@ -45,22 +51,28 @@ received security updates:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
  * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
 
 Revision r12 (i386; channels: stable, candidate, beta)
  * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
 
 Revision r13 (amd64; channels: edge)
  * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
 
 Revision r14 (i386; channels: edge)
  * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
 
-To resolve this, typically simply rebuilding the snap with
-snapcraft will pull in the security updates.
+Typically simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a good
+time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
 References:
+ * https://usn.ubuntu.com/3501-1/
  * https://usn.ubuntu.com/3602-1/
  * https://usn.ubuntu.com/3606-1/
 
@@ -90,8 +102,9 @@ Revision r23 (amd64; channels: edge)
 Revision r24 (i386; channels: edge)
  * libtiff5: 3606-1
 
-To resolve this, typically simply rebuilding the snap with
-snapcraft will pull in the security updates.
+Typically simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a good
+time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
@@ -121,22 +134,28 @@ received security updates:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
  * libtiff5: 3602-1
+ * libxcursor1: 3501-1
 
 Revision r12 (i386; channels: stable, candidate, beta)
  * libtiff5: 3602-1
+ * libxcursor1: 3501-1
 
 Revision r13 (amd64; channels: edge)
  * libtiff5: 3602-1
+ * libxcursor1: 3501-1
 
 Revision r14 (i386; channels: edge)
  * libtiff5: 3602-1
+ * libxcursor1: 3501-1
 
-To resolve this, typically simply rebuilding the snap with
-snapcraft will pull in the security updates.
+Typically simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a good
+time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
 References:
+ * https://usn.ubuntu.com/3501-1/
  * https://usn.ubuntu.com/3602-1/
 
 
@@ -164,8 +183,9 @@ Revision r13 (amd64; channels: edge)
 Revision r14 (i386; channels: edge)
  * libtiff5: 3606-1
 
-To resolve this, typically simply rebuilding the snap with
-snapcraft will pull in the security updates.
+Typically simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a good
+time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
@@ -192,22 +212,28 @@ received security updates:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
  * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
 
 Revision r12 (i386; channels: stable, candidate, beta)
  * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
 
 Revision r13 (amd64; channels: edge)
  * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
 
 Revision r14 (i386; channels: edge)
  * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
 
-To resolve this, typically simply rebuilding the snap with
-snapcraft will pull in the security updates.
+Typically simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a good
+time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
 References:
+ * https://usn.ubuntu.com/3501-1/
  * https://usn.ubuntu.com/3602-1/
  * https://usn.ubuntu.com/3606-1/
 
