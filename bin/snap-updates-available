@@ -473,7 +473,7 @@ def update_seen(seen_fn, seen_db, pkg_db):
     # TODO: update seen more efficiently (right now it is only 70k so not a
     # huge deal, but should probably move to sqlite)
     (fd, fn) = tempfile.mkstemp(prefix=common.MKDTEMP_PREFIX)
-    os.write(fd, bytes(json.dumps(seen_db), 'UTF-8'))
+    os.write(fd, bytes(json.dumps(seen_db, sort_keys=True, indent=2), 'UTF-8'))
     os.close(fd)
 
     shutil.move(fn, seen_fn)
