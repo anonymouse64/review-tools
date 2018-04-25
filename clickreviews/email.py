@@ -59,11 +59,19 @@ def send(email_to_addr, subj, body):
             if email_from_addr == '':
                 print("Bad from address: '%s'" % email_from_addr)
                 return False
+
         if 'CRT_EMAIL_TO' in os.environ:
-            email_to_addr = sanitize_addr(os.environ['CRT_EMAIL_TO'])
-            if email_to_addr == '':
-                print("Bad to address: '%s'" % email_to_addr)
+            addresses = []
+            for i in os.environ['CRT_EMAIL_TO'].split(', '):
+                addr = sanitize_addr(i.strip())
+                if addr != '':
+                    addresses.append(addr)
+                else:
+                    print("Bad to address: '%s'" % addr)
+            if len(addresses) == 0:
                 return False
+            email_to_addr = ", ".join(addresses)
+
         if 'CRT_EMAIL_SERVER' in os.environ:
             email_server = os.environ['CRT_EMAIL_SERVER']
 
