@@ -378,9 +378,9 @@ def generate_report(pkg_db, seen_db):
     '''Generate a report for this pkg, consulting seen_db'''
     pkgname = pkg_db['name']
 
-    report = '''A scan of the this snap shows that the following revisions were
-built with packages from the Ubuntu archive that have since
-received security updates:
+    report = '''A scan of the this snap shows that it was built with packages from the Ubuntu
+archive that have since received security updates. The following lists the USNs
+for affected binary packages in each snap revision:
 '''
 
     reference_urls = []
@@ -423,9 +423,9 @@ received security updates:
         return ""
 
     report += '''
-Typically simply rebuilding the snap will pull in the new security updates and
-resolve this. If your snap also contains vendored code, now might be a good
-time to review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and resolve
+this. If your snap also contains vendored code, now might be a good time to
+review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 '''
