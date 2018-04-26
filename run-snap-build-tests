@@ -8,6 +8,7 @@ export MAGIC="$SNAPDIR/../install/usr/share/misc/magic"
 
 # eventually
 #make check
+make functest-updates
 
 make coverage
 make coverage-report

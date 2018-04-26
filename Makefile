@@ -9,10 +9,12 @@ test:
 
 functest:
 	./tests/test.sh
-	./tests/test-updates-available.sh
 
 functest-system:
 	./tests/test.sh system
+
+functest-updates:
+	./tests/test-updates-available.sh
 
 coverage:
 	python3 -m coverage run ./run-tests
@@ -33,7 +35,7 @@ check-names:
 	diff -Naur check-names.list.orig check-names.list || exit 1
 	rm -f check-names.list.orig
 
-check: test functest syntax-check check-names
+check: test functest-updates functest syntax-check check-names
 
 clean:
 	rm -rf ./clickreviews/__pycache__ ./clickreviews/tests/__pycache__
