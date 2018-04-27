@@ -5,7 +5,7 @@ From: Snap Store <noreply@canonical.com>
 To: olivier.tilloy@canonical.com, security@ubuntu.com
 Subject: 0ad contains outdated Ubuntu packages
 
-A scan of the this snap shows that it was built with packages from the Ubuntu
+A scan of this snap shows that it was built with packages from the Ubuntu
 archive that have since received security updates. The following lists the USNs
 for affected binary packages in each snap revision:
 
@@ -45,7 +45,7 @@ From: Snap Store <noreply@canonical.com>
 To: olivier.tilloy@canonical.com, security@ubuntu.com
 Subject: 0ad contains outdated Ubuntu packages
 
-A scan of the this snap shows that it was built with packages from the Ubuntu
+A scan of this snap shows that it was built with packages from the Ubuntu
 archive that have since received security updates. The following lists the USNs
 for affected binary packages in each snap revision:
 
@@ -86,7 +86,7 @@ From: Snap Store <noreply@canonical.com>
 To: olivier.tilloy@canonical.com, security@ubuntu.com
 Subject: 0ad contains outdated Ubuntu packages
 
-A scan of the this snap shows that it was built with packages from the Ubuntu
+A scan of this snap shows that it was built with packages from the Ubuntu
 archive that have since received security updates. The following lists the USNs
 for affected binary packages in each snap revision:
 
@@ -128,7 +128,7 @@ From: Snap Store <noreply@canonical.com>
 To: olivier.tilloy@canonical.com, security@ubuntu.com
 Subject: 0ad contains outdated Ubuntu packages
 
-A scan of the this snap shows that it was built with packages from the Ubuntu
+A scan of this snap shows that it was built with packages from the Ubuntu
 archive that have since received security updates. The following lists the USNs
 for affected binary packages in each snap revision:
 
@@ -167,7 +167,7 @@ From: Snap Store <noreply@canonical.com>
 To: olivier.tilloy@canonical.com, security@ubuntu.com
 Subject: 0ad contains outdated Ubuntu packages
 
-A scan of the this snap shows that it was built with packages from the Ubuntu
+A scan of this snap shows that it was built with packages from the Ubuntu
 archive that have since received security updates. The following lists the USNs
 for affected binary packages in each snap revision:
 
@@ -206,7 +206,7 @@ From: Snap Store <noreply@canonical.com>
 To: olivier.tilloy@canonical.com, security@ubuntu.com
 Subject: 0ad contains outdated Ubuntu packages
 
-A scan of the this snap shows that it was built with packages from the Ubuntu
+A scan of this snap shows that it was built with packages from the Ubuntu
 archive that have since received security updates. The following lists the USNs
 for affected binary packages in each snap revision:
 

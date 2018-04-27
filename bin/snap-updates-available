@@ -378,7 +378,7 @@ def generate_report(pkg_db, seen_db):
     '''Generate a report for this pkg, consulting seen_db'''
     pkgname = pkg_db['name']
 
-    report = '''A scan of the this snap shows that it was built with packages from the Ubuntu
+    report = '''A scan of this snap shows that it was built with packages from the Ubuntu
 archive that have since received security updates. The following lists the USNs
 for affected binary packages in each snap revision:
 '''
