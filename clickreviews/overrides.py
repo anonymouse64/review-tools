@@ -334,6 +334,10 @@ canonical_juju = ['ian.booth@canonical.com',
                   'tim.penhey@canonical.com',
                   ]
 
+canonical_k8s = ['adam.stokes@canonical.com',
+                 'tim.van.steenburgh@canonical.com',
+                 ]
+
 canonical_lxd = ['david.britton@canonical.com',
                  'stephane.graber@canonical.com',
                  'tyler.hicks@canonical.com',
@@ -363,7 +367,7 @@ update_publisher_overrides = {
         'base-18': canonical_snapd,
         'caracalla-kernel': canonical_hwe,
         'chromium': ['olivier.tilloy@canonical.com'] + canonical_desktop,
-        'conjure-up': canonical_juju,
+        'conjure-up': canonical_k8s,
         'core': canonical_snapd,
         'core18': canonical_snapd,
         'dragonboard-kernel': canonical_kernel,
