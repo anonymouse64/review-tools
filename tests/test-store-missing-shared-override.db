@@ -1,0 +1,62 @@
+[
+  {
+    "publisher_email": "snappy-canonical-storeaccount@canonical.com",
+    "publisher_name": "Foo Bar",
+    "name": "missing-publisher-overrides-snap-1",
+    "revisions": [
+      {
+        "uploader_email": "noreply@canonical.com",
+        "uploader_name": "No Reply",
+        "channels": [
+          "edge"
+        ],
+        "manifest_yaml": "apps:\n  sh: {command: command-sh.wrapper}\narchitectures: [amd64]\nbuild-packages: []\nbuild-snaps: []\nconfinement: strict\ndescription: 'My description\n\n  '\ngrade: devel\nimage-info: {architecture: ppc64le, created_at: '2018-04-05T00:00:00Z', fingerprint: a0aeaf799c87a60a568cbac9826f918a26e166b33ebacc763adc5ef89f9d0991}\nname: test-snapcraft-manifest\nparts:\n  mypackages:\n    build-packages: []\n    installed-packages: []\n    installed-snaps: [core=4407, snapcraft=1345]\n    plugin: nil\n    prime: []\n    stage: [-usr/share/man, -usr/share/doc]\n    stage-packages: [libkrb5-3=1.13.2+dfsg-5ubuntu2, libgssapi-krb5-2=1.13.2+dfsg-5ubuntu2,\n      'libisccfg140=1:9.10.3.dfsg.P4-8ubuntu1.6', openssl=1.0.2g-1ubuntu4.4, libicu55=55.1-7ubuntu0.4,\n      'bind9-host=1:9.10.3.dfsg.P4-8ubuntu1.6', libk5crypto3=1.13.2+dfsg-5ubuntu2,\n      'libisc160=1:9.10.3.dfsg.P4-8ubuntu1.6', gcc-6-base=6.0.1-0ubuntu1, libgeoip1=1.6.9-1,\n      libkrb5support0=1.13.2+dfsg-5ubuntu2, 'liblwres141=1:9.10.3.dfsg.P4-8ubuntu1.6',\n      libkeyutils1=1.5.9-8ubuntu1, 'libdns162=1:9.10.3.dfsg.P4-8ubuntu1.6', libxml2=2.9.3+dfsg1-1ubuntu0.5,\n      'libisccc140=1:9.10.3.dfsg.P4-8ubuntu1.6', 'libbind9-140=1:9.10.3.dfsg.P4-8ubuntu1.6',\n      libssl1.0.0=1.0.2g-1ubuntu4.4]\n    uname: 'Linux 4.15.0-13-generic #14-Ubuntu SMP Sat Mar 17 13:44:27 UTC 2018 x86_64\n      x86_64 x86_64 GNU/Linux'\n  wrapper:\n    build-packages: []\n    installed-packages: []\n    installed-snaps: [core=4407, snapcraft=1345]\n    plugin: dump\n    prime: []\n    source: files/\n    stage: []\n    stage-packages: []\n    uname: 'Linux 4.15.0-13-generic #14-Ubuntu SMP Sat Mar 17 13:44:27 UTC 2018 x86_64\n      x86_64 x86_64 GNU/Linux'\nsummary: my summary\nversion: 0\n",
+        "version": "0.1",
+        "architectures": [
+          "i386"
+        ],
+        "revision": 1
+      }
+    ]
+  },
+  {
+    "publisher_email": "snappy-canonical-storeaccount@canonical.com",
+    "publisher_name": "Foo Bar",
+    "name": "missing-publisher-overrides-snap-2",
+    "revisions": [
+      {
+        "uploader_email": "noreply@canonical.com",
+        "uploader_name": "No Reply",
+        "channels": [
+          "edge"
+        ],
+        "manifest_yaml": "apps:\n  sh: {command: command-sh.wrapper}\narchitectures: [amd64]\nbuild-packages: []\nbuild-snaps: []\nconfinement: strict\ndescription: 'My description\n\n  '\ngrade: devel\nimage-info: {architecture: ppc64le, created_at: '2018-04-05T00:00:00Z', fingerprint: a0aeaf799c87a60a568cbac9826f918a26e166b33ebacc763adc5ef89f9d0991}\nname: test-snapcraft-manifest\nparts:\n  mypackages:\n    build-packages: []\n    installed-packages: []\n    installed-snaps: [core=4407, snapcraft=1345]\n    plugin: nil\n    prime: []\n    stage: [-usr/share/man, -usr/share/doc]\n    stage-packages: [libkrb5-3=1.13.2+dfsg-5ubuntu2, libgssapi-krb5-2=1.13.2+dfsg-5ubuntu2,\n      'libisccfg140=1:9.10.3.dfsg.P4-8ubuntu1.6', openssl=1.0.2g-1ubuntu4.4, libicu55=55.1-7ubuntu0.4,\n      'bind9-host=1:9.10.3.dfsg.P4-8ubuntu1.6', libk5crypto3=1.13.2+dfsg-5ubuntu2,\n      'libisc160=1:9.10.3.dfsg.P4-8ubuntu1.6', gcc-6-base=6.0.1-0ubuntu1, libgeoip1=1.6.9-1,\n      libkrb5support0=1.13.2+dfsg-5ubuntu2, 'liblwres141=1:9.10.3.dfsg.P4-8ubuntu1.6',\n      libkeyutils1=1.5.9-8ubuntu1, 'libdns162=1:9.10.3.dfsg.P4-8ubuntu1.6', libxml2=2.9.3+dfsg1-1ubuntu0.5,\n      'libisccc140=1:9.10.3.dfsg.P4-8ubuntu1.6', 'libbind9-140=1:9.10.3.dfsg.P4-8ubuntu1.6',\n      libssl1.0.0=1.0.2g-1ubuntu4.4]\n    uname: 'Linux 4.15.0-13-generic #14-Ubuntu SMP Sat Mar 17 13:44:27 UTC 2018 x86_64\n      x86_64 x86_64 GNU/Linux'\n  wrapper:\n    build-packages: []\n    installed-packages: []\n    installed-snaps: [core=4407, snapcraft=1345]\n    plugin: dump\n    prime: []\n    source: files/\n    stage: []\n    stage-packages: []\n    uname: 'Linux 4.15.0-13-generic #14-Ubuntu SMP Sat Mar 17 13:44:27 UTC 2018 x86_64\n      x86_64 x86_64 GNU/Linux'\nsummary: my summary\nversion: 0\n",
+        "version": "0.1",
+        "architectures": [
+          "i386"
+        ],
+        "revision": 1
+      }
+    ]
+  },
+  {
+    "publisher_email": "snappy-canonical-storeaccount@canonical.com",
+    "publisher_name": "Foo Bar",
+    "name": "core",
+    "revisions": [
+      {
+        "uploader_email": "noreply@canonical.com",
+        "uploader_name": "No Reply",
+        "channels": [
+          "edge"
+        ],
+        "manifest_yaml": "apps:\n  sh: {command: command-sh.wrapper}\narchitectures: [amd64]\nbuild-packages: []\nbuild-snaps: []\nconfinement: strict\ndescription: 'My description\n\n  '\ngrade: devel\nimage-info: {architecture: ppc64le, created_at: '2018-04-05T00:00:00Z', fingerprint: a0aeaf799c87a60a568cbac9826f918a26e166b33ebacc763adc5ef89f9d0991}\nname: test-snapcraft-manifest\nparts:\n  mypackages:\n    build-packages: []\n    installed-packages: []\n    installed-snaps: [core=4407, snapcraft=1345]\n    plugin: nil\n    prime: []\n    stage: [-usr/share/man, -usr/share/doc]\n    stage-packages: [libkrb5-3=1.13.2+dfsg-5ubuntu2, libgssapi-krb5-2=1.13.2+dfsg-5ubuntu2,\n      'libisccfg140=1:9.10.3.dfsg.P4-8ubuntu1.6', openssl=1.0.2g-1ubuntu4.4, libicu55=55.1-7ubuntu0.4,\n      'bind9-host=1:9.10.3.dfsg.P4-8ubuntu1.6', libk5crypto3=1.13.2+dfsg-5ubuntu2,\n      'libisc160=1:9.10.3.dfsg.P4-8ubuntu1.6', gcc-6-base=6.0.1-0ubuntu1, libgeoip1=1.6.9-1,\n      libkrb5support0=1.13.2+dfsg-5ubuntu2, 'liblwres141=1:9.10.3.dfsg.P4-8ubuntu1.6',\n      libkeyutils1=1.5.9-8ubuntu1, 'libdns162=1:9.10.3.dfsg.P4-8ubuntu1.6', libxml2=2.9.3+dfsg1-1ubuntu0.5,\n      'libisccc140=1:9.10.3.dfsg.P4-8ubuntu1.6', 'libbind9-140=1:9.10.3.dfsg.P4-8ubuntu1.6',\n      libssl1.0.0=1.0.2g-1ubuntu4.4]\n    uname: 'Linux 4.15.0-13-generic #14-Ubuntu SMP Sat Mar 17 13:44:27 UTC 2018 x86_64\n      x86_64 x86_64 GNU/Linux'\n  wrapper:\n    build-packages: []\n    installed-packages: []\n    installed-snaps: [core=4407, snapcraft=1345]\n    plugin: dump\n    prime: []\n    source: files/\n    stage: []\n    stage-packages: []\n    uname: 'Linux 4.15.0-13-generic #14-Ubuntu SMP Sat Mar 17 13:44:27 UTC 2018 x86_64\n      x86_64 x86_64 GNU/Linux'\nsummary: my summary\nversion: 0\n",
+        "version": "0.1",
+        "architectures": [
+          "i386"
+        ],
+        "revision": 1
+      }
+    ]
+  }
+]

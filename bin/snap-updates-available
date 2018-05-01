@@ -510,6 +510,28 @@ def update_seen(seen_fn, seen_db, pkg_db):
     shutil.move(fn, seen_fn)
 
 
+def get_shared_snap_without_override(store_db):
+    '''Report snaps that use a shared email but don't have an entry for
+       additional addresses.
+    '''
+    missing = {}
+    for item in store_db:
+        if 'name' not in item or 'publisher_email' not in item:
+            continue
+
+        if item['publisher_email'] not in update_publisher_overrides:
+            continue
+
+        if item['name'] not in \
+                update_publisher_overrides[item['publisher_email']]:
+            if item['publisher_email'] not in missing:
+                missing[item['publisher_email']] = []
+            if item['name'] not in missing[item['publisher_email']]:
+                missing[item['publisher_email']].append(item['name'])
+
+    return missing
+
+
 def main():
     common.REPORT_OUTPUT = "console"
     parser = argparse.ArgumentParser(
@@ -524,17 +546,34 @@ def main():
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--snap', type=str,
                        help='use manifest.yaml from snap')
-    group.add_argument('--store-db', type=str,
-                       help='Raw store db (json)')
+    group.add_argument('--usn-db', type=str,
+                       help='USN database (json)')
+    group.add_argument('--check-shared-publishers',
+                       help='Report snaps missing publisher overrides',
+                       action='store_true')
 
-    parser.add_argument('--usn-db', type=str,
-                        help='USN database (json)',
-                        required=True)
+    parser.add_argument('--store-db', type=str,
+                        help='Raw store db (json)')
     parser.add_argument('--seen-db', type=str,
                         help='Previously seen db (json)')
     parser.add_argument('--pkg-name', type=str,
                         help='Limit report to package name')
     args = parser.parse_args()
+
+    # XXX: for as nice as argparse is, our arg processing is less than clear
+    if args.check_shared_publishers:
+        if not args.store_db:
+            error("Must specify --store-db with --check-shared-publishers")
+        store_db = read_json_dict(args.store_db)
+        report = get_shared_snap_without_override(store_db)
+
+        if len(report) != 0:
+            print("The following snaps are missing from overrides.py:\n")
+            for eml in sorted(report):
+                print("%s:\n- %s" % (eml, "\n- ".join(report[eml])))
+            # pprint.pprint(report)
+
+        return
 
     if not args.snap and not args.store_db:
         error("Must specify --snap or --store-db")
