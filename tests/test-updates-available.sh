@@ -85,6 +85,13 @@ comment "== no USNs affect snap (snap updated again) =="
 run "$tmp_seen" test-usn-2.db test-store-3.db
 run "$tmp_seen" test-usn-2.db test-store-3.db
 
+# should show 3598-1, 3602-1, 3606-1, 3610-1, 3611-1, 3622-1, and 3628-1
+comment "= Test --seen-db for ubuntu-budgie-welcome ="
+reset_seen "$tmp_seen"
+run "$tmp_seen" test-usn-budgie-1.db test-store-budgie.db
+# should show only 3635-1
+run "$tmp_seen" test-usn-budgie-2.db test-store-budgie.db
+
 echo
 echo "Checking for differences in output..."
 diff -Naur ./tests/test-updates-available.sh.expected "$tmp" || {

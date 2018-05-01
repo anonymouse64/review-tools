@@ -393,10 +393,12 @@ for affected binary packages in each snap revision:
         architectures.sort()
         architectures = ", ".join(architectures)
 
-        report += "\nRevision r%s (%s; channel%s: %s)" % \
+        rev_header = "\nRevision r%s (%s; channel%s: %s)" % \
             (r, architectures,
              "s" if len(pkg_db['revisions'][r]['channels']) > 0 else "",
              ", ".join(pkg_db['revisions'][r]['channels']))
+        shown_rev_header = False
+
         for p in sorted(pkg_db['revisions'][r]['usn-report']):
             usns = []
             for usn in pkg_db['revisions'][r]['usn-report'][p]:
@@ -409,6 +411,9 @@ for affected binary packages in each snap revision:
             usns.sort()
 
             if len(usns) > 0:
+                if not shown_rev_header:
+                    report += rev_header
+                    shown_rev_header = True
                 report += "\n * %s: %s" % (p, ", ".join(usns))
 
             for usn in usns:
@@ -416,7 +421,8 @@ for affected binary packages in each snap revision:
                 if url not in reference_urls:
                     reference_urls.append(url)
 
-        report += "\n"
+        if shown_rev_header:
+            report += "\n"
 
     if len(reference_urls) == 0:
         # nothing to report
