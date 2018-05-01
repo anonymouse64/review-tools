@@ -6,7 +6,7 @@ To: olivier.tilloy@canonical.com, security@ubuntu.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists the USNs
+archive that have since received security updates. The following lists new USNs
 for affected binary packages in each snap revision:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
@@ -46,7 +46,7 @@ To: olivier.tilloy@canonical.com, security@ubuntu.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists the USNs
+archive that have since received security updates. The following lists new USNs
 for affected binary packages in each snap revision:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
@@ -87,7 +87,7 @@ To: olivier.tilloy@canonical.com, security@ubuntu.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists the USNs
+archive that have since received security updates. The following lists new USNs
 for affected binary packages in each snap revision:
 
 Revision r21 (amd64; channels: stable, candidate, beta)
@@ -129,7 +129,7 @@ To: olivier.tilloy@canonical.com, security@ubuntu.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists the USNs
+archive that have since received security updates. The following lists new USNs
 for affected binary packages in each snap revision:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
@@ -168,7 +168,7 @@ To: olivier.tilloy@canonical.com, security@ubuntu.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists the USNs
+archive that have since received security updates. The following lists new USNs
 for affected binary packages in each snap revision:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
@@ -207,7 +207,7 @@ To: olivier.tilloy@canonical.com, security@ubuntu.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists the USNs
+archive that have since received security updates. The following lists new USNs
 for affected binary packages in each snap revision:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
