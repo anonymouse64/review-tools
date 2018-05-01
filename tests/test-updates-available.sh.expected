@@ -245,3 +245,93 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-3.db'...
 
+= Test --seen-db for ubuntu-budgie-welcome =
+Emptying seen.db
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-budgie-1.db' --store-db='./tests/test-store-budgie.db'...
+From: Snap Store <noreply@canonical.com>
+To: packaging@ubuntubudgie.org, security@ubuntu.com
+Subject: ubuntu-budgie-welcome contains outdated Ubuntu packages
+
+A scan of this snap shows that it was built with packages from the Ubuntu
+archive that have since received security updates. The following lists new USNs
+for affected binary packages in each snap revision:
+
+Revision r11 (amd64; channels: candidate, beta)
+ * curl: 3598-1
+ * libcurl3-gnutls: 3598-1
+ * libicu55: 3610-1
+ * libssl1.0.0: 3611-1, 3628-1
+ * libtiff5: 3602-1, 3606-1
+ * libwayland-client0: 3622-1
+ * libwayland-cursor0: 3622-1
+ * libwayland-server0: 3622-1
+
+Revision r12 (i386; channels: candidate, beta)
+ * curl: 3598-1
+ * libcurl3-gnutls: 3598-1
+ * libicu55: 3610-1
+ * libssl1.0.0: 3611-1, 3628-1
+ * libtiff5: 3602-1, 3606-1
+ * libwayland-client0: 3622-1
+ * libwayland-cursor0: 3622-1
+ * libwayland-server0: 3622-1
+
+Revision r43 (i386; channels: stable, stable/ubuntu-18.04)
+ * libssl1.0.0: 3628-1
+
+Revision r44 (amd64; channels: stable, stable/ubuntu-18.04)
+ * libssl1.0.0: 3628-1
+
+Revision r45 (amd64; channels: edge)
+ * libssl1.0.0: 3628-1
+
+Revision r46 (i386; channels: edge)
+ * libssl1.0.0: 3628-1
+
+Simply rebuilding the snap will pull in the new security updates and resolve
+this. If your snap also contains vendored code, now might be a good time to
+review it for any needed updates.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://usn.ubuntu.com/3598-1/
+ * https://usn.ubuntu.com/3602-1/
+ * https://usn.ubuntu.com/3606-1/
+ * https://usn.ubuntu.com/3610-1/
+ * https://usn.ubuntu.com/3611-1/
+ * https://usn.ubuntu.com/3622-1/
+ * https://usn.ubuntu.com/3628-1/
+
+
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-budgie-2.db' --store-db='./tests/test-store-budgie.db'...
+From: Snap Store <noreply@canonical.com>
+To: packaging@ubuntubudgie.org, security@ubuntu.com
+Subject: ubuntu-budgie-welcome contains outdated Ubuntu packages
+
+A scan of this snap shows that it was built with packages from the Ubuntu
+archive that have since received security updates. The following lists new USNs
+for affected binary packages in each snap revision:
+
+Revision r11 (amd64; channels: candidate, beta)
+ * gir1.2-javascriptcoregtk-4.0: 3635-1
+ * gir1.2-webkit2-4.0: 3635-1
+ * libjavascriptcoregtk-4.0-18: 3635-1
+ * libwebkit2gtk-4.0-37: 3635-1
+
+Revision r12 (i386; channels: candidate, beta)
+ * gir1.2-javascriptcoregtk-4.0: 3635-1
+ * gir1.2-webkit2-4.0: 3635-1
+ * libjavascriptcoregtk-4.0-18: 3635-1
+ * libwebkit2gtk-4.0-37: 3635-1
+
+Simply rebuilding the snap will pull in the new security updates and resolve
+this. If your snap also contains vendored code, now might be a good time to
+review it for any needed updates.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://usn.ubuntu.com/3635-1/
+
+
