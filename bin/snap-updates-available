@@ -41,7 +41,6 @@ import argparse
 import json
 import os
 import pprint
-import re
 import shutil
 import sys
 import tempfile
@@ -49,27 +48,24 @@ import textwrap
 import yaml
 
 import clickreviews.common as common
-import clickreviews.debversion as debversion
 import clickreviews.email as email
 
 from clickreviews.common import (
     debug,
     error,
     warn,
+    read_file_as_json_dict,
+    _add_error,  # make a class
 )
-from clickreviews.sr_common import (
-    SnapReview,
+from clickreviews.store import (
+    get_pkg_revisions,
+    get_shared_snap_without_override,
+    get_usns_for_manifest,
 )
-from clickreviews.overrides import (
-    update_publisher_overrides,
+from clickreviews.usn import (
+    read_usn_db,
 )
 
-snap_to_release = {'base-18': 'bionic',
-                   'core': 'xenial',
-                   'core18': 'bionic',
-                   }
-
-tracked_releases = ['xenial', 'bionic']
 
 # The From address for all emails
 email_from_addr = "Snap Store <noreply@canonical.com>"
@@ -81,92 +77,6 @@ email_server = 'localhost'
 #
 # Helpers
 #
-def read_json_dict(fn):
-    # XXX: consider reading in as stream
-    debug("Loading: %s" % fn)
-    raw = {}
-    fd = common.open_file_read(fn)
-    try:
-        raw = json.load(fd)
-    except Exception:
-        raise
-        error("Could not load %s. Is it properly formatted?" % fn)
-
-    return raw
-
-
-# For fast checks:
-# usn_db[release][binary][usn][version]
-def read_usn_db(fn):
-    raw = read_json_dict(fn)
-    epoch_pat = re.compile(r'^[0-9]+:')
-
-    usn_db = {}
-    for usn in raw:
-        if "releases" not in raw[usn]:
-            continue
-        for rel in tracked_releases:
-            if rel not in raw[usn]["releases"]:
-                continue
-
-            # Now we have a USN for a tracked Ubuntu release
-            if rel not in usn_db:
-                usn_db[rel] = {}
-
-            if "sources" not in raw[usn]["releases"][rel]:
-                continue
-
-            # for checking epochs, later
-            source_versions = []
-            for src in raw[usn]["releases"][rel]["sources"]:
-                if "version" not in raw[usn]["releases"][rel]["sources"][src]:
-                    continue
-                sv = raw[usn]["releases"][rel]["sources"][src]["version"]
-                if sv not in source_versions:
-                    source_versions.append(sv)
-            source_versions.sort(reverse=True)
-
-            if "binaries" not in raw[usn]["releases"][rel]:
-                continue
-
-            # Find the binaries from the arch URLs to work around lack of
-            # source_map, etc
-            if "archs" not in raw[usn]["releases"][rel]:
-                continue
-            for arch in raw[usn]["releases"][rel]["archs"]:
-                if "urls" not in raw[usn]["releases"][rel]["archs"][arch]:
-                    continue
-                for u in raw[usn]["releases"][rel]["archs"][arch]["urls"]:
-                    # foo_1.2_amd64.deb
-                    tmp = os.path.basename(u).split('_')
-                    if len(tmp) < 3:
-                        continue
-                    bin = tmp[0]
-
-                    # obtain the version for this binary
-                    usn_version = tmp[1]
-                    # Note: handle epochs. source_versions is a reverse sorted
-                    # list which means we will always assume the snap has the
-                    # higher epoch (eg 2:1.2-1 over 1:1.2-1) which is
-                    # technically wrong but in practice we don't bump the epoch
-                    # in security updates within an Ubuntu release so in
-                    # practice this is not a problem.
-                    if usn_version not in source_versions:
-                        for v in source_versions:
-                            if epoch_pat.search(v) and \
-                                    v.endswith(':%s' % usn_version):
-                                usn_version = v
-                                break
-                    version = debversion.DebVersion(usn_version)
-
-                    if bin not in usn_db[rel]:
-                        usn_db[rel][bin] = {}
-                    if usn not in usn_db[rel][bin]:
-                        usn_db[rel][bin][usn] = version
-
-    return usn_db
-
-
 def get_snap_manifest(fn):
     if 'SNAP_USER_COMMON' in os.environ and \
             os.path.exists(os.environ['SNAP_USER_COMMON']):
@@ -194,184 +104,6 @@ def get_snap_manifest(fn):
     common.recursive_rm(dir)
 
     return man_yaml
-
-
-def verify_snap_manifest(m):
-    '''Verify snap manifest is well-formed and has everything we expect'''
-    (valid, level, msg) = SnapReview.verify_snap_manifest(SnapReview, m)
-    if not valid:
-        raise ValueError(msg)
-
-
-def get_ubuntu_release_from_manifest(m):
-    '''Determine the Ubuntu release from the manifest'''
-    if 'parts' not in m:
-        error("Could not determine Ubuntu release ('parts' not in manifest)")
-
-    installed_snaps = []
-    for part in m['parts']:
-        if 'installed-snaps' in m['parts'][part]:
-            for entry in m['parts'][part]['installed-snaps']:
-                if '=' not in entry:
-                    warn("'%s' not properly formatted. Skipping" % entry)
-                pkg = entry.split('=')[0]  # we don't care about the version
-
-                if pkg in snap_to_release and pkg not in installed_snaps:
-                    installed_snaps.append(pkg)
-
-    if len(installed_snaps) == 0:
-        default = "xenial"
-        debug("Could not determine Ubuntu release (no installed snaps). "
-              "Defaulting to '%s'" % default)
-        ubuntu_release = default
-    else:
-        # NOTE: this will have to change if a snap ever has multiple cores or
-        # base snaps installed
-        if len(installed_snaps) > 1:
-            error("Could not determine Ubuntu release (multiple core: %s" %
-                  ",".join(installed_snaps))
-
-        ubuntu_release = snap_to_release[installed_snaps[0]]
-
-    debug("Ubuntu release=%s" % ubuntu_release)
-
-    return ubuntu_release
-
-
-def get_staged_packages_from_manifest(m):
-    '''Obtain list of packages in stage-packages for various parts'''
-    if 'parts' not in m:
-        debug("Could not find 'parts' in manifest")
-        return None
-
-    d = {}
-    for part in m['parts']:
-        if 'stage-packages' in m['parts'][part]:
-            for entry in m['parts'][part]['stage-packages']:
-                if '=' not in entry:
-                    warn("'%s' not properly formatted. Skipping" % entry)
-                pkg, ver = entry.split('=')
-
-                if pkg not in d:
-                    d[pkg] = []
-                if ver not in d[pkg]:
-                    d[pkg].append(ver)
-
-    if len(d) == 0:
-        return None
-
-    debug("\n" + pprint.pformat(d))
-    return d
-
-
-def get_usns_for_manifest(m, usn_db):
-    '''Find new USNs for packages in the manifest'''
-    verify_snap_manifest(m)
-    debug("snap/manifest.yaml:\n" + pprint.pformat(m))
-
-    rel = get_ubuntu_release_from_manifest(m)
-    pkgs = get_staged_packages_from_manifest(m)
-    if rel not in usn_db:
-        error("'%s' not found in usn database" % rel)
-
-    pending_usns = {}
-
-    if pkgs is None:
-        debug("no stage-packages found")
-        return pending_usns
-
-    for pkg in pkgs:
-        if pkg in usn_db[rel]:
-            for v in pkgs[pkg]:
-                pkgversion = debversion.DebVersion(v)
-                for usn in usn_db[rel][pkg]:
-                    usnversion = usn_db[rel][pkg][usn]
-                    if debversion.compare(pkgversion, usnversion) < 0:
-                        debug('adding %s: %s (pkg:%s < usn:%s)' %
-                              (pkg, usn, pkgversion.full_version,
-                               usnversion.full_version))
-                        if pkg not in pending_usns:
-                            pending_usns[pkg] = []
-                        if usn not in pending_usns[pkg]:
-                            pending_usns[pkg].append(usn)
-                    else:
-                        debug('skipping %s: %s (pkg:%s >= usn:%s)' %
-                              (pkg, usn, pkgversion.full_version,
-                               usnversion.full_version))
-
-    return pending_usns
-
-
-def _add_error(pkgname, errors, msg):
-    if pkgname not in errors:
-        errors[pkgname] = []
-    errors[pkgname].append(msg)
-
-
-def get_pkg_revisions(item, usn_db, errors):
-    for i in ['name', 'publisher_email', 'revisions']:
-        if i not in item:
-            raise ValueError("required field '%s' not found" % i)
-
-    pkg_db = {}
-    pkg_db['revisions'] = {}
-
-    # we've already verified these are present
-    pkg_db['name'] = item['name']
-    pkg_db['publisher'] = email.sanitize_addr(item['publisher_email'])
-    if pkg_db['publisher'] == '':
-        _add_error(pkg_db['name'], errors, "publisher_email '%s' invalid" %
-                   pkg_db['publisher'])
-
-    for rev in item['revisions']:
-        if 'revision' not in rev:
-            _add_error(pkg_db['name'], errors, "no revisions found")
-            continue
-
-        r = str(rev['revision'])  # ensure yaml and json agree on type
-        debug("Checking %s r%s" % (item['name'], r))
-
-        if 'manifest_yaml' not in rev:
-            _add_error(pkg_db['name'], errors,
-                       "manifest_yaml missing for revision '%s'" % r)
-            continue
-
-        m = yaml.load(rev['manifest_yaml'])
-        try:
-            report = get_usns_for_manifest(m, usn_db)
-        except ValueError as e:
-            _add_error(pkg_db['name'], errors, "%s" % e)
-            continue
-
-        if r not in pkg_db['revisions']:
-            pkg_db['revisions'][r] = {}
-        pkg_db['revisions'][r]['channels'] = rev['channels']
-        pkg_db['revisions'][r]['architectures'] = rev['architectures']
-        pkg_db['revisions'][r]['usn-report'] = report
-        if 'uploaders' not in pkg_db:
-            pkg_db['uploaders'] = []
-        if 'uploader_email' in rev:
-            uploader = email.sanitize_addr(rev['uploader_email'])
-            if uploader == '':
-                # Don't treat this as fatal for this snap
-                _add_error(pkg_db['name'], errors,
-                           "uploader_email '%s' invalid" % uploader)
-            elif uploader != pkg_db['publisher'] and \
-                    uploader not in pkg_db['uploaders']:
-                pkg_db['uploaders'].append(uploader)
-
-        if 'additional' not in pkg_db:
-            pkg_db['additional'] = []
-        if pkg_db['publisher'] in update_publisher_overrides and \
-                pkg_db['name'] in \
-                update_publisher_overrides[pkg_db['publisher']]:
-            for eml in update_publisher_overrides[pkg_db['publisher']][pkg_db['name']]:
-                if eml != pkg_db['publisher'] and \
-                        eml not in pkg_db['uploaders'] and \
-                        eml not in pkg_db['additional']:
-                    pkg_db['additional'].append(eml)
-
-    return pkg_db
 
 
 def generate_report(pkg_db, seen_db):
@@ -476,7 +208,7 @@ def read_seen_db(fn):
             fd.write('{}\n')
             fd.close()
 
-    return read_json_dict(fn)
+    return read_file_as_json_dict(fn)
 
 
 def update_seen(seen_fn, seen_db, pkg_db):
@@ -516,28 +248,6 @@ def update_seen(seen_fn, seen_db, pkg_db):
     shutil.move(fn, seen_fn)
 
 
-def get_shared_snap_without_override(store_db):
-    '''Report snaps that use a shared email but don't have an entry for
-       additional addresses.
-    '''
-    missing = {}
-    for item in store_db:
-        if 'name' not in item or 'publisher_email' not in item:
-            continue
-
-        if item['publisher_email'] not in update_publisher_overrides:
-            continue
-
-        if item['name'] not in \
-                update_publisher_overrides[item['publisher_email']]:
-            if item['publisher_email'] not in missing:
-                missing[item['publisher_email']] = []
-            if item['name'] not in missing[item['publisher_email']]:
-                missing[item['publisher_email']].append(item['name'])
-
-    return missing
-
-
 def main():
     common.REPORT_OUTPUT = "console"
     parser = argparse.ArgumentParser(
@@ -571,7 +281,7 @@ def main():
 
         if not args.store_db:
             error("Must specify --store-db with --check-shared-publishers")
-        store_db = read_json_dict(args.store_db)
+        store_db = read_file_as_json_dict(args.store_db)
         report = get_shared_snap_without_override(store_db)
 
         if len(report) != 0:
@@ -600,7 +310,7 @@ def main():
         if len(report) != 0:
             pprint.pprint(report)
     elif args.store_db:
-        store_db = read_json_dict(args.store_db)
+        store_db = read_file_as_json_dict(args.store_db)
 
         if args.seen_db:
             seen_db = read_seen_db(args.seen_db)

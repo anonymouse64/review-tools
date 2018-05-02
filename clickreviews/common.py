@@ -582,8 +582,8 @@ def _unpack_snap_squashfs(snap_pkg, dest, item=None):
         error("uncompressed snap is too large (%dM > %dM)" %
               (size / 1024 / 1024, max / 1024 / 1024))
     elif size > avail * .9:
-        error("uncompressed snap is too large for available space (%dM > %dM)" %
-              (size / 1024 / 1024, avail / 1024 / 1024))
+        error("uncompressed snap is too large for available space (%dM > %dM)"
+              % (size / 1024 / 1024, avail / 1024 / 1024))
 
     global MKDTEMP_PREFIX
     global MKDTEMP_DIR
@@ -877,3 +877,25 @@ def check_results(testobj, report,
             testobj.assertEqual(len(report[k]), expected_counts[k],
                                 "(%s not equal)\n%s" %
                                 (k, json.dumps(report, indent=2)))
+
+
+def read_file_as_json_dict(fn):
+    '''Read in filename as json dict'''
+    # XXX: consider reading in as stream
+    debug("Loading: %s" % fn)
+    raw = {}
+    fd = open_file_read(fn)
+    try:
+        raw = json.load(fd)
+    except Exception:
+        raise
+        error("Could not load %s. Is it properly formatted?" % fn)
+
+    return raw
+
+
+# TODO: make this a class
+def _add_error(name, errors, msg):
+    if name not in errors:
+        errors[name] = []
+    errors[name].append(msg)
