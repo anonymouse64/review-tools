@@ -549,15 +549,13 @@ def main():
             $ %s --usn-db=/usn/db --store-db=/store/db --seen-db=/seen/db
         ''' % os.path.basename(sys.argv[0])))
 
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument('--snap', type=str,
-                       help='use manifest.yaml from snap')
-    group.add_argument('--usn-db', type=str,
-                       help='USN database (json)')
-    group.add_argument('--check-shared-publishers',
-                       help='Report snaps missing publisher overrides',
-                       action='store_true')
-
+    parser.add_argument('--snap', type=str,
+                        help='use manifest.yaml from snap')
+    parser.add_argument('--check-shared-publishers',
+                        help='Report snaps missing publisher overrides',
+                        action='store_true')
+    parser.add_argument('--usn-db', type=str,
+                        help='USN database (json)')
     parser.add_argument('--store-db', type=str,
                         help='Raw store db (json)')
     parser.add_argument('--seen-db', type=str,
@@ -568,6 +566,9 @@ def main():
 
     # XXX: for as nice as argparse is, our arg processing is less than clear
     if args.check_shared_publishers:
+        if args.snap:
+            error("--snap should not be used with --check-shared-publishers")
+
         if not args.store_db:
             error("Must specify --store-db with --check-shared-publishers")
         store_db = read_json_dict(args.store_db)
@@ -580,6 +581,12 @@ def main():
             # pprint.pprint(report)
 
         return
+
+    if args.snap:
+        if not args.usn_db:
+            error("Must specify --usn-db with --snap")
+        if args.store_db:
+            error("Must not specify --store-db with --snap")
 
     if not args.snap and not args.store_db:
         error("Must specify --snap or --store-db")
