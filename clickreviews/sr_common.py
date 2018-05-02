@@ -71,6 +71,7 @@ class SnapReview(Review):
                               'common_id': "",
                               'image-info': {},
                               'parts': {},
+                              'passthrough': {},
                               'version-script': "",
                               }
 
