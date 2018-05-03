@@ -15,11 +15,45 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from unittest import TestCase
-import clickreviews.usn
+
+import clickreviews.usn as usn
 
 
 class TestUSN(TestCase):
     """Tests for the USN functions."""
 
-    def test_check_something(self):
-        '''Test something'''
+    def test_check_read_usn_dn(self):
+        '''Test read_usn_db()'''
+        res = usn.read_usn_db("./tests/test-usn-unittest-1.db")
+
+        expected_db = {
+            'xenial': {'libtiff-doc': {'3602-1': '4.0.6-1ubuntu0.3',
+                                       '3606-1': '4.0.6-1ubuntu0.4'},
+                       'libtiff-opengl': {'3602-1': '4.0.6-1ubuntu0.3',
+                                          '3606-1': '4.0.6-1ubuntu0.4'},
+                       'libtiff-tools': {'3602-1': '4.0.6-1ubuntu0.3',
+                                         '3606-1': '4.0.6-1ubuntu0.4'},
+                       'libtiff5': {'3602-1': '4.0.6-1ubuntu0.3',
+                                    '3606-1': '4.0.6-1ubuntu0.4'},
+                       'libtiff5-dev': {'3602-1': '4.0.6-1ubuntu0.3',
+                                        '3606-1': '4.0.6-1ubuntu0.4'},
+                       'libtiffxx5': {'3602-1': '4.0.6-1ubuntu0.3',
+                                      '3606-1': '4.0.6-1ubuntu0.4'},
+                       'libxcursor-dev': {'3501-1':
+                                          '1:1.1.14-1ubuntu0.16.04.1'},
+                       'libxcursor1': {'3501-1':
+                                       '1:1.1.14-1ubuntu0.16.04.1'},
+                       'libxcursor1-dbg': {'3501-1':
+                                           '1:1.1.14-1ubuntu0.16.04.1'},
+                       'libxcursor1-udeb': {'3501-1':
+                                            '1:1.1.14-1ubuntu0.16.04.1'},
+                       }}
+
+        for rel in expected_db:
+            self.assertTrue(rel in res)
+            for pkg in expected_db[rel]:
+                self.assertTrue(pkg in res[rel])
+                for sn in expected_db[rel][pkg]:
+                    self.assertTrue(sn in res[rel][pkg])
+                    self.assertEquals(expected_db[rel][pkg][sn],
+                                      str(res[rel][pkg][sn]))

@@ -93,7 +93,7 @@ class TestStore(TestCase):
         '''Test get_package_revisions() - missing revision'''
         del self.store_db[0]['revisions'][0]['revision']
         errors = {}
-        res = store.get_pkg_revisions(self.store_db[0], self.usn_db, errors)
+        store.get_pkg_revisions(self.store_db[0], self.usn_db, errors)
         self.assertEquals(len(errors), 1)
         self.assertEquals(errors['0ad'][0], "no revisions found")
 
@@ -101,7 +101,7 @@ class TestStore(TestCase):
         '''Test get_package_revisions() - missing manifest'''
         del self.store_db[0]['revisions'][0]['manifest_yaml']
         errors = {}
-        res = store.get_pkg_revisions(self.store_db[0], self.usn_db, errors)
+        store.get_pkg_revisions(self.store_db[0], self.usn_db, errors)
         self.assertEquals(len(errors), 1)
         self.assertEquals(errors['0ad'][0], "manifest_yaml missing for revision '12'")
 
@@ -109,7 +109,7 @@ class TestStore(TestCase):
         '''Test get_package_revisions() - had usn db'''
         self.usn_db = "bad"
         errors = {}
-        res = store.get_pkg_revisions(self.store_db[0], self.usn_db, errors)
+        store.get_pkg_revisions(self.store_db[0], self.usn_db, errors)
         self.assertEquals(len(errors), 1)
         self.assertEquals(errors['0ad'][0], "'xenial' not found in usn database")
 
@@ -117,7 +117,7 @@ class TestStore(TestCase):
         '''Test get_package_revisions() - empty uploader'''
         self.store_db[0]['revisions'][0]['uploader_email'] = ''
         errors = {}
-        res = store.get_pkg_revisions(self.store_db[0], self.usn_db, errors)
+        store.get_pkg_revisions(self.store_db[0], self.usn_db, errors)
         self.assertEquals(len(errors), 1)
         self.assertEquals(errors['0ad'][0], "uploader_email '' invalid")
 

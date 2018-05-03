@@ -20,7 +20,6 @@ import clickreviews.debversion as debversion
 from clickreviews.common import (
     debug,
     warn,
-    error,
     _add_error,  # make a class
 )
 import clickreviews.email as email
@@ -201,7 +200,7 @@ def get_usns_for_manifest(m, usn_db):
     return pending_usns
 
 
-# XXX: move this out to somewhere so it isn't Ubuntu specific here
+# XXX: When LP: #1768820 is fixed, just use the manifest.yaml key
 def get_ubuntu_release_from_manifest(m):
     '''Determine the Ubuntu release from the manifest'''
     if 'parts' not in m:
