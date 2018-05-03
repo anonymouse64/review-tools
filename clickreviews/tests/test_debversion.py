@@ -18,13 +18,14 @@ from unittest import TestCase
 from clickreviews.debversion import (
     DebVersion,
     compare,
+    _order,
 )
 
 
 class TestDebVersion(TestCase):
     """Tests for the debian version functions."""
 
-    def test_zz_check_version_compare(self):
+    def test_check_version_compare(self):
         '''Test compare(a, b) == x'''
         # based on lib/dpkg/t/t-version.c
         versions = [('1:0', '2:0', -1),
@@ -180,7 +181,29 @@ class TestDebVersion(TestCase):
             print("  checking DebVersion('%s')" % v)
             try:
                 DebVersion(v)
-                self.assertFalse(True)
             except ValueError:
                 continue
-            self.assertFalse(True)
+
+            raise Exception("Should have raised ValueError")  # pragma: nocover
+
+    def test_check___repr__(self):
+        '''Test __repr()__'''
+        v = DebVersion("1.0")
+        self.assertEquals("%s" % v.__repr__(), "1.0")
+
+    def test_check___str__(self):
+        '''Test __str()__'''
+        v = DebVersion("1.0")
+        self.assertEquals(str(v), "1.0")
+
+    def test_check__order(self):
+        '''Test __str()__'''
+        expected_db = [('1', 0),
+                       ('a', 97),
+                       ('~', -1),
+                       ('@', 320),  # (ord'@') + 256
+                       ('', 0),
+                       ]
+        for ver, expected in expected_db:
+            res = _order(ver)
+            self.assertEquals(res, expected)
