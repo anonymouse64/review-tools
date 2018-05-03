@@ -54,6 +54,12 @@ class DebVersion():
         #       (self.full_version, self.epoch, self.version, self.revision))
         self.validate()
 
+    def __repr__(self):
+        return self.full_version
+
+    def __str__(self):
+        return self.full_version
+
     def validate(self):
         '''Check a couple extra things not caught by valid_pat'''
         # https://www.debian.org/doc/debian-policy/#s-f-version
