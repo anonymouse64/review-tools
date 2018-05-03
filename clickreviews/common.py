@@ -894,6 +894,37 @@ def read_file_as_json_dict(fn):
     return raw
 
 
+def get_snap_manifest(fn):
+    if 'SNAP_USER_COMMON' in os.environ and \
+            os.path.exists(os.environ['SNAP_USER_COMMON']):
+        common.MKDTEMP_DIR = os.environ['SNAP_USER_COMMON']
+    else:
+        common.MKDTEMP_DIR = tempfile.gettempdir()
+
+    man = "snap/manifest.yaml"
+    # common.unpack_pkg() fails if this exists, so this is safe
+    dir = tempfile.mktemp(prefix=common.MKDTEMP_PREFIX,
+                          dir=common.MKDTEMP_DIR)
+    common.unpack_pkg(fn, dir, man)
+
+    man_fn = os.path.join(dir, man)
+    if not os.path.isfile(man_fn):
+        common.recursive_rm(dir)
+        error("%s not in %s" % (man, fn))
+
+    fd = common.open_file_read(man_fn)
+    try:
+        man_yaml = yaml.safe_load(fd)
+    except Exception:
+        common.recursive_rm(dir)
+        error("Could not load snap/manifest.yaml. Is it properly "
+              "formatted?")
+
+    common.recursive_rm(dir)
+
+    return man_yaml
+
+
 # TODO: make this a class
 def _add_error(name, errors, msg):
     if name not in errors:
