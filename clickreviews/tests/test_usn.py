@@ -49,10 +49,14 @@ class TestUSN(TestCase):
                                             '1:1.1.14-1ubuntu0.16.04.1'},
                        }}
 
+        self.assertEquals(len(expected_db), len(res))
         for rel in expected_db:
             self.assertTrue(rel in res)
+            self.assertEquals(len(expected_db[rel]), len(res[rel]))
             for pkg in expected_db[rel]:
                 self.assertTrue(pkg in res[rel])
+                self.assertEquals(len(expected_db[rel][pkg]),
+                                  len(res[rel][pkg]))
                 for sn in expected_db[rel][pkg]:
                     self.assertTrue(sn in res[rel][pkg])
                     self.assertEquals(expected_db[rel][pkg][sn],
