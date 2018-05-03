@@ -37,8 +37,7 @@ snap_to_release = {'base-18': 'bionic',
                    }
 
 
-# XXX: s/usn_db/sn_db/
-def get_pkg_revisions(item, usn_db, errors):
+def get_pkg_revisions(item, secnot_db, errors):
     for i in ['name', 'publisher_email', 'revisions']:
         if i not in item:
             raise ValueError("required field '%s' not found" % i)
@@ -70,7 +69,7 @@ def get_pkg_revisions(item, usn_db, errors):
         m = yaml.load(rev['manifest_yaml'])
         verify_snap_manifest(m)
         try:
-            report = get_usns_for_manifest(m, usn_db)
+            report = get_secnots_for_manifest(m, secnot_db)
         except ValueError as e:
             _add_error(pkg_db['name'], errors, "%s" % e)
             continue
@@ -79,7 +78,7 @@ def get_pkg_revisions(item, usn_db, errors):
             pkg_db['revisions'][r] = {}
         pkg_db['revisions'][r]['channels'] = rev['channels']
         pkg_db['revisions'][r]['architectures'] = rev['architectures']
-        pkg_db['revisions'][r]['usn-report'] = report
+        pkg_db['revisions'][r]['secnot-report'] = report
         if 'uploaders' not in pkg_db:
             pkg_db['uploaders'] = []
         if 'uploader_email' in rev:
@@ -162,42 +161,42 @@ def verify_snap_manifest(m):
         raise ValueError(msg)
 
 
-# XXX: s/usn/sn/
-def get_usns_for_manifest(m, usn_db):
-    '''Find new USNs for packages in the manifest'''
+def get_secnots_for_manifest(m, secnot_db):
+    '''Find new security notifications for packages in the manifest'''
     debug("snap/manifest.yaml:\n" + pprint.pformat(m))
 
     rel = get_ubuntu_release_from_manifest(m)  # can raise ValueError
     pkgs = get_staged_packages_from_manifest(m)
-    if rel not in usn_db:
-        raise ValueError("'%s' not found in usn database" % rel)
+    if rel not in secnot_db:
+        raise ValueError("'%s' not found in security notification database" %
+                         rel)
 
-    pending_usns = {}
+    pending_secnots = {}
 
     if pkgs is None:
         debug("no stage-packages found")
-        return pending_usns
+        return pending_secnots
 
     for pkg in pkgs:
-        if pkg in usn_db[rel]:
+        if pkg in secnot_db[rel]:
             for v in pkgs[pkg]:
                 pkgversion = debversion.DebVersion(v)
-                for usn in usn_db[rel][pkg]:
-                    usnversion = usn_db[rel][pkg][usn]
-                    if debversion.compare(pkgversion, usnversion) < 0:
-                        debug('adding %s: %s (pkg:%s < usn:%s)' %
-                              (pkg, usn, pkgversion.full_version,
-                               usnversion.full_version))
-                        if pkg not in pending_usns:
-                            pending_usns[pkg] = []
-                        if usn not in pending_usns[pkg]:
-                            pending_usns[pkg].append(usn)
+                for secnot in secnot_db[rel][pkg]:
+                    secnotversion = secnot_db[rel][pkg][secnot]
+                    if debversion.compare(pkgversion, secnotversion) < 0:
+                        debug('adding %s: %s (pkg:%s < secnot:%s)' %
+                              (pkg, secnot, pkgversion.full_version,
+                               secnotversion.full_version))
+                        if pkg not in pending_secnots:
+                            pending_secnots[pkg] = []
+                        if secnot not in pending_secnots[pkg]:
+                            pending_secnots[pkg].append(secnot)
                     else:
-                        debug('skipping %s: %s (pkg:%s >= usn:%s)' %
-                              (pkg, usn, pkgversion.full_version,
-                               usnversion.full_version))
+                        debug('skipping %s: %s (pkg:%s >= secnot:%s)' %
+                              (pkg, secnot, pkgversion.full_version,
+                               secnotversion.full_version))
 
-    return pending_usns
+    return pending_secnots
 
 
 # XXX: When LP: #1768820 is fixed, just use the manifest.yaml key

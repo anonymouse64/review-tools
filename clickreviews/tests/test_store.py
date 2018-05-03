@@ -23,16 +23,14 @@ import clickreviews.store as store
 from clickreviews.common import (
     read_file_as_json_dict,
 )
-from clickreviews.usn import (
-    read_usn_db,
-)
+import clickreviews.usn as usn
 
 
 class TestStore(TestCase):
     """Tests for the store functions."""
     def setUp(self):
         '''Read in a sample store and security notice db'''
-        self.usn_db = read_usn_db("./tests/test-usn-unittest-1.db")
+        self.secnot_db = usn.read_usn_db("./tests/test-usn-unittest-1.db")
         self.store_db = read_file_as_json_dict(
             "./tests/test-store-unittest-1.db")
 
@@ -40,7 +38,7 @@ class TestStore(TestCase):
         '''Test get_package_revisions() - empty item'''
 
         try:
-            store.get_pkg_revisions({}, self.usn_db, {})
+            store.get_pkg_revisions({}, self.secnot_db, {})
         except ValueError:
             return
 
@@ -49,7 +47,7 @@ class TestStore(TestCase):
     def test_check_get_package_revisions_valid(self):
         '''Test get_package_revisions() - valid'''
         errors = {}
-        res = store.get_pkg_revisions(self.store_db[0], self.usn_db, errors)
+        res = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
         self.assertEquals(len(errors), 0)
 
         # verify the structure is what we expect
@@ -76,16 +74,16 @@ class TestStore(TestCase):
         self.assertTrue('architectures' in res['revisions']['12'])
         self.assertTrue('i386' in res['revisions']['12']['architectures'])
 
-        self.assertTrue('usn-report' in res['revisions']['12'])
-        self.assertTrue('libxcursor1' in res['revisions']['12']['usn-report'])
+        self.assertTrue('secnot-report' in res['revisions']['12'])
+        self.assertTrue('libxcursor1' in res['revisions']['12']['secnot-report'])
         self.assertTrue('3501-1' in
-                        res['revisions']['12']['usn-report']['libxcursor1'])
+                        res['revisions']['12']['secnot-report']['libxcursor1'])
 
     def test_check_get_package_revisions_missing_publisher(self):
         '''Test get_package_revisions() - missing publisher'''
         self.store_db[0]['publisher_email'] = ''
         errors = {}
-        store.get_pkg_revisions(self.store_db[0], self.usn_db, errors)
+        store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
         self.assertEquals(len(errors), 1)
         self.assertEquals(errors['0ad'][0], "publisher_email '' invalid")
 
@@ -93,7 +91,7 @@ class TestStore(TestCase):
         '''Test get_package_revisions() - missing revision'''
         del self.store_db[0]['revisions'][0]['revision']
         errors = {}
-        store.get_pkg_revisions(self.store_db[0], self.usn_db, errors)
+        store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
         self.assertEquals(len(errors), 1)
         self.assertEquals(errors['0ad'][0], "no revisions found")
 
@@ -101,23 +99,25 @@ class TestStore(TestCase):
         '''Test get_package_revisions() - missing manifest'''
         del self.store_db[0]['revisions'][0]['manifest_yaml']
         errors = {}
-        store.get_pkg_revisions(self.store_db[0], self.usn_db, errors)
+        store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
         self.assertEquals(len(errors), 1)
         self.assertEquals(errors['0ad'][0], "manifest_yaml missing for revision '12'")
 
-    def test_check_get_package_revisions_bad_usn(self):
-        '''Test get_package_revisions() - had usn db'''
-        self.usn_db = "bad"
+    def test_check_get_package_revisions_bad_secnot(self):
+        '''Test get_package_revisions() - bad secnot db'''
+        self.secnot_db = "bad"
         errors = {}
-        store.get_pkg_revisions(self.store_db[0], self.usn_db, errors)
+        store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
         self.assertEquals(len(errors), 1)
-        self.assertEquals(errors['0ad'][0], "'xenial' not found in usn database")
+        self.assertEquals(errors['0ad'][0],
+                          "'xenial' not found in security notification "
+                          "database")
 
     def test_check_get_package_revisions_empty_uploader(self):
         '''Test get_package_revisions() - empty uploader'''
         self.store_db[0]['revisions'][0]['uploader_email'] = ''
         errors = {}
-        store.get_pkg_revisions(self.store_db[0], self.usn_db, errors)
+        store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
         self.assertEquals(len(errors), 1)
         self.assertEquals(errors['0ad'][0], "uploader_email '' invalid")
 
@@ -125,7 +125,7 @@ class TestStore(TestCase):
         '''Test get_package_revisions() - has uploader'''
         self.store_db[0]['revisions'][0]['uploader_email'] = 'test@example.com'
         errors = {}
-        res = store.get_pkg_revisions(self.store_db[0], self.usn_db, errors)
+        res = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
         self.assertEquals(len(errors), 0)
         self.assertTrue('uploaders' in res)
         self.assertTrue(isinstance(res['uploaders'], list))
@@ -141,7 +141,7 @@ class TestStore(TestCase):
             ['over@example.com']
         self.store_db[0]['publisher_email'] = 'rt-tests@example.com'
         errors = {}
-        res = store.get_pkg_revisions(self.store_db[0], self.usn_db, errors)
+        res = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
         self.assertEquals(len(errors), 0)
         self.assertTrue('additional' in res)
         self.assertTrue(isinstance(res['additional'], list))
@@ -226,11 +226,11 @@ class TestStore(TestCase):
         res = store.get_staged_packages_from_manifest(m)
         self.assertEquals(res, None)
 
-    def test_check_get_usns_for_manifest(self):
-        '''Test get_usns_for_manifest()'''
+    def test_check_get_secnots_for_manifest(self):
+        '''Test get_secnots_for_manifest()'''
         m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
 
-        res = store.get_usns_for_manifest(m, self.usn_db)
+        res = store.get_secnots_for_manifest(m, self.secnot_db)
         self.assertTrue(isinstance(res, dict))
         self.assertEquals(len(res), 2)
         self.assertTrue('libxcursor1' in res)
@@ -241,17 +241,17 @@ class TestStore(TestCase):
         self.assertTrue('3602-1' in res['libtiff5'])
         self.assertTrue('3606-1' in res['libtiff5'])
 
-    def test_check_get_usns_for_manifest_empty_staged(self):
-        '''Test get_usns_for_manifest() - empty staged'''
+    def test_check_get_secnots_for_manifest_empty_staged(self):
+        '''Test get_secnots_for_manifest() - empty staged'''
         m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
         m['parts']['0ad-launcher']['stage-packages'] = []
 
-        res = store.get_usns_for_manifest(m, self.usn_db)
+        res = store.get_secnots_for_manifest(m, self.secnot_db)
         self.assertTrue(isinstance(res, dict))
         self.assertEquals(len(res), 0)
 
-    def test_check_get_usns_for_manifest_has_newer(self):
-        '''Test get_usns_for_manifest() - has newer'''
+    def test_check_get_secnots_for_manifest_has_newer(self):
+        '''Test get_secnots_for_manifest() - has newer'''
         m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
 
         # clear out all the stage-packages and then add one that has a
@@ -262,7 +262,7 @@ class TestStore(TestCase):
                 m['parts'][part]['stage-packages'].append(
                     "libxcursor1=999:1.1.14-1")
 
-        res = store.get_usns_for_manifest(m, self.usn_db)
+        res = store.get_secnots_for_manifest(m, self.secnot_db)
         self.assertTrue(isinstance(res, dict))
         self.assertEquals(len(res), 0)
 
