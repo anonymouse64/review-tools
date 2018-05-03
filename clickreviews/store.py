@@ -51,6 +51,7 @@ def get_pkg_revisions(item, usn_db, errors):
     if pkg_db['publisher'] == '':
         _add_error(pkg_db['name'], errors, "publisher_email '%s' invalid" %
                    pkg_db['publisher'])
+        return pkg_db
 
     for rev in item['revisions']:
         if 'revision' not in rev:
@@ -138,6 +139,7 @@ def get_staged_packages_from_manifest(m):
             for entry in m['parts'][part]['stage-packages']:
                 if '=' not in entry:
                     warn("'%s' not properly formatted. Skipping" % entry)
+                    continue
                 pkg, ver = entry.split('=')
 
                 if pkg not in d:
@@ -166,7 +168,7 @@ def get_usns_for_manifest(m, usn_db):
     rel = get_ubuntu_release_from_manifest(m)
     pkgs = get_staged_packages_from_manifest(m)
     if rel not in usn_db:
-        error("'%s' not found in usn database" % rel)
+        raise ValueError("'%s' not found in usn database" % rel)
 
     pending_usns = {}
 
