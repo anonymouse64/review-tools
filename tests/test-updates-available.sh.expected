@@ -335,3 +335,6 @@ References:
  * https://usn.ubuntu.com/3635-1/
 
 
+Running: snap-updates-available --usn-db='./tests/test-usn-budgie-2.db' --snap='./tests/test-snapcraft-manifest_0_amd64.snap'
+{'libssl1.0.0': ['3611-1', '3628-1'], 'openssl': ['3611-1', '3628-1']}
+

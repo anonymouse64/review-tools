@@ -92,6 +92,11 @@ run "$tmp_seen" test-usn-budgie-1.db test-store-budgie.db
 # should show only 3635-1
 run "$tmp_seen" test-usn-budgie-2.db test-store-budgie.db
 
+# Test --snap
+echo "Running: snap-updates-available --usn-db='./tests/test-usn-budgie-2.db' --snap='./tests/test-snapcraft-manifest_0_amd64.snap'" | tee -a "$tmp"
+PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-budgie-2.db' --snap='./tests/test-snapcraft-manifest_0_amd64.snap' | tee -a "$tmp"
+echo "" | tee -a "$tmp"
+
 echo
 echo "Checking for differences in output..."
 diff -Naur ./tests/test-updates-available.sh.expected "$tmp" || {
