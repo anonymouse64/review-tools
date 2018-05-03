@@ -60,7 +60,7 @@ from clickreviews.common import (
 from clickreviews.store import (
     get_pkg_revisions,
     get_shared_snap_without_override,
-    get_usns_for_manifest,
+    get_secnots_for_manifest,
 )
 from clickreviews.usn import (
     read_usn_db,
@@ -118,7 +118,7 @@ for affected binary packages in each snap revision:
     reference_urls = []
 
     for r in sorted(pkg_db['revisions']):
-        if len(pkg_db['revisions'][r]['usn-report']) == 0:
+        if len(pkg_db['revisions'][r]['secnot-report']) == 0:
             continue
 
         architectures = pkg_db['revisions'][r]['architectures']
@@ -131,25 +131,25 @@ for affected binary packages in each snap revision:
              ", ".join(pkg_db['revisions'][r]['channels']))
         shown_rev_header = False
 
-        for p in sorted(pkg_db['revisions'][r]['usn-report']):
-            usns = []
-            for usn in pkg_db['revisions'][r]['usn-report'][p]:
-                # only report new USNs, unless we don't know about this
+        for p in sorted(pkg_db['revisions'][r]['secnot-report']):
+            secnots = []
+            for secnot in pkg_db['revisions'][r]['secnot-report'][p]:
+                # only report new secnots, unless we don't know about this
                 # revision
                 if pkgname in seen_db and r in seen_db[pkgname] and \
-                        usn in seen_db[pkgname][r]:
+                        secnot in seen_db[pkgname][r]:
                     continue
-                usns.append(usn)
-            usns.sort()
+                secnots.append(secnot)
+            secnots.sort()
 
-            if len(usns) > 0:
+            if len(secnots) > 0:
                 if not shown_rev_header:
                     report += rev_header
                     shown_rev_header = True
-                report += "\n * %s: %s" % (p, ", ".join(usns))
+                report += "\n * %s: %s" % (p, ", ".join(secnots))
 
-            for usn in usns:
-                url = "https://usn.ubuntu.com/%s/" % usn
+            for secnot in secnots:
+                url = "https://usn.ubuntu.com/%s/" % secnot
                 if url not in reference_urls:
                     reference_urls.append(url)
 
@@ -218,16 +218,16 @@ def update_seen(seen_fn, seen_db, pkg_db):
 
     # update to add new revisions
     for r in pkg_db['revisions']:
-        if len(pkg_db['revisions'][r]['usn-report']) == 0:
+        if len(pkg_db['revisions'][r]['secnot-report']) == 0:
             continue
 
         if r not in seen_db[pkgname]:
             seen_db[pkgname][r] = []
 
-        for p in pkg_db['revisions'][r]['usn-report']:
-            for usn in pkg_db['revisions'][r]['usn-report'][p]:
-                if usn not in seen_db[pkgname][r]:
-                    seen_db[pkgname][r].append(usn)
+        for p in pkg_db['revisions'][r]['secnot-report']:
+            for secnot in pkg_db['revisions'][r]['secnot-report'][p]:
+                if secnot not in seen_db[pkgname][r]:
+                    seen_db[pkgname][r].append(secnot)
         seen_db[pkgname][r].sort()
 
     # remove old revisions
@@ -306,7 +306,7 @@ def main():
     if args.snap:
         m = get_snap_manifest(args.snap)
 
-        report = get_usns_for_manifest(m, usn_db)
+        report = get_secnots_for_manifest(m, usn_db)
         if len(report) != 0:
             pprint.pprint(report)
     elif args.store_db:
