@@ -33,10 +33,12 @@ from clickreviews.sr_common import (
 
 snap_to_release = {'base-18': 'bionic',
                    'core': 'xenial',
+                   'core16': 'xenial',
                    'core18': 'bionic',
                    }
 
 
+# XXX: s/usn_db/sn_db/
 def get_pkg_revisions(item, usn_db, errors):
     for i in ['name', 'publisher_email', 'revisions']:
         if i not in item:
@@ -161,11 +163,12 @@ def verify_snap_manifest(m):
         raise ValueError(msg)
 
 
+# XXX: s/usn/sn/
 def get_usns_for_manifest(m, usn_db):
     '''Find new USNs for packages in the manifest'''
     debug("snap/manifest.yaml:\n" + pprint.pformat(m))
 
-    rel = get_ubuntu_release_from_manifest(m)
+    rel = get_ubuntu_release_from_manifest(m)  # can raise ValueError
     pkgs = get_staged_packages_from_manifest(m)
     if rel not in usn_db:
         raise ValueError("'%s' not found in usn database" % rel)
@@ -198,10 +201,12 @@ def get_usns_for_manifest(m, usn_db):
     return pending_usns
 
 
+# XXX: move this out to somewhere so it isn't Ubuntu specific here
 def get_ubuntu_release_from_manifest(m):
     '''Determine the Ubuntu release from the manifest'''
     if 'parts' not in m:
-        error("Could not determine Ubuntu release ('parts' not in manifest)")
+        raise ValueError("Could not determine Ubuntu release ('parts' not in "
+                         "manifest)")
 
     installed_snaps = []
     for part in m['parts']:
@@ -223,8 +228,8 @@ def get_ubuntu_release_from_manifest(m):
         # NOTE: this will have to change if a snap ever has multiple cores or
         # base snaps installed
         if len(installed_snaps) > 1:
-            error("Could not determine Ubuntu release (multiple core: %s" %
-                  ",".join(installed_snaps))
+            raise ValueError("Could not determine Ubuntu release (multiple "
+                             "bases/cores: %s)" % ",".join(installed_snaps))
 
         ubuntu_release = snap_to_release[installed_snaps[0]]
 

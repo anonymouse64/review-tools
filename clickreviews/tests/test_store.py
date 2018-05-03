@@ -225,3 +225,123 @@ class TestStore(TestCase):
 
         res = store.get_staged_packages_from_manifest(m)
         self.assertEquals(res, None)
+
+    def test_check_get_usns_for_manifest(self):
+        '''Test get_usns_for_manifest()'''
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+
+        res = store.get_usns_for_manifest(m, self.usn_db)
+        self.assertTrue(isinstance(res, dict))
+        self.assertEquals(len(res), 2)
+        self.assertTrue('libxcursor1' in res)
+        self.assertEquals(len(res['libxcursor1']), 1)
+        self.assertEquals(res['libxcursor1'][0], '3501-1')
+        self.assertTrue('libtiff5' in res)
+        self.assertEquals(len(res['libtiff5']), 2)
+        self.assertTrue('3602-1' in res['libtiff5'])
+        self.assertTrue('3606-1' in res['libtiff5'])
+
+    def test_check_get_usns_for_manifest_empty_staged(self):
+        '''Test get_usns_for_manifest() - empty staged'''
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m['parts']['0ad-launcher']['stage-packages'] = []
+
+        res = store.get_usns_for_manifest(m, self.usn_db)
+        self.assertTrue(isinstance(res, dict))
+        self.assertEquals(len(res), 0)
+
+    def test_check_get_usns_for_manifest_has_newer(self):
+        '''Test get_usns_for_manifest() - has newer'''
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+
+        # clear out all the stage-packages and then add one that has a
+        # newer package than what is in the security notices
+        for part in m['parts']:
+            m['parts'][part]['stage-packages'] = []
+            if part == '0ad-launcher':
+                m['parts'][part]['stage-packages'].append(
+                    "libxcursor1=999:1.1.14-1")
+
+        res = store.get_usns_for_manifest(m, self.usn_db)
+        self.assertTrue(isinstance(res, dict))
+        self.assertEquals(len(res), 0)
+
+    def test_check_get_ubuntu_release_from_manifest(self):
+        '''Test get_ubuntu_release_from_manifest()'''
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        res = store.get_ubuntu_release_from_manifest(m)
+        self.assertEquals(res, "xenial")
+
+    def test_check_get_ubuntu_release_from_manifest_missing_parts(self):
+        '''Test get_ubuntu_release_from_manifest() - missing parts'''
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        del m['parts']
+
+        try:
+            store.get_ubuntu_release_from_manifest(m)
+        except ValueError:
+            return
+
+        raise Exception("Should have raised ValueError")  # pragma: nocover
+
+    def test_check_get_ubuntu_release_from_manifest_bad_staged(self):
+        '''Test get_ubuntu_release_from_manifest() - bad staged'''
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m['parts']['0ad-launcher']['installed-snaps'].append('foo')
+
+        res = store.get_ubuntu_release_from_manifest(m)
+        self.assertEquals(res, "xenial")
+
+    def test_check_get_ubuntu_release_from_manifest_base18(self):
+        '''Test get_ubuntu_release_from_manifest() - base-18'''
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m['parts']['0ad-launcher']['installed-snaps'].append('base-18=123')
+
+        res = store.get_ubuntu_release_from_manifest(m)
+        self.assertEquals(res, "bionic")
+
+    def test_check_get_ubuntu_release_from_manifest_base18_with_others(self):
+        '''Test get_ubuntu_release_from_manifest() - base-18 with others'''
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m['parts']['0ad-launcher']['installed-snaps'].append('abc=123')
+        m['parts']['0ad-launcher']['installed-snaps'].append('base-18=123')
+
+        res = store.get_ubuntu_release_from_manifest(m)
+        self.assertEquals(res, "bionic")
+
+    def test_check_get_ubuntu_release_from_manifest_base18_with_core(self):
+        '''Test get_ubuntu_release_from_manifest() - base-18 with others'''
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m['parts']['0ad-launcher']['installed-snaps'].append('core=123')
+        m['parts']['0ad-launcher']['installed-snaps'].append('base-18=123')
+
+        try:
+            store.get_ubuntu_release_from_manifest(m)
+        except ValueError:
+            return
+
+        raise Exception("Should have raised ValueError")  # pragma: nocover
+
+    def test_check_get_ubuntu_release_from_manifest_core18(self):
+        '''Test get_ubuntu_release_from_manifest() - core18'''
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m['parts']['0ad-launcher']['installed-snaps'].append('core18=123')
+
+        res = store.get_ubuntu_release_from_manifest(m)
+        self.assertEquals(res, "bionic")
+
+    def test_check_get_ubuntu_release_from_manifest_core16(self):
+        '''Test get_ubuntu_release_from_manifest() - core16'''
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m['parts']['0ad-launcher']['installed-snaps'].append('core16=123')
+
+        res = store.get_ubuntu_release_from_manifest(m)
+        self.assertEquals(res, "xenial")
+
+    def test_check_get_ubuntu_release_from_manifest_core(self):
+        '''Test get_ubuntu_release_from_manifest() - core'''
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m['parts']['0ad-launcher']['installed-snaps'].append('core=123')
+
+        res = store.get_ubuntu_release_from_manifest(m)
+        self.assertEquals(res, "xenial")
