@@ -26,20 +26,20 @@ email_from_addr = "Snap Store <noreply@canonical.com>"
 email_server = 'localhost'
 
 
-def sanitize_addr(addr):
+def sanitize_addr(a):
     '''Roughly sanitize the email field'''
-    (name, email) = parseaddr(addr)
+    (name, addr) = parseaddr(a)
 
     # "Foo bar <bad>"
-    if '@' not in email:
+    if '@' not in addr:
         return ''
 
     # "Foo bar <bad@>", "Foo bar <bad@@bad>", "Foo bar <@bad>"
-    if email.count('@') == 1 and (email.startswith('@') or
-                                  email.endswith('@')):
+    if addr.count('@') == 1 and (addr.startswith('@') or
+                                 addr.endswith('@')):
         return ''
 
-    return email
+    return addr
 
 
 def send(email_to_addr, subj, body):
