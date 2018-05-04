@@ -550,7 +550,7 @@ slots:
             c._verify_declaration(decl=decl, base=True)
         except SnapDeclarationException:
             return
-        raise Exception("base declaration should be invalid")
+        raise Exception("base declaration should be invalid")  # pragma: nocover
 
     def test__verify_declaration_invalid_type(self):
         '''Test _verify_declaration - bad type (list)'''
@@ -2401,7 +2401,7 @@ slots:
             c.check_declaration()
         except SnapDeclarationException:
             return
-        raise Exception("base declaration should be invalid")
+        raise Exception("base declaration should be invalid")  # pragma: nocover
 
     def test_check_declaration_plugs_mismatch_subsubkey_type(self):
         '''Test _verify_declaration - mismatched subsubkey_type'''
