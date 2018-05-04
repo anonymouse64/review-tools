@@ -196,6 +196,9 @@ def get_secnots_for_manifest(m, secnot_db):
                               (pkg, secnot, pkgversion.full_version,
                                secnotversion.full_version))
 
+                    if pkg in pending_secnots:
+                        pending_secnots[pkg].sort()
+
     return pending_secnots
 
 
