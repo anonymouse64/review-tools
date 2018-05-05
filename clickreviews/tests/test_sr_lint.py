@@ -4475,7 +4475,7 @@ architectures: [ amd64 ]
         if platform.machine() == 'x86_64':
             expected_counts = {'info': None, 'warn': 0, 'error': 1}
         else:  # ignore test on non-amd64
-            expected_counts = {'info': None, 'warn': 0, 'error': None}
+            expected_counts = {'info': None, 'warn': 0, 'error': None}  # pragma: nocover
         self.check_results(r, expected_counts)
 
     def test_check_architecture_all_skips_pyc(self):
