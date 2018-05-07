@@ -348,9 +348,15 @@ canonical_mir = ['alan.griffiths@canonical.com',
                  'michal.sawicz@canonical.com',
                  ]
 
+canonical_multipass = canonical_mir
+
 canonical_security = ['emily.ratliff@canonical.com',
                       'jamie@canonical.com',
                       ]
+
+canonical_server = ['david.britton@canonical.com',
+                    'robie.basak@canonical.com',
+                    ]
 
 canonical_snapd = ['gustavo.niemeyer@canonical.com',
                    'michael.vogt@canonical.com',
@@ -374,8 +380,10 @@ update_publisher_overrides = {
         'eog': canonical_desktop,
         'gcp-kernel': canonical_kernel,
         'gedit': canonical_desktop,
+        'git-ubuntu': canonical_server,
         'gke-kernel': canonical_kernel,
         'gnome-3-26-1604': canonical_desktop,
+        'gnome-3-28-1804': canonical_desktop,
         'gnome-calculator': canonical_desktop,
         'gnome-calendar': canonical_desktop,
         'gnome-characters': canonical_desktop,
@@ -391,6 +399,7 @@ update_publisher_overrides = {
         'lxd': canonical_lxd,
         'mir-kiosk': canonical_mir,
         'modem-manager': canonical_enablement,
+        'multipass': canonical_multipass,
         'network-manager': canonical_enablement,
         'pc-kernel': canonical_kernel,
         'pi2-kernel': canonical_kernel,
