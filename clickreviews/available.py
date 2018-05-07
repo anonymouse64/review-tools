@@ -20,14 +20,27 @@ import tempfile
 
 from clickreviews.common import (
     debug,
+    warn,
     open_file_write,
     read_file_as_json_dict,
     MKDTEMP_PREFIX,
+    _add_error,  # make a class
+    get_snap_manifest,
 )
 import clickreviews.email as email
 
+from clickreviews.store import (
+    get_pkg_revisions,
+    get_secnots_for_manifest,
+    get_shared_snap_without_override,
+)
+from clickreviews.usn import (
+    read_usn_db,
+)
 
-def generate_report(pkg_db, seen_db):
+
+# TODO: templatize this email
+def _secnot_report_for_pkg(pkg_db, seen_db):
     '''Generate a report for this pkg, consulting seen_db'''
     pkgname = pkg_db['name']
 
@@ -98,11 +111,11 @@ References:
     return report
 
 
-def email_report(pkg_db, seen_db):
+def _email_report_for_pkg(pkg_db, seen_db):
     '''Send email report for this pkgname'''
     pkgname = pkg_db['name']
 
-    body = generate_report(pkg_db, seen_db)
+    body = _secnot_report_for_pkg(pkg_db, seen_db)
     if body == "":
         return False
 
@@ -132,7 +145,7 @@ def read_seen_db(fn):
     return read_file_as_json_dict(fn)
 
 
-def update_seen(seen_fn, seen_db, pkg_db):
+def _update_seen(seen_fn, seen_db, pkg_db):
     pkgname = pkg_db['name']
     if pkgname not in seen_db:
         seen_db[pkgname] = {}
@@ -167,3 +180,78 @@ def update_seen(seen_fn, seen_db, pkg_db):
     os.close(fd)
 
     shutil.move(fn, seen_fn)
+
+
+def scan_store(secnot_db_fn, store_db_fn, seen_db_fn, pkgname):
+    '''For each snap in store db, see if there are any binary packages with
+       security notices, if see report them if not in the seen db. We perform
+       these actions on each snap and do not form a queue to keep the
+       implementation simple.
+    '''
+    secnot_db = read_usn_db(secnot_db_fn)
+    store_db = read_file_as_json_dict(store_db_fn)
+
+    if seen_db_fn:
+        seen_db = read_seen_db(seen_db_fn)
+    else:
+        seen_db = {}
+
+    errors = {}
+    for item in store_db:
+        if pkgname and 'name' in item and pkgname != item['name']:
+            continue
+
+        try:
+            pkg_db = get_pkg_revisions(item, secnot_db, errors)
+        except ValueError as e:
+            if 'name' not in item:
+                _add_error(item['name'], errors, "%s" % e)
+            continue
+
+        try:
+            rc = _email_report_for_pkg(pkg_db, seen_db)
+        except Exception as e:
+            _add_error(pkg_db['name'], errors, "%s" % e)
+            continue
+
+        if rc is False:
+            debug("Skipped email for '%s': up to date" % pkg_db['name'])
+
+        if seen_db_fn:
+            _update_seen(seen_db_fn, seen_db, pkg_db)
+
+    if len(errors) > 0:
+        for p in errors:
+            for e in errors[p]:
+                warn("%s: %s" % (p, e))
+
+
+def scan_snap(secnot_db_fn, snap_fn):
+    '''Scan snap for packages with security notices'''
+    secnot_db = read_usn_db(secnot_db_fn)
+
+    out = ""
+    m = get_snap_manifest(snap_fn)
+    report = get_secnots_for_manifest(m, secnot_db)
+    if len(report) != 0:
+        # FIXME: make pretty
+        import pprint
+        out += pprint.pformat(report)
+
+    return out
+
+
+def scan_shared_publishers(store_fn):
+    '''Check store db for any snaps with a shared email that don't also have a
+       mapping.
+    '''
+    store_db = read_file_as_json_dict(store_fn)
+    report = get_shared_snap_without_override(store_db)
+
+    out = ""
+    if len(report) != 0:
+        out += "The following snaps are missing from overrides.py:\n"
+        for eml in sorted(report):
+            out += "%s:\n- %s" % (eml, "\n- ".join(report[eml]))
+
+    return out

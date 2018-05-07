@@ -39,28 +39,14 @@
 
 import argparse
 import os
-import pprint
 import sys
 import textwrap
 
-import clickreviews.common as common
 import clickreviews.available as available
 
+import clickreviews.common as common
 from clickreviews.common import (
-    debug,
     error,
-    warn,
-    read_file_as_json_dict,
-    _add_error,  # make a class
-    get_snap_manifest,
-)
-from clickreviews.store import (
-    get_pkg_revisions,
-    get_shared_snap_without_override,
-    get_secnots_for_manifest,
-)
-from clickreviews.usn import (
-    read_usn_db,
 )
 
 
@@ -90,81 +76,31 @@ def main():
                         help='Limit report to package name')
     args = parser.parse_args()
 
-    # XXX: for as nice as argparse is, our arg processing is less than clear
-    if args.check_shared_publishers:
-        if args.snap:
-            error("--snap should not be used with --check-shared-publishers")
-
-        if not args.store_db:
-            error("Must specify --store-db with --check-shared-publishers")
-        store_db = read_file_as_json_dict(args.store_db)
-        report = get_shared_snap_without_override(store_db)
-
-        if len(report) != 0:
-            print("The following snaps are missing from overrides.py:\n")
-            for eml in sorted(report):
-                print("%s:\n- %s" % (eml, "\n- ".join(report[eml])))
-            # pprint.pprint(report)
-
-        return
-
-    if args.snap:
-        if not args.usn_db:
-            error("Must specify --usn-db with --snap")
-        if args.store_db:
-            error("Must not specify --store-db with --snap")
-
-    if not args.snap and not args.store_db:
+    # Arg validation
+    if args.check_shared_publishers and args.snap:
+        error("--snap should not be used with --check-shared-publishers")
+    elif args.check_shared_publishers and args.usn_db:
+        error("--usn-db should not be used with --check-shared-publishers")
+    elif args.check_shared_publishers and not args.store_db:
+        error("Must specify --store-db with --check-shared-publishers")
+    elif args.snap and not args.usn_db:
+        error("Must specify --usn-db with --snap")
+    elif args.snap and args.store_db:
+        error("Must not specify --store-db with --snap")
+    elif not args.snap and not args.store_db:
         error("Must specify --snap or --store-db")
 
-    usn_db = read_usn_db(args.usn_db)
-
-    if args.snap:
-        m = get_snap_manifest(args.snap)
-
-        report = get_secnots_for_manifest(m, usn_db)
-        if len(report) != 0:
-            pprint.pprint(report)
+    report = ""
+    if args.check_shared_publishers:
+        report = available.scan_shared_publishers(args.store_db)
+    elif args.snap:
+        report = available.scan_snap(args.usn_db, args.snap)
     elif args.store_db:
-        store_db = read_file_as_json_dict(args.store_db)
+        available.scan_store(args.usn_db, args.store_db, args.seen_db,
+                             args.pkg_name)
 
-        if args.seen_db:
-            seen_db = available.read_seen_db(args.seen_db)
-        else:
-            seen_db = {}
-
-        errors = {}
-        # TODO: capture these continues errors at the end
-        for item in store_db:
-            if args.pkg_name and 'name' in item and \
-                    args.pkg_name != item['name']:
-                # debug("Skipping %s (--pkg-name=%s specified)" %
-                #       (pkgname, args.pkg_name))
-                continue
-
-            try:
-                pkg_db = get_pkg_revisions(item, usn_db, errors)
-            except ValueError as e:
-                if 'name' not in item:
-                    _add_error(item['name'], errors, "%s" % e)
-                continue
-
-            try:
-                rc = available.email_report(pkg_db, seen_db)
-            except Exception as e:
-                _add_error(pkg_db['name'], errors, "%s" % e)
-                continue
-
-            if rc is False:
-                debug("Skipped email for '%s': up to date" % pkg_db['name'])
-
-            if args.seen_db:
-                available.update_seen(args.seen_db, seen_db, pkg_db)
-
-        if len(errors) > 0:
-            for p in errors:
-                for e in errors[p]:
-                    warn("%s: %s" % (p, e))
+    if report != "":
+        print(report)
 
 
 if __name__ == '__main__':

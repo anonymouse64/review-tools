@@ -48,9 +48,9 @@ class TestAvailable(TestCase):
         if self.tmpdir is not None:
             recursive_rm(self.tmpdir)
 
-    def test_check_generate_report(self):
-        '''Test generate_report()'''
-        res = available.generate_report(self.pkg_db, {})
+    def test_check__secnot_report_for_pkg(self):
+        '''Test _secnot_report_for_pkg()'''
+        res = available._secnot_report_for_pkg(self.pkg_db, {})
         needle = '''
 Revision r11 (amd64; channels: stable, candidate, beta)
  * libtiff5: 3602-1, 3606-1
@@ -70,21 +70,21 @@ Revision r14 (i386; channels: edge)
 '''
         self.assertTrue(needle in res)
 
-    def test_check_generate_report_rev_no_secnots(self):
-        '''Test generate_report() - rev no secnots'''
+    def test_check__secnot_report_for_pkg_rev_no_secnots(self):
+        '''Test _secnot_report_for_pkg() - rev no secnots'''
         self.pkg_db['revisions']['11']['secnot-report'] = {}
-        res = available.generate_report(self.pkg_db, {})
+        res = available._secnot_report_for_pkg(self.pkg_db, {})
         self.assertFalse(' r11 ' in res)
 
-    def test_check_generate_report_no_urls(self):
-        '''Test generate_report() - no urls'''
+    def test_check__secnot_report_for_pkg_no_urls(self):
+        '''Test _secnot_report_for_pkg() - no urls'''
         for rev in self.pkg_db['revisions']:
             self.pkg_db['revisions'][rev]['secnot-report'] = {}
-        res = available.generate_report(self.pkg_db, {})
+        res = available._secnot_report_for_pkg(self.pkg_db, {})
         self.assertEquals(res, "")
 
-    def test_check_generate_email_report_only_new_secnot(self):
-        '''Test email_report() - only new secnot'''
+    def test_check__secnot_report_for_pkg_only_new_secnot(self):
+        '''Test _secnot_report_for_pkg() - only new secnot'''
         seen_db = {
             '0ad': {
                 '11': ['3501-1', '3602-1'],
@@ -93,7 +93,7 @@ Revision r14 (i386; channels: edge)
                 '14': ['3501-1', '3602-1'],
             }
         }
-        res = available.generate_report(self.pkg_db, seen_db)
+        res = available._secnot_report_for_pkg(self.pkg_db, seen_db)
         needle = '''
 Revision r11 (amd64; channels: stable, candidate, beta)
  * libtiff5: 3606-1
@@ -109,8 +109,8 @@ Revision r14 (i386; channels: edge)
 '''
         self.assertTrue(needle in res)
 
-    def test_check_generate_email_report_only_new_secnot_budgie(self):
-        '''Test email_report() - only new secnot budgie'''
+    def test_check__secnot_report_for_pkg_only_new_secnot_budgie(self):
+        '''Test _secnot_report_for_pkg() - only new secnot budgie'''
         self.secnot_db = usn.read_usn_db("./tests/test-usn-budgie-2.db")
         self.store_db = read_file_as_json_dict("./tests/test-store-budgie.db")
         errors = {}
@@ -134,7 +134,7 @@ Revision r14 (i386; channels: edge)
                        '3622-1', '3628-1'],
             }
         }
-        res = available.generate_report(self.pkg_db, seen_db)
+        res = available._secnot_report_for_pkg(self.pkg_db, seen_db)
         needle = '''
 Revision r11 (amd64; channels: candidate, beta)
  * gir1.2-javascriptcoregtk-4.0: 3635-1
@@ -150,28 +150,28 @@ Revision r12 (i386; channels: candidate, beta)
 '''
         self.assertTrue(needle in res)
 
-    def test_check_email_report(self):
-        '''Test email_report()'''
-        res = available.email_report(self.pkg_db, {})
+    def test_check__email_report_for_pkg(self):
+        '''Test _email_report_for_pkg()'''
+        res = available._email_report_for_pkg(self.pkg_db, {})
         self.assertTrue(res)
 
-    def test_check_email_report_no_urls(self):
-        '''Test generate_report() - no urls'''
+    def test_check__email_report_for_pkg_no_urls(self):
+        '''Test _email_report_for_pkg() - no urls'''
         for rev in self.pkg_db['revisions']:
             self.pkg_db['revisions'][rev]['secnot-report'] = {}
-        res = available.email_report(self.pkg_db, {})
+        res = available._email_report_for_pkg(self.pkg_db, {})
         self.assertFalse(res)
 
-    def test_check_email_report_with_uploaders(self):
-        '''Test email_report() - with uploaders'''
+    def test_check__email_report_for_pkg_with_uploaders(self):
+        '''Test _email_report_for_pkg() - with uploaders'''
         self.pkg_db['uploaders'] = ["testme@example.com"]
-        res = available.email_report(self.pkg_db, {})
+        res = available._email_report_for_pkg(self.pkg_db, {})
         self.assertTrue(res)
 
-    def test_check_email_report_with_additional(self):
-        '''Test email_report() - with additional'''
+    def test_check__email_report_for_pkg_with_additional(self):
+        '''Test _email_report_for_pkg() - with additional'''
         self.pkg_db['additional'] = ["testme@example.com"]
-        res = available.email_report(self.pkg_db, {})
+        res = available._email_report_for_pkg(self.pkg_db, {})
         self.assertTrue(res)
 
     def test_check_read_seen_db(self):
@@ -181,15 +181,15 @@ Revision r12 (i386; channels: candidate, beta)
         res = available.read_seen_db(tmp)
         self.assertEquals(len(res), 0)
 
-    def test_check_update_seen(self):
-        '''Test update_seen()'''
+    def test_check__update_seen(self):
+        '''Test _update_seen()'''
         self.tmpdir = tempfile.mkdtemp()
         tmp = os.path.join(self.tmpdir, "seen.db")
         res = available.read_seen_db(tmp)
         self.assertEquals(len(res), 0)
         seen_db = res
 
-        available.update_seen(tmp, seen_db, self.pkg_db)
+        available._update_seen(tmp, seen_db, self.pkg_db)
 
         res = available.read_seen_db(tmp)
         self.assertEquals(len(res), 1)
@@ -215,8 +215,8 @@ Revision r12 (i386; channels: candidate, beta)
                 for secnot in expected_db[pkg][rev]:
                     self.assertTrue(secnot in res[pkg][rev])
 
-    def test_check_update_seen_no_secnots(self):
-        '''Test update_seen() - no secnots'''
+    def test_check__update_seen_no_secnots(self):
+        '''Test _update_seen() - no secnots'''
         self.tmpdir = tempfile.mkdtemp()
         tmp = os.path.join(self.tmpdir, "seen.db")
         res = available.read_seen_db(tmp)
@@ -225,15 +225,15 @@ Revision r12 (i386; channels: candidate, beta)
 
         for rev in self.pkg_db['revisions']:
             self.pkg_db['revisions'][rev]['secnot-report'] = {}
-        available.update_seen(tmp, seen_db, self.pkg_db)
+        available._update_seen(tmp, seen_db, self.pkg_db)
 
         res = available.read_seen_db(tmp)
         self.assertEquals(len(res), 1)
         self.assertTrue('0ad' in res)
         self.assertEquals(len(res['0ad']), 0)
 
-    def test_check_update_seen_remove_old_revision(self):
-        '''Test update_seen() - remove old revision'''
+    def test_check__update_seen_remove_old_revision(self):
+        '''Test _update_seen() - remove old revision'''
         self.tmpdir = tempfile.mkdtemp()
         tmp = os.path.join(self.tmpdir, "seen.db")
         res = available.read_seen_db(tmp)
@@ -247,7 +247,7 @@ Revision r12 (i386; channels: candidate, beta)
                 '7': ['3401-1'],
             }
         }
-        available.update_seen(tmp, seen_db, self.pkg_db)
+        available._update_seen(tmp, seen_db, self.pkg_db)
 
         res = available.read_seen_db(tmp)
         self.assertEquals(len(res), 1)
