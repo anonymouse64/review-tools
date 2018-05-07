@@ -117,7 +117,7 @@ def _email_report_for_pkg(pkg_db, seen_db):
 
     body = _secnot_report_for_pkg(pkg_db, seen_db)
     if body == "":
-        return False
+        return (None, None, None)
 
     subj = "%s contains outdated Ubuntu packages" % pkgname
 
@@ -132,7 +132,7 @@ def _email_report_for_pkg(pkg_db, seen_db):
     email.send(email_to_addr, subj, body)
 
     debug("Sent email for '%s'" % pkgname)
-    return True
+    return (email_to_addr, subj, body)
 
 
 def read_seen_db(fn):
@@ -197,6 +197,7 @@ def scan_store(secnot_db_fn, store_db_fn, seen_db_fn, pkgname):
         seen_db = {}
 
     errors = {}
+    sent = []
     for item in store_db:
         if pkgname and 'name' in item and pkgname != item['name']:
             continue
@@ -204,17 +205,18 @@ def scan_store(secnot_db_fn, store_db_fn, seen_db_fn, pkgname):
         try:
             pkg_db = get_pkg_revisions(item, secnot_db, errors)
         except ValueError as e:
-            if 'name' not in item:
+            if 'name' in item:
                 _add_error(item['name'], errors, "%s" % e)
             continue
 
         try:
-            rc = _email_report_for_pkg(pkg_db, seen_db)
-        except Exception as e:
+            (to_addr, subj, body) = _email_report_for_pkg(pkg_db, seen_db)
+            sent.append((to_addr, subj, body))
+        except Exception as e:  # pragma: nocover
             _add_error(pkg_db['name'], errors, "%s" % e)
             continue
 
-        if rc is False:
+        if body is None:  # pragma: nocover
             debug("Skipped email for '%s': up to date" % pkg_db['name'])
 
         if seen_db_fn:
@@ -224,6 +226,8 @@ def scan_store(secnot_db_fn, store_db_fn, seen_db_fn, pkgname):
         for p in errors:
             for e in errors[p]:
                 warn("%s: %s" % (p, e))
+
+    return sent, errors
 
 
 def scan_snap(secnot_db_fn, snap_fn):

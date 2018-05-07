@@ -338,3 +338,42 @@ References:
 Running: snap-updates-available --usn-db='./tests/test-usn-budgie-2.db' --snap='./tests/test-snapcraft-manifest_0_amd64.snap'
 {'libssl1.0.0': ['3611-1', '3628-1'], 'openssl': ['3611-1', '3628-1']}
 
+Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-1.db' --store-db='./tests/test-store-unittest-bad-1.db'
+WARN: 1ad: required field 'revisions' not found
+ERROR: Errors encountered when scanning store entries
+From: Snap Store <noreply@canonical.com>
+To: olivier.tilloy@canonical.com, security@ubuntu.com
+Subject: 0ad contains outdated Ubuntu packages
+
+A scan of this snap shows that it was built with packages from the Ubuntu
+archive that have since received security updates. The following lists new USNs
+for affected binary packages in each snap revision:
+
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r13 (amd64; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r14 (i386; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Simply rebuilding the snap will pull in the new security updates and resolve
+this. If your snap also contains vendored code, now might be a good time to
+review it for any needed updates.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://usn.ubuntu.com/3501-1/
+ * https://usn.ubuntu.com/3602-1/
+ * https://usn.ubuntu.com/3606-1/
+
+

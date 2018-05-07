@@ -152,27 +152,42 @@ Revision r12 (i386; channels: candidate, beta)
 
     def test_check__email_report_for_pkg(self):
         '''Test _email_report_for_pkg()'''
-        res = available._email_report_for_pkg(self.pkg_db, {})
-        self.assertTrue(res)
+        (to_addr, subj, body) = available._email_report_for_pkg(self.pkg_db,
+                                                                {})
+
+        for eml in ['olivier.tilloy@canonical.com', 'security@ubuntu.com']:
+            self.assertTrue(eml in to_addr)
+
+        self.assertTrue('0ad' in subj)
+
+        for pkg in ['libtiff5', 'libxcursor1']:
+            self.assertTrue(pkg in body)
+        for sn in ['3501-1', '3602-1', '3606-1']:
+            self.assertTrue(sn in body)
 
     def test_check__email_report_for_pkg_no_urls(self):
         '''Test _email_report_for_pkg() - no urls'''
         for rev in self.pkg_db['revisions']:
             self.pkg_db['revisions'][rev]['secnot-report'] = {}
-        res = available._email_report_for_pkg(self.pkg_db, {})
-        self.assertFalse(res)
+        (to_addr, subj, body) = available._email_report_for_pkg(self.pkg_db,
+                                                                {})
+        self.assertEquals(to_addr, None)
+        self.assertEquals(subj, None)
+        self.assertEquals(body, None)
 
     def test_check__email_report_for_pkg_with_uploaders(self):
         '''Test _email_report_for_pkg() - with uploaders'''
         self.pkg_db['uploaders'] = ["testme@example.com"]
-        res = available._email_report_for_pkg(self.pkg_db, {})
-        self.assertTrue(res)
+        (to_addr, subj, body) = available._email_report_for_pkg(self.pkg_db,
+                                                                {})
+        self.assertTrue("testme@example.com" in to_addr)
 
     def test_check__email_report_for_pkg_with_additional(self):
         '''Test _email_report_for_pkg() - with additional'''
         self.pkg_db['additional'] = ["testme@example.com"]
-        res = available._email_report_for_pkg(self.pkg_db, {})
-        self.assertTrue(res)
+        (to_addr, subj, body) = available._email_report_for_pkg(self.pkg_db,
+                                                                {})
+        self.assertTrue("testme@example.com" in to_addr)
 
     def test_check_read_seen_db(self):
         '''Test read_seen_db()'''
@@ -256,3 +271,78 @@ Revision r12 (i386; channels: candidate, beta)
 
         for r in ['7', '8', '9', '10']:
             self.assertFalse(r in seen_db['0ad'])
+
+    def test_check_scan_shared_publishers(self):
+        '''Test scan_shared_publishers()'''
+        fn = "./tests/test-store-missing-shared-override.db"
+        res = available.scan_shared_publishers(fn)
+        self.assertTrue(len(res) > 0)
+        for p in ['missing-publisher-overrides-snap-1',
+                  'missing-publisher-overrides-snap-2',
+                  ]:
+            self.assertTrue(p in res)
+
+    def test_check_scan_snap(self):
+        '''Test scan_snap()'''
+        secnot_fn = "./tests/test-usn-unittest-1.db"
+        snap_fn = "./tests/test-snapcraft-manifest-unittest_0_amd64.snap"
+        res = available.scan_snap(secnot_fn, snap_fn)
+        self.assertTrue(len(res) > 0)
+        self.assertTrue('3501-1' in res)
+
+    def test_check_scan_store(self):
+        '''Test scan_store()'''
+        secnot_fn = "./tests/test-usn-unittest-1.db"
+        store_fn = "./tests/test-store-unittest-1.db"
+        (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
+        self.assertEquals(len(errors), 0)
+        self.assertEquals(len(sent), 1)
+        (to_addr, subj, body) = sent[0]
+        for eml in ['olivier.tilloy@canonical.com', 'security@ubuntu.com']:
+            self.assertTrue(eml in to_addr)
+
+        self.assertTrue('0ad' in subj)
+
+        for pkg in ['libtiff5', 'libxcursor1']:
+            self.assertTrue(pkg in body)
+        for sn in ['3501-1', '3602-1', '3606-1']:
+            self.assertTrue(sn in body)
+
+    def test_check_scan_store_with_seen(self):
+        '''Test scan_store() - with seen'''
+        secnot_fn = "./tests/test-usn-unittest-1.db"
+        store_fn = "./tests/test-store-unittest-1.db"
+        self.tmpdir = tempfile.mkdtemp()
+        seen_fn = os.path.join(self.tmpdir, "seen.db")
+        (sent, errors) = available.scan_store(secnot_fn, store_fn, seen_fn,
+                                              None)
+        self.assertEquals(len(errors), 0)
+        self.assertEquals(len(sent), 1)
+        (to_addr, subj, body) = sent[0]
+        for eml in ['olivier.tilloy@canonical.com', 'security@ubuntu.com']:
+            self.assertTrue(eml in to_addr)
+
+        self.assertTrue('0ad' in subj)
+
+        for pkg in ['libtiff5', 'libxcursor1']:
+            self.assertTrue(pkg in body)
+        for sn in ['3501-1', '3602-1', '3606-1']:
+            self.assertTrue(sn in body)
+
+    def test_check_scan_store_with_pkgname(self):
+        '''Test scan_store() - with pkgname'''
+        secnot_fn = "./tests/test-usn-unittest-1.db"
+        store_fn = "./tests/test-store-unittest-1.db"
+        (sent, errors) = available.scan_store(secnot_fn, store_fn, None,
+                                              "not-there")
+        self.assertEquals(len(errors), 0)
+        self.assertEquals(len(sent), 0)
+
+    def test_check_scan_store_with_pkgname_bad_publisher(self):
+        '''Test scan_store() - with pkgname and bad publisher'''
+        secnot_fn = "./tests/test-usn-unittest-1.db"
+        store_fn = "./tests/test-store-unittest-bad-1.db"
+        (sent, errors) = available.scan_store(secnot_fn, store_fn, None,
+                                              "1ad")
+        self.assertEquals(len(errors), 1)
+        self.assertEquals(len(sent), 0)

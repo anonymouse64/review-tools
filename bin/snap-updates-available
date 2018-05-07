@@ -96,8 +96,10 @@ def main():
     elif args.snap:
         report = available.scan_snap(args.usn_db, args.snap)
     elif args.store_db:
-        available.scan_store(args.usn_db, args.store_db, args.seen_db,
-                             args.pkg_name)
+        (reports, errors) = available.scan_store(args.usn_db, args.store_db,
+                                                 args.seen_db, args.pkg_name)
+        if len(errors):
+            error("Errors encountered when scanning store entries")
 
     if report != "":
         print(report)
