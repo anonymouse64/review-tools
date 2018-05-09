@@ -22,6 +22,7 @@ click-reviewers-tools (0.48) UNRELEASED; urgency=medium
     - improve resquashs error message to use snapcraft >= 2.38 (LP: #1763641)
     - quick check unsquash -s to detect if fragments are used
   * rename gnome-online-accounts-service to accounts-service
+  * add snap-updates-available
 
  -- Jamie Strandboge <jamie@ubuntu.com>  Thu, 19 Apr 2018 12:31:56 -0500
 
