@@ -24,6 +24,7 @@ from clickreviews.common import (
 )
 import clickreviews.email as email
 from clickreviews.overrides import (
+    update_binaries_ignore,
     update_publisher_overrides,
 )
 from clickreviews.sr_common import (
@@ -141,6 +142,10 @@ def get_staged_packages_from_manifest(m):
                     warn("'%s' not properly formatted. Skipping" % entry)
                     continue
                 pkg, ver = entry.split('=')
+
+                if pkg in update_binaries_ignore:
+                    debug("Skipping ignored binary: '%s'" % pkg)
+                    continue
 
                 if pkg not in d:
                     d[pkg] = []

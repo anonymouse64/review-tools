@@ -226,6 +226,20 @@ class TestStore(TestCase):
         res = store.get_staged_packages_from_manifest(m)
         self.assertEquals(res, None)
 
+    def test_check_get_staged_packages_from_manifest_binary_ignored(self):
+        '''Test get_staged_packages_from_manifest()'''
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m['parts']['0ad-launcher']['stage-packages'].append(
+            'linux-libc-dev=4.4.0-104.127')
+
+        res = store.get_staged_packages_from_manifest(m)
+        self.assertTrue(isinstance(res, dict))
+        self.assertTrue(len(res) > 0)
+        self.assertTrue('libxcursor1' in res)
+        self.assertTrue('1:1.1.14-1' in res['libxcursor1'])
+        # make sure the ignored package is not present
+        self.assertFalse('linux-libc-dev' in res)
+
     def test_check_get_secnots_for_manifest(self):
         '''Test get_secnots_for_manifest()'''
         m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])

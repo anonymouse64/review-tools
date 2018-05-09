@@ -435,3 +435,7 @@ update_publisher_overrides = {
         'wifi-connect': canonical_enablement,
     },
 }
+
+# Some binary packages aren't worth alerting on since they don't contain
+# affected binaries (eg, a package with only header files)
+update_binaries_ignore = ['linux-libc-dev']
