@@ -300,6 +300,7 @@ class SnapReviewSecurity(SnapReview):
         t = 'info'
         n = self._get_check_name('squashfs_repack_checksum')
         s = "OK"
+        link = None
 
         (rc, out) = cmd(['sha512sum', fn])
         if rc != 0:
@@ -338,12 +339,13 @@ class SnapReviewSecurity(SnapReview):
             else:
                 mksquash_opts = MKSQUASHFS_OPTS
 
+            link = 'https://forum.snapcraft.io/t/automated-reviews-and-snapcraft-2-38/4982/17'
             t = 'error'
             s = "checksums do not match. Please ensure the snap is " + \
                 "created with either 'snapcraft pack <DIR>' (using " + \
                 "snapcraft >= 2.38) or 'mksquashfs <dir> <snap> %s'" % \
                 " ".join(mksquash_opts) + ". If using electron-builder, " \
-                "please upgrade to (at least) 20.9.2 stable."
+                "please upgrade to latest stable. See %s for details." % link
             # FIXME: fakeroot sporadically fails and saves the wrong
             # uid/gid/mode into its save file, thus causing the mksquashfs to
             # create the wrong file/perms/ownership. We want to not ignore this
@@ -361,6 +363,7 @@ class SnapReviewSecurity(SnapReview):
                 if self.snap_yaml['type'] in ['base', 'os']:
                     t = 'info'
                     s = "OK (check not enforced for base and os snaps)"
+                    link = None
                 elif pkgname in sec_mode_overrides:
                     has_sugid_override = False
                     setugid_pat = re.compile(r'[sS]')
@@ -372,8 +375,9 @@ class SnapReviewSecurity(SnapReview):
                         t = 'info'
                         s = "OK (check not enforced for app snaps with " + \
                             "setuid/setgid overrides)"
+                        link = None
 
-        self._add_result(t, n, s)
+        self._add_result(t, n, s, link)
 
     def check_squashfs_files(self):
         '''Check squashfs files'''
