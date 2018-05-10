@@ -267,7 +267,7 @@ security-snap-v2:squashfs_files_malformed_line|
 security-snap-v2:squashfs_files_malformed output|
 security-snap-v2:squashfs_files_unsquash|
 security-snap-v2:squashfs_fragments|
-security-snap-v2:squashfs_repack_checksum|
+security-snap-v2:squashfs_repack_checksum|https://forum.snapcraft.io/t/automated-reviews-and-snapcraft-2-38/4982/17
 security-snap-v2:squashfs_resquash|
 security-snap-v2:squashfs_stat|
 security-snap-v2:squashfs_supports_fstime|
