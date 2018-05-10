@@ -330,7 +330,6 @@ canonical_hwe = ['anthony.wong@canonical.com',
                  ]
 
 canonical_juju = ['ian.booth@canonical.com',
-                  'nicholas.skaggs@canonical.com',
                   'tim.penhey@canonical.com',
                   ]
 
