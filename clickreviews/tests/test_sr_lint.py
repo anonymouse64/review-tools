@@ -4701,7 +4701,7 @@ architectures: [ amd64 ]
         self.check_results(r, expected=expected)
 
     def test_check_plugs_lp1579201(self):
-        '''Test check_architecture_all() - amd64'''
+        '''Test check_plugs() - 1579201'''
         output_dir = self.mkdtemp()
         path = os.path.join(output_dir, 'snap.yaml')
         content = '''
