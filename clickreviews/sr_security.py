@@ -345,7 +345,8 @@ class SnapReviewSecurity(SnapReview):
                 "created with either 'snapcraft pack <DIR>' (using " + \
                 "snapcraft >= 2.38) or 'mksquashfs <dir> <snap> %s'" % \
                 " ".join(mksquash_opts) + ". If using electron-builder, " \
-                "please upgrade to latest stable. See %s for details." % link
+                "please upgrade to latest stable (>= 20.14.7). See %s " \
+                "for details." % link
             # FIXME: fakeroot sporadically fails and saves the wrong
             # uid/gid/mode into its save file, thus causing the mksquashfs to
             # create the wrong file/perms/ownership. We want to not ignore this
