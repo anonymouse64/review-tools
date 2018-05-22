@@ -202,6 +202,7 @@ lint-snap-v2:stop-timeout|
 lint-snap-v2:stop-timeout_range|
 lint-snap-v2:summary|
 lint-snap-v2:summary_present|
+lint-snap-v2:timer|
 lint-snap-v2:unknown_field|
 lint-snap-v2:unknown_hook|
 lint-snap-v2:unknown_refresh_mode|

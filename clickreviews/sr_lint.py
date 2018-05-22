@@ -1967,3 +1967,34 @@ class SnapReviewLint(SnapReview):
 
         (valid, t, s) = self.verify_snap_manifest(self.snap_manifest_yaml)
         self._add_result(t, n, s)
+
+    def check_apps_timer(self):
+        '''Check apps - timer'''
+        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+            return
+
+        # timers are a complex format. For now, let's just use a simple regex
+        timer_pat = re.compile(r'^([0-9:~/,\-]|mon|tue|wed|thu|fri|sat|sun)+$')
+        key = 'timer'
+        for app in self.snap_yaml['apps']:
+            if key not in self.snap_yaml['apps'][app]:
+                # We check for required elsewhere
+                continue
+
+            t = 'info'
+            n = self._get_check_name('%s' % key, app=app)
+            s = 'OK'
+            if not isinstance(self.snap_yaml['apps'][app][key], str) and \
+                    not isinstance(self.snap_yaml['apps'][app][key], int):
+                t = 'error'
+                s = "%s '%s' (not a str or int)" % (
+                    key, self.snap_yaml['apps'][app][key])
+                self._add_result(t, n, s)
+                continue
+
+            # 24:00 is an int in json
+            timer = str(self.snap_yaml['apps'][app][key])
+            if not timer_pat.search(timer):
+                t = 'error'
+                s = "'%s' not a valid timer" % timer
+            self._add_result(t, n, s)

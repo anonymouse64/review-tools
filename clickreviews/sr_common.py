@@ -105,6 +105,7 @@ class SnapReview(Review):
                      'stop-command',
                      'stop-mode',
                      'stop-timeout',
+                     'timer',
                      ]
     hooks_required = []
     hooks_optional = ['plugs']

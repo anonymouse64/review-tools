@@ -16,6 +16,7 @@ click-reviewers-tools (0.48) UNRELEASED; urgency=medium
     - 'common-id' is valid with non-daemon commands
     - add checks for refresh-mode and stop-mode
     - verify snap/manifest.yaml if it exists
+    - add check for timer
   * sr_security.py:
     - fix evaluation of SNAP_ENFORCE_RESQUASHFS so '0' turns it off
     - turn on resquash tests by default
@@ -24,7 +25,7 @@ click-reviewers-tools (0.48) UNRELEASED; urgency=medium
   * rename gnome-online-accounts-service to accounts-service
   * add snap-updates-available
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Thu, 19 Apr 2018 12:31:56 -0500
+ -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 22 May 2018 08:29:21 -0500
 
 click-reviewers-tools (0.47) RELEASED; urgency=medium
 

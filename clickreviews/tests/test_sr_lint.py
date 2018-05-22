@@ -1762,6 +1762,16 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
+    def test_check_apps_nondaemon_timer(self):
+        '''Test check_apps_nondaemon() - timer'''
+        self.set_test_snap_yaml("apps", {"foo": {"command": "bin/bar",
+                                                 "timer": "0:00-24:00/96"}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_nondaemon()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
     def test_check_apps_restart_condition_always(self):
         '''Test check_apps_restart-condition() - always'''
         entry = "always"
@@ -4245,6 +4255,51 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_manifest_yaml('parts', m['parts'])
         c = SnapReviewLint(self.test_name)
         c.check_snap_manifest()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_timer(self):
+        '''Test check_apps_timer()'''
+        good = ["0:00-24:00/96",
+                "9:00-11:00,,20:00-22:00",
+                "9:00-11:00/2,,20:00",
+                "9:00~11:00/2,,20:00",
+                "mon,10:00,,fri,15:00",
+                "mon-fri,10:00-11:00",
+                "fri-mon,10:00-11:00",
+                "mon5,10:00",
+                "mon2,10:00",
+                "mon2,mon1,10:00",
+                "mon1-mon3,10:00",
+                "mon,10:00~12:00,,fri,15:00",
+                "23:00~24:00/4",
+                "23:00~01:00/4",
+                "23:00-01:00/4",
+                "24:00",
+                ]
+        for timer in good:
+            self.set_test_snap_yaml("apps", {"bar": {"timer": timer}})
+            c = SnapReviewLint(self.test_name)
+            c.check_apps_timer()
+            r = c.click_report
+            expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+            self.check_results(r, expected_counts)
+
+    def test_check_apps_timer_bad_dict(self):
+        '''Test check_apps_timer() - bad dict'''
+        self.set_test_snap_yaml("apps", {"bar": {"timer": {}}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_timer()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_timer_bad_timer(self):
+        '''Test check_apps_timer() - bad timer'''
+        self.set_test_snap_yaml("apps", {"bar": {"timer": "m0n5,1o:oo"}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_timer()
         r = c.click_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
