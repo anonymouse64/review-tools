@@ -198,6 +198,7 @@ class SnapReview(Review):
                           'i2c': {'path/slots': ""},
                           'iio': {'path/slots': ""},
                           'mpris': {'name/slots': ""},
+                          'optical-drive': {'write/plugs': False},
                           'serial-port': {'path/slots': "",
                                           'usb-vendor/slots': 0,
                                           'usb-product/slots': 0,

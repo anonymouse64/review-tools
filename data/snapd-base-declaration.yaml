@@ -443,6 +443,12 @@
     allow-installation:
       slot-snap-type:
         - core
+    deny-connection:
+      plug-attributes:
+        write: true
+    deny-auto-connection:
+      plug-attributes:
+        write: true
   password-manager-service:
     allow-installation:
       slot-snap-type:
