@@ -271,6 +271,7 @@ func_execstack_overrides = ['checkbox-balboa',
                             'checkbox-snappy',
                             'checkbox-tillamook',
                             'store-checker',
+                            'enemy-territory',
                             ]
 
 # Some files from staged packages are known to have execstack, so don't flag
