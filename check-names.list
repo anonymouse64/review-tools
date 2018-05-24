@@ -204,7 +204,7 @@ lint-snap-v2:summary|
 lint-snap-v2:summary_present|
 lint-snap-v2:timer|
 lint-snap-v2:unknown_field|
-lint-snap-v2:unknown_hook|
+lint-snap-v2:unknown_hook|https://forum.snapcraft.io/t/supported-snap-hooks/3795
 lint-snap-v2:unknown_refresh_mode|
 lint-snap-v2:unknown_stop_mode|
 lint-snap-v2:valid_contents_for_architecture|

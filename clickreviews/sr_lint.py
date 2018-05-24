@@ -317,11 +317,13 @@ class SnapReviewLint(SnapReview):
         t = 'info'
         n = self._get_check_name('unknown_hook')
         s = 'OK'
+        link = None
         if len(unknown) > 0:
             t = 'warn'
             s = "unknown hooks in meta/hooks: '%s'" % \
                 (",".join(sorted(unknown)))
-        self._add_result(t, n, s)
+            link = 'https://forum.snapcraft.io/t/supported-snap-hooks/3795'
+        self._add_result(t, n, s, link=link)
 
     def check_icon(self):
         '''Check icon'''
