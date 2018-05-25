@@ -1702,6 +1702,9 @@ class SnapReviewLint(SnapReview):
         if not self.is_snap2 or 'apps' not in self.snap_yaml:
             return
 
+        dupes = []
+        seen = []
+
         for app in self.snap_yaml['apps']:
             key = 'common-id'
             if key not in self.snap_yaml['apps'][app]:
@@ -1715,6 +1718,17 @@ class SnapReviewLint(SnapReview):
                 t = 'error'
                 s = "%s '%s' (not a str)" % (key,
                                              self.snap_yaml['apps'][app][key])
+            self._add_result(t, n, s)
+
+            if self.snap_yaml['apps'][app][key] not in seen:
+                seen.append(self.snap_yaml['apps'][app][key])
+            else:
+                dupes.append(self.snap_yaml['apps'][app][key])
+
+        if len(dupes) > 0:
+            n = self._get_check_name('%s_duplicates' % key, app=app)
+            t = 'error'
+            s = "%s specified more than once for: %s" % (key, ", ".join(dupes))
             self._add_result(t, n, s)
 
     def check_interface_content_slot_source(self):

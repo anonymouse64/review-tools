@@ -133,6 +133,7 @@ lint-snap-v2:base_interfaces|
 lint-snap-v2:base_valid|
 lint-snap-v2:command|
 lint-snap-v2:common-id|
+lint-snap-v2:common-id_duplicates|
 lint-snap-v2:completer|
 lint-snap-v2:confinement_classic|https://forum.snapcraft.io/t/process-for-reviewing-classic-confinement-snaps/1460
 lint-snap-v2:confinement_classic_with_interfaces|https://launchpad.net/bugs/1655369
