@@ -216,6 +216,9 @@ sec_mode_overrides = {
     'openwrt': {  # demo from Canonical
         './rootfs/tmp': 'rwxrwxrwt',
     },
+    'snapd': {
+        './usr/lib/snapd/snap-confine': 'rwsr-sr-x',
+    },
     'ubuntu-core': {
         './bin/mount': 'rwsr-xr-x',
         './bin/ping': 'rwsr-xr-x',
