@@ -34,6 +34,9 @@ import time
 import types
 import yaml
 
+from clickreviews.overrides import (
+    common_external_symlink_override,
+)
 
 REPORT_OUTPUT = "json"
 RESULT_TYPES = ['info', 'warn', 'error']
@@ -826,6 +829,16 @@ def find_external_symlinks(unpack_dir, pkg_files, pkgname):
 
     def _is_external(link, pats, pkgname):
         rp = os.path.realpath(link)
+
+        if rp.startswith('/') and len(rp) > 1 and \
+                pkgname in common_external_symlink_override:
+            if rp.startswith(unpack_dir + "/"):
+                rel = os.path.relpath(rp, unpack_dir)
+            else:
+                rel = rp[1:]
+            if rel in common_external_symlink_override[pkgname]:
+                return False
+
         if not rp.startswith(unpack_dir + "/") and \
                 not rp.startswith(os.path.join("/snap", pkgname) + "/") and \
                 not rp.startswith(

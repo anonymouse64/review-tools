@@ -446,3 +446,10 @@ update_publisher_overrides = {
 update_binaries_ignore = ['linux-headers-generic',
                           'linux-libc-dev',
                           ]
+
+# Some snaps may have legitimate access for external symlinks. This only says
+# that some symlink may point to this target. It does not verify the name of
+# the symlink (only the target).
+common_external_symlink_override = {
+    'snapd': ['usr/lib/snapd/snap-device-helper'],
+}
