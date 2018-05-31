@@ -134,6 +134,11 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  daemon-notify:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   dbus:
     allow-installation:
       slot-snap-type:
@@ -249,6 +254,11 @@
       -
         plug-attributes:
           read: all
+  hostname-control:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   i2c:
     allow-installation:
       slot-snap-type:
@@ -625,4 +635,9 @@
   x11:
     allow-installation:
       slot-snap-type:
+        - app
         - core
+    deny-connection:
+      on-classic: false
+    deny-auto-connection:
+      on-classic: false
