@@ -274,8 +274,13 @@ sec_resquashfs_overrides = ['clion',  # jetbrains
                             'goland',
                             'intellij-idea-community',
                             'intellij-idea-ultimate',
+                            'kotlin',
+                            'kotlin-native',
                             'phpstorm',
+                            'pycharm-community',
+                            'pycharm-educational',
                             'pycharm-professional',
+                            'rider',
                             'rubymine',
                             'webstorm',  # end jetbrains
                             ]
