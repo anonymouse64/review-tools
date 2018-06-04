@@ -265,6 +265,20 @@ sec_mode_overrides = {
 sec_browser_support_overrides = ['screencloudplayer',
                                  'webdemo']
 
+# Snaps that for some reason do not resquash properly. This is primarily used
+# for partners that are stuck on an older snapcraft.
+sec_resquashfs_overrides = ['clion',  # jetbrains
+                            'clion-nsg',
+                            'datagrip',
+                            'gogland',
+                            'goland',
+                            'intellij-idea-community',
+                            'intellij-idea-ultimate',
+                            'phpstorm',
+                            'pycharm-professional',
+                            'rubymine',
+                            'webstorm',  # end jetbrains
+                            ]
 # Snaps that have legitimate need for executable stack but otherwise work fine
 # in strict mode
 func_execstack_overrides = ['checkbox-balboa',

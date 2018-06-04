@@ -31,6 +31,7 @@ from clickreviews.common import (
 from clickreviews.overrides import (
     sec_mode_overrides,
     sec_browser_support_overrides,
+    sec_resquashfs_overrides,
 )
 import os
 import re
@@ -186,7 +187,9 @@ class SnapReviewSecurity(SnapReview):
             s = 'could not stat squashfs'
             self._add_result(t, n, s)
             return
-        if '\nNumber of fragments 0\n' not in out and \
+
+        if self.snap_yaml['name'] not in sec_resquashfs_overrides and \
+                '\nNumber of fragments 0\n' not in out and \
                 ('SNAP_ENFORCE_RESQUASHFS' not in os.environ or
                  ('SNAP_ENFORCE_RESQUASHFS' in os.environ and
                   os.environ['SNAP_ENFORCE_RESQUASHFS'] != "0")):
@@ -347,6 +350,12 @@ class SnapReviewSecurity(SnapReview):
                 " ".join(mksquash_opts) + ". If using electron-builder, " \
                 "please upgrade to latest stable (>= 20.14.7). See %s " \
                 "for details." % link
+
+            pkgname = self.snap_yaml['name']
+            if pkgname in sec_resquashfs_overrides:
+                t = 'info'
+                s = "OK (check not enforced for this snap): %s" % s
+
             # FIXME: fakeroot sporadically fails and saves the wrong
             # uid/gid/mode into its save file, thus causing the mksquashfs to
             # create the wrong file/perms/ownership. We want to not ignore this
@@ -359,7 +368,6 @@ class SnapReviewSecurity(SnapReview):
             # and other snaps without sec_mode_overrides that specify
             # setuid/setgid. Eventually we'll fix fakeroot or do something else
             # so we can use this for all snaps, with or without -all-root.
-            pkgname = self.snap_yaml['name']
             if 'SNAP_FAKEROOT_RESQUASHFS' not in os.environ:
                 if self.snap_yaml['type'] in ['base', 'os']:
                     t = 'info'
