@@ -1062,7 +1062,56 @@ exit 1
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'security-snap-v2:squashfs_fragments'
-        expected['error'][name] = {"text": "The squashfs was built without '-no-fragments'. If using snapcraft, please upgrade to at least 2.38 and rebuild. Otherwise, please ensure the snap is built using 'mksquashfs <dir> <snap> -noappend -comp xz -all-root -no-xattrs -no-fragments'"}
+        expected['error'][name] = {"text": "The squashfs was built without '-no-fragments'. Please ensure the snap is created with either 'snapcraft pack <DIR>' (using snapcraft >= 2.38) or 'mksquashfs <dir> <snap> -noappend -comp xz -all-root -no-xattrs -no-fragments'. If using electron-builder, please upgrade to latest stable (>= 20.14.7). See https://forum.snapcraft.io/t/automated-reviews-and-snapcraft-2-38/4982/17 for details."}
+        self.check_results(report, expected=expected)
+
+    def test_check_squashfs_resquash_unsquash_fragments_override(self):
+        '''Test check_squashfs_resquash() - fragments - override'''
+        output_dir = self.mkdtemp()
+        package = utils.make_snap2(output_dir=output_dir)
+        c = SnapReviewSecurity(package)
+
+        # fake unsquashfs
+        unsquashfs = os.path.join(output_dir, 'unsquashfs')
+        content = '''#!/bin/sh
+if [ "$1" = "-s" ]; then
+    cat <<EOM
+...
+Number of fragments 3
+...
+EOM
+fi
+exit 0
+'''
+        with open(unsquashfs, 'w') as f:
+            f.write(content)
+        os.chmod(unsquashfs, 0o775)
+
+        old_path = os.environ['PATH']
+        if old_path:
+            os.environ['PATH'] = "%s:%s" % (output_dir, os.environ['PATH'])
+        else:
+            os.environ['PATH'] = output_dir  # pragma: nocover
+
+        os.environ['SNAP_ENFORCE_RESQUASHFS'] = "1"
+        # add this snap to the override
+        from clickreviews.overrides import sec_resquashfs_overrides
+        sec_resquashfs_overrides.append("test")
+        c.check_squashfs_resquash()
+        # then clean up
+        sec_resquashfs_overrides.remove("test")
+        os.environ.pop('SNAP_ENFORCE_RESQUASHFS')
+        os.environ['PATH'] = old_path
+        report = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'security-snap-v2:squashfs_fragments'
+        expected['info'][name] = {"text": "OK (check not enforced for this snap): The squashfs was built without '-no-fragments'. Please ensure the snap is created with either 'snapcraft pack <DIR>' (using snapcraft >= 2.38) or 'mksquashfs <dir> <snap> -noappend -comp xz -all-root -no-xattrs -no-fragments'. If using electron-builder, please upgrade to latest stable (>= 20.14.7). See https://forum.snapcraft.io/t/automated-reviews-and-snapcraft-2-38/4982/17 for details."}
         self.check_results(report, expected=expected)
 
     def test_check_squashfs_resquash_unsquashfs_fail(self):

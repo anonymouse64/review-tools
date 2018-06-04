@@ -188,17 +188,24 @@ class SnapReviewSecurity(SnapReview):
             self._add_result(t, n, s)
             return
 
-        if self.snap_yaml['name'] not in sec_resquashfs_overrides and \
-                '\nNumber of fragments 0\n' not in out and \
+        if '\nNumber of fragments 0\n' not in out and \
                 ('SNAP_ENFORCE_RESQUASHFS' not in os.environ or
                  ('SNAP_ENFORCE_RESQUASHFS' in os.environ and
                   os.environ['SNAP_ENFORCE_RESQUASHFS'] != "0")):
+            link = 'https://forum.snapcraft.io/t/automated-reviews-and-snapcraft-2-38/4982/17'
             t = 'error'
             n = self._get_check_name('squashfs_fragments')
-            s = "The squashfs was built without '-no-fragments'. If using " + \
-                "snapcraft, please upgrade to at least 2.38 and rebuild. " + \
-                "Otherwise, please ensure the snap is built using " \
-                "'mksquashfs <dir> <snap> %s'" % " ".join(MKSQUASHFS_OPTS)
+            s = "The squashfs was built without '-no-fragments'. Please " + \
+                "ensure the snap is created with either 'snapcraft pack " + \
+                "<DIR>' (using snapcraft >= 2.38) or 'mksquashfs <dir> " + \
+                "<snap> %s'" % " ".join(MKSQUASHFS_OPTS) + ". If using electron-builder, " \
+                "please upgrade to latest stable (>= 20.14.7). See %s " \
+                "for details." % link
+
+            if self.snap_yaml['name'] in sec_resquashfs_overrides:
+                t = 'info'
+                s = "OK (check not enforced for this snap): %s" % s
+
             self._add_result(t, n, s)
             return
 
