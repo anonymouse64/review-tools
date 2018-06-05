@@ -4315,6 +4315,91 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
+    def test_check_apps_before_after_with_before(self):
+        '''Test check_apps_before_after() - before'''
+        self.set_test_snap_yaml("apps", {
+                                "bar": {},
+                                "baz": {"before": ["bar"]},
+                                })
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_before_after()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_before_after_with_after(self):
+        '''Test check_apps_before_after() - after'''
+        self.set_test_snap_yaml("apps", {
+                                "bar": {},
+                                "baz": {"after": ["bar"]},
+                                })
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_before_after()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_before_after_with_both(self):
+        '''Test check_apps_before_after() - both'''
+        self.set_test_snap_yaml("apps", {
+                                "bar": {},
+                                "baz": {"after": ["bar"]},
+                                "norf": {"before": ["bar"]},
+                                })
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_before_after()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_before_after_empty(self):
+        '''Test check_apps_before_after() - empty'''
+        self.set_test_snap_yaml("apps", {
+                                "bar": {},
+                                "baz": {"before": []},
+                                })
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_before_after()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_before_after_bad(self):
+        '''Test check_apps_before_after() - bad'''
+        self.set_test_snap_yaml("apps", {
+                                "bar": {},
+                                "baz": {"before": "bad"},
+                                })
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_before_after()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_before_after_bad_entry(self):
+        '''Test check_apps_before_after() - bad'''
+        self.set_test_snap_yaml("apps", {
+                                "bar": {},
+                                "baz": {"before": [{}]},
+                                })
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_before_after()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_before_after_nonexistent(self):
+        '''Test check_apps_before_after() - bad'''
+        self.set_test_snap_yaml("apps", {
+                                "bar": {},
+                                "baz": {"before": ["nonexistent"]},
+                                })
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_before_after()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
 
 class TestSnapReviewLintNoMock(TestCase):
     """Tests without mocks where they are not needed."""

@@ -17,6 +17,7 @@ click-reviewers-tools (0.48) UNRELEASED; urgency=medium
     - add checks for refresh-mode and stop-mode
     - verify snap/manifest.yaml if it exists
     - add check for timer
+    - add check for before/after
   * sr_security.py:
     - fix evaluation of SNAP_ENFORCE_RESQUASHFS so '0' turns it off
     - turn on resquash tests by default
@@ -25,7 +26,7 @@ click-reviewers-tools (0.48) UNRELEASED; urgency=medium
   * rename gnome-online-accounts-service to accounts-service
   * add snap-updates-available
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 22 May 2018 08:29:21 -0500
+ -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 05 Jun 2018 17:25:27 -0500
 
 click-reviewers-tools (0.47) RELEASED; urgency=medium
 

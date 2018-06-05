@@ -89,7 +89,9 @@ class SnapReview(Review):
                                     }
 
     apps_required = ['command']
-    apps_optional = ['aliases',
+    apps_optional = ['after',
+                     'before',
+                     'aliases',
                      'common-id',
                      'completer',
                      'daemon',

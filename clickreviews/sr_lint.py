@@ -2014,3 +2014,50 @@ class SnapReviewLint(SnapReview):
                 t = 'error'
                 s = "'%s' not a valid timer" % timer
             self._add_result(t, n, s)
+
+    def check_apps_before_after(self):
+        '''Check apps - before/after'''
+        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+            return
+
+        for key in ['after', 'before']:
+            for app in self.snap_yaml['apps']:
+                if key not in self.snap_yaml['apps'][app]:
+                    continue
+
+                t = 'info'
+                n = self._get_check_name('%s' % key, app=app)
+                s = 'OK'
+                if not isinstance(self.snap_yaml['apps'][app][key], list):
+                    t = 'error'
+                    s = "%s '%s' (not a list)" % (
+                        key, self.snap_yaml['apps'][app][key])
+                    self._add_result(t, n, s)
+                    continue
+
+                if len(self.snap_yaml['apps'][app][key]) == 0:
+                    t = 'error'
+                    s = "%s '%s' (empty)" % (
+                        key, self.snap_yaml['apps'][app][key])
+                    self._add_result(t, n, s)
+                    continue
+
+                for key_app in self.snap_yaml['apps'][app][key]:
+                    if not isinstance(key_app, str):
+                        t = 'error'
+                        n = self._get_check_name('%s' % key, app=app,
+                                                 extra=key_app)
+                        s = "%s '%s' (not a str)" % (
+                            key, self.snap_yaml['apps'][app][key])
+                        self._add_result(t, n, s)
+                        continue
+
+                    t = 'info'
+                    n = self._get_check_name('%s_exists' % key, app=app,
+                                             extra=key_app)
+                    s = 'OK'
+                    if key_app not in self.snap_yaml['apps']:
+                        t = 'error'
+                        s = "Could not find non-existent app '%s' for '%s'" % \
+                            (key_app, key)
+                    self._add_result(t, n, s)

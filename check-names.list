@@ -114,6 +114,7 @@ lint:snappy_type_redflag|https://developer.ubuntu.com/en/snappy/guides/framework
 lint:snappy_type_valid|
 lint:snappy_unknown|
 lint:snappy_version_valid|
+lint-snap-v2:after_exists|
 lint-snap-v2:aliases_valid|https://forum.snapcraft.io/t/process-for-reviewing-aliases-auto-connections-and-track-requests/455
 lint-snap-v2:alias_valid|
 lint-snap-v2:app_plugs|
@@ -131,6 +132,8 @@ lint-snap-v2:assumes_valid|
 lint-snap-v2:base_allowed|
 lint-snap-v2:base_interfaces|
 lint-snap-v2:base_valid|
+lint-snap-v2:before|
+lint-snap-v2:before_exists|
 lint-snap-v2:command|
 lint-snap-v2:common-id|
 lint-snap-v2:common-id_duplicates|
