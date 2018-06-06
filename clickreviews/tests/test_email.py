@@ -27,8 +27,8 @@ class TestEmail(TestCase):
         '''Test sanitize_addr() - valid'''
         addresses = [('foo@bar.com', 'foo@bar.com'),
                      ('Foo Bar <foo.bar@example.com>', 'foo.bar@example.com'),
-                     ('snappy-canonical-storeaccount@canonical.com',
-                         'snappy-canonical-storeaccount@canonical.com'),
+                     ('snaps@canonical.com',
+                      'snaps@canonical.com'),
                      ]
         for (addr, expected) in addresses:
             self.assertEquals(sanitize_addr(addr), expected)

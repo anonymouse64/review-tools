@@ -388,8 +388,10 @@ canonical_snapcraft = ['evan.dandrea@canonical.com',
                        'sergio.schvezov@canonical.com',
                        ]
 
+# snaps@canonical.com used to be 'snappy-canonical-storeaccount@canonical.com'
+# but it was changed a little while ago
 update_publisher_overrides = {
-    'snappy-canonical-storeaccount@canonical.com': {
+    'snaps@canonical.com': {
         'aws-kernel': canonical_kernel,
         'azure-kernel': canonical_kernel,
         'base-18': canonical_snapd,

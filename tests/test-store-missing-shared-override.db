@@ -1,6 +1,6 @@
 [
   {
-    "publisher_email": "snappy-canonical-storeaccount@canonical.com",
+    "publisher_email": "snaps@canonical.com",
     "publisher_name": "Foo Bar",
     "name": "missing-publisher-overrides-snap-1",
     "revisions": [
@@ -20,7 +20,7 @@
     ]
   },
   {
-    "publisher_email": "snappy-canonical-storeaccount@canonical.com",
+    "publisher_email": "snaps@canonical.com",
     "publisher_name": "Foo Bar",
     "name": "missing-publisher-overrides-snap-2",
     "revisions": [
@@ -40,7 +40,7 @@
     ]
   },
   {
-    "publisher_email": "snappy-canonical-storeaccount@canonical.com",
+    "publisher_email": "snaps@canonical.com",
     "publisher_name": "Foo Bar",
     "name": "core",
     "revisions": [
