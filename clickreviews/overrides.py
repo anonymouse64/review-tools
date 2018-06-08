@@ -152,6 +152,9 @@ sec_mode_overrides = {
     'chromium': {  # chromium from Canonical
         './usr/lib/chromium-browser/chrome-sandbox': 'r-sr-xr-x',
     },
+    'chromium-mir-kiosk': {  # chromium from Canonical with XWayland, etc
+        './usr/lib/chromium-browser/chrome-sandbox': 'r-sr-xr-x',
+    },
     'core': {
         './bin/mount': 'rwsr-xr-x',
         './bin/ping': 'rwsr-xr-x',
@@ -262,8 +265,10 @@ sec_mode_overrides = {
 # Snaps that may specify 'daemon' with 'browser-support'. Normally this
 # shouldn't be granted because snaps running with 'daemon' run as root and this
 # grants more privileges than intended.
-sec_browser_support_overrides = ['screencloudplayer',
-                                 'webdemo']
+sec_browser_support_overrides = ['chromium-mir-kiosk',
+                                 'screencloudplayer',
+                                 'webdemo',
+                                 ]
 
 # Snaps that for some reason do not resquash properly. This is primarily used
 # for partners that are stuck on an older snapcraft.
@@ -397,6 +402,7 @@ update_publisher_overrides = {
         'base-18': canonical_snapd,
         'caracalla-kernel': canonical_hwe,
         'chromium': ['olivier.tilloy@canonical.com'] + canonical_desktop,
+        'chromium-mir-kiosk': ['olivier.tilloy@canonical.com'] + canonical_mir,
         'conjure-up': canonical_k8s,
         'core': canonical_snapd,
         'core18': canonical_snapd,
