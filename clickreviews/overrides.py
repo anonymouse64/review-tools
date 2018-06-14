@@ -39,6 +39,7 @@ redflagged_snap_types_overrides = {
                'gcp-kernel',
                'gke-kernel',
                'hummingboard-kernel',
+               'joule-drone-kernel',
                'joule-linux',
                'joule-linux-lool',
                'linux-generic-allwinner',
