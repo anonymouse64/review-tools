@@ -25,8 +25,9 @@ click-reviewers-tools (0.48) UNRELEASED; urgency=medium
     - quick check unsquash -s to detect if fragments are used
   * rename gnome-online-accounts-service to accounts-service
   * add snap-updates-available
+  * add 2.34 interfaces
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 05 Jun 2018 17:25:27 -0500
+ -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 10 Jul 2018 09:12:03 -0500
 
 click-reviewers-tools (0.47) RELEASED; urgency=medium
 

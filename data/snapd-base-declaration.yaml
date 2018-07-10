@@ -101,12 +101,27 @@
     deny-auto-connection:
       plug-attributes:
         allow-sandbox: true
+  calendar-service:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   camera:
     allow-installation:
       slot-snap-type:
         - core
     deny-auto-connection: true
+  can-bus:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   classic-support:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
+  contacts-service:
     allow-installation:
       slot-snap-type:
         - core
@@ -165,6 +180,11 @@
     deny-connection: true
     deny-auto-connection: true
   docker-support:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
+  dvb:
     allow-installation:
       slot-snap-type:
         - core
@@ -277,6 +297,11 @@
         - core
     deny-auto-connection: true
   joystick:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
+  juju-client-observe:
     allow-installation:
       slot-snap-type:
         - core
@@ -588,7 +613,9 @@
     allow-installation:
       slot-snap-type:
         - app
-    deny-connection: true
+        - core
+    deny-connection:
+      on-classic: false
     deny-auto-connection: true
   uhid:
     allow-installation:
