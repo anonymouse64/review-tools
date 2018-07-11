@@ -12,3 +12,4 @@ debian/tmp
 .coverage
 check-names.list.orig
 setup.cfg
+squashfs-root
