@@ -32,6 +32,7 @@ import glob
 import os
 import re
 import shlex
+import unicodedata
 
 
 class SnapReviewLint(SnapReview):
@@ -2128,3 +2129,48 @@ class SnapReviewLint(SnapReview):
                         s = "Could not find non-existent app '%s' for '%s'" % \
                             (key_app, key)
                     self._add_result(t, n, s)
+
+    def _has_invalid_unicode(self, value, allow_newlines=True):
+        '''Check if string contains invalid unicode chars'''
+        invalid = \
+            set(ch for ch in value
+                if (unicodedata.category(ch)[0] == "C" or ch == "\uFFFD") and
+                not (ch == '\n' and allow_newlines))
+        if not invalid:
+            return ""
+
+        if invalid == {'\n'}:
+            return "newlines not allowed"
+
+        return "control/private unicode characters not allowed"
+
+    def check_unicode_fields(self):
+        '''Check various fields for valid unicode'''
+        if not self.is_snap2:
+            return
+
+        errors = []
+        for field in self.snappy_required + self.snappy_optional:
+            if field not in self.snap_yaml:
+                continue
+
+            # These fields are verified elsewhere, so just check all fields
+            # that are strings
+            if not isinstance(self.snap_yaml[field], str):
+                continue
+
+            newlines_ok = False
+            if field == 'description':
+                newlines_ok = True
+
+            res = self._has_invalid_unicode(self.snap_yaml[field], newlines_ok)
+            if res != "":
+                errors.append("'%s' invalid: %s" % (field, res))
+
+        t = 'info'
+        n = self._get_check_name('valid_unicode')
+        s = 'ok'
+        if len(errors) > 0:
+            t = 'error'
+            s = "found errors in file output: %s" % ", ".join(errors)
+        self._add_result(t, n, s)

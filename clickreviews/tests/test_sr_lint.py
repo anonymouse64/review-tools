@@ -4573,6 +4573,66 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
+    def test_check_unicode_fields(self):
+        '''Test check_unicode_fields()'''
+        c = SnapReviewLint(self.test_name)
+        c.check_unicode_fields()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_unicode_fields_description_newline(self):
+        '''Test check_unicode_fields() - description (newline)'''
+        self.set_test_snap_yaml("description", "invalid\nnewline")
+        c = SnapReviewLint(self.test_name)
+        c.check_unicode_fields()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_unicode_fields_description_invalid_unicode(self):
+        '''Test check_unicode_fields() - description (invalid unicode)'''
+        self.set_test_snap_yaml("description", "new\ninvalid \u200b")
+        c = SnapReviewLint(self.test_name)
+        c.check_unicode_fields()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'lint-snap-v2:valid_unicode'
+        expected['error'][name] = {"text": "found errors in file output: 'description' invalid: control/private unicode characters not allowed"}
+        self.check_results(r, expected=expected)
+
+    def test_check_unicode_fields_summary_invalid_unicode(self):
+        '''Test check_unicode_fields() - summary (invalid unicode)'''
+        self.set_test_snap_yaml("summary", "invalid \u200b")
+        c = SnapReviewLint(self.test_name)
+        c.check_unicode_fields()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'lint-snap-v2:valid_unicode'
+        expected['error'][name] = {"text": "found errors in file output: 'summary' invalid: control/private unicode characters not allowed"}
+        self.check_results(r, expected=expected)
+
+    def test_check_unicode_fields_summary_invalid_newline(self):
+        '''Test check_unicode_fields() - summary (invalid newline)'''
+        self.set_test_snap_yaml("summary", "invalid\nnewline")
+        c = SnapReviewLint(self.test_name)
+        c.check_unicode_fields()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
 
 class TestSnapReviewLintNoMock(TestCase):
     """Tests without mocks where they are not needed."""
