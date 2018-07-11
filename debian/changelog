@@ -18,6 +18,7 @@ click-reviewers-tools (0.48) UNRELEASED; urgency=medium
     - verify snap/manifest.yaml if it exists
     - add check for timer
     - add check for before/after
+    - update epoch checks for new yaml (LP: #1780981)
   * sr_security.py:
     - fix evaluation of SNAP_ENFORCE_RESQUASHFS so '0' turns it off
     - turn on resquash tests by default

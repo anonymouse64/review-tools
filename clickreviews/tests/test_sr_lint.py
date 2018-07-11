@@ -2855,8 +2855,8 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
-    def test_check_epoch(self):
-        '''Test check_epoch'''
+    def test_check_epoch_simple(self):
+        '''Test check_epoch - simple integer'''
         self.set_test_snap_yaml("epoch", 2)
         c = SnapReviewLint(self.test_name)
         c.check_epoch()
@@ -2864,7 +2864,34 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
-    def test_check_epoch_negative(self):
+    def test_check_epoch_simple_transition(self):
+        '''Test check_epoch - simple transition'''
+        self.set_test_snap_yaml("epoch", "3*")
+        c = SnapReviewLint(self.test_name)
+        c.check_epoch()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_epoch_simple_zero(self):
+        '''Test check_epoch - simple 0'''
+        self.set_test_snap_yaml("epoch", 0)
+        c = SnapReviewLint(self.test_name)
+        c.check_epoch()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_epoch_simple_bad(self):
+        '''Test check_epoch - string'''
+        self.set_test_snap_yaml("epoch", "abc")
+        c = SnapReviewLint(self.test_name)
+        c.check_epoch()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_epoch_simple_bad_negative(self):
         '''Test check_epoch - negative'''
         self.set_test_snap_yaml("epoch", -1)
         c = SnapReviewLint(self.test_name)
@@ -2873,9 +2900,138 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
-    def test_check_epoch_decimal(self):
+    def test_check_epoch_simple_bad_negative_transition(self):
+        '''Test check_epoch - negative transition'''
+        self.set_test_snap_yaml("epoch", "-1*")
+        c = SnapReviewLint(self.test_name)
+        c.check_epoch()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_epoch_simple_bad_decimal(self):
         '''Test check_epoch - decimal'''
         self.set_test_snap_yaml("epoch", 1.01)
+        c = SnapReviewLint(self.test_name)
+        c.check_epoch()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_epoch_full_empty(self):
+        '''Test check_epoch - full - empty'''
+        self.set_test_snap_yaml("epoch", {})
+        c = SnapReviewLint(self.test_name)
+        c.check_epoch()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_epoch_full_unknown(self):
+        '''Test check_epoch - full - unknown'''
+        self.set_test_snap_yaml("epoch", {'bad': [1]})
+        c = SnapReviewLint(self.test_name)
+        c.check_epoch()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_epoch_full_read(self):
+        '''Test check_epoch - full read'''
+        self.set_test_snap_yaml("epoch", {'read': [3, 4, 5]})
+        c = SnapReviewLint(self.test_name)
+        c.check_epoch()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_epoch_full_read_zero(self):
+        '''Test check_epoch - zero'''
+        self.set_test_snap_yaml("epoch", {'read': [0, 1]})
+        c = SnapReviewLint(self.test_name)
+        c.check_epoch()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_epoch_full_read_bad_transition(self):
+        '''Test check_epoch - bad full read (transition)'''
+        self.set_test_snap_yaml("epoch", {'read': ["3*"]})
+        c = SnapReviewLint(self.test_name)
+        c.check_epoch()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_epoch_full_read_bad_int(self):
+        '''Test check_epoch - bad full read - int'''
+        self.set_test_snap_yaml("epoch", {'read': 3})
+        c = SnapReviewLint(self.test_name)
+        c.check_epoch()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_epoch_full_read_bad_negative(self):
+        '''Test check_epoch - bad full read - negative'''
+        self.set_test_snap_yaml("epoch", {'read': [1, -2, 3]})
+        c = SnapReviewLint(self.test_name)
+        c.check_epoch()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_epoch_full_write(self):
+        '''Test check_epoch - full write'''
+        self.set_test_snap_yaml("epoch", {'write': [3, 4, 5]})
+        c = SnapReviewLint(self.test_name)
+        c.check_epoch()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_epoch_full_write_bad_transition(self):
+        '''Test check_epoch - bad full write (transition)'''
+        self.set_test_snap_yaml("epoch", {'write': ["3*"]})
+        c = SnapReviewLint(self.test_name)
+        c.check_epoch()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_epoch_full_write_bad_int(self):
+        '''Test check_epoch - bad full write - int'''
+        self.set_test_snap_yaml("epoch", {'write': 3})
+        c = SnapReviewLint(self.test_name)
+        c.check_epoch()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_epoch_full_read_write(self):
+        '''Test check_epoch - full read/write'''
+        self.set_test_snap_yaml("epoch", {'read': [3, 4, 5],
+                                          'write': [4, 5]})
+        c = SnapReviewLint(self.test_name)
+        c.check_epoch()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_epoch_full_read_write_bad_transition(self):
+        '''Test check_epoch - bad full read/write (transition)'''
+        self.set_test_snap_yaml("epoch", {'read': [3, 4, 5],
+                                          'write': ["3*"]})
+        c = SnapReviewLint(self.test_name)
+        c.check_epoch()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_epoch_full_read_write_bad_int(self):
+        '''Test check_epoch - bad full read/write - int'''
+        self.set_test_snap_yaml("epoch", {'read': 3,
+                                          'write': [4, 5]})
         c = SnapReviewLint(self.test_name)
         c.check_epoch()
         r = c.click_report
@@ -2889,15 +3045,6 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c.check_epoch()
         r = c.click_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
-        self.check_results(r, expected_counts)
-
-    def test_check_epoch_bad(self):
-        '''Test check_epoch - string'''
-        self.set_test_snap_yaml("epoch", "abc")
-        c = SnapReviewLint(self.test_name)
-        c.check_epoch()
-        r = c.click_report
-        expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
     def test_check_confinement_strict(self):

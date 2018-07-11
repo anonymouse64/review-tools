@@ -1154,14 +1154,75 @@ class SnapReviewLint(SnapReview):
         t = 'info'
         n = self._get_check_name('epoch_valid')
         s = 'OK'
-        if not isinstance(self.snap_yaml['epoch'], int):
+
+        # Valid formats:
+        # - simple
+        #   epoch: 0
+        #   epoch: n (where n > 0)
+        #   epoch: n* (where n > 0)
+        # - full
+        #   epoch:
+        #     read: [n-1, n]
+        #   epoch:
+        #     write: [n-1, n]
+        #   epoch:
+        #     read: [n-2, n-1, n]
+        #     write: [n-1, n]
+
+        simple = "positive integer with optional trailing '*'"
+
+        if isinstance(self.snap_yaml['epoch'], int):  # epoch: n
+            if int(self.snap_yaml['epoch']) < 0:
+                t = 'error'
+                s = "malformed 'epoch': '%s' should be %s" % (
+                    self.snap_yaml['epoch'], simple)
+        elif isinstance(self.snap_yaml['epoch'], str):  # epoch: n*
+            if not re.search(r'^[0-9]+\*?$', self.snap_yaml['epoch']):
+                t = 'error'
+                s = "malformed 'epoch': '%s' should be %s" % (
+                    self.snap_yaml['epoch'], simple)
+        elif isinstance(self.snap_yaml['epoch'], dict):  # full syntax
+            if len(self.snap_yaml['epoch']) == 0:
+                t = 'error'
+                s = 'malformed full syntax for epoch (empty)'
+                self._add_result(t, n, s)
+                return
+
+            allowed = ['read', 'write']
+            for k in self.snap_yaml['epoch']:
+                if k not in allowed:
+                    t = 'error'
+                    s = "malformed full syntax for epoch: '%s' unknown" % k
+                    self._add_result(t, n, s)
+                    return
+
+            for k in allowed:
+                if k not in self.snap_yaml['epoch']:
+                    continue
+                if not isinstance(self.snap_yaml['epoch'][k], list):
+                    t = 'error'
+                    s = "malformed full syntax for epoch: '%s' not a list" % k
+                    self._add_result(t, n, s)
+                    return
+
+                for i in self.snap_yaml['epoch'][k]:
+                    if not isinstance(i, int):
+                        t = 'error'
+                        s = "malformed full syntax for epoch: '%s' " % k + \
+                            "not a list of positive integers"
+                        self._add_result(t, n, s)
+                        return
+
+                    if i < 0:
+                        t = 'error'
+                        s = "malformed 'epoch': '%s' in '%s' should be %s" % \
+                            (i, k, simple)
+                        self._add_result(t, n, s)
+                        return
+        else:
             t = 'error'
-            s = "malformed 'epoch': %s (not an integer)" % (
-                self.snap_yaml['epoch'])
-        elif int(self.snap_yaml['epoch']) < 0:
-            t = 'error'
-            s = "malformed 'epoch': '%s' should be positive integer" % (
-                self.snap_yaml['epoch'])
+            s = "malformed 'epoch'. Should use simple syntax of '%s' or full syntax with read and/or write lists of positive integers"
+
         self._add_result(t, n, s)
 
     def check_confinement(self):
