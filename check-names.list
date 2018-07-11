@@ -212,6 +212,7 @@ lint-snap-v2:unknown_hook|https://forum.snapcraft.io/t/supported-snap-hooks/3795
 lint-snap-v2:unknown_refresh_mode|
 lint-snap-v2:unknown_stop_mode|
 lint-snap-v2:valid_contents_for_architecture|
+lint-snap-v2:valid_unicode|
 lint-snap-v2:vcs_files|
 lint-snap-v2:version_valid|
 online_accounts:account-application_hook|
