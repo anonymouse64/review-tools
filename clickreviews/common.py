@@ -63,6 +63,7 @@ MKSQUASHFS_OPTS = ['-noappend', '-comp', 'xz', '-all-root', '-no-xattrs',
 AA_PROFILE_NAME_MAXLEN = 230  # 245 minus a bit for child profiles
 AA_PROFILE_NAME_ADVLEN = 100
 # Store enforces this length for snap v2
+STORE_PKGNAME_SNAPV2_MINLEN = 2
 STORE_PKGNAME_SNAPV2_MAXLEN = 40
 # Per noise: "07:33 < noise> jdstrand: yeah, i think 5GB compressed would be a
 # good/reasonable limit for now

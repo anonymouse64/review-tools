@@ -164,6 +164,15 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
+    def test_check_name_toplevel_minlen_for_store(self):
+        '''Test check_name - toplevel minlen for store'''
+        self.set_test_snap_yaml("name", "aa")
+        c = SnapReviewLint(self.test_name)
+        c.check_name()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
     def test_check_name_toplevel_too_long_for_store(self):
         '''Test check_name - toplevel too long for store'''
         self.set_test_snap_yaml("name", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa41chars")
@@ -179,6 +188,23 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected['info'] = dict()
         name = 'lint-snap-v2:name_valid'
         expected['error'][name] = {"text": "malformed 'name': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa41chars' (length '41' exceeds store limit '40')"}
+        self.check_results(r, expected=expected)
+
+    def test_check_name_toplevel_too_short_for_store(self):
+        '''Test check_name - toplevel too short for store'''
+        self.set_test_snap_yaml("name", "a")
+        c = SnapReviewLint(self.test_name)
+        c.check_name()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'lint-snap-v2:name_valid'
+        expected['error'][name] = {"text": "malformed 'name': 'a' (length '1' below store limit '2')"}
         self.check_results(r, expected=expected)
 
     def test_check_name_toplevel_efficient(self):

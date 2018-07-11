@@ -21,6 +21,7 @@ from clickreviews.sr_common import (
 from clickreviews.common import (
     find_external_symlinks,
     STORE_PKGNAME_SNAPV2_MAXLEN,
+    STORE_PKGNAME_SNAPV2_MINLEN,
 )
 from clickreviews.overrides import (
     redflagged_snap_types_overrides,
@@ -189,6 +190,11 @@ class SnapReviewLint(SnapReview):
             s = "malformed 'name': '%s' " % self.snap_yaml['name'] + \
                 "(length '%d' " % len(self.snap_yaml['name']) + \
                 "exceeds store limit '%d')" % STORE_PKGNAME_SNAPV2_MAXLEN
+        elif len(self.snap_yaml['name']) < STORE_PKGNAME_SNAPV2_MINLEN:
+            t = 'error'
+            s = "malformed 'name': '%s' " % self.snap_yaml['name'] + \
+                "(length '%d' " % len(self.snap_yaml['name']) + \
+                "below store limit '%d')" % STORE_PKGNAME_SNAPV2_MINLEN
         elif not self._verify_pkgname(self.snap_yaml['name']):
             t = 'error'
             s = "malformed 'name': '%s' " % self.snap_yaml['name'] + \
@@ -1169,7 +1175,7 @@ class SnapReviewLint(SnapReview):
         #     read: [n-2, n-1, n]
         #     write: [n-1, n]
 
-        simple = "positive integer with optional trailing '*'"
+        simple = "0 or positive integer with optional trailing '*'"
 
         if isinstance(self.snap_yaml['epoch'], int):  # epoch: n
             if int(self.snap_yaml['epoch']) < 0:
