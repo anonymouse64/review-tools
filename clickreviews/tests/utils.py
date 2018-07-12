@@ -15,7 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from clickreviews.common import (
-    MKSQUASHFS_OPTS
+    MKSQUASHFS_OPTS,
+    cmd
 )
 import json
 import os
@@ -310,3 +311,10 @@ def build_package(path, name, version, pkgfmt_type, pkgfmt_version,
         # construct the click without filtering any files in the build dir.
         subprocess.check_call(['dpkg-deb', '-b', path, output_path])
     return output_path
+
+
+def debian_architecture():
+    (rc, out) = cmd(['dpkg-architecture', '-q', 'DEB_HOST_ARCH'])
+    if rc != 0:
+        return None
+    return out

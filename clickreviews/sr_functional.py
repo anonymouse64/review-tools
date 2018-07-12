@@ -66,6 +66,12 @@ class SnapReviewFunctional(SnapReview):
         link = None
         bins = []
 
+        # execstack not supported on arm64, so skip this check on arm64
+        if 'SNAP_ARCH' in os.environ and os.environ['SNAP_ARCH'] == "arm64":
+            s = 'OK (skipped on %s)' % os.environ['SNAP_ARCH']
+            self._add_result(t, n, s, link=link)
+            return
+
         skipped_pats = []
         for p in func_execstack_skipped_pats:
             skipped_pats.append(re.compile(r'%s' % p))

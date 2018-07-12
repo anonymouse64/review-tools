@@ -90,6 +90,10 @@ class TestSnapReviewFunctionalNoMock(TestCase):
 
     def test_check_execstack(self):
         '''Test check_execstack() - execstack found execstack binary'''
+        os.environ['SNAP_ARCH'] = utils.debian_architecture()
+        if os.environ['SNAP_ARCH'] == "arm64":  # doesn't work on arm64
+            return
+
         # copy /bin/ls nonexecstack.bin
         package = utils.make_snap2(output_dir=self.mkdtemp(),
                                    extra_files=['/bin/ls:nonexecstack.bin']
@@ -102,6 +106,10 @@ class TestSnapReviewFunctionalNoMock(TestCase):
 
     def test_check_execstack_found_binary(self):
         '''Test check_execstack() - execstack found execstack binary'''
+        os.environ['SNAP_ARCH'] = utils.debian_architecture()
+        if os.environ['SNAP_ARCH'] == "arm64":  # doesn't work on arm64
+            return
+
         output_dir = self.mkdtemp()
         fn = os.path.join(output_dir, "hasexecstack.bin")
         shutil.copyfile('/bin/ls', fn)
@@ -126,6 +134,10 @@ class TestSnapReviewFunctionalNoMock(TestCase):
 
     def test_check_execstack_found_binary_devmode(self):
         '''Test check_execstack() - execstack found execstack binary - devmode'''
+        os.environ['SNAP_ARCH'] = utils.debian_architecture()
+        if os.environ['SNAP_ARCH'] == "arm64":  # doesn't work on arm64
+            return
+
         output_dir = self.mkdtemp()
         fn = os.path.join(output_dir, "hasexecstack.bin")
         shutil.copyfile('/bin/ls', fn)
@@ -157,6 +169,10 @@ confinement: devmode
 
     def test_check_execstack_found_binary_override(self):
         '''Test check_execstack() - execstack found execstack binary - override'''
+        os.environ['SNAP_ARCH'] = utils.debian_architecture()
+        if os.environ['SNAP_ARCH'] == "arm64":  # doesn't work on arm64
+            return
+
         output_dir = self.mkdtemp()
         fn = os.path.join(output_dir, "hasexecstack.bin")
         shutil.copyfile('/bin/ls', fn)
@@ -184,6 +200,10 @@ confinement: devmode
 
     def test_check_execstack_os(self):
         '''Test check_execstack() - os snap'''
+        os.environ['SNAP_ARCH'] = utils.debian_architecture()
+        if os.environ['SNAP_ARCH'] == "arm64":  # doesn't work on arm64
+            return
+
         output_dir = self.mkdtemp()
         fn = os.path.join(output_dir, "hasexecstack.bin")
         shutil.copyfile('/bin/ls', fn)
@@ -207,6 +227,10 @@ type: os
 
     def test_check_execstack_rc_nonzero(self):
         '''Test check_execstack() - execstack returns non-zero'''
+        os.environ['SNAP_ARCH'] = utils.debian_architecture()
+        if os.environ['SNAP_ARCH'] == "arm64":  # doesn't work on arm64
+            return
+
         package = utils.make_snap2(output_dir=self.mkdtemp())
         c = SnapReviewFunctional(package)
         c.pkg_bin_files = ["path/to/nonexistent/file"]
@@ -218,6 +242,10 @@ type: os
     def test_check_execstack_binary_skip(self):
         '''Test check_execstack() - execstack found only skipped execstack
            binaries'''
+        os.environ['SNAP_ARCH'] = utils.debian_architecture()
+        if os.environ['SNAP_ARCH'] == "arm64":  # doesn't work on arm64
+            return
+
         test_files = ['boot/memtest86+_multiboot.bin',
                       'lib/klibc-T5LXP1hTwH_ezt-1EUSxPbNR_es.so',
                       'usr/alpha-linux-gnu/lib/libgnatprj.so.6',
@@ -257,6 +285,10 @@ type: os
 
     def test_check_execstack_found_with_binary_skip(self):
         '''Test check_execstack() - execstack found skipped execstack binary'''
+        os.environ['SNAP_ARCH'] = utils.debian_architecture()
+        if os.environ['SNAP_ARCH'] == "arm64":  # doesn't work on arm64
+            return
+
         test_files = ['hasexecstack.bin',
                       'usr/lib/klibc/bin/cat',
                       ]
@@ -290,3 +322,20 @@ type: os
         self.assertTrue(report['warn'][name]['text'].startswith("Found files with executable stack"))
         self.assertTrue('hasexecstack.bin' in report['warn'][name]['text'])
         self.assertTrue('klibc' not in report['warn'][name]['text'])
+
+    def test_check_execstack_skipped_arm64(self):
+        '''Test check_execstack() - skipped on arm64'''
+        os.environ['SNAP_ARCH'] = "arm64"
+
+        package = utils.make_snap2()
+        c = SnapReviewFunctional(package)
+        c.check_execstack()
+        report = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(report, expected_counts)
+
+        self.assertTrue('info' in report)
+        name = 'functional-snap-v2:execstack'
+        self.assertTrue(name in report['info'])
+        self.assertTrue('text' in report['info'][name])
+        self.assertTrue(report['info'][name]['text'] == ("OK (skipped on arm64)"))
