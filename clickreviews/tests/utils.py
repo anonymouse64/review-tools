@@ -314,7 +314,7 @@ def build_package(path, name, version, pkgfmt_type, pkgfmt_version,
 
 
 def debian_architecture():
-    (rc, out) = cmd(['dpkg-architecture', '-q', 'DEB_HOST_ARCH'])
+    (rc, out) = cmd(['dpkg-architecture', '-q', 'DEB_BUILD_ARCH'])
     if rc != 0:
-        return None
+        raise ValueError("Could not determined DEB_BUILD_ARCH")
     return out
