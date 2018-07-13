@@ -91,6 +91,8 @@ class TestSnapReviewFunctionalNoMock(TestCase):
     def test_check_execstack(self):
         '''Test check_execstack() - execstack found execstack binary'''
         os.environ['SNAP_ARCH'] = utils.debian_architecture()
+        if os.environ['SNAP_ARCH'] == "arm64":  # unsupported on arm64
+            return
 
         # copy /bin/ls nonexecstack.bin
         package = utils.make_snap2(output_dir=self.mkdtemp(),
@@ -105,6 +107,8 @@ class TestSnapReviewFunctionalNoMock(TestCase):
     def test_check_execstack_found_binary(self):
         '''Test check_execstack() - execstack found execstack binary'''
         os.environ['SNAP_ARCH'] = utils.debian_architecture()
+        if os.environ['SNAP_ARCH'] == "arm64":  # unsupported on arm64
+            return
 
         output_dir = self.mkdtemp()
         fn = os.path.join(output_dir, "hasexecstack.bin")
@@ -131,6 +135,8 @@ class TestSnapReviewFunctionalNoMock(TestCase):
     def test_check_execstack_found_binary_devmode(self):
         '''Test check_execstack() - execstack found execstack binary - devmode'''
         os.environ['SNAP_ARCH'] = utils.debian_architecture()
+        if os.environ['SNAP_ARCH'] == "arm64":  # unsupported on arm64
+            return
 
         output_dir = self.mkdtemp()
         fn = os.path.join(output_dir, "hasexecstack.bin")
@@ -164,6 +170,8 @@ confinement: devmode
     def test_check_execstack_found_binary_override(self):
         '''Test check_execstack() - execstack found execstack binary - override'''
         os.environ['SNAP_ARCH'] = utils.debian_architecture()
+        if os.environ['SNAP_ARCH'] == "arm64":  # unsupported on arm64
+            return
 
         output_dir = self.mkdtemp()
         fn = os.path.join(output_dir, "hasexecstack.bin")
@@ -193,6 +201,8 @@ confinement: devmode
     def test_check_execstack_os(self):
         '''Test check_execstack() - os snap'''
         os.environ['SNAP_ARCH'] = utils.debian_architecture()
+        if os.environ['SNAP_ARCH'] == "arm64":  # unsupported on arm64
+            return
 
         output_dir = self.mkdtemp()
         fn = os.path.join(output_dir, "hasexecstack.bin")
@@ -218,6 +228,8 @@ type: os
     def test_check_execstack_rc_nonzero(self):
         '''Test check_execstack() - execstack returns non-zero'''
         os.environ['SNAP_ARCH'] = utils.debian_architecture()
+        if os.environ['SNAP_ARCH'] == "arm64":  # unsupported on arm64
+            return
 
         package = utils.make_snap2(output_dir=self.mkdtemp())
         c = SnapReviewFunctional(package)
@@ -231,6 +243,8 @@ type: os
         '''Test check_execstack() - execstack found only skipped execstack
            binaries'''
         os.environ['SNAP_ARCH'] = utils.debian_architecture()
+        if os.environ['SNAP_ARCH'] == "arm64":  # unsupported on arm64
+            return
 
         test_files = ['boot/memtest86+_multiboot.bin',
                       'lib/klibc-T5LXP1hTwH_ezt-1EUSxPbNR_es.so',
@@ -272,6 +286,8 @@ type: os
     def test_check_execstack_found_with_binary_skip(self):
         '''Test check_execstack() - execstack found skipped execstack binary'''
         os.environ['SNAP_ARCH'] = utils.debian_architecture()
+        if os.environ['SNAP_ARCH'] == "arm64":  # unsupported on arm64
+            return
 
         test_files = ['hasexecstack.bin',
                       'usr/lib/klibc/bin/cat',
