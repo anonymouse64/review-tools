@@ -317,4 +317,4 @@ def debian_architecture():
     (rc, out) = cmd(['dpkg-architecture', '-q', 'DEB_BUILD_ARCH'])
     if rc != 0:
         raise ValueError("Could not determined DEB_BUILD_ARCH")
-    return out
+    return out.strip()
