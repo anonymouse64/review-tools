@@ -472,6 +472,7 @@ update_publisher_overrides = {
         'lxd': canonical_lxd,
         'microk8s': canonical_k8s,
         'mir-kiosk': canonical_mir,
+        'mir-kiosk-apps': canonical_mir,
         'modem-manager': canonical_enablement,
         'multipass': canonical_multipass,
         'network-manager': canonical_enablement,
