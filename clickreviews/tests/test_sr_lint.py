@@ -5748,3 +5748,83 @@ Type=Application
         r = c.click_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
+
+    def test_check_meta_gui_desktop_missing_mir_kiosk(self):
+        '''Test check_meta_gui_desktop() - missing - mir-kiosk'''
+        output_dir = self.mkdtemp()
+        path = os.path.join(output_dir, 'snap.yaml')
+        content = '''
+name: testme
+version: 0.1
+summary: some thing
+description: some desc
+plugs:
+  foo:
+    interface: content
+    default-provider: mir-kiosk
+apps:
+  testme:
+    command: bin/foo
+    plugs: [ x11 ]
+'''
+        with open(path, 'w') as f:
+            f.write(content)
+
+        package = utils.make_snap2(output_dir=output_dir,
+                                   extra_files=[
+                                       '%s:meta/snap.yaml' % path,
+                                   ]
+                                   )
+        c = SnapReviewLint(package)
+        c.check_meta_gui_desktop()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'lint-snap-v2:meta_gui_desktop'
+        expected['info'][name] = {"text": "OK (using x11 with mir-kiosk)"}
+        self.check_results(r, expected=expected)
+
+    def test_check_meta_gui_desktop_missing_not_mir_kiosk(self):
+        '''Test check_meta_gui_desktop() - missing - not mir-kiosk'''
+        output_dir = self.mkdtemp()
+        path = os.path.join(output_dir, 'snap.yaml')
+        content = '''
+name: testme
+version: 0.1
+summary: some thing
+description: some desc
+plugs:
+  foo:
+    interface: content
+    default-provider: something-else
+apps:
+  testme:
+    command: bin/foo
+    plugs: [ x11 ]
+'''
+        with open(path, 'w') as f:
+            f.write(content)
+
+        package = utils.make_snap2(output_dir=output_dir,
+                                   extra_files=[
+                                       '%s:meta/snap.yaml' % path,
+                                   ]
+                                   )
+        c = SnapReviewLint(package)
+        c.check_meta_gui_desktop()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 1, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'lint-snap-v2:meta_gui_desktop'
+        expected['warn'][name] = {"text": "desktop interfaces (x11) specified without a corresponding meta/gui/*.desktop file. If using snapcraft, please see https://snapcraft.io/docs/build-snaps/metadata#fixed-assets. Otherwise, please provide a desktop file in meta/gui/*.desktop (it should reference one of the 'apps' from your snapcraft/snap.yaml)."}
+        self.check_results(r, expected=expected)

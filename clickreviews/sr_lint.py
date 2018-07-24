@@ -1515,6 +1515,18 @@ class SnapReviewLint(SnapReview):
         if not self.is_snap2:
             return
 
+        default_provider_is_mir = False
+        if self._uses_interface("plugs", "content"):
+            if "plugs" in self.snap_yaml:
+                for ref in self.snap_yaml["plugs"]:
+                    spec = self.snap_yaml["plugs"][ref]
+                    if isinstance(spec, dict) and \
+                            'interface' in spec and \
+                            spec['interface'] == "content" and \
+                            'default-provider' in spec and \
+                            spec['default-provider'] == "mir-kiosk":
+                        default_provider_is_mir = True
+
         has_desktop_files = False
         for f in self.pkg_files:
             fn = os.path.relpath(f, self._get_unpack_dir())
@@ -1538,6 +1550,10 @@ class SnapReviewLint(SnapReview):
             if self.snap_yaml['name'] in desktop_file_exception:
                 t = 'info'
                 s = "OK (overidden)"
+            elif self._uses_interface("plugs", "x11") and \
+                    default_provider_is_mir:
+                t = 'info'
+                s = "OK (using x11 with mir-kiosk)"
             else:
                 t = 'warn'
                 s = "desktop interfaces " + \
