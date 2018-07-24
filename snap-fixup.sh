@@ -25,5 +25,12 @@ sed -e 's#^FAKEROOT_PREFIX=#FAKEROOT_PREFIX=$SNAP#' \
     "$SNAPDIR"/usr/bin/fakeroot-sysv > ./fakeroot-sysv
 mv -f ./fakeroot-sysv "$SNAPDIR"/usr/bin/fakeroot-sysv
 chmod 755 "$SNAPDIR"/usr/bin/fakeroot-sysv
+cd -
+
+echo "Symlinking libmagic.so"
+libmagic=$(find "$SNAPDIR"/usr/lib -name libmagic.so.1.0.0)
+cd $(dirname "$libmagic")
+ln -s libmagic.so.1.0.0 libmagic.so
+cd -
 
 rmdir "$SNAPTMP"
