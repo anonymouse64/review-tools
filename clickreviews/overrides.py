@@ -447,6 +447,7 @@ update_publisher_overrides = {
         'chromium-mir-kiosk': ['olivier.tilloy@canonical.com'] + canonical_mir,
         'conjure-up': canonical_k8s,
         'core': canonical_snapd,
+        'core16': canonical_snapd,
         'core18': canonical_snapd,
         'dragonboard-kernel': canonical_kernel,
         'eog': canonical_desktop,
