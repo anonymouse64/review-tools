@@ -484,6 +484,7 @@ update_publisher_overrides = {
         'pi2-kernel': canonical_kernel,
         'quadrapassel': canonical_desktop,
         'simple-scan': canonical_desktop,
+        'smt': canonical_security,
         'snapcraft': canonical_snapcraft,
         'snapd': canonical_snapd,
         'snappy-debug': canonical_security,
