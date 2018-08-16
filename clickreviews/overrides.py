@@ -64,7 +64,8 @@ redflagged_snap_types_overrides = {
     'os': ['core',
            'ubuntu-core'
            ],
-    'gadget': ['dragonboard',  # Canonical reference gadgets
+    'gadget': ['cm3',        # Canonical reference gadgets
+               'dragonboard',
                'pc',
                'pi2',
                'pi3',
