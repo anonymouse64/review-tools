@@ -260,6 +260,15 @@ sec_mode_overrides = {
     'openwrt': {  # demo from Canonical
         './rootfs/tmp': 'rwxrwxrwt',
     },
+    'opera': {  # official Opera snap
+        './usr/lib/x86_64-linux-gnu/opera-developer/opera_sandbox': 'rwsr-xr-x',
+    },
+    'opera-beta': {  # official Opera snap
+        './usr/lib/x86_64-linux-gnu/opera-developer/opera_sandbox': 'rwsr-xr-x',
+    },
+    'opera-developer': {  # official Opera snap
+        './usr/lib/x86_64-linux-gnu/opera-developer/opera_sandbox': 'rwsr-xr-x',
+    },
     'snapd': {
         './usr/lib/snapd/snap-confine': 'rwsr-sr-x',
     },
