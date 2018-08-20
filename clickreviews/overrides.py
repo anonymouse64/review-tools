@@ -361,6 +361,7 @@ func_execstack_skipped_pats = ['boot/.*',
                                'usr/share/dpdk/test/.*',
                                # investigate
                                'usr/lib/arm-linux-gnueabihf/libx264.so.148',
+                               'usr/lib/arm-linux-gnueabihf/libvolk.so.1.1',
                                ]
 
 # By default we don't regulate which snaps specify which base snaps, but some
