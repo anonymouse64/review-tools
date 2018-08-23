@@ -72,6 +72,7 @@ class SnapReviewLint(SnapReview):
                                       'kernel',
                                       'gadget',
                                       'os',
+                                      'snapd',
                                       ]
 
         self.interface_plug_requires_desktop_file = ['unity7',

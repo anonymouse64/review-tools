@@ -118,12 +118,14 @@ class SnapReview(Review):
     # - kernel
     # - gadget
     # - os (deprecated)
+    # - snapd
     valid_snap_types = ['app',
                         'base',
                         'core',
                         'kernel',
                         'gadget',
                         'os',
+                        'snapd',
                         ]
 
     # snap/hooktypes.go

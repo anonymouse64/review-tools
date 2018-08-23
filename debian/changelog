@@ -9,6 +9,7 @@ click-reviewers-tools (0.48) UNRELEASED; urgency=medium
       are dominated by magic.py and libmagic so further improvements would need
       investigating in that area
     - update magic_binary_file_descriptions for newer file/python-magic
+    - support new 'snapd' snap type
   * sr_lint.py:
     - add checks for 'layout' (for now, default to 'warn' when in use at
       request of the snapd team
@@ -30,7 +31,7 @@ click-reviewers-tools (0.48) UNRELEASED; urgency=medium
   * add snap-updates-available
   * add 2.34 interfaces
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 10 Jul 2018 09:12:03 -0500
+ -- Jamie Strandboge <jamie@ubuntu.com>  Thu, 23 Aug 2018 12:21:56 -0500
 
 click-reviewers-tools (0.47) RELEASED; urgency=medium
 

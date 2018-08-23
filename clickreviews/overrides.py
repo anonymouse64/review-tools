@@ -109,6 +109,7 @@ redflagged_snap_types_overrides = {
              'test-snapd-base',
              'solus-runtime-gaming',  # Community base snaps
              ],
+    'snapd': ['snapd']
 }
 
 # List of snaps that may specify an interface that requires a desktop file but

@@ -528,6 +528,17 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         name = c._get_check_name('snap_type_redflag')
         self.check_manual_review(r, name)
 
+    def test_check_type_redflagged_snapd(self):
+        '''Test check_type_redflagged - snapd'''
+        self.set_test_snap_yaml("type", "snapd")
+        c = SnapReviewLint(self.test_name)
+        c.check_type_redflagged()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+        name = c._get_check_name('snap_type_redflag')
+        self.check_manual_review(r, name)
+
     def test_check_type_redflagged_os_whitelisted_core(self):
         '''Test check_type_redflagged - os (core)'''
         self.set_test_snap_yaml("type", "os")
@@ -598,6 +609,24 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected['info'] = dict()
         name = 'lint-snap-v2:snap_type_redflag'
         expected['info'][name] = {"text": "OK (override 'pc' for 'type: gadget')"}
+        self.check_results(r, expected=expected)
+
+    def test_check_type_redflagged_snapd_whitelisted(self):
+        '''Test check_type_redflagged - snapd whitelisted'''
+        self.set_test_snap_yaml("type", "snapd")
+        self.set_test_snap_yaml("name", "snapd")
+        c = SnapReviewLint(self.test_name)
+        c.check_type_redflagged()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'lint-snap-v2:snap_type_redflag'
+        expected['info'][name] = {"text": "OK (override 'snapd' for 'type: snapd')"}
         self.check_results(r, expected=expected)
 
     def test_check_type_redflagged_base(self):
