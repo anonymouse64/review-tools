@@ -116,6 +116,11 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  cifs-mount:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   classic-support:
     allow-installation:
       slot-snap-type:
@@ -535,6 +540,11 @@
     allow-installation:
       slot-snap-type:
         - core
+  screencast-legacy:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   serial-port:
     allow-installation:
       slot-snap-type:
