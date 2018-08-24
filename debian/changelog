@@ -30,6 +30,7 @@ click-reviewers-tools (0.48) UNRELEASED; urgency=medium
   * rename gnome-online-accounts-service to accounts-service
   * add snap-updates-available
   * add 2.34 interfaces
+  * add 2.35 interfaces
 
  -- Jamie Strandboge <jamie@ubuntu.com>  Thu, 23 Aug 2018 12:21:56 -0500
 

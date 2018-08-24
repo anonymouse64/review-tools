@@ -144,6 +144,11 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  cpu-control:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   cups-control:
     allow-installation:
       slot-snap-type:
