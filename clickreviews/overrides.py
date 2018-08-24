@@ -65,16 +65,10 @@ redflagged_snap_types_overrides = {
            'ubuntu-core'
            ],
     'gadget': ['cm3',        # Canonical reference gadgets
-               'cm3-18',
                'dragonboard',
-               'dragonboard-18',
                'pc',
-               'pc-amd64-18',
-               'pc-i386-18',
                'pi2',
-               'pi2-18',
                'pi3',
-               'pi3-18',
                'cm3-ondra',  # @canonical.com gadgets
                'cm3-openhab',
                'hikey-snappy-gadget',
