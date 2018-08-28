@@ -3496,7 +3496,6 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         bad_types = (
             "base",
             "core",
-            "gadget",
             "kernel",
             "os",
         )

@@ -1585,7 +1585,7 @@ class SnapReviewLint(SnapReview):
         if not self.is_snap2 or 'base' not in self.snap_yaml:
             return
 
-        use_with = ['app']
+        use_with = ['app', 'gadget']
 
         t = 'info'
         n = self._get_check_name('base_valid')
