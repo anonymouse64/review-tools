@@ -72,6 +72,9 @@ class SnapReview(Review):
                               'image-info': {},
                               'parts': {},
                               'passthrough': {},
+                              'snapcraft-os-release-id': '',
+                              'snapcraft-os-release-version-id': '',
+                              'snapcraft-version': '',
                               'version-script': "",
                               }
 
