@@ -4440,7 +4440,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.check_snap_manifest()
         r = c.click_report
-        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
     def test_check_snap_manifest_part_missing(self):

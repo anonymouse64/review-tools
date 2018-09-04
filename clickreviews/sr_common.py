@@ -427,18 +427,9 @@ class SnapReview(Review):
                         return (False, t, s)
             return (True, 'info', 'OK')
 
-        unknown = []
-        for f in m:
-            if f not in self.snappy_required + self.snappy_optional + \
-                    list(self.snap_manifest_required.keys()) + \
-                    list(self.snap_manifest_optional.keys()):
-                unknown.append(f)
-        if len(unknown) > 0:
-            t = 'error'
-            s = 'unknown keys in snap/manifest.yaml: %s' % \
-                ','.join(sorted(unknown))
-            return (False, t, s)
-
+        # Only worry about missing keys and the format of known keys, not
+        # unknown keys
+        # https://forum.snapcraft.io/t/builds-failing-automated-review/7112
         missing = []
         for f in self.snappy_required + \
                 list(self.snap_manifest_required.keys()):
