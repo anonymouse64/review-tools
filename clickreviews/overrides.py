@@ -262,10 +262,10 @@ sec_mode_overrides = {
         './rootfs/tmp': 'rwxrwxrwt',
     },
     'opera': {  # official Opera snap
-        './usr/lib/x86_64-linux-gnu/opera-developer/opera_sandbox': 'rwsr-xr-x',
+        './usr/lib/x86_64-linux-gnu/opera/opera_sandbox': 'rwsr-xr-x',
     },
     'opera-beta': {  # official Opera snap
-        './usr/lib/x86_64-linux-gnu/opera-developer/opera_sandbox': 'rwsr-xr-x',
+        './usr/lib/x86_64-linux-gnu/opera-beta/opera_sandbox': 'rwsr-xr-x',
     },
     'opera-developer': {  # official Opera snap
         './usr/lib/x86_64-linux-gnu/opera-developer/opera_sandbox': 'rwsr-xr-x',
