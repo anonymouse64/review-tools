@@ -79,6 +79,7 @@ redflagged_snap_types_overrides = {
                'nxp-ls1043ardb-gadget',
                'odroid-xu4',
                'orangepi-zero',
+               'orangepi-zero-ogra',
                'pi3-ondra',
                'pi3-openhab',
                'pi3-unipi',
