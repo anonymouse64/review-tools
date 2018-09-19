@@ -108,7 +108,8 @@ redflagged_snap_types_overrides = {
              'core16',
              'core18',
              'test-snapd-base',
-             'solus-runtime-gaming',  # Community base snaps
+             'fedora29',              # Community base snaps
+             'solus-runtime-gaming',
              ],
     'snapd': ['snapd']
 }
