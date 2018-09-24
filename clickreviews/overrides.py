@@ -80,6 +80,7 @@ redflagged_snap_types_overrides = {
                'odroid-xu4',
                'orangepi-zero',
                'orangepi-zero-ogra',
+               'pi-kiosk',
                'pi3-ondra',
                'pi3-openhab',
                'pi3-unipi',
