@@ -486,6 +486,7 @@ update_publisher_overrides = {
         'gnome-sudoku': canonical_desktop,
         'gnome-system-monitor': canonical_desktop,
         'godd': canonical_snapd,
+        'gtk-common-themes': canonical_desktop,
         'juju': canonical_juju,
         'jq': canonical_snapd,
         'jq-core18': canonical_snapd,
