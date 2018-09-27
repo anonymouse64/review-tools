@@ -240,6 +240,7 @@ sec_mode_overrides = {
     },
     'core18': {
         './bin/mount': 'rwsr-xr-x',
+        './bin/ping': 'rwsr-xr-x',
         './bin/su': 'rwsr-xr-x',
         './bin/umount': 'rwsr-xr-x',
         './sbin/pam_extrausers_chkpwd': 'rwxr-sr-x',
