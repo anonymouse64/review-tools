@@ -320,7 +320,8 @@ sec_mode_overrides = {
 # Snaps that may specify 'daemon' with 'browser-support'. Normally this
 # shouldn't be granted because snaps running with 'daemon' run as root and this
 # grants more privileges than intended.
-sec_browser_support_overrides = ['chromium-mir-kiosk',
+sec_browser_support_overrides = ['chromium-mir-kiosk',        # mir team
+                                 'dashkiosk-client-browser',  # ogra
                                  'screencloudplayer',
                                  'webdemo',
                                  ]
