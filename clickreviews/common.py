@@ -705,8 +705,11 @@ def open_file_write(path):
     return orig
 
 
-def recursive_rm(dirPath, contents_only=False):
+def recursive_rm(dirPath, contents_only=False, top=True):
     '''recursively remove directory'''
+    if top:
+        os.chmod(dirPath, 0o0755)  # ensure the top dir is always removable
+
     try:
         names = os.listdir(dirPath)
     except PermissionError:
@@ -723,10 +726,10 @@ def recursive_rm(dirPath, contents_only=False):
             os.unlink(path)
         else:
             try:
-                recursive_rm(path)
+                recursive_rm(path, top=False)
             except PermissionError:
                 os.chmod(path, 0o0755)  # LP: #1712476
-                recursive_rm(path)
+                recursive_rm(path, top=False)
 
     if contents_only is False:
         os.rmdir(dirPath)
