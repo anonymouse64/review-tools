@@ -167,6 +167,16 @@ slots:
                         'on-classic': False
                     },
                 },
+                'inst-on-store': {
+                    'allow-installation': {
+                        'on-store': ['mystore']
+                    },
+                },
+                'inst-on-brand': {
+                    'deny-installation': {
+                        'on-brand': ['mybrand']
+                    },
+                },
                 'inst-slot-snap-type-all': {
                     'allow-installation': {
                         'slot-snap-type': ['core', 'gadget', 'kernel', 'app']
@@ -186,12 +196,16 @@ slots:
                     'allow-installation': [
                         {'slot-snap-type': ['app']},
                         {'on-classic': 'false'},
+                        {'on-store': ['mystore']},
+                        {'on-brand': ['mybrand']},
                     ],
                 },
                 'inst-deny-alternates': {
                     'deny-installation': [
                         {'slot-snap-type': ['gadget']},
                         {'on-classic': 'true'},
+                        {'on-store': ['mystore']},
+                        {'on-brand': ['mybrand']},
                     ],
                 },
                 'conn-on-classic-true': {
@@ -202,6 +216,16 @@ slots:
                 'conn-on-classic-false': {
                     'deny-connection': {
                         'on-classic': False
+                    },
+                },
+                'conn-on-store-true': {
+                    'allow-connection': {
+                        'on-store': ['mystore']
+                    },
+                },
+                'conn-on-brand-true': {
+                    'deny-connection': {
+                        'on-brand': ['mybrand']
                     },
                 },
                 'conn-plug-snap-type-all': {
@@ -253,6 +277,12 @@ slots:
                         {'plug-snap-id': ['somethingelse32charslongGgGgGgGg'],
                          'on-classic': 'true',
                          },
+                        {'plug-snap-id': ['somethingelseelse32charslongGgGg'],
+                         'on-store': ['mystore'],
+                         },
+                        {'plug-snap-id': ['somethingelseelseelse32charslong'],
+                         'on-brand': ['mybrand'],
+                         },
                     ],
                 },
                 'conn-deny-alternates': {
@@ -262,6 +292,12 @@ slots:
                          },
                         {'plug-snap-id': ['somethingelse32charslongGgGgGgGg'],
                          'on-classic': 'true',
+                         },
+                        {'plug-snap-id': ['somethingelseelse32charslongGgGg'],
+                         'on-store': ['mystore'],
+                         },
+                        {'plug-snap-id': ['somethingelseelseelse32charslong'],
+                         'on-brand': ['mybrand'],
                          },
                     ],
                 },
@@ -273,6 +309,16 @@ slots:
                 'autoconn-on-classic-false': {
                     'deny-auto-connection': {
                         'on-classic': False
+                    },
+                },
+                'autoconn-on-store': {
+                    'allow-auto-connection': {
+                        'on-store': ['mystore']
+                    },
+                },
+                'autoconn-on-brand': {
+                    'deny-auto-connection': {
+                        'on-brand': ['mybrand']
                     },
                 },
                 'autoconn-plug-snap-type-all': {
@@ -324,6 +370,12 @@ slots:
                         {'plug-snap-id': ['somethingelse32charslongGgGgGgGg'],
                          'on-classic': 'true',
                          },
+                        {'plug-snap-id': ['somethingelseelse32charslongGgGg'],
+                         'on-store': ['mystore'],
+                         },
+                        {'plug-snap-id': ['somethingelseelseelse32charslong'],
+                         'on-brand': ['mybrand'],
+                         },
                     ],
                 },
                 'autoconn-deny-alternates': {
@@ -333,6 +385,12 @@ slots:
                          },
                         {'plug-snap-id': ['somethingelse32charslongGgGgGgGg'],
                          'on-classic': 'true',
+                         },
+                        {'plug-snap-id': ['somethingelseelse32charslongGgGg'],
+                         'on-store': ['mystore'],
+                         },
+                        {'plug-snap-id': ['somethingelseelseelse32charslong'],
+                         'on-brand': ['mybrand'],
                          },
                     ],
                 },
@@ -346,6 +404,16 @@ slots:
                 'inst-on-classic-false': {
                     'deny-installation': {
                         'on-classic': False
+                    },
+                },
+                'inst-on-store': {
+                    'allow-installation': {
+                        'on-store': ['mystore']
+                    },
+                },
+                'inst-on-brand': {
+                    'deny-installation': {
+                        'on-brand': ['mybrand']
                     },
                 },
                 'inst-plug-snap-type-all': {
@@ -367,12 +435,16 @@ slots:
                     'allow-installation': [
                         {'plug-snap-type': ['app']},
                         {'on-classic': 'false'},
+                        {'on-store': ['mystore']},
+                        {'on-brand': ['mybrand']},
                     ],
                 },
                 'inst-deny-alternates': {
                     'deny-installation': [
                         {'plug-snap-type': ['gadget']},
                         {'on-classic': 'true'},
+                        {'on-store': ['mystore']},
+                        {'on-brand': ['mybrand']},
                     ],
                 },
                 'conn-on-classic-true': {
@@ -383,6 +455,16 @@ slots:
                 'conn-on-classic-false': {
                     'deny-connection': {
                         'on-classic': False
+                    },
+                },
+                'conn-on-store-true': {
+                    'allow-connection': {
+                        'on-store': ['mystore']
+                    },
+                },
+                'conn-on-brand-true': {
+                    'deny-connection': {
+                        'on-brand': ['mybrand']
                     },
                 },
                 'conn-slot-snap-type-all': {
@@ -434,6 +516,12 @@ slots:
                         {'slot-snap-id': ['somethingelse32charslongGgGgGgGg'],
                          'on-classic': 'true',
                          },
+                        {'slot-snap-id': ['somethingelseelse32charslongGgGg'],
+                         'on-store': ['mystore'],
+                         },
+                        {'slot-snap-id': ['somethingelseelseelse32charslong'],
+                         'on-brand': ['mybrand'],
+                         },
                     ],
                 },
                 'conn-deny-alternates': {
@@ -443,6 +531,12 @@ slots:
                          },
                         {'slot-snap-id': ['somethingelse32charslongGgGgGgGg'],
                          'on-classic': 'true',
+                         },
+                        {'slot-snap-id': ['somethingelseelse32charslongGgGg'],
+                         'on-store': ['mystore'],
+                         },
+                        {'slot-snap-id': ['somethingelseelseelse32charslong'],
+                         'on-brand': ['mybrand'],
                          },
                     ],
                 },
@@ -454,6 +548,16 @@ slots:
                 'autoconn-on-classic-false': {
                     'deny-auto-connection': {
                         'on-classic': False
+                    },
+                },
+                'autoconn-on-store': {
+                    'allow-auto-connection': {
+                        'on-store': ['mystore']
+                    },
+                },
+                'autoconn-on-brand': {
+                    'deny-auto-connection': {
+                        'on-brand': ['mybrand']
                     },
                 },
                 'autoconn-slot-snap-type-all': {
@@ -505,6 +609,12 @@ slots:
                         {'slot-snap-id': ['somethingelse32charslongGgGgGgGg'],
                          'on-classic': 'true',
                          },
+                        {'slot-snap-id': ['somethingelseelse32charslongGgGg'],
+                         'on-store': ['mystore'],
+                         },
+                        {'slot-snap-id': ['somethingelseelseelse32charslong'],
+                         'on-brand': ['mybrand'],
+                         },
                     ],
                 },
                 'autoconn-deny-alternates': {
@@ -515,13 +625,19 @@ slots:
                         {'slot-snap-id': ['somethingelse32charslongGgGgGgGg'],
                          'on-classic': 'true',
                          },
+                        {'slot-snap-id': ['somethingelseelse32charslongGgGg'],
+                         'on-store': ['mystore'],
+                         },
+                        {'slot-snap-id': ['somethingelseelseelse32charslong'],
+                         'on-brand': ['mybrand'],
+                         },
                     ],
                 },
             },
         }
         c._verify_declaration(decl=decl)
         r = c.click_report
-        expected_counts = {'info': 62, 'warn': 0, 'error': 0}
+        expected_counts = {'info': 74, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
     def test__verify_declaration_invalid_empty(self):
@@ -1006,6 +1122,56 @@ slots:
         expected['info'] = dict()
         name = 'declaration-snap-v2:valid_slots:foo:allow-connection_plug-attributes'
         expected['error'][name] = {"text": "declaration malformed ('plug-attributes' not a dict)"}
+        self.check_results(r, expected=expected)
+
+    def test__verify_declaration_invalid_slots_iface_constraint_on_store(self):
+        '''Test _verify_declaration - invalid interface constraint on-store'''
+        c = SnapReviewDeclaration(self.test_name)
+        decl = {
+            'slots': {
+                'foo': {
+                    'allow-connection': {
+                        'on-store': {}
+                    }
+                }
+            }
+        }
+        c._verify_declaration(decl=decl)
+        r = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:valid_slots:foo:allow-connection_on-store'
+        expected['error'][name] = {"text": "declaration malformed ('on-store' not a list)"}
+        self.check_results(r, expected=expected)
+
+    def test__verify_declaration_invalid_slots_iface_constraint_on_brand_value(self):
+        '''Test _verify_declaration - invalid interface constraint on-brand'''
+        c = SnapReviewDeclaration(self.test_name)
+        decl = {
+            'slots': {
+                'foo': {
+                    'allow-connection': {
+                        'on-brand': [{}]
+                    }
+                }
+            }
+        }
+        c._verify_declaration(decl=decl)
+        r = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:valid_slots:foo:allow-connection_on-brand'
+        expected['error'][name] = {"text": "declaration malformed ('{}' in 'on-brand' not a string)"}
         self.check_results(r, expected=expected)
 
     def test__verify_declaration_valid_slots_plug_attribs_browser_support(self):
@@ -2818,7 +2984,7 @@ slots:
         expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'plug-attributes' from base declaration"}
         self.check_results(r, expected=expected)
 
-    def test_zz_check_declaration_plugs_connection_alternates_bool3(self):
+    def test_check_declaration_plugs_connection_alternates_bool3(self):
         '''Test check_declaration - plugs - matching alternate attrib bool/str'''
         c = SnapReviewDeclaration(self.test_name)
 
@@ -4070,4 +4236,766 @@ slots:
         expected['info'] = dict()
         name = 'declaration-snap-v2:plugs_deny-connection:iface:browser-support'
         expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'plug-attributes' from base declaration. If using a chromium webview, you can disable the internal sandbox (eg, use --no-sandbox) and remove the 'allow-sandbox' attribute instead. For Oxide webviews, export OXIDE_NO_SANDBOX=1 to disable its internal sandbox. Similarly for QtWebEngine, use QTWEBENGINE_DISABLE_SANDBOX=1."}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_override_invalid_on_store(self):
+        '''Test check_declaration - override - invalid on-store'''
+        overrides = {
+            'snap_on_store': {}
+        }
+        try:
+            SnapReviewDeclaration(self.test_name, overrides=overrides)
+        except ValueError:
+            return
+        raise Exception("on-store override should be invalid")  # pragma: nocover
+
+    def test_check_declaration_docker_on_store_no_decl(self):
+        '''Test check_declaration - override - on-store no decl'''
+        overrides = {
+            'snap_on_store': 'mystore'
+        }
+        slots = {'iface': {'interface': 'docker'}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 2}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:slots_deny-connection:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}
+        name = 'declaration-snap-v2:slots_allow-installation:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint from base declaration"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_docker_on_store_install(self):
+        '''Test check_declaration - override - on-store install'''
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            'snap_decl_slots': {
+                'docker': {
+                    'allow-installation': {
+                        'on-store': ['mystore'],
+                    },
+                },
+            },
+            'snap_on_store': 'mystore',
+        }
+        slots = {'iface': {'interface': 'docker'}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:valid_slots:docker:allow-installation'
+        expected['info'][name] = {"text": "OK"}
+        name = 'declaration-snap-v2:slots_deny-connection:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_docker_on_store_connect(self):
+        '''Test check_declaration - override - on-store connect'''
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            'snap_decl_slots': {
+                'docker': {
+                    'allow-connection': {
+                        'on-store': ['mystore'],
+                    },
+                },
+            },
+            'snap_on_store': 'mystore',
+        }
+        slots = {'iface': {'interface': 'docker'}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:slots_allow-installation:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint from base declaration"}
+        name = 'declaration-snap-v2:valid_slots:docker:allow-connection'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_docker_on_store_install_connect(self):
+        '''Test check_declaration - override - on-store install/connect'''
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            'snap_decl_slots': {
+                'docker': {
+                    'allow-installation': {
+                        'on-store': ['mystore'],
+                    },
+                    'allow-connection': {
+                        'on-store': ['mystore'],
+                    },
+                },
+            },
+            'snap_on_store': 'mystore',
+        }
+        slots = {'iface': {'interface': 'docker'}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 3, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_declaration_docker_on_store_mismatch(self):
+        '''Test check_declaration - override - on-store mismatch'''
+        overrides = {
+            'snap_decl_slots': {
+                'docker': {
+                    'allow-installation': {
+                        'on-store': ['mystore'],
+                    },
+                    'allow-connection': {
+                        'on-store': ['mystore'],
+                    },
+                },
+            },
+            'snap_on_store': 'nomatch',
+        }
+        slots = {'iface': {'interface': 'docker'}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 2}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:slots_deny-connection:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}
+        name = 'declaration-snap-v2:slots_allow-installation:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint from base declaration"}
+        name = 'declaration-snap-v2:valid_slots:docker:allow-installation'
+        expected['info'][name] = {"text": "OK"}
+        name = 'declaration-snap-v2:valid_slots:docker:allow-connection'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_docker_on_store_install_connect_multiple(self):
+        '''Test check_declaration - override - on-store install/connect
+           multiple
+        '''
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            'snap_decl_slots': {
+                'docker': {
+                    'allow-installation': {
+                        'on-store': ['other-store', 'mystore'],
+                    },
+                    'allow-connection': {
+                        'on-store': ['mystore', 'other-store'],
+                    },
+                },
+            },
+            'snap_on_store': 'mystore',
+        }
+        slots = {'iface': {'interface': 'docker'}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 3, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_declaration_browser_support_on_store(self):
+        '''Test check_declaration - override - on-store browser-support'''
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            'snap_decl_plugs': {
+                'browser-support': {
+                    'allow-connection': {
+                        'on-store': ['other-store', 'mystore'],
+                    },
+                },
+            },
+            'snap_on_store': 'mystore',
+        }
+        plugs = {
+            'iface': {
+                'interface': 'browser-support',
+                'allow-sandbox': True,
+            }
+        }
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:valid_plugs:browser-support:allow-connection'
+        expected['info'][name] = {"text": "OK"}
+        name = 'declaration-snap-v2:plugs:iface:browser-support'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_browser_support_on_store_mismatch(self):
+        '''Test check_declaration - override - on-store browser-support
+           mismatch
+        '''
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            'snap_decl_plugs': {
+                'browser-support': {
+                    'allow-connection': {
+                        'on-store': ['other-store', 'mystore'],
+                    },
+                },
+            },
+            'snap_on_store': 'mismatch',
+        }
+        plugs = {
+            'iface': {
+                'interface': 'browser-support',
+                'allow-sandbox': True,
+            }
+        }
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:valid_plugs:browser-support:allow-connection'
+        expected['info'][name] = {"text": "OK"}
+        name = 'declaration-snap-v2:plugs_deny-connection:iface:browser-support'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'plug-attributes' from base declaration. If using a chromium webview, you can disable the internal sandbox (eg, use --no-sandbox) and remove the 'allow-sandbox' attribute instead. For Oxide webviews, export OXIDE_NO_SANDBOX=1 to disable its internal sandbox. Similarly for QtWebEngine, use QTWEBENGINE_DISABLE_SANDBOX=1."}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_network_on_store_deny_install(self):
+        '''Test check_declaration - override - on-store network deny'''
+        self.set_test_snap_yaml("type", "gadget")
+        overrides = {
+            'snap_decl_plugs': {
+                'network': {
+                    'deny-installation': {
+                        'plug-snap-type': ['gadget'],
+                        'on-store': ['other-store', 'mystore'],
+                    },
+                },
+            },
+            'snap_on_store': 'mystore',
+        }
+        plugs = {
+            'iface': {
+                'interface': 'network',
+            }
+        }
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:valid_plugs:network:deny-installation'
+        expected['info'][name] = {"text": "OK"}
+        name = 'declaration-snap-v2:plugs_deny-installation:iface:network'
+        expected['error'][name] = {"text": "human review required due to 'deny-installation' constraint for 'plug-snap-type' from snap declaration"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_override_invalid_on_brand(self):
+        '''Test check_declaration - override - invalid on-brand'''
+        overrides = {
+            'snap_on_brand': {}
+        }
+        try:
+            SnapReviewDeclaration(self.test_name, overrides=overrides)
+        except ValueError:
+            return
+        raise Exception("on-brand override should be invalid")  # pragma: nocover
+
+    def test_check_declaration_docker_on_brand_no_decl(self):
+        '''Test check_declaration - override - on-brand no decl'''
+        overrides = {
+            'snap_on_brand': 'mybrand'
+        }
+        slots = {'iface': {'interface': 'docker'}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 2}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:slots_deny-connection:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}
+        name = 'declaration-snap-v2:slots_allow-installation:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint from base declaration"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_docker_on_brand_install(self):
+        '''Test check_declaration - override - on-brand install'''
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            'snap_decl_slots': {
+                'docker': {
+                    'allow-installation': {
+                        'on-brand': ['mybrand'],
+                    },
+                },
+            },
+            'snap_on_brand': 'mybrand',
+        }
+        slots = {'iface': {'interface': 'docker'}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:valid_slots:docker:allow-installation'
+        expected['info'][name] = {"text": "OK"}
+        name = 'declaration-snap-v2:slots_deny-connection:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_docker_on_brand_connect(self):
+        '''Test check_declaration - override - on-brand connect'''
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            'snap_decl_slots': {
+                'docker': {
+                    'allow-connection': {
+                        'on-brand': ['mybrand'],
+                    },
+                },
+            },
+            'snap_on_brand': 'mybrand',
+        }
+        slots = {'iface': {'interface': 'docker'}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:slots_allow-installation:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint from base declaration"}
+        name = 'declaration-snap-v2:valid_slots:docker:allow-connection'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_docker_on_brand_install_connect(self):
+        '''Test check_declaration - override - on-brand install/connect'''
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            'snap_decl_slots': {
+                'docker': {
+                    'allow-installation': {
+                        'on-brand': ['mybrand'],
+                    },
+                    'allow-connection': {
+                        'on-brand': ['mybrand'],
+                    },
+                },
+            },
+            'snap_on_brand': 'mybrand',
+        }
+        slots = {'iface': {'interface': 'docker'}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 3, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_declaration_docker_on_brand_mismatch(self):
+        '''Test check_declaration - override - on-brand mismatch'''
+        overrides = {
+            'snap_decl_slots': {
+                'docker': {
+                    'allow-installation': {
+                        'on-brand': ['mybrand'],
+                    },
+                    'allow-connection': {
+                        'on-brand': ['mybrand'],
+                    },
+                },
+            },
+            'snap_on_brand': 'nomatch',
+        }
+        slots = {'iface': {'interface': 'docker'}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 2}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:slots_deny-connection:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}
+        name = 'declaration-snap-v2:slots_allow-installation:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint from base declaration"}
+        name = 'declaration-snap-v2:valid_slots:docker:allow-installation'
+        expected['info'][name] = {"text": "OK"}
+        name = 'declaration-snap-v2:valid_slots:docker:allow-connection'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_docker_on_brand_install_connect_multiple(self):
+        '''Test check_declaration - override - on-brand install/connect
+           multiple
+        '''
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            'snap_decl_slots': {
+                'docker': {
+                    'allow-installation': {
+                        'on-brand': ['other-brand', 'mybrand'],
+                    },
+                    'allow-connection': {
+                        'on-brand': ['mybrand', 'other-brand'],
+                    },
+                },
+            },
+            'snap_on_brand': 'mybrand',
+        }
+        slots = {'iface': {'interface': 'docker'}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 3, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_declaration_browser_support_on_brand(self):
+        '''Test check_declaration - override - on-brand browser-support'''
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            'snap_decl_plugs': {
+                'browser-support': {
+                    'allow-connection': {
+                        'on-brand': ['other-brand', 'mybrand'],
+                    },
+                },
+            },
+            'snap_on_brand': 'mybrand',
+        }
+        plugs = {
+            'iface': {
+                'interface': 'browser-support',
+                'allow-sandbox': True,
+            }
+        }
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:valid_plugs:browser-support:allow-connection'
+        expected['info'][name] = {"text": "OK"}
+        name = 'declaration-snap-v2:plugs:iface:browser-support'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_browser_support_on_brand_mismatch(self):
+        '''Test check_declaration - override - on-brand browser-support
+           mismatch
+        '''
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            'snap_decl_plugs': {
+                'browser-support': {
+                    'allow-connection': {
+                        'on-brand': ['other-brand', 'mybrand'],
+                    },
+                },
+            },
+            'snap_on_brand': 'mismatch',
+        }
+        plugs = {
+            'iface': {
+                'interface': 'browser-support',
+                'allow-sandbox': True,
+            }
+        }
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:valid_plugs:browser-support:allow-connection'
+        expected['info'][name] = {"text": "OK"}
+        name = 'declaration-snap-v2:plugs_deny-connection:iface:browser-support'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'plug-attributes' from base declaration. If using a chromium webview, you can disable the internal sandbox (eg, use --no-sandbox) and remove the 'allow-sandbox' attribute instead. For Oxide webviews, export OXIDE_NO_SANDBOX=1 to disable its internal sandbox. Similarly for QtWebEngine, use QTWEBENGINE_DISABLE_SANDBOX=1."}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_network_on_brand_deny_install(self):
+        '''Test check_declaration - override - on-brand network deny'''
+        self.set_test_snap_yaml("type", "gadget")
+        overrides = {
+            'snap_decl_plugs': {
+                'network': {
+                    'deny-installation': {
+                        'plug-snap-type': ['gadget'],
+                        'on-brand': ['other-brand', 'mybrand'],
+                    },
+                },
+            },
+            'snap_on_brand': 'mybrand',
+        }
+        plugs = {
+            'iface': {
+                'interface': 'network',
+            }
+        }
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:valid_plugs:network:deny-installation'
+        expected['info'][name] = {"text": "OK"}
+        name = 'declaration-snap-v2:plugs_deny-installation:iface:network'
+        expected['error'][name] = {"text": "human review required due to 'deny-installation' constraint for 'plug-snap-type' from snap declaration"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_docker_on_brand_install_on_store_connect(self):
+        '''Test check_declaration - override - on-brand install on-store connect'''
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            'snap_decl_slots': {
+                'docker': {
+                    'allow-installation': {
+                        'on-brand': ['other-brand', 'mybrand'],
+                    },
+                    'allow-connection': {
+                        'on-store': ['mystore', 'other-store'],
+                    },
+                },
+            },
+            'snap_on_brand': 'mybrand',
+            'snap_on_store': 'mystore',
+        }
+        slots = {'iface': {'interface': 'docker'}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 3, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:valid_slots:docker:allow-installation'
+        expected['info'][name] = {"text": "OK"}
+        name = 'declaration-snap-v2:valid_slots:docker:allow-connection'
+        expected['info'][name] = {"text": "OK"}
+        name = 'declaration-snap-v2:slots:iface:docker'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_docker_on_brand_install_on_store_connect_mismatch(self):
+        '''Test check_declaration - override - on-brand install on-store connect
+           mismatch
+        '''
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            'snap_decl_slots': {
+                'docker': {
+                    'allow-installation': {
+                        'on-brand': ['other-brand', 'mybrand'],
+                    },
+                    'allow-connection': {
+                        'on-store': ['mystore', 'other-store'],
+                    },
+                },
+            },
+            'snap_on_brand': 'mystore',
+            'snap_on_store': 'mybrand',
+        }
+        slots = {'iface': {'interface': 'docker'}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 2}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:slots_allow-installation:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint from base declaration"}
+        name = 'declaration-snap-v2:slots_deny-connection:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_docker_on_brand_on_store_install(self):
+        '''Test check_declaration - override - on-brand/on-store install'''
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            'snap_decl_slots': {
+                'docker': {
+                    'allow-installation': {
+                        'on-brand': ['other-brand', 'mybrand'],
+                        'on-store': ['other-store', 'mystore'],
+                    },
+                    'allow-connection': True,
+                },
+            },
+            'snap_on_store': 'mystore',
+            'snap_on_brand': 'mybrand',
+        }
+        slots = {'iface': {'interface': 'docker'}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 3, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_declaration_docker_on_brand_on_store_install_mismatch_on_store(self):
+        '''Test check_declaration - override - on-brand/on-store install
+           mismatch on-store
+        '''
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            'snap_decl_slots': {
+                'docker': {
+                    'allow-installation': {
+                        'on-brand': ['other-brand', 'mybrand'],
+                        'on-store': ['other-store', 'mystore'],
+                    },
+                    'allow-connection': True,
+                },
+            },
+            'snap_on_store': 'mismatch',
+            'snap_on_brand': 'mybrand',
+        }
+        slots = {'iface': {'interface': 'docker'}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:slots_allow-installation:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint from base declaration"}
         self.check_results(r, expected=expected)

@@ -166,6 +166,10 @@ def main():
                         help='file specifying snap declaration for slots')
     parser.add_argument('--allow-classic', help='allow confinement: classic',
                         action='store_true')
+    parser.add_argument('--on-store', default=None,
+                        help='store id for the snap')
+    parser.add_argument('--on-brand', default=None,
+                        help='brand id for the snap')
     args = parser.parse_args()
 
     if not os.path.exists(args.filename):
@@ -195,6 +199,14 @@ def main():
         if overrides is None:
             overrides = {}
         overrides['snap_allow_classic'] = args.allow_classic
+    if args.on_store:
+        if overrides is None:
+            overrides = {}
+        overrides['snap_on_store'] = args.on_store
+    if args.on_brand:
+        if overrides is None:
+            overrides = {}
+        overrides['snap_on_brand'] = args.on_brand
 
     results.run_all_checks(overrides)
     sys.exit(results.rc)

@@ -17,6 +17,7 @@
 from __future__ import print_function
 from clickreviews.sr_common import SnapReview, SnapReviewException
 from clickreviews.overrides import iface_attributes_noflag
+import copy
 import re
 
 # Specification:
@@ -37,6 +38,18 @@ class SnapReviewDeclaration(SnapReview):
             return
 
         self._verify_declaration(self.base_declaration, base=True)
+
+        self.on_store = None
+        if overrides is not None and 'snap_on_store' in overrides:
+            if not isinstance(overrides['snap_on_store'], str):
+                raise ValueError("'--on-store' should be a str")
+            self.on_store = overrides['snap_on_store']
+
+        self.on_brand = None
+        if overrides is not None and 'snap_on_brand' in overrides:
+            if not isinstance(overrides['snap_on_brand'], str):
+                raise ValueError("'--on-brand' should be a str")
+            self.on_brand = overrides['snap_on_brand']
 
         self.snap_declaration = None
         if overrides is not None and ('snap_decl_plugs' in overrides or
@@ -100,7 +113,9 @@ class SnapReviewDeclaration(SnapReview):
                           "plug-publisher-id"
                           "slot-publisher-id",
                           "plug-snap-id",
-                          "slot-snap-id"
+                          "slot-snap-id",
+                          "on-store",
+                          "on-brand",
                           ]
             cstr_dicts = ["plug-attributes", "slot-attributes"]
             for cstr_key in cstr:
@@ -291,7 +306,7 @@ class SnapReviewDeclaration(SnapReview):
 
                     allowed = []
                     if constraint.endswith("-installation"):
-                        allowed = ["on-classic"]
+                        allowed = ["on-classic", "on-store", "on-brand"]
                         if key == "plugs":
                             allowed.append("plug-snap-type")
                             allowed.append("plug-attributes")
@@ -300,7 +315,7 @@ class SnapReviewDeclaration(SnapReview):
                             allowed.append("slot-attributes")
                     else:
                         allowed = ["plug-attributes", "slot-attributes",
-                                   "on-classic"]
+                                   "on-classic", "on-store", "on-brand"]
                         if key == "plugs":
                             allowed.append("slot-publisher-id")
                             allowed.append("slot-snap-id")
@@ -400,18 +415,58 @@ class SnapReviewDeclaration(SnapReview):
 
     def _get_decl(self, base, snap, side, interface, dtype):
         '''If the snap declaration has something to say about the declaration
-           override type (dtype), then use it instead of the base declaration.
+           override type (dtype), then use it instead of the base declaration
+           iff the store/brand passed to us matches the store/brand in the snap
+           declaration.
         '''
-        decl = base
+        decl = copy.deepcopy(base)
         base_decl = True
         decl_type = "base"
 
         if snap is not None and side in snap and interface in snap[side]:
             for k in snap[side][interface]:
                 if k.endswith(dtype):
-                    decl = snap
+                    # only apply the snap declaration if it is properly scoped
+                    # to the store
+                    if isinstance(snap[side][interface][k], dict):
+                        if 'on-store' in snap[side][interface][k] and \
+                                'on-brand' in snap[side][interface][k] and not \
+                                (self.on_store in snap[side][interface][k]['on-store'] and
+                                 self.on_brand in snap[side][interface][k]['on-brand']):
+                            # when both on-store and on-brand are in the snap
+                            # declaration, if either doesn't match, then ignore
+                            # the declaration since it isn't scoped to both
+                            continue
+                        elif 'on-store' in snap[side][interface][k] and \
+                                self.on_store not in snap[side][interface][k]['on-store']:
+                            # when on-store is in the snap declaration, if it
+                            # doesn't match, then ignore the declaration since
+                            # it isn't scoped to the store.
+                            continue
+                        elif 'on-brand' in snap[side][interface][k] and \
+                                self.on_brand not in snap[side][interface][k]['on-brand']:
+                            # when on-brand is in the snap declaration, if it
+                            # doesn't match, then ignore the declaration since
+                            # it isn't scoped to the brand.
+                            continue
+
                     base_decl = False
                     decl_type = "snap"
+                    if side not in decl:
+                        decl[side] = {}
+                    if interface not in decl[side]:
+                        decl[side][interface] = {}
+                    decl[side][interface][k] = snap[side][interface][k]
+                    # since the snap decl says something, but we copied the
+                    # base decl, make sure we get rid of the base decl
+                    # component
+                    other = None
+                    if k.startswith('allow-'):
+                        other = 'deny-%s' % dtype
+                    elif k.startswith('deny-'):
+                        other = 'allow-%s' % dtype
+                    if other is not None and other in decl[side][interface]:
+                        del(decl[side][interface][other])
                     break
 
         return (decl, base_decl, decl_type)
