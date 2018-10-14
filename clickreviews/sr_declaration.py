@@ -17,7 +17,6 @@
 from __future__ import print_function
 from clickreviews.sr_common import SnapReview, SnapReviewException
 from clickreviews.overrides import iface_attributes_noflag
-import copy
 import re
 
 # Specification:
@@ -419,7 +418,7 @@ class SnapReviewDeclaration(SnapReview):
            iff the store/brand passed to us matches the store/brand in the snap
            declaration.
         '''
-        decl = copy.deepcopy(base)
+        decl = base
         base_decl = True
         decl_type = "base"
 
@@ -450,23 +449,9 @@ class SnapReviewDeclaration(SnapReview):
                             # it isn't scoped to the brand.
                             continue
 
+                    decl = snap
                     base_decl = False
                     decl_type = "snap"
-                    if side not in decl:
-                        decl[side] = {}
-                    if interface not in decl[side]:
-                        decl[side][interface] = {}
-                    decl[side][interface][k] = snap[side][interface][k]
-                    # since the snap decl says something, but we copied the
-                    # base decl, make sure we get rid of the base decl
-                    # component
-                    other = None
-                    if k.startswith('allow-'):
-                        other = 'deny-%s' % dtype
-                    elif k.startswith('deny-'):
-                        other = 'allow-%s' % dtype
-                    if other is not None and other in decl[side][interface]:
-                        del(decl[side][interface][other])
                     break
 
         return (decl, base_decl, decl_type)
