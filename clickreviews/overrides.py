@@ -427,6 +427,10 @@ canonical_lxd = ['david.britton@canonical.com',
                  'tyler.hicks@canonical.com',
                  ]
 
+canonical_maas = ['andres.rodriguez@canonical.com',
+                  'blake.rouse@canonical.com',
+                  ]
+
 canonical_mir = ['alan.griffiths@canonical.com',
                  'gerry.boland@canonical.com',
                  'michal.sawicz@canonical.com',
@@ -493,6 +497,7 @@ update_publisher_overrides = {
         'jq-core18': canonical_snapd,
         'libreoffice': canonical_desktop,
         'lxd': canonical_lxd,
+        'maas': canonical_maas,
         'microk8s': canonical_k8s,
         'mir-kiosk': canonical_mir,
         'mir-kiosk-apps': canonical_mir,
@@ -501,6 +506,8 @@ update_publisher_overrides = {
         'network-manager': canonical_enablement,
         'pc': canonical_snapd,
         'pc-kernel': canonical_kernel,
+        'pi': canonical_snapd,
+        'pi-kernel': canonical_kernel,
         'pi2': canonical_snapd,
         'pi2-kernel': canonical_kernel,
         'pi3': canonical_snapd,
