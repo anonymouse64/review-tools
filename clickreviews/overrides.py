@@ -406,12 +406,11 @@ canonical_foundations = ['daniel.watkins@canonical.com',
                          ]
 
 canonical_kernel = ['brad.figg@canonical.com',
-                    'leann.ogasawara@canonical.com',
                     'tyler.hicks@canonical.com',
                     ]
 
 canonical_hwe = ['anthony.wong@canonical.com',
-                 'leann.ogasawara@canonical.com',
+                 'brad.figg@canonical.com',
                  ]
 
 canonical_juju = ['ian.booth@canonical.com',
@@ -422,9 +421,8 @@ canonical_k8s = ['adam.stokes@canonical.com',
                  'tim.van.steenburgh@canonical.com',
                  ]
 
-canonical_lxd = ['david.britton@canonical.com',
-                 'stephane.graber@canonical.com',
-                 'tyler.hicks@canonical.com',
+canonical_lxd = ['stephane.graber@canonical.com',
+                 'free.ekanayaka@canonical.com',
                  ]
 
 canonical_maas = ['andres.rodriguez@canonical.com',
@@ -438,11 +436,12 @@ canonical_mir = ['alan.griffiths@canonical.com',
 
 canonical_multipass = canonical_mir
 
-canonical_security = ['emily.ratliff@canonical.com',
+canonical_security = ['joe.mcmanus@canonical.com',
+                      'alex.murray@canonical.com',
                       'jamie@canonical.com',
                       ]
 
-canonical_server = ['david.britton@canonical.com',
+canonical_server = ['josh.powers@canonical.com',
                     'robie.basak@canonical.com',
                     ]
 
