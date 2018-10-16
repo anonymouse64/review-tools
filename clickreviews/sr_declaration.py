@@ -425,8 +425,14 @@ class SnapReviewDeclaration(SnapReview):
         if snap is not None and side in snap and interface in snap[side]:
             for k in snap[side][interface]:
                 if k.endswith(dtype):
-                    # only apply the snap declaration if it is properly scoped
-                    # to the store
+                    # only apply the scoped constraint from the snap
+                    # declaration if it is properly scoped to the store/brand
+                    #
+                    # NOTE: currently if --on-store/--on-brand is specified to
+                    # the review-tools but the constraint here is not scoped
+                    # (doesn't contain on-store/on-brand: []) then we treat it
+                    # as if --on-store/--on-brand was not specified. If store
+                    # behavior changes, this code might have to change.
                     if isinstance(snap[side][interface][k], dict):
                         if 'on-store' in snap[side][interface][k] and \
                                 'on-brand' in snap[side][interface][k] and not \
@@ -449,6 +455,7 @@ class SnapReviewDeclaration(SnapReview):
                             # it isn't scoped to the brand.
                             continue
 
+                    # Otherwise, use the snap declaration
                     decl = snap
                     base_decl = False
                     decl_type = "snap"
