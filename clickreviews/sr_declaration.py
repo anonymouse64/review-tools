@@ -1,6 +1,6 @@
 '''sr_declaration.py: click declaration'''
 #
-# Copyright (C) 2014-2016 Canonical Ltd.
+# Copyright (C) 2014-2018 Canonical Ltd.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 from __future__ import print_function
 from clickreviews.sr_common import SnapReview, SnapReviewException
 from clickreviews.overrides import iface_attributes_noflag
+import copy
 import re
 
 # Specification:
@@ -418,7 +419,7 @@ class SnapReviewDeclaration(SnapReview):
            iff the store/brand passed to us matches the store/brand in the snap
            declaration.
         '''
-        decl = base
+        decl = copy.deepcopy(base)  # avoid any side-effects
         base_decl = True
         decl_type = "base"
 
@@ -456,7 +457,7 @@ class SnapReviewDeclaration(SnapReview):
                             continue
 
                     # Otherwise, use the snap declaration
-                    decl = snap
+                    decl = copy.deepcopy(snap)  # avoid any side-effects
                     base_decl = False
                     decl_type = "snap"
                     break
