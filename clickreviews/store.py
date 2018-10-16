@@ -20,6 +20,7 @@ import clickreviews.debversion as debversion
 from clickreviews.common import (
     debug,
     warn,
+    get_os_codename,
     _add_error,  # make a class
 )
 import clickreviews.email as email
@@ -224,6 +225,18 @@ def get_ubuntu_release_from_manifest(m):
 
                 if pkg in snap_to_release and pkg not in installed_snaps:
                     installed_snaps.append(pkg)
+
+    # if we have an os-release, let's try to use it, otherwise fall back to old
+    # behavior
+    if 'snapcraft-os-release-id' in m and \
+            'snapcraft-os-release-version-id' in m:
+        try:
+            ubuntu_release = get_os_codename(m['snapcraft-os-release-id'],
+                                             m['snapcraft-os-release-version-id'])
+            debug("Ubuntu release=%s" % ubuntu_release)
+            return ubuntu_release
+        except ValueError:
+            pass
 
     if len(installed_snaps) == 0:
         default = "xenial"

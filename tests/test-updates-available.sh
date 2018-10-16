@@ -92,6 +92,12 @@ run "$tmp_seen" test-usn-budgie-1.db test-store-budgie.db
 # should show only 3635-1
 run "$tmp_seen" test-usn-budgie-2.db test-store-budgie.db
 
+# should show 3790-1 for test-xenial and test-bionic, but not test-default
+comment "= Test --seen-db updated for test-xenial and test-bionic ="
+reset_seen "$tmp_seen"
+run "$tmp_seen" test-usn-os-release.db test-store-os-release.db
+run "$tmp_seen" test-usn-os-release.db test-store-os-release.db
+
 # Test --snap
 echo "Running: snap-updates-available --usn-db='./tests/test-usn-budgie-2.db' --snap='./tests/test-snapcraft-manifest_0_amd64.snap'" | tee -a "$tmp"
 PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-budgie-2.db' --snap='./tests/test-snapcraft-manifest_0_amd64.snap' 2>&1 | tee -a "$tmp"

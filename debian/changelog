@@ -34,7 +34,7 @@ click-reviewers-tools (0.48) UNRELEASED; urgency=medium
   * add 2.35 interfaces
   * sr_declaration.py: support verifying on-store and on-brand constraints
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Thu, 23 Aug 2018 12:21:56 -0500
+ -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 16 Oct 2018 16:49:52 -0500
 
 click-reviewers-tools (0.47) RELEASED; urgency=medium
 

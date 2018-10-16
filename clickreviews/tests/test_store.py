@@ -359,3 +359,45 @@ class TestStore(TestCase):
 
         res = store.get_ubuntu_release_from_manifest(m)
         self.assertEquals(res, "xenial")
+
+    def test_check_get_ubuntu_release_from_manifest_os_release_xenial(self):
+        '''Test get_ubuntu_release_from_manifest() - ubuntu/xenial'''
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m['snapcraft-os-release-id'] = 'ubuntu'
+        m['snapcraft-os-release-version-id'] = '16.04'
+        res = store.get_ubuntu_release_from_manifest(m)
+        self.assertEquals(res, "xenial")
+
+    def test_check_get_ubuntu_release_from_manifest_os_release_artful(self):
+        '''Test get_ubuntu_release_from_manifest() - ubuntu/artful'''
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m['snapcraft-os-release-id'] = 'ubuntu'
+        m['snapcraft-os-release-version-id'] = '17.10'
+        res = store.get_ubuntu_release_from_manifest(m)
+        self.assertEquals(res, "artful")
+
+    def test_check_get_ubuntu_release_from_manifest_os_release_bionic(self):
+        '''Test get_ubuntu_release_from_manifest() - ubuntu/bionic'''
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m['snapcraft-os-release-id'] = 'ubuntu'
+        m['snapcraft-os-release-version-id'] = '18.04'
+        res = store.get_ubuntu_release_from_manifest(m)
+        self.assertEquals(res, "bionic")
+
+    def test_check_get_ubuntu_release_from_manifest_os_release_nonexist_os(self):
+        '''Test get_ubuntu_release_from_manifest() - nonexistent'''
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m['snapcraft-os-release-id'] = 'nonexistent'
+        m['snapcraft-os-release-version-id'] = '18.04'
+        res = store.get_ubuntu_release_from_manifest(m)
+        # fallback to old behavior
+        self.assertEquals(res, "xenial")
+
+    def test_check_get_ubuntu_release_from_manifest_os_release_nonexist_ver(self):
+        '''Test get_ubuntu_release_from_manifest() - ubuntu/nonexistent'''
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m['snapcraft-os-release-id'] = 'ubuntu'
+        m['snapcraft-os-release-version-id'] = '1.02'
+        res = store.get_ubuntu_release_from_manifest(m)
+        # fallback to old behavior
+        self.assertEquals(res, "xenial")

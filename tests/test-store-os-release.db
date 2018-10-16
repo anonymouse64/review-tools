@@ -1,0 +1,65 @@
+[
+  {
+    "publisher_email": "foo@example.com",
+    "publisher_name": "Foo Bar",
+    "name": "test-default",
+    "revisions": [
+      {
+        "uploader_email": "foo@example.com",
+        "uploader_name": "Foo Bar",
+        "channels": [
+          "stable",
+          "beta"
+        ],
+        "manifest_yaml": "name: test-default\nversion: 0\nsummary: foo\ndescription: foo\nconfinement: strict\napps:\n  foo:\n    command: bar\nparts:\n  launcher:\n    build-packages: []\n    installed-packages: []\n    installed-snaps: []\n    plugin: dump\n    prime: []\n    stage: []\n    stage-packages:\n    - python-requests=2.9.1-3ubuntu0.1\n    uname: 'Linux 4.4.0-101-generic #124-Ubuntu SMP Fri Nov 10 18:29:59 UTC 2017 i686\n      athlon i686 GNU/Linux'\ngrade: stable\narchitectures:\n- i386\nbuild-packages: []\nbuild-snaps: []\n",
+        "version": "0",
+        "architectures": [
+          "i386"
+        ],
+        "revision": 12
+      }
+    ]
+  },
+  {
+    "publisher_email": "foo@example.com",
+    "publisher_name": "Foo Bar",
+    "name": "test-xenial",
+    "revisions": [
+      {
+        "uploader_email": "foo@example.com",
+        "uploader_name": "Foo Bar",
+        "channels": [
+          "stable",
+          "beta"
+        ],
+        "manifest_yaml": "snapcfart-os-release-id: ubuntu\nsnapcraft-os-release-version-id: '16.04'\nname: test-xenial\nversion: 0\nsummary: foo\ndescription: foo\nconfinement: strict\napps:\n  foo:\n    command: bar\nparts:\n  launcher:\n    build-packages: []\n    installed-packages: []\n    installed-snaps: []\n    plugin: dump\n    prime: []\n    stage: []\n    stage-packages:\n    - python-requests=2.9.1-3\n    uname: 'Linux 4.4.0-101-generic #124-Ubuntu SMP Fri Nov 10 18:29:59 UTC 2017 i686\n      athlon i686 GNU/Linux'\ngrade: stable\narchitectures:\n- i386\nbuild-packages: []\nbuild-snaps: []\n",
+        "version": "0",
+        "architectures": [
+          "i386"
+        ],
+        "revision": 12
+      }
+    ]
+  },
+  {
+    "publisher_email": "foo@example.com",
+    "publisher_name": "Foo Bar",
+    "name": "test-bionic",
+    "revisions": [
+      {
+        "uploader_email": "foo@example.com",
+        "uploader_name": "Foo Bar",
+        "channels": [
+          "stable",
+          "beta"
+        ],
+        "manifest_yaml": "snapcraft-os-release-id: ubuntu\nsnapcraft-os-release-version-id: '18.04'\nname: test-bionic\nversion: 0\nsummary: foo\ndescription: foo\nconfinement: strict\napps:\n  foo:\n    command: bar\nparts:\n  launcher:\n    build-packages: []\n    installed-packages: []\n    installed-snaps: []\n    plugin: dump\n    prime: []\n    stage: []\n    stage-packages:\n    - python-requests=2.18.4-2\n    uname: 'Linux 4.4.0-101-generic #124-Ubuntu SMP Fri Nov 10 18:29:59 UTC 2017 i686\n      athlon i686 GNU/Linux'\ngrade: stable\narchitectures:\n- i386\nbuild-packages: []\nbuild-snaps: []\n",
+        "version": "0",
+        "architectures": [
+          "i386"
+        ],
+        "revision": 12
+      }
+    ]
+  }
+]
