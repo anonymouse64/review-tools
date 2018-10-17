@@ -92,11 +92,11 @@ class SnapReviewDeclaration(SnapReview):
             if self.is_bool(cstr):
                 if not base:
                     self._add_result('info', n, s)
-                return True
+                return False
             elif not isinstance(cstr, dict):
                 malformed(n, "%s not True, False or dict" %
                           constraint, base)
-                return True
+                return False
 
             for cstr_key in cstr:
                 if cstr_key not in allowed:
@@ -106,6 +106,9 @@ class SnapReviewDeclaration(SnapReview):
                     malformed(name, "unknown constraint key '%s'" % cstr_key,
                               base)
                     found_errors = True
+
+            if found_errors:
+                return False
 
             cstr_bools = ["on-classic"]
             cstr_lists = ["plug-snap-type",
@@ -239,7 +242,7 @@ class SnapReviewDeclaration(SnapReview):
                             found_errors = True
                             break
 
-            return found_errors
+            return not found_errors
             # end verify_constraint()
 
         # from snapd.git/assers/ifacedecls.go
@@ -270,7 +273,7 @@ class SnapReviewDeclaration(SnapReview):
                     decl[key][iface] = self.str2bool(decl[key][iface])
                 # iface may be bool or dict
                 if self.is_bool(decl[key][iface]):
-                    n = self._get_check_name('valid_%s' % key, app=iface)
+                    n = self._get_check_name('valid_%s_bool' % key, app=iface)
                     self._add_result('info', n, 'OK')
                     continue
                 elif not isinstance(decl[key][iface], dict):
@@ -279,7 +282,6 @@ class SnapReviewDeclaration(SnapReview):
                               "interface not True, False or dict", base)
                     continue
 
-                found_errors = False
                 for constraint in decl[key][iface]:
                     # snap declarations from the store express bools as strings
                     if isinstance(decl[key][iface][constraint], str):
@@ -302,7 +304,7 @@ class SnapReviewDeclaration(SnapReview):
                     if constraint not in allowed_ctrs:
                         malformed(n, "unknown constraint '%s'" % constraint,
                                   base)
-                        break
+                        continue
 
                     allowed = []
                     if constraint.endswith("-installation"):
@@ -333,10 +335,12 @@ class SnapReviewDeclaration(SnapReview):
                     else:
                         alternates.append(cstr)
 
+                    found_errors = False
                     index = 0
                     for alt in alternates:
-                        if verify_constraint(alt, decl, key, iface, index,
-                                             allowed, (len(alternates) > 1)):
+                        if not verify_constraint(alt, decl, key, iface, index,
+                                                 allowed,
+                                                 (len(alternates) > 1)):
                             found_errors = True
                         index += 1
 

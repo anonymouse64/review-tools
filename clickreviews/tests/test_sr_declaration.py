@@ -749,7 +749,7 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:valid_slots:foo'
+        name = 'declaration-snap-v2:valid_slots_bool:foo'
         expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
@@ -766,7 +766,7 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:valid_plugs:foo'
+        name = 'declaration-snap-v2:valid_plugs_bool:foo'
         expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
@@ -783,7 +783,7 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:valid_slots:foo'
+        name = 'declaration-snap-v2:valid_slots_bool:foo'
         expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
@@ -800,7 +800,7 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:valid_plugs:foo'
+        name = 'declaration-snap-v2:valid_plugs_bool:foo'
         expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
@@ -1059,7 +1059,7 @@ slots:
     def test__verify_declaration_invalid_slots_iface_constraint_str(self):
         '''Test _verify_declaration - invalid interface constraint str'''
         c = SnapReviewDeclaration(self.test_name)
-        decl = {'slots': {'foo': {'allow-installation': {'plug-snap-id': ""}}}}
+        decl = {'slots': {'foo': {'allow-connection': {'plug-snap-id': ""}}}}
         c._verify_declaration(decl=decl)
         r = c.click_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
@@ -1069,7 +1069,7 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:valid_slots:foo:allow-installation_plug-snap-id'
+        name = 'declaration-snap-v2:valid_slots:foo:allow-connection_plug-snap-id'
         expected['error'][name] = {"text": "declaration malformed ('plug-snap-id' not a list)"}
         self.check_results(r, expected=expected)
 
@@ -1080,7 +1080,7 @@ slots:
         decl = {
             'slots': {
                 'foo': {
-                    'allow-installation': {
+                    'allow-connection': {
                         'plug-snap-id': [{}]
                     }
                 }
@@ -1095,7 +1095,7 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:valid_slots:foo:allow-installation_plug-snap-id'
+        name = 'declaration-snap-v2:valid_slots:foo:allow-connection_plug-snap-id'
         expected['error'][name] = {"text": "declaration malformed ('{}' in 'plug-snap-id' not a string)"}
         self.check_results(r, expected=expected)
 
@@ -4965,9 +4965,7 @@ slots:
         self.check_results(r, expected_counts)
 
     def test_check_declaration_docker_on_brand_on_store_install_mismatch_on_store(self):
-        '''Test check_declaration - override - on-brand/on-store install
-           mismatch on-store
-        '''
+        '''Test check_declaration - override - on-brand/on-store install mismatch on-store'''
         self.set_test_snap_yaml("type", "app")
         overrides = {
             'snap_decl_slots': {
@@ -4998,6 +4996,8 @@ slots:
         expected['info'] = dict()
         name = 'declaration-snap-v2:slots_allow-installation:iface:docker'
         expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint from base declaration"}
+        name = 'declaration-snap-v2:valid_slots:docker:allow-connection'
+        expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_on_store_no_scope(self):
