@@ -398,7 +398,9 @@ canonical_desktop = ['ken.vandine@canonical.com',
                      'will.cooke@canonical.com',
                      ]
 
-canonical_enablement = ['snappy-canonical-enablement@canonical.com']
+canonical_enablement = ['snappy-canonical-enablement@canonical.com',
+                        'tony.espy@canonical.com',
+                        ]
 
 canonical_foundations = ['daniel.watkins@canonical.com',
                          'patricia.gaughen@canonical.com',
@@ -457,6 +459,8 @@ canonical_snapcraft = ['evan.dandrea@canonical.com',
 # but it was changed a little while ago
 update_publisher_overrides = {
     'snaps@canonical.com': {
+        'alsa_utils': canonical_enablement,
+        'avahi': canonical_enablement,
         'aws-kernel': canonical_kernel,
         'azure-kernel': canonical_kernel,
         'base-18': canonical_snapd,
@@ -473,6 +477,7 @@ update_publisher_overrides = {
         'dell-edge-iot-kernel': canonical_kernel,
         'dragonboard': canonical_snapd,
         'dragonboard-kernel': canonical_kernel,
+        'easy-openvpn': canonical_enablement,
         'eog': canonical_desktop,
         'gcp-kernel': canonical_kernel,
         'gedit': canonical_desktop,
@@ -495,6 +500,7 @@ update_publisher_overrides = {
         'jq': canonical_snapd,
         'jq-core18': canonical_snapd,
         'libreoffice': canonical_desktop,
+        'locationd': canonical_enablement,
         'lxd': canonical_lxd,
         'maas': canonical_maas,
         'microk8s': canonical_k8s,
@@ -503,6 +509,7 @@ update_publisher_overrides = {
         'modem-manager': canonical_enablement,
         'multipass': canonical_multipass,
         'network-manager': canonical_enablement,
+        'openwrt': canonical_enablement,
         'pc': canonical_snapd,
         'pc-kernel': canonical_kernel,
         'pi': canonical_snapd,
@@ -510,7 +517,9 @@ update_publisher_overrides = {
         'pi2': canonical_snapd,
         'pi2-kernel': canonical_kernel,
         'pi3': canonical_snapd,
+        'pulseaudio': canonical_enablement,
         'quadrapassel': canonical_desktop,
+        'se-test-tools': canonical_enablement,
         'simple-scan': canonical_desktop,
         'smt': canonical_security,
         'snapcraft': canonical_snapcraft,
@@ -543,10 +552,14 @@ update_publisher_overrides = {
         'test-snapd-system-observe-consumer': canonical_snapd,
         'test-snapd-uhid': canonical_snapd,
         'test-snapd-upower-observe-consumer': canonical_snapd,
+        'tpm': canonical_enablement,
+        'tpm2': canonical_enablement,
         'ubuntu-image': canonical_foundations,
+        'udisks2': canonical_enablement,
         'ufw': canonical_security,
         'wifi-ap': canonical_enablement,
         'wifi-connect': canonical_enablement,
+        'wpa-supplicant': canonical_enablement,
     },
 }
 
