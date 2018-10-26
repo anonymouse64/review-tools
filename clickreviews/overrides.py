@@ -32,6 +32,7 @@ redflagged_snap_types_overrides = {
     'kernel': ['dragonboard-kernel',  # Canonical reference kernels
                'linux-generic-bbb',
                'pc-kernel',
+               'pi-kernel',
                'pi2-kernel',
                'aws-kernel',  # @canonical.com kernels
                'azure-kernel',
