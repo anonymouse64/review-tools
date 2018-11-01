@@ -1924,10 +1924,6 @@ class SnapReviewLint(SnapReview):
             self._add_result(t, n, s)
             return
 
-        # for now, this is only in beta
-        t = 'warn'
-        s = 'Layouts are currently a beta feature'
-
         self._add_result(t, n, s)
 
         for target in self.snap_yaml[key]:
