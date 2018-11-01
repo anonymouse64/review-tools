@@ -110,6 +110,7 @@ OS_RELEASE_MAP = {
         '17.10': 'artful',
         '18.04': 'bionic',
         '18.10': 'cosmic',
+        '19.04': 'disco',
     },
 }
 
