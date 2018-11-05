@@ -91,7 +91,7 @@ redflagged_snap_types_overrides = {
                'sabrelite',
                'wdl-nextcloud',
                'wdl-nextcloud-pi2',
-               'artik5',  # 3rd party vendor gadgets
+               'artik5',  # 3rd party vendor and brand store gadgets
                'artik10',
                'bubblegum96-gadget',
                'dragonboard-turtlebot-kyrofa',
@@ -101,6 +101,9 @@ redflagged_snap_types_overrides = {
                'nitrogen-gadget',
                'pc-turtlebot-kyrofa',
                'rexroth-xm21',
+               'screenly-gadget-pi3',
+               'screenly-gadget-resin-rubus',
+               'screenly-gadget-cm3',
                'subutai-pc',
                'telig',
                'tsimx6-gadget',
