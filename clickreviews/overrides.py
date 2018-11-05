@@ -470,6 +470,7 @@ update_publisher_overrides = {
         'chromium': ['olivier.tilloy@canonical.com'] + canonical_desktop,
         'chromium-ffmpeg': ['olivier.tilloy@canonical.com'] + canonical_desktop,
         'chromium-mir-kiosk': ['olivier.tilloy@canonical.com'] + canonical_mir,
+        'classic': canonical_snapd,
         'cm3': canonical_snapd,
         'conjure-up': canonical_k8s,
         'core': canonical_snapd,
