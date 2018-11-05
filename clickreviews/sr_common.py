@@ -92,26 +92,30 @@ class SnapReview(Review):
                                     }
 
     apps_required = ['command']
-    apps_optional = ['after',
-                     'before',
-                     'aliases',
-                     'common-id',
-                     'completer',
-                     'daemon',
-                     'environment',
-                     'plugs',
-                     'ports',
-                     'post-stop-command',
-                     'refresh-mode',
-                     'reload-command',
-                     'restart-condition',
-                     'slots',
-                     'sockets',
-                     'stop-command',
-                     'stop-mode',
-                     'stop-timeout',
-                     'timer',
-                     ]
+    apps_optional_daemon = ['after',
+                            'before',
+                            'daemon',
+                            'ports',
+                            'post-stop-command',
+                            'refresh-mode',
+                            'reload-command',
+                            'restart-condition',
+                            'sockets',
+                            'stop-command',
+                            'stop-mode',
+                            'stop-timeout',
+                            'timer',
+                            ]
+    apps_optional_shared = ['aliases',
+                            'command',
+                            'common-id',
+                            'completer',
+                            'environment',
+                            'plugs',
+                            'slots',
+                            ]
+    apps_optional = apps_optional_daemon + \
+        apps_optional_shared
     hooks_required = []
     hooks_optional = ['plugs']
 
