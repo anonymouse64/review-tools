@@ -2199,3 +2199,40 @@ class SnapReviewLint(SnapReview):
             t = 'error'
             s = "found errors in file output: %s" % ", ".join(errors)
         self._add_result(t, n, s)
+
+    def check_apps_autostart(self):
+        '''Check apps - autostart'''
+        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+            return
+
+        # We intentionally don't check for existence since the application may
+        # create the .desktop file on the fly in
+        # $SNAP_USER_DATA/.config/autostart
+        for app in self.snap_yaml['apps']:
+            key = 'autostart'
+            if key not in self.snap_yaml['apps'][app]:
+                # We check for required elsewhere
+                continue
+
+            dname = self.snap_yaml['apps'][app][key]
+
+            t = 'info'
+            n = self._get_check_name('%s' % key, app=app)
+            s = 'OK'
+            if not isinstance(dname, str):
+                t = 'error'
+                s = "%s '%s' (not a str)" % (key, dname)
+            elif not dname.endswith('.desktop'):
+                t = 'error'
+                s = "'%s' does not end with '.desktop'" % (dname)
+            elif not re.search(r'^[a-zA-Z0-9._-]+$', dname):
+                # https://specifications.freedesktop.org/desktop-entry-spec/latest/ar01s02.html
+                # https://dbus.freedesktop.org/doc/dbus-specification.html#message-protocol-names
+                # The specification says a desktop file must be a valid DBus
+                # name. Since there are exceptions for what is allowed to under
+                # various circumstances, just do a simple match (if needed,
+                # this can be fine-tuned in the future. For simplicity, don't
+                # strip the .desktop extension since it is already valid.
+                t = 'error'
+                s = "malformed desktop file name ('%s'). Should consist of only: [a-zA-Z0-9._-]" % (dname)
+            self._add_result(t, n, s)

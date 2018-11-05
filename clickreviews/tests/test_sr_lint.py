@@ -4691,6 +4691,42 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
+    def test_check_apps_autostart(self):
+        '''Test check_apps_autostart()'''
+        self.set_test_snap_yaml("apps", {"foo": {"autostart": "foo.desktop"}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_autostart()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_autostart_invalid_list(self):
+        '''Test check_apps_autostart()'''
+        self.set_test_snap_yaml("apps", {"foo": {"autostart": []}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_autostart()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_autostart_invalid_ext(self):
+        '''Test check_apps_autostart()'''
+        self.set_test_snap_yaml("apps", {"foo": {"autostart": "foo.bad"}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_autostart()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_autostart_invalid_regex(self):
+        '''Test check_apps_autostart()'''
+        self.set_test_snap_yaml("apps", {"foo": {"autostart": "f/b.desktop"}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_autostart()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
 
 class TestSnapReviewLintNoMock(TestCase):
     """Tests without mocks where they are not needed."""
