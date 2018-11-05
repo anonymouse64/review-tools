@@ -524,6 +524,7 @@ update_publisher_overrides = {
         'se-test-tools': canonical_enablement,
         'simple-scan': canonical_desktop,
         'smt': canonical_security,
+        'snap-store': canonical_desktop,
         'snapcraft': canonical_snapcraft,
         'snapd': canonical_snapd,
         'snappy-debug': canonical_security,
