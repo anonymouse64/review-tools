@@ -92,6 +92,7 @@ class SnapReview(Review):
                                     }
 
     apps_required = ['command']
+    apps_optional_cli = ['autostart']
     apps_optional_daemon = ['after',
                             'before',
                             'daemon',
@@ -114,7 +115,8 @@ class SnapReview(Review):
                             'plugs',
                             'slots',
                             ]
-    apps_optional = apps_optional_daemon + \
+    apps_optional = apps_optional_cli + \
+        apps_optional_daemon + \
         apps_optional_shared
     hooks_required = []
     hooks_optional = ['plugs']

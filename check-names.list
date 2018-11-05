@@ -136,6 +136,7 @@ lint-snap-v2:base_interfaces|
 lint-snap-v2:base_valid|
 lint-snap-v2:before|
 lint-snap-v2:before_exists|
+lint-snap-v2:cli_required|
 lint-snap-v2:command|
 lint-snap-v2:common-id|
 lint-snap-v2:common-id_duplicates|

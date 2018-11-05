@@ -657,22 +657,20 @@ class SnapReviewLint(SnapReview):
 
             self._verify_valid_values(app, key, valid)
 
-    def check_apps_nondaemon(self):
-        '''Check apps - non-daemon'''
+    def check_apps_invalid_combinations(self):
+        '''Check apps - invalid combinations'''
         if not self.is_snap2 or 'apps' not in self.snap_yaml:
             return
 
-        # Certain options require 'daemon' so list the keys that are shared
-        # by services and binaries
+        # Certain options require 'daemon' be specified
         for app in self.snap_yaml['apps']:
             needs_daemon = []
-            for key in self.snap_yaml['apps'][app]:
-                if key not in self.apps_optional or \
-                        key == 'daemon' or \
-                        key in self.apps_optional_shared or \
-                        'daemon' in self.snap_yaml['apps'][app]:
-                    continue
-                needs_daemon.append(key)
+            if 'daemon' not in self.snap_yaml['apps'][app]:
+                for key in self.snap_yaml['apps'][app]:
+                    if key not in self.apps_optional:  # checked elsewhere
+                        continue
+                    if key in self.apps_optional_daemon:
+                        needs_daemon.append(key)
 
             t = 'info'
             n = self._get_check_name('daemon_required', app=app)
@@ -680,6 +678,24 @@ class SnapReviewLint(SnapReview):
             if len(needs_daemon) > 0:
                 t = 'error'
                 s = "'%s' must be used with 'daemon'" % ",".join(needs_daemon)
+            self._add_result(t, n, s)
+
+        # Certain options require 'daemon' not be specified
+        for app in self.snap_yaml['apps']:
+            needs_cli = []
+            if 'daemon' in self.snap_yaml['apps'][app]:
+                for key in self.snap_yaml['apps'][app]:
+                    if key not in self.apps_optional:  # checked elsewhere
+                        continue
+                    if key in self.apps_optional_cli:
+                        needs_cli.append(key)
+
+            t = 'info'
+            n = self._get_check_name('cli_required', app=app)
+            s = "OK"
+            if len(needs_cli) > 0:
+                t = 'error'
+                s = "'%s' must not be used with 'daemon'" % ",".join(needs_cli)
             self._add_result(t, n, s)
 
     def check_apps_restart_condition(self):

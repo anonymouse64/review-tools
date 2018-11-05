@@ -1715,114 +1715,144 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
-    def test_check_apps_nondaemon(self):
-        '''Test check_apps_nondaemon()'''
+    def test_check_apps_invalid_combinations_nonexistent_daemon(self):
+        '''Test check_apps_invalid_combinations() - nonexistent daemon'''
+        self.set_test_snap_yaml("apps", {"foo": {"daemon": "simple",
+                                                 "nonexistent": "bar"}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_invalid_combinations()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_invalid_combinations_nonexistent_cli(self):
+        '''Test check_apps_invalid_combinations() - nonexistent cli'''
+        self.set_test_snap_yaml("apps", {"foo": {"nonexistent": "bar"}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_invalid_combinations()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_invalid_combinations(self):
+        '''Test check_apps_invalid_combinations()'''
         entry = "simple"
         self.set_test_snap_yaml("apps", {"foo": {"daemon": entry,
                                                  "stop-command": "bin/bar"}})
         c = SnapReviewLint(self.test_name)
-        c.check_apps_nondaemon()
+        c.check_apps_invalid_combinations()
         r = c.click_report
-        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
-    def test_check_apps_nondaemon_command(self):
-        '''Test check_apps_nondaemon() - command'''
+    def test_check_apps_invalid_combinations_command(self):
+        '''Test check_apps_invalid_combinations() - command'''
         self.set_test_snap_yaml("apps", {"foo": {"command": "bin/bar"}})
         c = SnapReviewLint(self.test_name)
-        c.check_apps_nondaemon()
+        c.check_apps_invalid_combinations()
         r = c.click_report
-        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
-    def test_check_apps_nondaemon_plugs(self):
-        '''Test check_apps_nondaemon() - plugs'''
+    def test_check_apps_invalid_combinations_plugs(self):
+        '''Test check_apps_invalid_combinations() - plugs'''
         self.set_test_snap_yaml("apps", {"foo": {"command": "bin/bar",
                                                  "plugs": {}}})
         c = SnapReviewLint(self.test_name)
-        c.check_apps_nondaemon()
+        c.check_apps_invalid_combinations()
         r = c.click_report
-        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
-    def test_check_apps_nondaemon_stop(self):
-        '''Test check_apps_nondaemon() - stop'''
+    def test_check_apps_invalid_combinations_stop(self):
+        '''Test check_apps_invalid_combinations() - stop'''
         self.set_test_snap_yaml("apps", {"foo": {"command": "bin/bar",
                                                  "stop-command": "bin/bar"}})
         c = SnapReviewLint(self.test_name)
-        c.check_apps_nondaemon()
+        c.check_apps_invalid_combinations()
         r = c.click_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
-    def test_check_apps_nondaemon_stop_timeout(self):
-        '''Test check_apps_nondaemon() - stop-timeout'''
+    def test_check_apps_invalid_combinations_stop_timeout(self):
+        '''Test check_apps_invalid_combinations() - stop-timeout'''
         self.set_test_snap_yaml("apps", {"foo": {"command": "bin/bar",
                                                  "stop-timeout": 59}})
         c = SnapReviewLint(self.test_name)
-        c.check_apps_nondaemon()
+        c.check_apps_invalid_combinations()
         r = c.click_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
-    def test_check_apps_nondaemon_restart_condition(self):
-        '''Test check_apps_nondaemon() - restart-condition'''
+    def test_check_apps_invalid_combinations_restart_condition(self):
+        '''Test check_apps_invalid_combinations() - restart-condition'''
         self.set_test_snap_yaml("apps", {"foo": {"command": "bin/bar",
                                                  "restart-condition":
                                                  "never"}})
         c = SnapReviewLint(self.test_name)
-        c.check_apps_nondaemon()
+        c.check_apps_invalid_combinations()
         r = c.click_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
-    def test_check_apps_nondaemon_post_stop_command(self):
-        '''Test check_apps_nondaemon() - post-stop-command'''
+    def test_check_apps_invalid_combinations_post_stop_command(self):
+        '''Test check_apps_invalid_combinations() - post-stop-command'''
         self.set_test_snap_yaml("apps", {"foo": {"command": "bin/bar",
                                                  "post-stop-command": "bin/bar"}})
         c = SnapReviewLint(self.test_name)
-        c.check_apps_nondaemon()
+        c.check_apps_invalid_combinations()
         r = c.click_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
-    def test_check_apps_nondaemon_ports(self):
-        '''Test check_apps_nondaemon() - ports'''
+    def test_check_apps_invalid_combinations_ports(self):
+        '''Test check_apps_invalid_combinations() - ports'''
         ports = self._create_ports()
         self.set_test_snap_yaml("apps", {"foo": {"command": "bin/bar",
                                                  "ports": ports}})
         c = SnapReviewLint(self.test_name)
-        c.check_apps_nondaemon()
+        c.check_apps_invalid_combinations()
         r = c.click_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
-    def test_check_apps_nondaemon_refresh_mode(self):
-        '''Test check_apps_nondaemon() - refresh-mode'''
+    def test_check_apps_invalid_combinations_refresh_mode(self):
+        '''Test check_apps_invalid_combinations() - refresh-mode'''
         self.set_test_snap_yaml("apps", {"foo": {"command": "bin/bar",
                                                  "refresh-mode": "endure"}})
         c = SnapReviewLint(self.test_name)
-        c.check_apps_nondaemon()
+        c.check_apps_invalid_combinations()
         r = c.click_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
-    def test_check_apps_nondaemon_stop_mode(self):
-        '''Test check_apps_nondaemon() - stop-mode'''
+    def test_check_apps_invalid_combinations_stop_mode(self):
+        '''Test check_apps_invalid_combinations() - stop-mode'''
         self.set_test_snap_yaml("apps", {"foo": {"command": "bin/bar",
                                                  "stop-mode": "sigterm"}})
         c = SnapReviewLint(self.test_name)
-        c.check_apps_nondaemon()
+        c.check_apps_invalid_combinations()
         r = c.click_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
-    def test_check_apps_nondaemon_timer(self):
-        '''Test check_apps_nondaemon() - timer'''
+    def test_check_apps_invalid_combinations_timer(self):
+        '''Test check_apps_invalid_combinations() - timer'''
         self.set_test_snap_yaml("apps", {"foo": {"command": "bin/bar",
                                                  "timer": "0:00-24:00/96"}})
         c = SnapReviewLint(self.test_name)
-        c.check_apps_nondaemon()
+        c.check_apps_invalid_combinations()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_invalid_combinations_autostart(self):
+        '''Test check_apps_invalid_combinations() - autostart'''
+        self.set_test_snap_yaml("apps", {"foo": {"command": "bin/bar",
+                                                 "daemon": "simple",
+                                                 "autostart": "foo.desktop"}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_invalid_combinations()
         r = c.click_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
