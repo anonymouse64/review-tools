@@ -588,7 +588,12 @@ def _unpack_cmd(cmd_args, d, dest):
     if dest is None:
         dest = d
     else:
+        # The original directory might have restrictive permissions, so save
+        # them off, chmod the dir, do the move and reapply
+        st_mode = os.stat(d).st_mode
+        os.chmod(d, 0o0755)
         shutil.move(d, dest)
+        os.chmod(dest, st_mode & 0o7777)
 
     return dest
 
