@@ -442,6 +442,10 @@ canonical_mir = ['alan.griffiths@canonical.com',
 
 canonical_multipass = canonical_mir
 
+canonical_openstack = ['ryan.beisner@canonical.com',
+                       'james.page@canonical.com',
+                       ]
+
 canonical_security = ['joe.mcmanus@canonical.com',
                       'alex.murray@canonical.com',
                       'jamie@canonical.com',
@@ -509,6 +513,7 @@ update_publisher_overrides = {
         'lxd': canonical_lxd,
         'maas': canonical_maas,
         'microk8s': canonical_k8s,
+        'microstack': canonical_openstack,
         'mir-kiosk': canonical_mir,
         'mir-kiosk-apps': canonical_mir,
         'modem-manager': canonical_enablement,
