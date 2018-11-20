@@ -59,6 +59,7 @@ class SnapReview(Review):
                        'license-agreement',  # OBSOLETE (LP: #1638303)
                        'license-version',    # OBSOLETE
                        'summary',
+                       'title',
                        'type',
                        'plugs',
                        'slots',

@@ -940,6 +940,51 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
+    def test_check_title(self):
+        '''Test check_title'''
+        self.set_test_snap_yaml("title", "This is a test title")
+        c = SnapReviewLint(self.test_name)
+        c.check_title()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_title_missing(self):
+        '''Test check_title - not present'''
+        self.set_test_snap_yaml("title", None)
+        c = SnapReviewLint(self.test_name)
+        c.check_title()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_title_bad(self):
+        '''Test check_title - short'''
+        self.set_test_snap_yaml("title", "a")
+        c = SnapReviewLint(self.test_name)
+        c.check_title()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_title_bad2(self):
+        '''Test check_title - empty'''
+        self.set_test_snap_yaml("title", "")
+        c = SnapReviewLint(self.test_name)
+        c.check_title()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_title_bad3(self):
+        '''Test check_title - list'''
+        self.set_test_snap_yaml("title", [])
+        c = SnapReviewLint(self.test_name)
+        c.check_title()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
     def test_check_summary(self):
         '''Test check_summary'''
         self.set_test_snap_yaml("summary", "This is a test summary")

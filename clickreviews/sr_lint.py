@@ -141,12 +141,10 @@ class SnapReviewLint(SnapReview):
                 s = "invalid assumes: %s" % ",".join(bad_assumes)
         self._add_result(t, n, s)
 
-    def check_description(self):
-        '''Check description'''
+    def _check_description_summary_title(self, key):
+        '''Check description, summary or title fields'''
         if not self.is_snap2:
             return
-
-        key = 'description'
 
         t = 'info'
         n = self._get_check_name('%s_present' % key)
@@ -172,6 +170,18 @@ class SnapReviewLint(SnapReview):
             t = 'info'
             s = "%s is too short: '%s'" % (key, self.snap_yaml[key])
         self._add_result(t, n, s)
+
+    def check_description(self):
+        '''Check description'''
+        self._check_description_summary_title("description")
+
+    def check_summary(self):
+        '''Check summary'''
+        self._check_description_summary_title("summary")
+
+    def check_title(self):
+        '''Check title'''
+        self._check_description_summary_title("title")
 
     def check_name(self):
         '''Check package name'''
@@ -201,38 +211,6 @@ class SnapReviewLint(SnapReview):
             t = 'error'
             s = "malformed 'name': '%s' " % self.snap_yaml['name'] + \
                 "(may be only lower case, digits and hyphens)"
-        self._add_result(t, n, s)
-
-    def check_summary(self):
-        '''Check summary'''
-        if not self.is_snap2:
-            return
-
-        key = 'summary'
-
-        t = 'info'
-        n = self._get_check_name('%s_present' % key)
-        s = 'OK'
-        if key not in self.snap_yaml:
-            s = 'OK (optional %s field not specified)' % key
-            self._add_result(t, n, s)
-            return
-        self._add_result(t, n, s)
-
-        t = 'info'
-        n = self._get_check_name(key)
-        s = 'OK'
-        if not isinstance(self.snap_yaml[key], str):
-            t = 'error'
-            s = "invalid %s entry: %s (not a str)" % (key, self.snap_yaml[key])
-            self._add_result(t, n, s)
-            return
-        elif len(self.snap_yaml[key]) < 1:
-            t = 'error'
-            s = "invalid %s entry (empty)" % (key)
-        elif len(self.snap_yaml[key]) < len(self.snap_yaml['name']):
-            t = 'info'
-            s = "%s is too short: '%s'" % (key, self.snap_yaml[key])
         self._add_result(t, n, s)
 
     def check_type(self):
