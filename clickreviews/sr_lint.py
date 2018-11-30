@@ -141,7 +141,7 @@ class SnapReviewLint(SnapReview):
                 s = "invalid assumes: %s" % ",".join(bad_assumes)
         self._add_result(t, n, s)
 
-    def _check_description_summary_title(self, key):
+    def _check_description_summary_title(self, key, maxlen):
         '''Check description, summary or title fields'''
         if not self.is_snap2:
             return
@@ -169,19 +169,26 @@ class SnapReviewLint(SnapReview):
         elif len(self.snap_yaml[key]) < len(self.snap_yaml['name']):
             t = 'info'
             s = "%s is too short: '%s'" % (key, self.snap_yaml[key])
+        elif len(self.snap_yaml[key]) > maxlen:
+            t = 'error'
+            s = "%s is too long (> %d): '%s'" % (key, maxlen,
+                                                 self.snap_yaml[key])
         self._add_result(t, n, s)
 
     def check_description(self):
         '''Check description'''
-        self._check_description_summary_title("description")
+        # snap/validate.go
+        self._check_description_summary_title("description", 4096)
 
     def check_summary(self):
         '''Check summary'''
-        self._check_description_summary_title("summary")
+        # should mirror the store, which is currently 128
+        self._check_description_summary_title("summary", 128)
 
     def check_title(self):
         '''Check title'''
-        self._check_description_summary_title("title")
+        # snap/validate.go
+        self._check_description_summary_title("title", 40)
 
     def check_name(self):
         '''Check package name'''

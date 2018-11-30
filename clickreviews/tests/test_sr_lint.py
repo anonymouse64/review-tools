@@ -985,6 +985,15 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
+    def test_check_title_bad4(self):
+        '''Test check_title - long'''
+        self.set_test_snap_yaml("title", "0123456789012345678901234567890123456789a")
+        c = SnapReviewLint(self.test_name)
+        c.check_title()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
     def test_check_summary(self):
         '''Test check_summary'''
         self.set_test_snap_yaml("summary", "This is a test summary")
