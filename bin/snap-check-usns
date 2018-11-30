@@ -1,0 +1,83 @@
+#!/bin/bash
+set -e
+
+debug() {
+    if [ -n "$DEBUG" ]; then
+        echo "$@" >&2
+    fi
+}
+
+if [ -z "$SNAP_COMMON" ]; then
+    export SNAP_COMMON="$HOME/snap/review-tools/common"
+    debug "SNAP_COMMON not set. Defaulting to '$SNAP_COMMON'"
+fi
+
+tmpdir=$(mktemp -d -p "$SNAP_COMMON")
+cleanup() {
+    rm -frf "$tmpdir"
+}
+
+trap cleanup EXIT HUP INT QUIT TERM
+
+if [ -z "$1" ]; then
+    echo "Must specify a snap name"
+    exit 1
+fi
+
+cwd=$(pwd)
+cd "$tmpdir"
+usndb="database.json"
+if [ -e "$SNAP_COMMON/$usndb" ]; then
+    yesterday=$(date -d 'now - 1 days' +%s)
+    ftime=$(date -r "$SNAP_COMMON/$usndb" +%s)
+    if (( ftime <= yesterday )); then
+        debug "Downloading $usndb"
+        review-tools.fetch-usn-db "$usndb.bz2"
+        mv -f ./database* "$SNAP_COMMON"
+    else
+        debug "Reusing $usndb"
+    fi
+fi
+
+debug
+for i in "$@" ; do
+    cd "$cwd"  # so the next check works with relative paths
+    if [ -e "$i" ]; then
+        cd "$tmpdir"
+        if [ "${i:0:1}" = "/" ]; then
+            ln -s "$i" .
+        else
+            ln -s "$cwd/$i" .
+        fi
+    else
+        cd "$tmpdir"
+        snap download "$i" > /dev/null
+    fi
+done
+
+started=
+out="$tmpdir/out"
+for i in ./*.snap ; do
+    if [ -z "$started" ]; then
+        echo "{" > "$out"
+    else
+        echo "," >> "$out"
+    fi
+    debug "Checking $i"
+    res=$(review-tools.updates-available --usn-db="$SNAP_COMMON/$usndb" --snap="$i")
+    name=$(basename "$i" .snap)
+    echo -n "  \"$name\": " >> "$out"
+    if [ -z "$res" ]; then
+        echo -n "{}" >> "$out"
+    else
+        echo >> "$out"
+        #shellcheck disable=SC2001
+        echo -n "$res" | sed -e 's/^/    /' -e "s/'/\"/g" >> "$out"
+    fi
+    started="yes"
+    debug
+done
+echo >> "$out"
+echo "}" >> "$out"
+
+cat "$out"

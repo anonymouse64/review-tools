@@ -17,6 +17,7 @@ if os.path.exists(changelog):
 scripts = glob.glob('bin/click-*') + glob.glob('bin/snap-*')
 scripts.append('bin/create-snap-declaration')
 scripts.append('bin/snap-updates-available')
+scripts.append('bin/snap-check-usns')
 scripts.append('bin/fetch-db')
 scripts.remove('bin/click-check-skeleton')
 scripts.remove('bin/snap-check-skeleton')
