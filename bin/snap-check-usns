@@ -7,12 +7,12 @@ debug() {
     fi
 }
 
-if [ -z "$SNAP_COMMON" ]; then
-    export SNAP_COMMON="$HOME/snap/review-tools/common"
-    debug "SNAP_COMMON not set. Defaulting to '$SNAP_COMMON'"
+if [ -z "$SNAP_USER_COMMON" ]; then
+    export SNAP_USER_COMMON="$HOME/snap/review-tools/common"
+    debug "SNAP_USER_COMMON not set. Defaulting to '$SNAP_USER_COMMON'"
 fi
 
-tmpdir=$(mktemp -d -p "$SNAP_COMMON")
+tmpdir=$(mktemp -d -p "$SNAP_USER_COMMON")
 cleanup() {
     rm -frf "$tmpdir"
 }
@@ -27,13 +27,13 @@ fi
 cwd=$(pwd)
 cd "$tmpdir"
 usndb="database.json"
-if [ -e "$SNAP_COMMON/$usndb" ]; then
+if [ -e "$SNAP_USER_COMMON/$usndb" ]; then
     yesterday=$(date -d 'now - 1 days' +%s)
-    ftime=$(date -r "$SNAP_COMMON/$usndb" +%s)
+    ftime=$(date -r "$SNAP_USER_COMMON/$usndb" +%s)
     if (( ftime <= yesterday )); then
         debug "Downloading $usndb"
         review-tools.fetch-usn-db "$usndb.bz2"
-        mv -f ./database* "$SNAP_COMMON"
+        mv -f ./database* "$SNAP_USER_COMMON"
     else
         debug "Reusing $usndb"
     fi
@@ -64,7 +64,7 @@ for i in ./*.snap ; do
         echo "," >> "$out"
     fi
     debug "Checking $i"
-    res=$(review-tools.updates-available --usn-db="$SNAP_COMMON/$usndb" --snap="$i")
+    res=$(review-tools.updates-available --usn-db="$SNAP_USER_COMMON/$usndb" --snap="$i")
     name=$(basename "$i" .snap)
     echo -n "  \"$name\": " >> "$out"
     if [ -z "$res" ]; then
