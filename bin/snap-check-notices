@@ -14,6 +14,7 @@ fi
 
 fetchdb="$SNAP/bin/fetch-db"
 available="$SNAP/bin/snap-updates-available"
+usndb="database.json"
 if [ -z "$SNAP" ]; then
     fetchdb="review-tools.fetch-usn-db"
     available="review-tools.updates-available"
@@ -27,6 +28,17 @@ cleanup() {
 
 trap cleanup EXIT HUP INT QUIT TERM
 
+fetch() {
+    debug "Downloading $usndb"
+    if [ -n "$DEBUG" ]; then
+        "$fetchdb" "$usndb.bz2"
+    else
+        "$fetchdb" "$usndb.bz2" > /dev/null 2>&1
+    fi
+    mv -f ./database* "$SNAP_USER_COMMON"
+}
+
+
 if [ -z "$1" ]; then
     echo "Must specify a snap name"
     exit 1
@@ -34,17 +46,16 @@ fi
 
 cwd=$(pwd)
 cd "$tmpdir"
-usndb="database.json"
 if [ -e "$SNAP_USER_COMMON/$usndb" ]; then
     yesterday=$(date -d 'now - 1 days' +%s)
     ftime=$(date -r "$SNAP_USER_COMMON/$usndb" +%s)
     if (( ftime <= yesterday )); then
-        debug "Downloading $usndb"
-        "$fetchdb" "$usndb.bz2"
-        mv -f ./database* "$SNAP_USER_COMMON"
+        fetch
     else
         debug "Reusing $usndb"
     fi
+else
+    fetch
 fi
 
 debug
@@ -59,7 +70,11 @@ for i in "$@" ; do
         fi
     else
         cd "$tmpdir"
-        snap download "$i" > /dev/null
+        if [ -n "$DEBUG" ]; then
+            snap download "$i"
+        else
+            snap download "$i" > /dev/null
+        fi
     fi
 done
 
