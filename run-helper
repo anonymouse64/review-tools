@@ -28,7 +28,7 @@ for i in ./clickreviews/*py \
     if echo "$i" | grep -q 'cr_.*\.py' ; then
         continue
     fi
-    if echo "$i" | grep -q 'snap-check-usns' ; then
+    if echo "$i" | grep -q 'snap-check-notices' ; then
         continue  # shell
     fi
     echo "Checking $i"

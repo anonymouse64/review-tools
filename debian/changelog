@@ -38,7 +38,7 @@ click-reviewers-tools (0.48) UNRELEASED; urgency=medium
     - add 'top=True' to recursive_rm and chmod the dirPath when set
       (LP: #1786071)
     - ensure the original directory is moveable in _unpack_cmd() (LP: #1801788)
-  * add snap-check-usns
+  * add snap-check-notices
 
  -- Jamie Strandboge <jamie@ubuntu.com>  Fri, 30 Nov 2018 16:36:16 -0600
 
