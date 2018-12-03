@@ -5589,7 +5589,7 @@ apps:
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'lint-snap-v2:meta_gui_desktop'
-        expected['warn'][name] = {"text": "desktop interfaces (unity7) specified without a corresponding meta/gui/*.desktop file. If using snapcraft, please see https://snapcraft.io/docs/build-snaps/metadata#fixed-assets. Otherwise, please provide a desktop file in meta/gui/*.desktop (it should reference one of the 'apps' from your snapcraft/snap.yaml)."}
+        expected['warn'][name] = {"text": "desktop interfaces (unity7) specified without a corresponding meta/gui/*.desktop file. If using snapcraft, please see https://snapcraft.io/docs/build-snaps/metadata#fixed-assets. Otherwise, please provide a desktop file in meta/gui/*.desktop (it should reference one of the 'apps' from your snapcraft/snap.yaml). If your application legitimately does not need a desktop file, please create a topic at https://forum.snapcraft.io using the store category."}
         self.check_results(r, expected=expected)
 
     def test_check_meta_gui_desktop_missing_app_plug_exception(self):
@@ -5664,7 +5664,7 @@ apps:
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'lint-snap-v2:meta_gui_desktop'
-        expected['warn'][name] = {"text": "desktop interfaces (unity7) specified without a corresponding meta/gui/*.desktop file. If using snapcraft, please see https://snapcraft.io/docs/build-snaps/metadata#fixed-assets. Otherwise, please provide a desktop file in meta/gui/*.desktop (it should reference one of the 'apps' from your snapcraft/snap.yaml)."}
+        expected['warn'][name] = {"text": "desktop interfaces (unity7) specified without a corresponding meta/gui/*.desktop file. If using snapcraft, please see https://snapcraft.io/docs/build-snaps/metadata#fixed-assets. Otherwise, please provide a desktop file in meta/gui/*.desktop (it should reference one of the 'apps' from your snapcraft/snap.yaml). If your application legitimately does not need a desktop file, please create a topic at https://forum.snapcraft.io using the store category."}
         self.check_results(r, expected=expected)
 
     def test_check_meta_gui_desktop_missing_app_plug_reference2(self):
@@ -5703,7 +5703,7 @@ apps:
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'lint-snap-v2:meta_gui_desktop'
-        expected['warn'][name] = {"text": "desktop interfaces (unity7) specified without a corresponding meta/gui/*.desktop file. If using snapcraft, please see https://snapcraft.io/docs/build-snaps/metadata#fixed-assets. Otherwise, please provide a desktop file in meta/gui/*.desktop (it should reference one of the 'apps' from your snapcraft/snap.yaml)."}
+        expected['warn'][name] = {"text": "desktop interfaces (unity7) specified without a corresponding meta/gui/*.desktop file. If using snapcraft, please see https://snapcraft.io/docs/build-snaps/metadata#fixed-assets. Otherwise, please provide a desktop file in meta/gui/*.desktop (it should reference one of the 'apps' from your snapcraft/snap.yaml). If your application legitimately does not need a desktop file, please create a topic at https://forum.snapcraft.io using the store category."}
         self.check_results(r, expected=expected)
 
     def test_check_meta_gui_desktop_missing_app_plug_reference3(self):
@@ -5741,7 +5741,7 @@ apps:
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'lint-snap-v2:meta_gui_desktop'
-        expected['warn'][name] = {"text": "desktop interfaces (unity7) specified without a corresponding meta/gui/*.desktop file. If using snapcraft, please see https://snapcraft.io/docs/build-snaps/metadata#fixed-assets. Otherwise, please provide a desktop file in meta/gui/*.desktop (it should reference one of the 'apps' from your snapcraft/snap.yaml)."}
+        expected['warn'][name] = {"text": "desktop interfaces (unity7) specified without a corresponding meta/gui/*.desktop file. If using snapcraft, please see https://snapcraft.io/docs/build-snaps/metadata#fixed-assets. Otherwise, please provide a desktop file in meta/gui/*.desktop (it should reference one of the 'apps' from your snapcraft/snap.yaml). If your application legitimately does not need a desktop file, please create a topic at https://forum.snapcraft.io using the store category."}
         self.check_results(r, expected=expected)
 
     def test_check_meta_gui_desktop_missing_top_plug_null(self):
@@ -5778,7 +5778,7 @@ apps:
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'lint-snap-v2:meta_gui_desktop'
-        expected['warn'][name] = {"text": "desktop interfaces (unity7) specified without a corresponding meta/gui/*.desktop file. If using snapcraft, please see https://snapcraft.io/docs/build-snaps/metadata#fixed-assets. Otherwise, please provide a desktop file in meta/gui/*.desktop (it should reference one of the 'apps' from your snapcraft/snap.yaml)."}
+        expected['warn'][name] = {"text": "desktop interfaces (unity7) specified without a corresponding meta/gui/*.desktop file. If using snapcraft, please see https://snapcraft.io/docs/build-snaps/metadata#fixed-assets. Otherwise, please provide a desktop file in meta/gui/*.desktop (it should reference one of the 'apps' from your snapcraft/snap.yaml). If your application legitimately does not need a desktop file, please create a topic at https://forum.snapcraft.io using the store category."}
         self.check_results(r, expected=expected)
 
     def test_check_meta_gui_desktop_missing_top_plug(self):
@@ -5816,7 +5816,7 @@ apps:
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'lint-snap-v2:meta_gui_desktop'
-        expected['warn'][name] = {"text": "desktop interfaces (unity7) specified without a corresponding meta/gui/*.desktop file. If using snapcraft, please see https://snapcraft.io/docs/build-snaps/metadata#fixed-assets. Otherwise, please provide a desktop file in meta/gui/*.desktop (it should reference one of the 'apps' from your snapcraft/snap.yaml)."}
+        expected['warn'][name] = {"text": "desktop interfaces (unity7) specified without a corresponding meta/gui/*.desktop file. If using snapcraft, please see https://snapcraft.io/docs/build-snaps/metadata#fixed-assets. Otherwise, please provide a desktop file in meta/gui/*.desktop (it should reference one of the 'apps' from your snapcraft/snap.yaml). If your application legitimately does not need a desktop file, please create a topic at https://forum.snapcraft.io using the store category."}
         self.check_results(r, expected=expected)
 
     def test_check_meta_gui_desktop_missing_top_plug_ref(self):
@@ -5853,7 +5853,7 @@ apps:
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'lint-snap-v2:meta_gui_desktop'
-        expected['warn'][name] = {"text": "desktop interfaces (unity7) specified without a corresponding meta/gui/*.desktop file. If using snapcraft, please see https://snapcraft.io/docs/build-snaps/metadata#fixed-assets. Otherwise, please provide a desktop file in meta/gui/*.desktop (it should reference one of the 'apps' from your snapcraft/snap.yaml)."}
+        expected['warn'][name] = {"text": "desktop interfaces (unity7) specified without a corresponding meta/gui/*.desktop file. If using snapcraft, please see https://snapcraft.io/docs/build-snaps/metadata#fixed-assets. Otherwise, please provide a desktop file in meta/gui/*.desktop (it should reference one of the 'apps' from your snapcraft/snap.yaml). If your application legitimately does not need a desktop file, please create a topic at https://forum.snapcraft.io using the store category."}
         self.check_results(r, expected=expected)
 
     def test_check_meta_gui_desktop_missing_exec(self):
@@ -5939,6 +5939,7 @@ apps:
 
     def test_check_meta_gui_desktop_missing_not_mir_kiosk(self):
         '''Test check_meta_gui_desktop() - missing - not mir-kiosk'''
+        self.maxDiff = None
         output_dir = self.mkdtemp()
         path = os.path.join(output_dir, 'snap.yaml')
         content = '''
@@ -5974,5 +5975,5 @@ apps:
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'lint-snap-v2:meta_gui_desktop'
-        expected['warn'][name] = {"text": "desktop interfaces (x11) specified without a corresponding meta/gui/*.desktop file. If using snapcraft, please see https://snapcraft.io/docs/build-snaps/metadata#fixed-assets. Otherwise, please provide a desktop file in meta/gui/*.desktop (it should reference one of the 'apps' from your snapcraft/snap.yaml)."}
+        expected['warn'][name] = {"text": "desktop interfaces (x11) specified without a corresponding meta/gui/*.desktop file. If using snapcraft, please see https://snapcraft.io/docs/build-snaps/metadata#fixed-assets. Otherwise, please provide a desktop file in meta/gui/*.desktop (it should reference one of the 'apps' from your snapcraft/snap.yaml). If your application legitimately does not need a desktop file, please create a topic at https://forum.snapcraft.io using the store category."}
         self.check_results(r, expected=expected)
