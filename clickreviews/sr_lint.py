@@ -1553,30 +1553,22 @@ class SnapReviewLint(SnapReview):
                 t = 'info'
                 s = "OK (using x11 with mir-kiosk)"
             else:
-                # LP: 1643910. We have this check because BAMF from Unity 7
-                # generates desktop files without considering snaps and the
-                # snap run command. Specifically, if an X app is launched via
-                # /snap/bin/foo, then BAMF looks it up to create a desktop file
-                # for displaying in the launcher (this first launch is fine),
-                # but if the user performs 'Lock to Launcher' then the file is
-                # written out to disk with an Exec= line that does not include
-                # snap run, so launching from the launcher results in the
-                # application running unconfined. This check is horribly
-                # imperfect and doesn't account for applications that don't
-                # actually need a desktop file or a snap launching other
-                # executables that don't have desktop files. :\
-                t = 'warn'
+                # LP: 1643910. We used to have this check because BAMF from
+                # Unity 7 generated desktop files without considering snaps and
+                # the snap run command, resulting in a desktop files with a
+                # rewritten Exec= line that omitted snap run. This was fixed in
+                # LP: #1747802 so now make this an info.
+                t = 'info'
                 s = "desktop interfaces " + \
                     "(%s) " % ",".join(desktop_interfaces_specified) + \
                     "specified without a corresponding meta/gui/*.desktop " + \
-                    "file. If using snapcraft, please see " + \
-                    "https://snapcraft.io/docs/build-snaps/metadata#fixed-assets. " + \
-                    "Otherwise, please provide a desktop file in " + \
-                    "meta/gui/*.desktop (it should reference one of the " + \
-                    "'apps' from your snapcraft/snap.yaml). If your " + \
-                    "application legitimately does not need a desktop file, " + \
-                    "please create a topic at https://forum.snapcraft.io " + \
-                    "using the store category."
+                    "file. If your application does not require a desktop " + \
+                    "file, you may ignore this. Otherwise, if using " + \
+                    "snapcraft, please see " + \
+                    "https://snapcraft.io/docs/build-snaps/metadata#fixed-assets " + \
+                    "or provide a desktop file in meta/gui/*.desktop (it " + \
+                    "should reference one of the 'apps' from your " + \
+                    "snapcraft/snap.yaml)."
 
         self._add_result(t, n, s)
 
