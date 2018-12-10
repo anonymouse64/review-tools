@@ -404,6 +404,7 @@ canonical_desktop = ['ken.vandine@canonical.com',
                      ]
 
 canonical_enablement = ['snappy-canonical-enablement@canonical.com',
+                        'pascal.morin@canonical.com',
                         'tony.espy@canonical.com',
                         ]
 
@@ -570,6 +571,7 @@ update_publisher_overrides = {
         'tpm2': canonical_enablement,
         'ubuntu-image': canonical_foundations,
         'udisks2': canonical_enablement,
+        'uefi-fw-tools': canonical_enablement,
         'ufw': canonical_security,
         'wifi-ap': canonical_enablement,
         'wifi-connect': canonical_enablement,
