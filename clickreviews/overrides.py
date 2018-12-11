@@ -550,6 +550,7 @@ update_publisher_overrides = {
         'test-snapd-cups-control-consumer': canonical_snapd,
         'test-snapd-dbus-consumer': canonical_snapd,
         'test-snapd-dbus-provider': canonical_snapd,
+        'test-snapd-dbus-service': canonical_snapd,
         'test-snapd-eds': canonical_snapd,
         'test-snapd-fuse-consumer': canonical_snapd,
         'test-snapd-go-webserver': canonical_snapd,
