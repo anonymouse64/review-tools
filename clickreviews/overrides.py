@@ -406,6 +406,7 @@ canonical_desktop = ['ken.vandine@canonical.com',
 canonical_enablement = ['snappy-canonical-enablement@canonical.com',
                         'pascal.morin@canonical.com',
                         'tony.espy@canonical.com',
+                        'jim.hodapp@canonical.com',
                         ]
 
 canonical_foundations = ['daniel.watkins@canonical.com',
@@ -486,6 +487,7 @@ update_publisher_overrides = {
         'core16': canonical_snapd,
         'core18': canonical_snapd,
         'dell-edge-iot-kernel': canonical_kernel,
+        'docker': canonical_enablement,
         'dragonboard': canonical_snapd,
         'dragonboard-kernel': canonical_kernel,
         'easy-openvpn': canonical_enablement,
