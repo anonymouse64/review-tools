@@ -632,6 +632,7 @@ class SnapReviewLint(SnapReview):
                  "forking",
                  "oneshot",
                  "notify",
+                 "dbus",
                  ]
 
         for app in self.snap_yaml['apps']:
@@ -681,6 +682,125 @@ class SnapReviewLint(SnapReview):
             if len(needs_cli) > 0:
                 t = 'error'
                 s = "'%s' must not be used with 'daemon'" % ",".join(needs_cli)
+            self._add_result(t, n, s)
+
+        # 'daemon: dbus' requires:
+        # a) that 'bus-name' is specified and
+        # b) that 'bus-name' matches one of the dbus slots
+        for app in self.snap_yaml['apps']:
+            if 'daemon' not in self.snap_yaml['apps'][app] or \
+                    self.snap_yaml['apps'][app]['daemon'] != 'dbus':
+                continue  # nothing to review
+
+            t = 'info'
+            n = self._get_check_name('dbus_bus-name_required', app=app)
+            s = "OK"
+            if 'bus-name' not in self.snap_yaml['apps'][app]:
+                t = 'error'
+                s = "use of 'daemon: dbus' requires 'bus-name'"
+                self._add_result(t, n, s)
+                continue
+            elif not isinstance(self.snap_yaml['apps'][app]['bus-name'], str):
+                t = 'error'
+                s = "'bus-name' (not a str)"
+                self._add_result(t, n, s)
+                continue
+
+            needle = self.snap_yaml['apps'][app]['bus-name']
+
+            needs_slot = False
+            if "slots" not in self.snap_yaml or \
+                    not self._uses_interface("slots", "dbus"):
+                needs_slot = True
+            else:
+                has_slot = False
+                for ref in self.snap_yaml["slots"]:
+                    spec = self.snap_yaml["slots"][ref]
+                    if isinstance(spec, dict) and \
+                            (('interface' not in spec and ref == 'dbus') or
+                             ('interface' in spec and
+                                 spec['interface'] == "dbus")) and \
+                            'bus' in spec:
+                        if 'slots' in self.snap_yaml['apps'][app] and \
+                                ref in self.snap_yaml['apps'][app]['slots'] \
+                                and spec['bus'] == "system" and \
+                                'name' in spec and spec['name'] == needle:
+                            # found a matching slot in the snap-wide slot or
+                            # the app's slot
+                            has_slot = True
+
+                if not has_slot:
+                    needs_slot = True
+
+            t = 'info'
+            n = self._get_check_name('dbus_slot_required', app=app)
+            s = "OK"
+            if needs_slot:
+                t = 'error'
+                s = "must use a dbus slot that matches 'bus: system' and " + \
+                    "'name: %s'" % needle
+            self._add_result(t, n, s)
+
+        # commands should not mix dbus session and system slots
+        for app in self.snap_yaml['apps']:
+            show_report = False
+            if 'slots' not in self.snap_yaml or \
+                    len(self.snap_yaml['slots']) == 0:
+                continue
+            has_session = False
+            has_system = False
+            for ref in self.snap_yaml["slots"]:
+                spec = self.snap_yaml["slots"][ref]
+                if isinstance(spec, dict) and \
+                        (('interface' not in spec and ref == 'dbus') or
+                         ('interface' in spec and
+                             spec['interface'] == "dbus")) and \
+                        'bus' in spec:
+                    show_report = True
+                    if 'slots' in self.snap_yaml['apps'][app] and \
+                            ref in self.snap_yaml['apps'][app]['slots']:
+                        if spec['bus'] == "system":
+                            has_system = True
+                        elif spec['bus'] == "session":
+                            has_session = True
+
+            t = 'info'
+            n = self._get_check_name('dbus_mixed_slots', app=app)
+            s = "OK"
+            if has_session and has_system:
+                t = 'error'
+                s = "Cannot specify both 'bus: session' and 'bus: system' " + \
+                    "dbus slots in the same app"
+            if show_report:
+                self._add_result(t, n, s)
+
+        # 'activatable: True' should be used with 'daemon: dbus'
+        has_activatable = False
+        for app in self.snap_yaml['apps']:
+            if 'daemon' not in self.snap_yaml['apps'][app]:
+                continue
+            if 'slots' not in self.snap_yaml or \
+                    len(self.snap_yaml['slots']) == 0:
+                continue
+
+            for ref in self.snap_yaml["slots"]:
+                spec = self.snap_yaml["slots"][ref]
+                if isinstance(spec, dict) and \
+                        (('interface' not in spec and ref == 'dbus') or
+                         ('interface' in spec and
+                             spec['interface'] == "dbus")) and \
+                        'activatable' in spec and spec['activatable']:
+                    if 'slots' in self.snap_yaml['apps'][app] and \
+                            ref in self.snap_yaml['apps'][app]['slots']:
+                        has_activatable = True
+
+            t = 'info'
+            n = self._get_check_name('dbus_activatable', app=app)
+            s = "OK"
+            if has_activatable and \
+                    self.snap_yaml['apps'][app]['daemon'] != 'dbus':
+                t = 'warn'
+                s = "'activatable: true' should be used with 'daemon: dbus'"
             self._add_result(t, n, s)
 
     def check_apps_restart_condition(self):

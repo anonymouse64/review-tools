@@ -153,6 +153,10 @@ lint-snap-v2:content_source_key_valid|
 lint-snap-v2:content_source_valid|
 lint-snap-v2:daemon|
 lint-snap-v2:daemon_required|
+lint-snap-v2:dbus_activatable|
+lint-snap-v2:dbus_bus-name_required|
+lint-snap-v2:dbus_mixed_slots|
+lint-snap-v2:dbus_slot_required|
 lint-snap-v2:description|
 lint-snap-v2:description_present|
 lint-snap-v2:desktop_file|

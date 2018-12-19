@@ -1171,9 +1171,9 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.check_results(r, expected_counts)
 
     def test_check_apps_bad7(self):
-        '''Test check_apps() - unknown field (bus-name)'''
+        '''Test check_apps() - unknown field'''
         self.set_test_snap_yaml("apps", {"foo": {"command": "bin/foo",
-                                                 "bus-name": "foo"},
+                                                 "nonexistent": "foo"},
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps()
@@ -1730,6 +1730,16 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
+    def test_check_apps_daemon_dbus(self):
+        '''Test check_apps_daemon() - dbus'''
+        entry = "dbus"
+        self.set_test_snap_yaml("apps", {"foo": {"daemon": entry}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_daemon()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
     def test_check_apps_daemon_missing(self):
         '''Test check_apps_daemon() - missing'''
         self.set_test_snap_yaml("apps", {"foo": {}})
@@ -1909,6 +1919,124 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c.check_apps_invalid_combinations()
         r = c.click_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_invalid_combinations_dbus(self):
+        '''Test check_apps_invalid_combinations() - dbus'''
+        self.set_test_snap_yaml("slots", {"system": {"interface": "dbus",
+                                                     "bus": "system",
+                                                     "name": "foo",
+                                                     "activatable": True}})
+        self.set_test_snap_yaml("apps", {"foo": {"command": "bin/bar",
+                                                 "daemon": "dbus",
+                                                 "bus-name": "foo",
+                                                 "slots": ["system"]}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_invalid_combinations()
+        r = c.click_report
+        expected_counts = {'info': 5, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_invalid_combinations_dbus_bus_name_mismatch(self):
+        '''Test check_apps_invalid_combinations() - dbus mismatch'''
+        self.set_test_snap_yaml("slots", {"system": {"interface": "dbus",
+                                                     "bus": "system",
+                                                     "name": "mismatch",
+                                                     "activatable": True}})
+        self.set_test_snap_yaml("apps", {"foo": {"command": "bin/bar",
+                                                 "daemon": "dbus",
+                                                 "bus-name": "foo",
+                                                 "slots": ["system"]}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_invalid_combinations()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': None, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_invalid_combinations_dbus_bus_name(self):
+        '''Test check_apps_invalid_combinations() - dbus - bus-name'''
+        self.set_test_snap_yaml("apps", {"foo": {"command": "bin/bar",
+                                                 "daemon": "dbus"}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_invalid_combinations()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_invalid_combinations_dbus_bus_name_bad(self):
+        '''Test check_apps_invalid_combinations() - dbus - bad bus-name'''
+        self.set_test_snap_yaml("apps", {"foo": {"command": "bin/bar",
+                                                 "daemon": "dbus",
+                                                 "bus-name": []}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_invalid_combinations()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_invalid_combinations_dbus_bus_name_empty_slots(self):
+        '''Test check_apps_invalid_combinations() - dbus - bus-name - empty
+           slots
+        '''
+        self.set_test_snap_yaml("slots", {})
+        self.set_test_snap_yaml("apps", {"foo": {"command": "bin/bar",
+                                                 "daemon": "dbus",
+                                                 "bus-name": "foo"}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_invalid_combinations()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_invalid_combinations_dbus_mixed(self):
+        '''Test check_apps_invalid_combinations() - dbus - mixed slots'''
+        self.set_test_snap_yaml("slots", {"system": {"interface": "dbus",
+                                                     "bus": "system",
+                                                     "name": "foo",
+                                                     "activatable": True},
+                                          "session": {"interface": "dbus",
+                                                      "bus": "session",
+                                                      "name": "bar"}})
+        self.set_test_snap_yaml("apps", {"foo": {"command": "bin/bar",
+                                                 "daemon": "dbus",
+                                                 "bus-name": "foo",
+                                                 "slots": ["system", "session"]
+                                                 }})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_invalid_combinations()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_invalid_combinations_dbus_activatable_simple(self):
+        '''Test check_apps_invalid_combinations() - dbus activatable/simple'''
+        self.set_test_snap_yaml("slots", {"system": {"interface": "dbus",
+                                                     "bus": "system",
+                                                     "name": "foo",
+                                                     "activatable": True}})
+        self.set_test_snap_yaml("apps", {"foo": {"command": "bin/bar",
+                                                 "daemon": "simple",
+                                                 "bus-name": "foo",
+                                                 "slots": ["system"]}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_invalid_combinations()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 1, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_invalid_combinations_dbus_simple(self):
+        '''Test check_apps_invalid_combinations() - dbus activatable/simple'''
+        self.set_test_snap_yaml("slots", {"system": {"interface": "dbus",
+                                                     "bus": "system",
+                                                     "name": "foo"}})
+        self.set_test_snap_yaml("apps", {"foo": {"command": "bin/bar",
+                                                 "daemon": "simple",
+                                                 "bus-name": "foo",
+                                                 "slots": ["system"]}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_invalid_combinations()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
     def test_check_apps_restart_condition_always(self):

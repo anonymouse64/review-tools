@@ -96,6 +96,7 @@ class SnapReview(Review):
     apps_optional_cli = ['autostart']
     apps_optional_daemon = ['after',
                             'before',
+                            'bus-name',
                             'daemon',
                             'ports',
                             'post-stop-command',
@@ -198,6 +199,7 @@ class SnapReview(Review):
                                       },
                           'dbus': {'name/slots': "",
                                    'bus/slots': "",
+                                   'activatable/slots': False,
                                    'name/plugs': "",
                                    'bus/plugs': "",
                                    },
