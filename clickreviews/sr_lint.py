@@ -1953,34 +1953,94 @@ class SnapReviewLint(SnapReview):
                 continue
             self._add_result(t, n, s)
 
-            known = ['bind', 'bind-file', 'symlink']
+            # from snap/info_snap.go
+            known = ['bind', 'bind-file', 'symlink', 'type', 'user', 'group',
+                     'mode']
             for ltype in self.snap_yaml[key][target]:
                 t = 'info'
-                n = self._get_check_name('%s_type' % key, app=target,
+                n = self._get_check_name('%s' % key, app=target,
                                          extra=ltype)
                 s = 'OK'
 
                 if ltype not in known:
                     t = 'error'
-                    s = "invalid layout type: '%s' (should be one of %s)" % \
+                    s = "invalid layout: '%s' (should be one of %s)" % \
                         (ltype, ", ".join(known))
-                self._add_result(t, n, s)
+                    self._add_result(t, n, s)
+                    continue
 
-                source = self.snap_yaml[key][target][ltype]
-                t = 'info'
-                n = self._get_check_name('%s_source' % key, app=target,
-                                         extra=source)
-                s = 'OK'
+                if ltype in ['bind', 'bind-file', 'symlink']:
+                    target = target
+                    source = self.snap_yaml[key][target][ltype]
+                    t = 'info'
+                    n = self._get_check_name('%s_source' % key, app=target,
+                                             extra=source)
+                    s = 'OK'
 
-                layout_prefixes = ["$SNAP", "$SNAP_COMMON", "$SNAP_DATA"]
-                if not isinstance(source, str):
-                    t = 'error'
-                    s = "invalid source: %s (not a str)" % source
-                elif not _verify_layout_source(source, layout_prefixes):
-                    t = 'error'
-                    s = "invalid source mount: '%s'" % source + "(should " + \
-                        "be a legal path and start with one of: %s" % \
-                        ", ".join(layout_prefixes)
+                    layout_prefixes = ["$SNAP", "$SNAP_COMMON", "$SNAP_DATA"]
+                    if not isinstance(source, str):
+                        t = 'error'
+                        s = "invalid source: %s (not a str)" % source
+                    elif not _verify_layout_source(source, layout_prefixes):
+                        t = 'error'
+                        s = "invalid source mount: '%s'" % source + \
+                            "(should be a legal path and start with one " + \
+                            "of: %s" % ", ".join(layout_prefixes)
+                elif ltype == 'mode':
+                    ltype = 'mode'
+                    rdata = self.snap_yaml[key][target][ltype]
+                    if not isinstance(rdata, int) and \
+                            not isinstance(rdata, str):
+                        t = 'error'
+                        s = "invalid mode: should be an integer (eg, 0755)"
+                        self._add_result(t, n, s)
+                        continue
+
+                    mode = None
+                    if isinstance(rdata, str):
+                        try:
+                            mode = int(rdata, 8)
+                        except Exception:
+                            t = 'error'
+                            s = "mode '%s' should be an integer " % rdata + \
+                                "within 1-777 octal"
+                            self._add_result(t, n, s)
+                            continue
+                    else:
+                        mode = rdata
+
+                    if mode < 0o1 or mode > 0o777:
+                        t = 'error'
+                        s = "mode '%s' must be within 1-777 octal" % \
+                            format(mode, 'o')
+                elif ltype == 'type':
+                    ltype = 'type'
+                    rdata = self.snap_yaml[key][target][ltype]
+                    if not isinstance(rdata, str):
+                        t = 'error'
+                        s = "invalid %s (not a str)" % ltype
+                        self._add_result(t, n, s)
+                        continue
+
+                    if rdata != 'tmpfs':
+                        t = 'error'
+                        s = "invalid type: %s != tmpfs" % rdata
+                elif ltype in ['user', 'group']:
+                    rdata = self.snap_yaml[key][target][ltype]
+                    if not isinstance(rdata, str):
+                        t = 'error'
+                        s = "invalid %s (not a str)" % ltype
+                        self._add_result(t, n, s)
+                        continue
+
+                    # Don't allow specifying uids
+                    try:
+                        int(self.snap_yaml[key][target][ltype])
+                        t = 'error'
+                        s = "invalid %s (should not be a number)" % ltype
+                    except Exception:
+                        pass
+
                 self._add_result(t, n, s)
 
     def check_apps_refresh_mode(self):

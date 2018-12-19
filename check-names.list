@@ -177,7 +177,6 @@ lint-snap-v2:iffy_files|
 lint-snap-v2:layout|
 lint-snap-v2:layout_source|
 lint-snap-v2:layout_target|
-lint-snap-v2:layout_type|
 lint-snap-v2:license_valid|
 lint-snap-v2:meta_gui_desktop|
 lint-snap-v2:name_valid|
@@ -211,6 +210,8 @@ lint-snap-v2:stop-timeout_range|
 lint-snap-v2:summary|
 lint-snap-v2:summary_present|
 lint-snap-v2:timer|
+lint-snap-v2:title|
+lint-snap-v2:title_present|
 lint-snap-v2:unknown_field|
 lint-snap-v2:unknown_hook|https://forum.snapcraft.io/t/supported-snap-hooks/3795
 lint-snap-v2:unknown_refresh_mode|

@@ -4297,11 +4297,21 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                 '/var/lib/demo': {
                     'bind': '$SNAP_DATA/var/lib/demo'
                 },
+                '/var/lib/foo': {
+                    'type': 'tmpfs',
+                    'mode': '755',
+                },
+                '/var/lib/bar': {
+                    'type': 'tmpfs',
+                    'user': 'username',
+                    'group': 'groupname',
+                    'mode': '0755',
+                },
             })
         c = SnapReviewLint(self.test_name)
         c.check_layout()
         r = c.click_report
-        expected_counts = {'info': 22, 'warn': 0, 'error': 0}
+        expected_counts = {'info': 23, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
     def test_check_layout_bad(self):
@@ -4402,6 +4412,110 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             "layout", {
                 '/etc/demo': {
                     'nonexistent': '$SNAP_COMMON/etc/demo'
+                },
+            })
+        c = SnapReviewLint(self.test_name)
+        c.check_layout()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_layout_mode_bad(self):
+        '''Test check_layout() - mode bad'''
+        self.set_test_snap_yaml(
+            "layout", {
+                '/var/lib/foo': {
+                    'type': 'tmpfs',
+                    'mode': [],
+                },
+            })
+        c = SnapReviewLint(self.test_name)
+        c.check_layout()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_layout_mode_range(self):
+        '''Test check_layout() - mode range'''
+        self.set_test_snap_yaml(
+            "layout", {
+                '/var/lib/foo': {
+                    'type': 'tmpfs',
+                    'mode': 0,
+                },
+                '/var/lib/bar': {
+                    'type': 'tmpfs',
+                    'mode': '778',
+                },
+            })
+        c = SnapReviewLint(self.test_name)
+        c.check_layout()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 2}
+        self.check_results(r, expected_counts)
+
+    def test_check_layout_type_bad(self):
+        '''Test check_layout() - type bad'''
+        self.set_test_snap_yaml(
+            "layout", {
+                '/var/lib/foo': {
+                    'type': [],
+                },
+            })
+        c = SnapReviewLint(self.test_name)
+        c.check_layout()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_layout_type_nonexistent(self):
+        '''Test check_layout() - type nonexistent'''
+        self.set_test_snap_yaml(
+            "layout", {
+                '/var/lib/foo': {
+                    'type': 'nonexistent',
+                },
+            })
+        c = SnapReviewLint(self.test_name)
+        c.check_layout()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_layout_user_bad(self):
+        '''Test check_layout() - user bad'''
+        self.set_test_snap_yaml(
+            "layout", {
+                '/var/lib/foo': {
+                    'user': [],
+                },
+            })
+        c = SnapReviewLint(self.test_name)
+        c.check_layout()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_layout_user_invalid(self):
+        '''Test check_layout() - user invalid'''
+        self.set_test_snap_yaml(
+            "layout", {
+                '/var/lib/foo': {
+                    'user': "0",
+                },
+            })
+        c = SnapReviewLint(self.test_name)
+        c.check_layout()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_layout_group_bad(self):
+        '''Test check_layout() - group bad'''
+        self.set_test_snap_yaml(
+            "layout", {
+                '/var/lib/foo': {
+                    'group': [],
                 },
             })
         c = SnapReviewLint(self.test_name)
