@@ -24,6 +24,7 @@ click-reviewers-tools (0.48) UNRELEASED; urgency=medium
     - add unicode-text-validation for toplevel snap.yaml fields (LP: #1750527)
     - bases are allowed with 'type: gadget'
     - add checks for personal-files/system-files
+    - add checks for command-chain
   * sr_security.py:
     - fix evaluation of SNAP_ENFORCE_RESQUASHFS so '0' turns it off
     - turn on resquash tests by default
@@ -41,7 +42,7 @@ click-reviewers-tools (0.48) UNRELEASED; urgency=medium
     - ensure the original directory is moveable in _unpack_cmd() (LP: #1801788)
   * add snap-check-notices
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Fri, 30 Nov 2018 16:36:16 -0600
+ -- Jamie Strandboge <jamie@ubuntu.com>  Wed, 09 Jan 2019 10:46:38 -0600
 
 click-reviewers-tools (0.47) RELEASED; urgency=medium
 
