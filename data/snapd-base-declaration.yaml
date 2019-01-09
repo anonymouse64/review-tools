@@ -25,7 +25,13 @@
   lxd-support:
     allow-installation: false
     deny-auto-connection: true
+  personal-files:
+    allow-installation: false
+    deny-auto-connection: true
   snapd-control:
+    allow-installation: false
+    deny-auto-connection: true
+  system-files:
     allow-installation: false
     deny-auto-connection: true
   unity8:
@@ -499,6 +505,11 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  personal-files:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   physical-memory-control:
     allow-installation:
       slot-snap-type:
@@ -582,6 +593,11 @@
       slot-snap-type:
         - app
     deny-connection: true
+    deny-auto-connection: true
+  system-files:
+    allow-installation:
+      slot-snap-type:
+        - core
     deny-auto-connection: true
   system-observe:
     allow-installation:

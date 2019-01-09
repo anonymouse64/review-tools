@@ -5023,6 +5023,92 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
+    def test_check_interface_personal_files_plugs(self):
+        '''Test check_interface_personal_files_plugs()'''
+        plugs = {"personal-files": {"read": ["$HOME/.foo"]}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewLint(self.test_name)
+        c.check_interface_personal_system_files_plugs()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_interface_personal_files_plugs_invalid(self):
+        '''Test check_interface_personal_files_plugs() - invalid (str)'''
+        plugs = {"personal-files": {"read": "$HOME/.foo"}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewLint(self.test_name)
+        c.check_interface_personal_system_files_plugs()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_interface_personal_files_plugs_invalid_entry(self):
+        '''Test check_interface_personal_files_plugs() - invalid entry'''
+        plugs = {"personal-files": {"read": [{}]}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewLint(self.test_name)
+        c.check_interface_personal_system_files_plugs()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_check_interface_personal_files_plugs_badpath1(self):
+        '''Test check_interface_personal_files_plugs() - invalid normpath'''
+        plugs = {"personal-files": {"read": ["$HOME/./.foo"]}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewLint(self.test_name)
+        c.check_interface_personal_system_files_plugs()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_check_interface_personal_files_plugs_badpath2(self):
+        '''Test check_interface_personal_files_plugs() - invalid abspath'''
+        plugs = {"personal-files": {"read": ["/foo"]}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewLint(self.test_name)
+        c.check_interface_personal_system_files_plugs()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_interface_system_files_plugs(self):
+        '''Test check_interface_system_files_plugs()'''
+        plugs = {
+            "ref": {
+                "interface": "system-files",
+                "write": ["/foo"]
+            },
+            "network": {}
+        }
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewLint(self.test_name)
+        c.check_interface_personal_system_files_plugs()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_check_interface_system_files_plugs_badpath1(self):
+        '''Test check_interface_system_files_plugs() - invalid normpath'''
+        plugs = {"system-files": {"write": ["/./foo"]}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewLint(self.test_name)
+        c.check_interface_personal_system_files_plugs()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_check_interface_system_files_plugs_badpath2(self):
+        '''Test check_interface_system_files_plugs() - invalid home path'''
+        plugs = {"system-files": {"write": ["$HOME/.foo"]}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewLint(self.test_name)
+        c.check_interface_personal_system_files_plugs()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
 
 class TestSnapReviewLintNoMock(TestCase):
     """Tests without mocks where they are not needed."""

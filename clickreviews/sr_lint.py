@@ -2408,3 +2408,58 @@ class SnapReviewLint(SnapReview):
                 t = 'error'
                 s = "malformed desktop file name ('%s'). Should consist of only: [a-zA-Z0-9._-]" % (dname)
             self._add_result(t, n, s)
+
+    def check_interface_personal_system_files_plugs(self):
+        '''Check personal-files/system-files interface plug attributes'''
+        if not self.is_snap2 or 'plugs' not in self.snap_yaml:
+            return
+
+        for plug in self.snap_yaml['plugs']:
+            iname = plug
+            if 'interface' in self.snap_yaml['plugs'][iname]:
+                iname = self.snap_yaml['plugs'][iname]['interface']
+
+            if iname not in ['personal-files', 'system-files']:
+                continue
+
+            iface = self.snap_yaml['plugs'][plug]
+
+            for attrib in ['read', 'write']:
+                if attrib not in iface:
+                    continue
+                if not isinstance(iface[attrib], list):
+                    t = 'error'
+                    n = self._get_check_name('%s_attrib_valid' % iname,
+                                             app=attrib)
+                    s = "invalid attribute: %s (not a list)" % attrib
+                    self._add_result(t, n, s)
+                    continue
+
+                for entry in iface[attrib]:
+                    if not isinstance(entry, str):
+                        t = 'error'
+                        n = self._get_check_name('%s_valid' % iname,
+                                                 app=attrib)
+                        s = "invalid entry: %s (not a str)" % entry
+                        self._add_result(t, n, s)
+                        continue
+
+                    t = 'info'
+                    n = self._get_check_name('%s_path' % iname,
+                                             app=attrib)
+                    s = 'OK'
+                    if (iname == 'personal-files' and
+                            not entry.startswith('$HOME/')) or \
+                            (iname == 'system-files' and
+                             not entry.startswith('/')):
+                        t = 'error'
+                        suggested = '/'
+                        if iname == 'personal-files':
+                            suggested = '$HOME'
+                        s = "invalid path for entry: %s " % entry + \
+                            "(should start with '%s')" % suggested
+                    elif '\0' in entry or os.path.normpath(entry) != entry:
+                        t = 'error'
+                        s = "invalid path: %s " % entry
+
+                    self._add_result(t, n, s)

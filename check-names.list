@@ -184,6 +184,9 @@ lint-snap-v2:layout_target|
 lint-snap-v2:license_valid|
 lint-snap-v2:meta_gui_desktop|
 lint-snap-v2:name_valid|
+lint-snap-v2:personal-files_attrib_valid|
+lint-snap-v2:personal-files_path|
+lint-snap-v2:personal-files_valid|
 lint-snap-v2:plugs|
 lint-snap-v2:plugs_attributes|
 lint-snap-v2:plugs_required_attributes|
@@ -213,6 +216,7 @@ lint-snap-v2:stop-timeout|
 lint-snap-v2:stop-timeout_range|
 lint-snap-v2:summary|
 lint-snap-v2:summary_present|
+lint-snap-v2:system-files_path|
 lint-snap-v2:timer|
 lint-snap-v2:title|
 lint-snap-v2:title_present|

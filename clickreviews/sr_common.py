@@ -215,6 +215,9 @@ class SnapReview(Review):
                           'iio': {'path/slots': ""},
                           'mpris': {'name/slots': ""},
                           'optical-drive': {'write/plugs': False},
+                          'personal-files': {'read/plugs': [],
+                                             'write/plugs': [],
+                                             },
                           'serial-port': {'path/slots': "",
                                           'usb-vendor/slots': 0,
                                           'usb-product/slots': 0,
@@ -222,6 +225,9 @@ class SnapReview(Review):
                                           },
                           'snapd-control': {'refresh-schedule/plugs': ""},
                           'spi': {'path/slots': ""},
+                          'system-files': {'read/plugs': [],
+                                           'write/plugs': [],
+                                           },
                           }
 
     # interfaces_required[iface] lists required attributes as combinations.
