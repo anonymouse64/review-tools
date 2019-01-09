@@ -1470,6 +1470,141 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
+    def test_check_apps_command_chain(self):
+        '''Test check_apps_command_chain()'''
+        cmd = "bin/foo"
+        self.set_test_snap_yaml("apps", {"foo": {"command-chain": [cmd]},
+                                         })
+        c = SnapReviewLint(self.test_name)
+        c.pkg_files.append(os.path.join('/fake', cmd))
+        c.check_apps_command_chain()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_command_chain_dotslash(self):
+        '''Test check_apps_command_chain() - starts with ./'''
+        cmd = "bin/foo"
+        self.set_test_snap_yaml("apps", {"foo": {"command-chain": ["./" + cmd]},
+                                         })
+        c = SnapReviewLint(self.test_name)
+        c.pkg_files.append(os.path.join('/fake', cmd))
+        c.check_apps_command_chain()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_command_chain_missing(self):
+        '''Test check_apps_command_chain() - missing'''
+        self.set_test_snap_yaml("apps", {"foo": {}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_command_chain()
+        r = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_command_chain_empty(self):
+        '''Test check_apps_command_chain() - empty'''
+        self.set_test_snap_yaml("apps", {"foo": {"command-chain": []},
+                                         })
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_command_chain()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_command_chain_command_empty(self):
+        '''Test check_apps_command_chain() - command empty'''
+        self.set_test_snap_yaml("apps", {"foo": {"command-chain": [""]},
+                                         })
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_command_chain()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_command_chain_invalid(self):
+        '''Test check_apps_command_chain() - dict'''
+        self.set_test_snap_yaml("apps", {"foo": {"command-chain": {}},
+                                         })
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_command_chain()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_command_chain_command_invalid(self):
+        '''Test check_apps_command_chain() - dict'''
+        self.set_test_snap_yaml("apps", {"foo": {"command-chain": [{}]},
+                                         })
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_command_chain()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_command_chain_nonexistent(self):
+        '''Test check_apps_command_chain() - nonexistent'''
+        cmd = "bin/foo"
+        self.set_test_snap_yaml("apps", {"foo": {"command-chain": [cmd]},
+                                         })
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_command_chain()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_one_command_chain_with_args(self):
+        '''Test check_apps() - one command with args'''
+        cmd = "bin/foo"
+        self.set_test_snap_yaml("apps", {"foo": {"command-chain": ["%s -c bar" % cmd]}})
+        c = SnapReviewLint(self.test_name)
+        c.pkg_files.append(os.path.join('/fake', cmd))
+        c.check_apps_command_chain()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_one_command_chain_with_space(self):
+        '''Test check_apps() - one command with space'''
+        cmd = "bin/foo bar"
+        self.set_test_snap_yaml("apps", {"foo": {"command-chain": ["'%s'" % cmd]}})
+        c = SnapReviewLint(self.test_name)
+        c.pkg_files.append(os.path.join('/fake', cmd))
+        c.check_apps_command_chain()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_one_command_chain_with_space_with_args(self):
+        '''Test check_apps() - one command with space with args'''
+        cmd = "bin/foo bar"
+        self.set_test_snap_yaml("apps", {"foo": {"command-chain": ["'%s' -c foo" % cmd]}})
+        c = SnapReviewLint(self.test_name)
+        c.pkg_files.append(os.path.join('/fake', cmd))
+        c.check_apps_command_chain()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_one_command_chain_with_unmatched_startquote(self):
+        '''Test check_apps() - one command with unmatched startquote'''
+        self.set_test_snap_yaml("apps", {"foo": {"command-chain": ["'bin/foo bar"]}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_command_chain()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_one_command_chain_with_unmatched_midquote(self):
+        '''Test check_apps() - one command with unmatched midquote'''
+        self.set_test_snap_yaml("apps", {"foo": {"command-chain": ["bin/foo'bar"]}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_command_chain()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
     def test_check_apps_completer(self):
         '''Test check_apps_completer()'''
         cmd = "bin/foo"

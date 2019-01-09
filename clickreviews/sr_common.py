@@ -111,6 +111,7 @@ class SnapReview(Review):
                             ]
     apps_optional_shared = ['aliases',
                             'command',
+                            'command-chain',
                             'common-id',
                             'completer',
                             'environment',
