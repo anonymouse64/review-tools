@@ -68,6 +68,7 @@ redflagged_snap_types_overrides = {
     'gadget': ['cm3',        # Canonical reference gadgets
                'dragonboard',
                'pc',
+               'pi',
                'pi2',
                'pi3',
                'cm3-ondra',  # @canonical.com gadgets
