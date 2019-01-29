@@ -35,6 +35,7 @@ click-reviewers-tools (0.48) UNRELEASED; urgency=medium
   * add 2.34 interfaces
   * add 2.35 interfaces
   * add 2.36 interfaces
+  * add 2.37 interfaces
   * sr_declaration.py: support verifying on-store and on-brand constraints
   * common.py:
     - add 'top=True' to recursive_rm and chmod the dirPath when set
@@ -42,7 +43,7 @@ click-reviewers-tools (0.48) UNRELEASED; urgency=medium
     - ensure the original directory is moveable in _unpack_cmd() (LP: #1801788)
   * add snap-check-notices
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Wed, 09 Jan 2019 10:46:38 -0600
+ -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 29 Jan 2019 08:21:50 -0600
 
 click-reviewers-tools (0.47) RELEASED; urgency=medium
 
