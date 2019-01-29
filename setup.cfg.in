@@ -1,4 +1,5 @@
 # E501 line too long
 # W504 line break after binary operator
+# W605 invalid escape sequence (remove this after click code is removed)
 [pep8]
-ignore = E501,W504
+ignore = E501,W504,W605
