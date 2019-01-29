@@ -186,6 +186,7 @@ class Review(object):
         'application/x-executable',
         'application/x-sharedlib',
         'application/x-object',
+        'application/x-pie-executable',
     ]
 
     def __init__(self, fn, review_type, overrides=None):
