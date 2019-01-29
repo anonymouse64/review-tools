@@ -3,6 +3,9 @@
 
 "16":
  plugs:
+  block-devices:
+    allow-installation: false
+    deny-auto-connection: true
   classic-support:
     allow-installation: false
     deny-auto-connection: true
@@ -47,6 +50,11 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  adb-support:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   alsa:
     allow-installation:
       slot-snap-type:
@@ -73,6 +81,11 @@
     deny-auto-connection: true
     deny-connection:
       on-classic: false
+  block-devices:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   bluetooth-control:
     allow-installation:
       slot-snap-type:
@@ -191,6 +204,16 @@
     allow-installation:
       slot-snap-type:
         - core
+  device-buttons:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
+  display-control:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   docker:
     allow-installation: false
     deny-connection: true
@@ -323,6 +346,11 @@
         - core
     deny-auto-connection: true
   kernel-module-control:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
+  kernel-module-observe:
     allow-installation:
       slot-snap-type:
         - core
@@ -631,6 +659,11 @@
         - core
     deny-auto-connection: true
   tpm:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
+  u2f-devices:
     allow-installation:
       slot-snap-type:
         - core
