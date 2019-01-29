@@ -833,7 +833,7 @@ def detect_package(fn, dir):
 
 def find_external_symlinks(unpack_dir, pkg_files, pkgname):
     '''Check if symlinks in the package go out to the system.'''
-    common = '(-[0-9.]+)?\.so(\.[0-9.]+)?'
+    common = r'(-[0-9.]+)?\.so(\.[0-9.]+)?'
     libc6_libs = ['ld-*.so',
                   'libanl',
                   'libBrokenLocale',

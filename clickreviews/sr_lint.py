@@ -63,7 +63,7 @@ class SnapReviewLint(SnapReview):
                           'CVS*',
                           'RCS*'
                           ]
-        self.iffy_files = ['^\..+\.swp$',  # vim
+        self.iffy_files = [r'^\..+\.swp$',  # vim
                            ]
 
         self._list_all_compiled_binaries()
