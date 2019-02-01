@@ -113,7 +113,10 @@ def main():
 
         if snap not in reports:
             reports[snap] = dict()
-        reports[snap][rev] = json.loads(out.replace("'", '"'))
+        if out == '':
+            reports[snap][rev] = dict()
+        else:
+            reports[snap][rev] = json.loads(out.replace("'", '"'))
 
     pprint.pprint(reports)
 
