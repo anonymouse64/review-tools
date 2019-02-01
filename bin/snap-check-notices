@@ -1,106 +1,126 @@
-#!/bin/bash
-set -e
+#!/usr/bin/python3
 
-debug() {
-    if [ -n "$DEBUG" ]; then
-        echo "$@" >&2
-    fi
-}
+# Copyright (C) 2019 Canonical Ltd.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-if [ -z "$SNAP_USER_COMMON" ]; then
-    export SNAP_USER_COMMON="$HOME/snap/review-tools/common"
-    debug "SNAP_USER_COMMON not set. Defaulting to '$SNAP_USER_COMMON'"
-fi
+import argparse
+import json
+import os
+import pprint
+import sys
+import tempfile
+import time
 
-fetchdb="$SNAP/bin/fetch-db"
-available="$SNAP/bin/snap-updates-available"
-usndb="database.json"
-if [ -z "$SNAP" ]; then
-    fetchdb="review-tools.fetch-usn-db"
-    available="review-tools.updates-available"
-    debug "SNAP not set. Defaulting to 'review-tools.*'"
-fi
-
-tmpdir=$(mktemp -d -p "$SNAP_USER_COMMON")
-cleanup() {
-    rm -frf "$tmpdir"
-}
-
-trap cleanup EXIT HUP INT QUIT TERM
-
-fetch() {
-    debug "Downloading $usndb"
-    if [ -n "$DEBUG" ]; then
-        "$fetchdb" "$usndb.bz2"
-    else
-        "$fetchdb" "$usndb.bz2" > /dev/null 2>&1
-    fi
-    mv -f ./database* "$SNAP_USER_COMMON"
-}
+import clickreviews.common as common
+from clickreviews.common import (
+    cmd,
+    debug,
+    warn,
+    error,
+)
 
 
-if [ -z "$1" ]; then
-    echo "Must specify a snap name"
-    exit 1
-fi
+def help():
+    print('''Usage:
+$ %s SNAP1 SNAP2 ...
+''' % os.path.basename(sys.argv[0]))
 
-cwd=$(pwd)
-cd "$tmpdir"
-if [ -e "$SNAP_USER_COMMON/$usndb" ]; then
-    yesterday=$(date -d 'now - 1 days' +%s)
-    ftime=$(date -r "$SNAP_USER_COMMON/$usndb" +%s)
-    if (( ftime <= yesterday )); then
-        fetch
-    else
-        debug "Reusing $usndb"
-    fi
-else
-    fetch
-fi
 
-debug
-for i in "$@" ; do
-    cd "$cwd"  # so the next check works with relative paths
-    if [ -e "$i" ]; then
-        cd "$tmpdir"
-        if [ "${i:0:1}" = "/" ]; then
-            ln -s "$i" .
-        else
-            ln -s "$cwd/$i" .
-        fi
-    else
-        cd "$tmpdir"
-        if [ -n "$DEBUG" ]; then
-            snap download "$i"
-        else
-            snap download "$i" > /dev/null
-        fi
-    fi
-done
+def main():
+    common.REPORT_OUTPUT = "console"
+    if len(sys.argv) < 2:
+        help()
+        error("Please specify the path to the snap(s)")
+    elif sys.argv[1] in ['-h', '--help', 'help']:
+        help()
+        sys.exit(0)
 
-started=
-out="$tmpdir/out"
-for i in ./*.snap ; do
-    if [ -z "$started" ]; then
-        echo "{" > "$out"
-    else
-        echo "," >> "$out"
-    fi
-    debug "Checking $i"
-    res=$("$available" --usn-db="$SNAP_USER_COMMON/$usndb" --snap="$i")
-    name=$(basename "$i" .snap)
-    echo -n "  \"$name\": " >> "$out"
-    if [ -z "$res" ]; then
-        echo -n "{}" >> "$out"
-    else
-        echo >> "$out"
-        #shellcheck disable=SC2001
-        echo -n "$res" | sed -e 's/^/    /' -e "s/'/\"/g" >> "$out"
-    fi
-    started="yes"
-    debug
-done
-echo >> "$out"
-echo "}" >> "$out"
+    # initialize variables
+    if 'SNAP_USER_COMMON' not in os.environ:
+        os.environ['SNAP_USER_COMMON'] = "%s/snap/review-tools/common" % \
+            os.environ['HOME']
+        debug("SNAP_USER_COMMON not set. Defaulting to %s" %
+              os.environ['SNAP_USER_COMMON'])
 
-cat "$out"
+    usndb = "database.json"
+    if 'SNAP' in os.environ:
+        fetchdb = "%s/bin/fetch-db" % os.environ['SNAP']
+        available = "%s/bin/snap-updates-available" % os.environ['SNAP']
+    else:
+        fetchdb = "review-tools.fetch-usn-db"
+        available = "review-tools.updates-available"
+        debug("SNAP not set. Defaulting to 'review-tools.*'")
+
+    curdir = os.getcwd()
+    os.chdir(os.environ['SNAP_USER_COMMON'])
+
+    # download the usndb
+    do_fetch = False
+    update_interval = 60 * 60 * 24  # one day
+    if not os.path.exists("./" + usndb) or \
+            time.time() - os.path.getmtime("./" + usndb) >= update_interval:
+        rc, out = cmd([fetchdb, "%s.bz2" % usndb])
+        if rc != 0:
+            error(out)
+    else:
+        debug("Reusing %s" % usndb)
+
+    os.chdir(curdir)
+
+    reports = dict()
+    had_debug = None
+    if 'SNAP_DEBUG' in os.environ:
+        had_debug = os.environ['SNAP_DEBUG']
+
+    for pkg in sys.argv[1:]:
+        if not os.path.isfile(pkg):
+            warn("Skipping '%s', not a regular file" % pkg)
+            continue
+
+        snap = os.path.basename(pkg).split('_')[0]
+        rev = "unknown"
+        if '_' in pkg:
+            rev = os.path.basename(pkg).split('_')[1].split(".")[0]
+
+        if snap in reports and rev in reports[snap]:
+            debug("Skipping %s with revision %s" % (snap, rev))
+            continue
+
+        # this carries through to available
+        if had_debug is not None:
+            os.unsetenv('SNAP_DEBUG')
+        rc, out = cmd([available,
+                       '--usn-db=%s' %
+                       os.path.join(os.environ['SNAP_USER_COMMON'], usndb),
+                       '--snap=%s' % os.path.abspath(pkg)])
+        if had_debug is not None:
+            os.environ['SNAP_DEBUG'] = had_debug
+
+        if rc != 0:
+            warn(out)
+            continue
+
+        if snap not in reports:
+            reports[snap] = dict()
+        reports[snap][rev] = json.loads(out.replace("'", '"'))
+
+    pprint.pprint(reports)
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("Aborted.")
+        sys.exit(1)
