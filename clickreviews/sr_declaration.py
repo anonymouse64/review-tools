@@ -978,7 +978,7 @@ class SnapReviewDeclaration(SnapReview):
 
             return matched
 
-        print("JAMIE3.0: side=%s, iface=%s, rules=%s, cstr=%s" % (side, iface, rules, cstr))
+        print("JAMIE3: side=%s, iface=%s, rules=%s, cstr=%s" % (side, iface, rules, cstr))
         matched = False
         checked = False
 
@@ -1004,12 +1004,23 @@ class SnapReviewDeclaration(SnapReview):
         print("JAMIE3.4: matched=%s, checked=%s, cstr=%s" % (matched, checked, cstr))
         if checked and ((matched and cstr.startswith('deny')) or
                         (not matched and cstr.startswith('allow'))):
-            return "failed due to %s constraint" % cstr
+            s = "failed due to %s constraint (interface attributes)" % cstr
+            if "plug-attributes" in rules and \
+                    'allow-sandbox' in rules['plug-attributes'] and \
+                    rules['plug-attributes']['allow-sandbox']:
+                s += ". If using a chromium webview, you can disable the " + \
+                     "internal sandbox (eg, use --no-sandbox) and remove " + \
+                     "the 'allow-sandbox' attribute instead. For " + \
+                     "QtWebEngine webviews, export " + \
+                     "QTWEBENGINE_DISABLE_SANDBOX=1 to disable its " + \
+                     "internal sandbox."
+            return s
 
         return None
 
     # func checkSnapType() in helpers.go
     def _checkSnapType(self, side, iface, rules, cstr):
+        print("JAMIE4: side=%s, iface=%s, rules=%s, cstr=%s" % (side, iface, rules, cstr))
         snap_type = 'app'
         if 'type' in self.snap_yaml:
             snap_type = self.snap_yaml['type']
@@ -1029,7 +1040,7 @@ class SnapReviewDeclaration(SnapReview):
         print("JAMIE4.4: matched=%s, checked=%s, cstr=%s" % (matched, checked, cstr))
         if checked and ((matched and cstr.startswith('deny')) or
                         (not matched and cstr.startswith('allow'))):
-            return "failed due to %s constraint (interface attributes)" % cstr
+            return "failed due to %s constraint (snap-type)" % cstr
 
         return None
 
@@ -1039,51 +1050,57 @@ class SnapReviewDeclaration(SnapReview):
         if 'type' in self.snap_yaml and self.snap_yaml['type'] != 'app':
             return None
 
-        matched = False
-        checked = False
-        for rules_key in rules:
-            if not rules_key == "on-classic":
-                continue
-            checked = True
-
-        print("JAMIE5.4: matched=%s, checked=%s, cstr=%s" % (matched, checked, cstr))
-        if checked and ((matched and cstr.startswith('deny')) or
-                        (not matched and cstr.startswith('allow'))):
+        # if on-classic is specified at all, we want to flag since some of
+        # the snaps need special attention
+        if "on-classic" in rules:
             return "failed due to %s constraint (on-classic)" % cstr
 
-        return "TODO: _checkOnClassic"
+        return None
 
     # func checkDeviceScope() in helpers.go
     def _checkDeviceScope(self, side, iface, rules, cstr):
         print("JAMIE6: side=%s, iface=%s, rules=%s, cstr=%s" % (side, iface, rules, cstr))
+        # on-store
         matched = False
         checked = False
-        for rules_key in rules:
-            if not rules_key == "%s-snap-type" % side[:-1]:
-                continue
+        if self.on_store:
             checked = True
+            if "on-store" in rules and self.on_store in rules['on-store']:
+                matched = True
 
         print("JAMIE6.4: matched=%s, checked=%s, cstr=%s" % (matched, checked, cstr))
         if checked and ((matched and cstr.startswith('deny')) or
                         (not matched and cstr.startswith('allow'))):
-            return "failed due to %s constraint (on-brand/on-store)" % cstr
+            return "failed due to %s constraint (on-store)" % cstr
 
-        return "TODO: _checkDeviceScope()"
+        # on-brand
+        matched = False
+        checked = False
+        if self.on_brand:
+            checked = True
+            if "on-brand" in rules and self.on_brand in rules['on-brand']:
+                matched = True
+
+        if checked and ((matched and cstr.startswith('deny')) or
+                        (not matched and cstr.startswith('allow'))):
+            return "failed due to %s constraint (on-brand)" % cstr
+
+        return None
 
     # func checkPlugInstallationConstraints1() in helpers.go
     def _checkInstallationConstraints1(self, side, iface, rules, cstr):
-        print("JAMIE2.5: side=%s, iface=%s, rules=%s, cstr=%s" % (side, iface, rules, cstr))
+        print("JAMIE2: side=%s, iface=%s, rules=%s, cstr=%s" % (side, iface, rules, cstr))
 
+        # no need to check the others if we have a toplevel constraint
         if isinstance(rules, bool):
             if ((rules and cstr.startswith('deny')) or
                     (not rules and cstr.startswith('allow'))):
                 return "failed due to %s constraint (bool)" % cstr
+            return None
 
         res = self._attributesCheck(side, iface, rules, cstr)
         if res is not None:
             return res
-        # FIXME: shortcircuit for testing
-        return None
 
         res = self._checkSnapType(side, iface, rules, cstr)
         if res is not None:
@@ -1101,77 +1118,111 @@ class SnapReviewDeclaration(SnapReview):
 
     # func checkPlugInstallationConstraints() in helpers.go
     def _checkInstallationConstraints(self, side, iface, rules, cstr):
-        print("JAMIE2: side=%s, iface=%s, rules=%s, cstr=%s" % (side, iface, rules, cstr))
+        print("JAMIE1: side=%s, iface=%s, rules=%s, cstr=%s" % (side, iface, rules, cstr))
         if cstr not in rules:
             return None
 
         firstError = None
 
         # OR of constraints
-        for i in rules[cstr]:
-            res = self._checkInstallationConstraints1(side, iface, i, cstr)
-            if res is None:
-                return res
+        if side.startswith('allow'):
+            for i in rules[cstr]:
+                res = self._checkInstallationConstraints1(side, iface, i, cstr)
+                print("JAMIE1.1: res=%s" % res)
+                if res is None:
+                    return res
 
-            if firstError is None:
-                firstError = res
+                if firstError is None:
+                    firstError = res
 
-        return firstError
+            return firstError
+        else:
+            for i in rules[cstr]:
+                res = self._checkInstallationConstraints1(side, iface, i, cstr)
+                print("JAMIE1.2: res=%s" % res)
+                if res is not None:
+                    return res
 
-    def _checkRule(self, side, iface, rules, snapRule):
-        res = self._checkInstallationConstraints(side, iface, rules, 'deny-installation')
+            return None
+
+    def _checkRule(self, side, iface, rules, cstr_type):
+        res = self._checkInstallationConstraints(side, iface, rules, 'deny-%s' % cstr_type)
         if res is not None:
             return res
 
-        res = self._checkInstallationConstraints(side, iface, rules, 'allow-installation')
+        res = self._checkInstallationConstraints(side, iface, rules, 'allow-%s' % cstr_type)
         if res is not None:
             return res
 
         return None
 
     # func (ic *InstallCandidate) checkPlug()/checkSlot() from policy.go
-    def _checkSide(self, side, iface, cstr_type):
+    def _checkInstallSide(self, side, iface, cstr_type):
         # if the snap declaration has something to say, only it is consulted
         # (there is no merging with base declaration)
-        if self.snap_declaration and iface['name'] in self.snap_declaration[side]:
-            decl = self._getDecl(side, iface['name'], True)
+        if self.snap_declaration and iface['interface'] in self.snap_declaration[side]:
+            decl = self._getDecl(side, iface['interface'], True)
             rules = self._getRules(decl, cstr_type)
             if rules is not None:
-                return self._checkRule(side, iface, rules, True)
+                return self._checkRule(side, iface, rules, cstr_type)
+            return None
 
-        decl = self._getDecl(side, iface['name'], False)
+        decl = self._getDecl(side, iface['interface'], False)
         rules = self._getRules(decl, cstr_type)
         if rules is not None:
-            return self._checkRule(side, iface, rules, False)
-
+            return self._checkRule(side, iface, rules, cstr_type)
         return None
 
     # func (ic *InstallCandidate) Check() in policy.go
-    def _installCheck(self, side, iname, attribs):
+    def _installationCheck(self, side, iname, attribs):
         iface = {}
         if attribs is not None:
             iface = copy.deepcopy(attribs)
-        iface['name'] = iname
+        iface['interface'] = iname
 
-        res = self._checkSide('slots', iface, "installation")
-        if res is not None:
-            return res
+        if side == 'slots':
+            res = self._checkInstallSide('slots', iface, "installation")
+            if res is not None:
+                return res
 
-        res = self._checkSide('plugs', iface, "installation")
-        if res is not None:
-            return res
+        if side == 'plugs':
+            res = self._checkInstallSide('plugs', iface, "installation")
+            if res is not None:
+                return res
+
+        return None
+
+    # TODO: verify this logic is correct for us since it is different than
+    # snapd
+    # func (ic *ConnectionCandidate) check() in policy.go
+    def _connectionCheck(self, side, iname, attribs):
+        iface = {}
+        if attribs is not None:
+            iface = copy.deepcopy(attribs)
+        iface['interface'] = iname
+
+        if side == 'slots':
+            res = self._checkInstallSide('slots', iface, "connection")
+            if res is not None:
+                return res
+
+        if side == 'plugs':
+            res = self._checkInstallSide('plugs', iface, "connection")
+            if res is not None:
+                return res
 
         return None
 
     def _verify_iface2(self, name, iface, interface, attribs=None):
+        print("JAMIE0: name=%s, iface=%s, interface=%s, attribs=%s" % (name, iface, interface, attribs))
         if self.snap_declaration and 'plugs' in self.snap_declaration and interface in self.snap_declaration['plugs']:
-            print("JAMIE1: snapdecl[plugs][%s]=%s" % (interface, self.snap_declaration['plugs'][interface]))
+            print("JAMIE0: snapdecl[plugs][%s]=%s" % (interface, self.snap_declaration['plugs'][interface]))
         if self.snap_declaration and 'slots' in self.snap_declaration and interface in self.snap_declaration['slots']:
-            print("JAMIE1: snapdecl[slots][%s]=%s" % (interface, self.snap_declaration['slots'][interface]))
-        if interface in self.base_declaration['plugs']:
-            print("JAMIE1: basedecl[plugs][%s]=%s" % (interface, self.base_declaration['plugs'][interface]))
-        if interface in self.base_declaration['slots']:
-            print("JAMIE1: basedecl[slots][%s]=%s" % (interface, self.base_declaration['slots'][interface]))
+            print("JAMIE0: snapdecl[slots][%s]=%s" % (interface, self.snap_declaration['slots'][interface]))
+        if 'plugs' in self.base_declaration and interface in self.base_declaration['plugs']:
+            print("JAMIE0: basedecl[plugs][%s]=%s" % (interface, self.base_declaration['plugs'][interface]))
+        if 'slots' in self.base_declaration and interface in self.base_declaration['slots']:
+            print("JAMIE0: basedecl[slots][%s]=%s" % (interface, self.base_declaration['slots'][interface]))
 
         if name.endswith('slot'):
             side = 'slots'
@@ -1197,10 +1248,17 @@ class SnapReviewDeclaration(SnapReview):
             self._add_result(t, n, s)
             return
 
-        err = self._installCheck(side, interface, attribs)
+        # only need to check installation and connection since snapd handles
+        # auto-connection
+        t = 'info'
+        n = self._get_check_name('%s' % side, app=iface, extra=interface)
+        s = 'OK'
+        err = self._installationCheck(side, interface, attribs)
         if err is not None:
             t = 'error'
-            n = self._get_check_name('%s' % name, app=iface, extra=interface)
             s = err
-
+        err = self._connectionCheck(side, interface, attribs)
+        if err is not None:
+            t = 'error'
+            s = err
         self._add_result(t, n, s)
