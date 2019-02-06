@@ -1130,17 +1130,17 @@ class SnapReviewDeclaration(SnapReview):
         return None
 
     # func (ic *InstallCandidate) checkPlug()/checkSlot() from policy.go
-    def _checkSide(self, side, iface):
+    def _checkSide(self, side, iface, cstr_type):
         # if the snap declaration has something to say, only it is consulted
         # (there is no merging with base declaration)
         if self.snap_declaration and iface['name'] in self.snap_declaration[side]:
             decl = self._getDecl(side, iface['name'], True)
-            rules = self._getRules(decl, "installation")
+            rules = self._getRules(decl, cstr_type)
             if rules is not None:
                 return self._checkRule(side, iface, rules, True)
 
         decl = self._getDecl(side, iface['name'], False)
-        rules = self._getRules(decl, "installation")
+        rules = self._getRules(decl, cstr_type)
         if rules is not None:
             return self._checkRule(side, iface, rules, False)
 
@@ -1153,11 +1153,11 @@ class SnapReviewDeclaration(SnapReview):
             iface = copy.deepcopy(attribs)
         iface['name'] = iname
 
-        res = self._checkSide('slots', iface)
+        res = self._checkSide('slots', iface, "installation")
         if res is not None:
             return res
 
-        res = self._checkSide('plugs', iface)
+        res = self._checkSide('plugs', iface, "installation")
         if res is not None:
             return res
 
