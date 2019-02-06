@@ -1332,7 +1332,7 @@ slots:
                 'content': {
                     'allow-connection': {
                         'slot-attributes': {
-                            'read': ""
+                            'read': {}
                         }
                     }
                 }
@@ -1348,7 +1348,7 @@ slots:
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'declaration-snap-v2:valid_slots:content:allow-connection_slot-attributes'
-        expected['error'][name] = {"text": "declaration malformed (wrong type '' for attribute 'read')"}
+        expected['error'][name] = {"text": "declaration malformed (wrong type '{}' for attribute 'read')"}
         self.check_results(r, expected=expected)
 
     def test__verify_declaration_invalid_slots_plug_attribs_content_side(self):
