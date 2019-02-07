@@ -2694,7 +2694,7 @@ slots:
         self._set_base_declaration(c, base)
         c.check_declaration()
         r = c.click_report
-        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
         expected = dict()
@@ -2702,7 +2702,7 @@ slots:
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'declaration-snap-v2:plugs:iface-foo:foo'
-        expected['info'][name] = {"text": "OK"}
+        expected['error'][name] = {"text": "failed due to allow-connection constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_bad_subsubkey_type(self):
@@ -2731,7 +2731,7 @@ slots:
 
     def test_check_declaration_plugs_mismatch_subsubkey_type(self):
         '''Test _verify_declaration - mismatched subsubkey_type'''
-        plugs = {'iface-foo': {'interface': 'foo', 'attrib1': ['foo']}}
+        plugs = {'iface-foo': {'interface': 'foo', 'attrib1': True}}
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewDeclaration(self.test_name)
         base = {
@@ -2748,15 +2748,15 @@ slots:
         self._set_base_declaration(c, base)
         c.check_declaration()
         r = c.click_report
-        expected_counts = {'info': 0, 'warn': 0, 'error': -1}
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
         expected = dict()
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_allow-connection:iface-foo:foo'
-        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint for 'plug-attributes' from base declaration"}
+        name = 'declaration-snap-v2:plugs:iface-foo:foo'
+        expected['error'][name] = {"text": "failed due to allow-connection constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_connection_alternates_one_denied(self):
