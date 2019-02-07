@@ -1014,9 +1014,9 @@ class SnapReviewDeclaration(SnapReview):
                      "QtWebEngine webviews, export " + \
                      "QTWEBENGINE_DISABLE_SANDBOX=1 to disable its " + \
                      "internal sandbox."
-            return s
+            return (checked, s)
 
-        return None
+        return (checked, None)
 
     # func checkSnapType() in helpers.go
     def _checkSnapType(self, side, iface, rules, cstr):
@@ -1040,52 +1040,54 @@ class SnapReviewDeclaration(SnapReview):
         print("JAMIE4.4: matched=%s, checked=%s, cstr=%s" % (matched, checked, cstr))
         if checked and ((matched and cstr.startswith('deny')) or
                         (not matched and cstr.startswith('allow'))):
-            return "failed due to %s constraint (snap-type)" % cstr
+            return (checked, "failed due to %s constraint (snap-type)" % cstr)
 
-        return None
+        return (checked, None)
 
     # func checkOnClassic() in helpers.go
     def _checkOnClassic(self, side, iface, rules, cstr):
         print("JAMIE5: side=%s, iface=%s, rules=%s, cstr=%s" % (side, iface, rules, cstr))
         if 'type' in self.snap_yaml and self.snap_yaml['type'] != 'app':
-            return None
+            return (False, None)
 
         # if on-classic is specified at all, we want to flag since some of
         # the snaps need special attention
         if "on-classic" in rules:
-            return "failed due to %s constraint (on-classic)" % cstr
+            return (True, "failed due to %s constraint (on-classic)" % cstr)
 
-        return None
+        return (False, None)
 
     # func checkDeviceScope() in helpers.go
     def _checkDeviceScope(self, side, iface, rules, cstr):
         print("JAMIE6: side=%s, iface=%s, rules=%s, cstr=%s" % (side, iface, rules, cstr))
+
         # on-store
         matched = False
-        checked = False
+        checkedStore = False
         if self.on_store:
-            checked = True
+            checkedStore = True
             if "on-store" in rules and self.on_store in rules['on-store']:
                 matched = True
 
-        print("JAMIE6.4: matched=%s, checked=%s, cstr=%s" % (matched, checked, cstr))
-        if checked and ((matched and cstr.startswith('deny')) or
-                        (not matched and cstr.startswith('allow'))):
-            return "failed due to %s constraint (on-store)" % cstr
+        print("JAMIE6.4: matched=%s, checkedStore=%s, cstr=%s" % (matched, checkedStore, cstr))
+        if checkedStore and ((matched and cstr.startswith('deny')) or
+                             (not matched and cstr.startswith('allow'))):
+            return (checkedStore, "failed due to %s constraint (on-store)" % cstr)
 
         # on-brand
         matched = False
-        checked = False
+        checkedBranch = False
         if self.on_brand:
-            checked = True
+            checkedBranch = True
             if "on-brand" in rules and self.on_brand in rules['on-brand']:
                 matched = True
 
-        if checked and ((matched and cstr.startswith('deny')) or
-                        (not matched and cstr.startswith('allow'))):
-            return "failed due to %s constraint (on-brand)" % cstr
+        print("JAMIE6.5: matched=%s, checkedBranch=%s, cstr=%s" % (matched, checkedBranch, cstr))
+        if checkedBranch and ((matched and cstr.startswith('deny')) or
+                              (not matched and cstr.startswith('allow'))):
+            return (checkedBranch, "failed due to %s constraint (on-brand)" % cstr)
 
-        return None
+        return (checkedStore or checkedBranch, None)
 
     # func checkPlugInstallationConstraints1() in helpers.go
     def _checkInstallationConstraints1(self, side, iface, rules, cstr):
@@ -1098,21 +1100,49 @@ class SnapReviewDeclaration(SnapReview):
                 return "failed due to %s constraint (bool)" % cstr
             return None
 
-        res = self._attributesCheck(side, iface, rules, cstr)
-        if res is not None:
-            return res
+        # if res is not None with allowed, just return res since we have a
+        # failure to match. If all the res are not None with denied, then we
+        # have a full match and will return the first res.
+        denied = []
+        num_checked = 0
 
-        res = self._checkSnapType(side, iface, rules, cstr)
+        (checked, res) = self._attributesCheck(side, iface, rules, cstr)
+        if checked:
+            num_checked += 1
         if res is not None:
-            return res
+            if cstr.startswith('allow'):
+                return res
+            denied.append(res)
 
-        res = self._checkOnClassic(side, iface, rules, cstr)
+        (checked, res) = self._checkSnapType(side, iface, rules, cstr)
+        if checked:
+            num_checked += 1
         if res is not None:
-            return res
+            if cstr.startswith('allow'):
+                return res
+            denied.append(res)
 
-        res = self._checkDeviceScope(side, iface, rules, cstr)
+        (checked, res) = self._checkOnClassic(side, iface, rules, cstr)
+        if checked:
+            num_checked += 1
         if res is not None:
-            return res
+            if cstr.startswith('allow'):
+                return res
+            denied.append(res)
+
+        (checked, res) = self._checkDeviceScope(side, iface, rules, cstr)
+        if checked:
+            num_checked += 1
+        if res is not None:
+            if cstr.startswith('allow'):
+                return res
+            denied.append(res)
+
+        print("JAMIE2.1: cstr=%s, num_checked=%s, denied=%s" % (cstr, num_checked, denied))
+        if cstr.startswith('deny') and num_checked > 0 and \
+                len(denied) == num_checked:
+            # FIXME: perhaps allow showing more than just the first
+            return denied[0]
 
         return None
 
@@ -1126,6 +1156,7 @@ class SnapReviewDeclaration(SnapReview):
 
         # OR of constraints
         if side.startswith('allow'):
+            # With allow, the first success is a match and we allow it
             for i in rules[cstr]:
                 res = self._checkInstallationConstraints1(side, iface, i, cstr)
                 print("JAMIE1.1: res=%s" % res)
@@ -1137,6 +1168,7 @@ class SnapReviewDeclaration(SnapReview):
 
             return firstError
         else:
+            # With deny, the first failure is a match and we deny it
             for i in rules[cstr]:
                 res = self._checkInstallationConstraints1(side, iface, i, cstr)
                 print("JAMIE1.2: res=%s" % res)
@@ -1158,9 +1190,17 @@ class SnapReviewDeclaration(SnapReview):
 
     # func (ic *InstallCandidate) checkPlug()/checkSlot() from policy.go
     def _checkInstallSide(self, side, iface, cstr_type):
-        # if the snap declaration has something to say, only it is consulted
-        # (there is no merging with base declaration)
+        # if the snap declaration has something to say for this constraint,
+        # only it is consulted (there is no merging with base declaration)
+        snapHasSay = False
         if self.snap_declaration and iface['interface'] in self.snap_declaration[side]:
+            for i in ['allow', 'deny']:
+                cstr = "%s-%s" % (i, cstr_type)
+                if cstr in self.snap_declaration[side][iface['interface']]:
+                    snapHasSay = True
+                    break
+
+        if snapHasSay:
             decl = self._getDecl(side, iface['interface'], True)
             rules = self._getRules(decl, cstr_type)
             if rules is not None:
@@ -1175,6 +1215,7 @@ class SnapReviewDeclaration(SnapReview):
 
     # func (ic *InstallCandidate) Check() in policy.go
     def _installationCheck(self, side, iname, attribs):
+        print("JAMIE0.1: side=%s, iname=%s, attribs=%s" % (side, iname, attribs))
         iface = {}
         if attribs is not None:
             iface = copy.deepcopy(attribs)
@@ -1196,6 +1237,7 @@ class SnapReviewDeclaration(SnapReview):
     # snapd
     # func (ic *ConnectionCandidate) check() in policy.go
     def _connectionCheck(self, side, iname, attribs):
+        print("JAMIE0.2: side=%s, iname=%s, attribs=%s" % (side, iname, attribs))
         iface = {}
         if attribs is not None:
             iface = copy.deepcopy(attribs)

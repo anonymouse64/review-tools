@@ -3140,7 +3140,7 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_deny-connection:iface:foo'
+        name = 'declaration-snap-v2:plugs:iface:foo'
         expected['error'][name] = {"text": "failed due to deny-connection constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
@@ -3481,7 +3481,7 @@ slots:
         expected['error'][name] = {"text": "failed due to deny-installation constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
-    def test_zz_check_declaration_slots_installation_alternates_three_allowed(self):
+    def test_check_declaration_slots_installation_alternates_three_allowed(self):
         '''Test check_declaration - slots installation alternates - core not matching attrib'''
         slots = {'iface': {'interface': 'foo', 'name': 'three'}}
         self.set_test_snap_yaml("slots", slots)
@@ -4106,15 +4106,15 @@ slots:
 
         c.check_declaration()
         r = c.click_report
-        expected_counts = {'info': -1, 'warn': 0, 'error': -1}
+        expected_counts = {'info': 1, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
         expected = dict()
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_deny-connection:iface:docker'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}
+        name = 'declaration-snap-v2:slots:iface:docker'
+        expected['error'][name] = {"text": "failed due to deny-connection constraint (bool)"}
         name = 'declaration-snap-v2:valid_slots:docker:allow-installation'
         expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
@@ -4663,7 +4663,7 @@ slots:
 
         c.check_declaration()
         r = c.click_report
-        expected_counts = {'info': 1, 'warn': 0, 'error': -1}
+        expected_counts = {'info': 1, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
         expected = dict()
@@ -4672,8 +4672,8 @@ slots:
         expected['info'] = dict()
         name = 'declaration-snap-v2:valid_plugs:browser-support:allow-connection'
         expected['info'][name] = {"text": "OK"}
-        name = 'declaration-snap-v2:plugs_deny-connection:iface:browser-support'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'plug-attributes' from base declaration. If using a chromium webview, you can disable the internal sandbox (eg, use --no-sandbox) and remove the 'allow-sandbox' attribute instead. For Oxide webviews, export OXIDE_NO_SANDBOX=1 to disable its internal sandbox. Similarly for QtWebEngine, use QTWEBENGINE_DISABLE_SANDBOX=1."}
+        name = 'declaration-snap-v2:plugs:iface:browser-support'
+        expected['error'][name] = {"text": "failed due to deny-connection constraint (interface attributes). If using a chromium webview, you can disable the internal sandbox (eg, use --no-sandbox) and remove the 'allow-sandbox' attribute instead. For QtWebEngine webviews, export QTWEBENGINE_DISABLE_SANDBOX=1 to disable its internal sandbox."}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_network_on_store_deny_install(self):
@@ -4804,7 +4804,7 @@ slots:
 
         c.check_declaration()
         r = c.click_report
-        expected_counts = {'info': -1, 'warn': 0, 'error': -1}
+        expected_counts = {'info': 1, 'warn': 0, 'error': -1}
         self.check_results(r, expected_counts)
 
         expected = dict()
@@ -4986,7 +4986,7 @@ slots:
         name = 'declaration-snap-v2:valid_plugs:browser-support:allow-connection'
         expected['info'][name] = {"text": "OK"}
         name = 'declaration-snap-v2:plugs:iface:browser-support'
-        expected['error'][name] = {"text": "failed due to deny-connection constraint (int erface attributes). If using a chromium webview, you can disable the internal sandbox (eg, use --no-sandbox) and remove the 'allow-sandbox' attribute instead. For QtWebEngine webvi ews, export QTWEBENGINE_DISABLE_SANDBOX=1 to disable its internal sandbox."}
+        expected['error'][name] = {"text": "failed due to deny-connection constraint (interface attributes). If using a chromium webview, you can disable the internal sandbox (eg, use --no-sandbox) and remove the 'allow-sandbox' attribute instead. For QtWebEngine webviews, export QTWEBENGINE_DISABLE_SANDBOX=1 to disable its internal sandbox."}
 
         self.check_results(r, expected=expected)
 
