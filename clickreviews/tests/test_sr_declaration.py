@@ -3453,7 +3453,7 @@ slots:
         expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
-    def test_check_declaration_plugs_content(self):
+    def test_zz_check_declaration_plugs_content(self):
         '''Test check_declaration - plugs content'''
         plugs = {'iface': {'interface': 'content',
                            'target': 'foo',
@@ -3765,7 +3765,7 @@ slots:
 
         c.check_declaration()
         r = c.click_report
-        expected_counts = {'info': -1, 'warn': 0, 'error': 0}
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
         expected = dict()
@@ -3773,10 +3773,10 @@ slots:
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'declaration-snap-v2:plugs:iface:docker'
-        expected['info'][name] = {"text": "OK"}
+        expected['error'][name] = {"text": "failed due to allow-installation constraint (bool)"}
         self.check_results(r, expected=expected)
 
-    def test_check_declaration_slots_docker(self):
+    def test_aa_check_declaration_slots_docker(self):
         '''Test check_declaration - slots docker'''
         slots = {'iface': {'interface': 'docker'}}
         self.set_test_snap_yaml("slots", slots)
@@ -3893,7 +3893,7 @@ slots:
         expected['error'][name] = {"text": "failed due to deny-connection constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
-    def test_zz_check_declaration_plugs_mir(self):
+    def test_check_declaration_plugs_mir(self):
         '''Test check_declaration - plugs mir'''
         plugs = {'iface': {'interface': 'mir'}}
         self.set_test_snap_yaml("plugs", plugs)
