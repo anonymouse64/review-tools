@@ -439,7 +439,7 @@ class SnapReviewDeclaration(SnapReview):
         return rules
 
     def _attributesCheck(self, side, iface, rules, cstr):
-        def _checkAttrib(val, against):
+        def _checkAttrib(val, against, side, rules_attrib):
             if type(val) not in [str, list, dict, bool]:
                 raise SnapDeclarationException("unknown type '%s'" % val)
 
@@ -447,9 +447,13 @@ class SnapReviewDeclaration(SnapReview):
             if isinstance(val, str):
                 if re.search(r'^(%s)$' % against, val):
                     matched = True
+                elif side == 'plugs' and re.search(r'^\$SLOT\(%s\)$' % rules_attrib, against):
+                    matched = True
+                elif side == 'slots' and re.search(r'^\$PLUG\(%s\)$' % rules_attrib, against):
+                    matched = True
             elif isinstance(val, list):
                 for i in val:
-                    if _checkAttrib(i, against):
+                    if _checkAttrib(i, against, side, rules_attrib):
                         matched = True
             else:  # bools and dicts (TODO: nested matches for dicts)
                 matched = (against == val)
@@ -473,11 +477,11 @@ class SnapReviewDeclaration(SnapReview):
                     if isinstance(against, list):
                         num_matched = 0
                         for i in against:
-                            if _checkAttrib(val, i):
+                            if _checkAttrib(val, i, side, rules_attrib):
                                 num_matched += 1
                             matched = (num_matched == len(against))
                     else:
-                        matched = _checkAttrib(val, against)
+                        matched = _checkAttrib(val, against, side, rules_attrib)
 
         print("JAMIE3.4: matched=%s, checked=%s, cstr=%s" % (matched, checked, cstr))
         if checked and ((matched and cstr.startswith('deny')) or
@@ -598,15 +602,14 @@ class SnapReviewDeclaration(SnapReview):
 
     # based on, func checkPlugInstallationConstraints1() in helpers.go
     #
-    # When we want to check:
+    # To avoid superflous manual reviews, we want to limit when we want to
+    # check to:
     # - any installation constraints
     # - slotting non-core snap connection constraints
     # - plugging snap connection constraints (excepting when not boolean in the
     #   fallback base declaration slot, since as a practical matter, the
     #   slotting snap will have been flagged and require a snap declaration for
     #   snaps to connect to it)
-    #
-    # If it is an allow constraint, short-circuit and return on first match
     def _checkInstallationConstraints1(self, side, iface, rules, cstr, whence):
         print("JAMIE2: side=%s, iface=%s, rules=%s, cstr=%s, whence=%s" % (side, iface, rules, cstr, whence))
 
@@ -667,7 +670,7 @@ class SnapReviewDeclaration(SnapReview):
 
         firstError = None
 
-        # OR of constraints
+        # OR of alternative constraints
         if side.startswith('allow'):
             # With allow, the first success is a match and we allow it
             for i in rules[cstr]:

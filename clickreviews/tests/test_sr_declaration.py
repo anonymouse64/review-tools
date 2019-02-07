@@ -3453,7 +3453,7 @@ slots:
         expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
-    def test_zz_check_declaration_plugs_content(self):
+    def test_check_declaration_plugs_content(self):
         '''Test check_declaration - plugs content'''
         plugs = {'iface': {'interface': 'content',
                            'target': 'foo',
