@@ -420,6 +420,7 @@ class SnapReviewDeclaration(SnapReview):
         if iface in self.base_declaration[side]:
             return copy.deepcopy(self.base_declaration[side][iface])
         elif iface in self.base_declaration['slots']:
+            # Fallback to slots in the base declaration if nothing is in plugs
             return copy.deepcopy(self.base_declaration['slots'][iface])
 
         return None
@@ -530,61 +531,31 @@ class SnapReviewDeclaration(SnapReview):
             if snap_type == 'os':
                 snap_type = 'core'
 
-        # verified elsewhere
-        if snap_type not in ['app', 'core']:
-            return
-
-        # Flag when:
-        # - base decl has plugs/allow-connection/on-classic: True and app
-        #   (indicates when on all-snaps, deny the connection from the app)
-        # - base decl has plugs/deny-connection/on-classic: False and app
-        #   (indicates when on all-snaps, deny the connection from the app)
-        # - base decl has plugs/allow-connection/on-classic: False and core
-        #   (indicates when on all-snaps, deny the connection to core)
-        # - base decl has plugs/deny-connection/on-classic: True and core
-        #   (indicates when on all-snaps, deny the connection to core)
-        #
-        # - base decl has slots/allow-connection/on-classic False and app
-        #   (indicates when on all-snaps, deny the connection to the app)
-        # - base decl has slots/deny-connection/on-classic True and app
-        #   (indicates when on all-snaps, deny the connection to the app)
-        # - base decl has slots/allow-connection/on-classic True and core
-        #   (indicates when on all-snaps, deny the connection to core)
-        # - base decl has slots/deny-connection/on-classic False and core
-        #   (indicates when on all-snaps, deny the connection to core)
-
         matched = False
         checked = False
 
+        # verified elsewhere
+        if snap_type not in ['app', 'core']:
+            return (checked, None)
+
+        # Flag when:
+        # - installation constraint is specified with on-classic, since it
+        #   will be blocked somewhere
+        # - a providing (slotting) !core snap on all-snaps system has
+        #   allow/on-classic True or deny/on-classic False since it will be
+        #   blocked on core (we omit core snaps since they are blocked for
+        #   other reasons
+        # TODO: if ever need to prompt with plugs/*-connection/on-classic, then
+        # need to disambiguate the fallback to 'slots' in _getDecl()
         if "on-classic" in rules:
             checked = True
 
-            # We could make this shorter, but do it this way for clarity
-            if side == 'plugs':
-                if cstr.startswith('allow') and rules['on-classic'] and \
-                        snap_type == 'app':
-                    matched = True
-                elif cstr.startswith('deny') and not rules['on-classic'] and \
-                        snap_type == 'app':
-                    matched = True
-                elif cstr.startswith('allow') and not rules['on-classic'] and \
-                        snap_type == 'core':
-                    matched = True
-                elif cstr.startswith('deny') and rules['on-classic'] and \
-                        snap_type == 'core':
-                    matched = True
+            if 'installation' in cstr:
+                matched = True
             else:
-                if cstr.startswith('allow') and not rules['on-classic'] and \
-                        snap_type == 'app':
-                    matched = True
-                elif cstr.startswith('deny') and rules['on-classic'] and \
-                        snap_type == 'app':
-                    matched = True
-                elif cstr.startswith('allow') and rules['on-classic'] and \
-                        snap_type == 'core':
-                    matched = True
-                elif cstr.startswith('deny') and not rules['on-classic'] and \
-                        snap_type == 'core':
+                if side == 'slots' and snap_type != 'core' and \
+                    ((cstr.startswith('allow') and rules['on-classic']) or
+                     (cstr.startswith('deny') and not rules['on-classic'])):
                     matched = True
 
         print("JAMIE5.4: matched=%s, checked=%s, cstr=%s" % (matched, checked, cstr))
@@ -725,7 +696,7 @@ class SnapReviewDeclaration(SnapReview):
         return None
 
     # func (ic *InstallCandidate) checkPlug()/checkSlot() from policy.go
-    def _checkInstallSide(self, side, iface, cstr_type):
+    def _checkSide(self, side, iface, cstr_type):
         # if the snap declaration has something to say for this constraint,
         # only it is consulted (there is no merging with base declaration)
         snapHasSay = False
@@ -758,12 +729,12 @@ class SnapReviewDeclaration(SnapReview):
         iface['interface'] = iname
 
         if side == 'slots':
-            res = self._checkInstallSide('slots', iface, "installation")
+            res = self._checkSide('slots', iface, "installation")
             if res is not None:
                 return res
 
         if side == 'plugs':
-            res = self._checkInstallSide('plugs', iface, "installation")
+            res = self._checkSide('plugs', iface, "installation")
             if res is not None:
                 return res
 
@@ -780,12 +751,12 @@ class SnapReviewDeclaration(SnapReview):
         iface['interface'] = iname
 
         if side == 'slots':
-            res = self._checkInstallSide('slots', iface, "connection")
+            res = self._checkSide('slots', iface, "connection")
             if res is not None:
                 return res
 
         if side == 'plugs':
-            res = self._checkInstallSide('plugs', iface, "connection")
+            res = self._checkSide('plugs', iface, "connection")
             if res is not None:
                 return res
 
