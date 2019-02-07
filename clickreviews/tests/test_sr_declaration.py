@@ -1529,33 +1529,6 @@ slots:
         expected['error'][name] = {"text": "declaration malformed (invalid format for snap id 'b@d')"}
         self.check_results(r, expected=expected)
 
-    def test__get_all_combinations(self):
-        '''Test _get_all_combinations()'''
-        c = SnapReviewDeclaration(self.test_name)
-        iface = 'someiface'
-        snap = {
-            'slots': {
-                iface: {
-                    'foo': '1',
-                    'bar': ['2', '3'],
-                    'baz': '4',
-                    'norf': ['5', '6'],
-                }
-            },
-            'plugs': {
-                iface: {
-                    'qux': '7',
-                    'quux': ['8', '9'],
-                }
-            }
-        }
-        c.snap_declaration = snap
-
-        (decls, has_alt) = c._get_all_combinations(iface)
-        self.assertTrue(has_alt)
-        self.assertTrue(len(decls['base']) == 0)
-        self.assertTrue(len(decls['snap']) == 8)
-
     def test_check_declaration_unknown_interface(self):
         '''Test check_declaration - unknown interface'''
         slots = {'iface-foo': {'interface': 'bar'}}
@@ -3920,7 +3893,7 @@ slots:
         expected['error'][name] = {"text": "failed due to deny-connection constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
-    def test_check_declaration_plugs_mir(self):
+    def test_zz_check_declaration_plugs_mir(self):
         '''Test check_declaration - plugs mir'''
         plugs = {'iface': {'interface': 'mir'}}
         self.set_test_snap_yaml("plugs", plugs)
