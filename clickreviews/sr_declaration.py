@@ -348,529 +348,6 @@ class SnapReviewDeclaration(SnapReview):
                     if not base and not found_errors:
                         self._add_result(t, n, s)
 
-    def _match(self, against, val):
-        '''Ordering matters since 'against' is treated as a regex if str'''
-        if type(against) != type(val):
-            return False
-
-        if type(val) not in [str, list, dict, bool]:
-            raise SnapDeclarationException("unknown type '%s'" % val)
-
-        matched = False
-
-        if isinstance(val, str):
-            if re.search(r'^(%s)$' % against, val):
-                matched = True
-        elif isinstance(val, list):
-            # TODO: nested matches for lists
-            matched = (sorted(against) == sorted(val))
-        else:  # bools and dicts (TODO: nested matches for dicts)
-            matched = (against == val)
-
-        return matched
-
-    def _search(self, d, key, val=None, subkey=None, subval=None, subval_inverted=False):
-        '''Search dictionary 'd' for matching values. Returns true when
-           - val == d[key]
-           - subval in d[key][subkey]
-           - subval dictionary has any matches in d[key][subkey] dict
-           - subval_inverted == True and subval has any non-matches in
-             d[key][subkey] dict
-
-           When 'key' must be in 'd' and when 'subkey' is not None, it must be
-           in d[key] (we want to raise an Exception here for when _search() is
-           used with only exact matches).
-        '''
-        found = False
-
-        if val is not None and val == d[key]:
-            found = True
-        elif isinstance(d[key], dict) and subkey is not None and \
-                subval is not None:
-            if self.is_bool(d[key][subkey]):
-                found = d[key][subkey] == subval
-                if subval_inverted:
-                    found = not found
-            elif isinstance(d[key][subkey], list):
-                if subval_inverted:
-                    if subval not in d[key][subkey]:
-                        found = True
-                elif subval in d[key][subkey]:
-                    found = True
-            elif isinstance(d[key][subkey], dict) and isinstance(subval, dict):
-                d_keys = set(d[key][subkey].keys())
-                subval_keys = set(subval.keys())
-                int_keys = d_keys.intersection(subval_keys)
-                matches = 0
-                for subsubkey in int_keys:
-                    if self._match(d[key][subkey][subsubkey],
-                                   subval[subsubkey]) or \
-                            d[key][subkey][subsubkey] in \
-                            iface_attributes_noflag:
-                        found = True
-                        matches += 1
-
-                if subval_inverted:
-                    # return true when something didn't match
-                    if matches != len(int_keys):
-                        found = True
-                    else:
-                        found = False
-
-        return found
-
-    def _get_decl(self, base, snap, side, interface, dtype):
-        '''If the snap declaration has something to say about the declaration
-           override type (dtype), then use it instead of the base declaration
-           iff the store/brand passed to us matches the store/brand in the snap
-           declaration.
-        '''
-        decl = copy.deepcopy(base)  # avoid any side-effects
-        base_decl = True
-        decl_type = "base"
-
-        if snap is not None and side in snap and interface in snap[side]:
-            for k in snap[side][interface]:
-                if k.endswith(dtype):
-                    # only apply the scoped constraint from the snap
-                    # declaration if it is properly scoped to the store/brand
-                    #
-                    # NOTE: currently if --on-store/--on-brand is specified to
-                    # the review-tools but the constraint here is not scoped
-                    # (doesn't contain on-store/on-brand: []) then we treat it
-                    # as if --on-store/--on-brand was not specified. If store
-                    # behavior changes, this code might have to change.
-                    if isinstance(snap[side][interface][k], dict):
-                        if 'on-store' in snap[side][interface][k] and \
-                                'on-brand' in snap[side][interface][k] and not \
-                                (self.on_store in snap[side][interface][k]['on-store'] and
-                                 self.on_brand in snap[side][interface][k]['on-brand']):
-                            # when both on-store and on-brand are in the snap
-                            # declaration, if either doesn't match, then ignore
-                            # the declaration since it isn't scoped to both
-                            continue
-                        elif 'on-store' in snap[side][interface][k] and \
-                                self.on_store not in snap[side][interface][k]['on-store']:
-                            # when on-store is in the snap declaration, if it
-                            # doesn't match, then ignore the declaration since
-                            # it isn't scoped to the store.
-                            continue
-                        elif 'on-brand' in snap[side][interface][k] and \
-                                self.on_brand not in snap[side][interface][k]['on-brand']:
-                            # when on-brand is in the snap declaration, if it
-                            # doesn't match, then ignore the declaration since
-                            # it isn't scoped to the brand.
-                            continue
-
-                    # Otherwise, use the snap declaration
-                    decl = copy.deepcopy(snap)  # avoid any side-effects
-                    base_decl = False
-                    decl_type = "snap"
-                    break
-
-        return (decl, base_decl, decl_type)
-
-    def _get_all_combinations(self, interface):
-        '''Return list of all base and snap declaration combinations where
-           each base/snap declaration pair represents a particular combination
-           of alternate constraints. Also return if there are alternate
-           constraints anywhere.
-
-           For simple declarations, this will return the interface of the
-           base declaration and if a snap declaration is specified, the
-           interface of the snap declaration (ie, a single base/snap
-           declaration pair).
-
-           For complex declarations with alternate constrainst, this will
-           return a list of pairs such that for each of base and snap
-           declarations, we'll expand like so (showing on the base declaration
-           for simplicity):
-
-               base = {
-                   'slots': {
-                       'interface': {
-                           'foo': '1',
-                           'bar': ['2', '3'],
-                           'baz': '4',
-                           'norf': ['5', '6'],
-                       }
-                   },
-                   'plugs': {
-                       'interface': {
-                           'qux': '7',
-                           'quux': ['8', '9'],
-                       }
-                   }
-               }
-
-            then the list of 'base declarations' to check against is:
-
-                decls['base'] = [
-                    {'slots': {
-                        'interface': {
-                            'foo': '1',
-                            'bar': '2',
-                            'baz': '4',
-                            'norf': '5',
-                        },
-                    },
-                    {'slots': {
-                        'interface': {
-                            'foo': '1',
-                            'bar': '2',
-                            'baz': '4',
-                            'norf': '6',
-                        }
-                    },
-                    {'slots': {
-                        'interface': {
-                            'foo': '1',
-                            'bar': '3',
-                            'baz': '4',
-                            'norf': '5',
-                        }
-                    },
-                    {'slots': {
-                        'interface': {
-                            'foo': '1',
-                            'bar': '3',
-                            'baz': '4',
-                            'norf': '6',
-                        }
-                    },
-                    {'plugs': {
-                        'interface': {
-                            'qux': '7',
-                            'quux': '8',
-                        }
-                    },
-                    {'plugs': {
-                        'interface': {
-                            'qux': '7',
-                            'quux': '9',
-                        }
-                    },
-                ]
-
-            If the plugs side is defined for this interface, it will appear
-            next to the slot as with a regular declaration. If the snap
-            declaration is defined, it will be stored in decls['snap'] in the
-            same way as the base declaration.
-
-            In this manner, each one of the base declarations can be evaluated
-            and compared to any defined snap declarations.
-        '''
-        def expand(d, side, interface, keys, templates):
-            if len(keys) == 0:
-                return templates
-
-            updated = []
-            key = keys[-1]
-            for i in d[side][interface][key]:
-                for t in templates:
-                    tmp = {side: {interface: {}}}
-                    # copy existing keys
-                    for template_key in t[side][interface]:
-                        tmp[side][interface][template_key] = \
-                            t[side][interface][template_key]
-                    tmp[side][interface][key] = i
-                    updated.append(tmp)
-
-            return expand(d, side, interface, keys[:-1], updated)
-
-        decls = {'base': [], 'snap': []}
-
-        has_alternates = False
-        for dtype in ["base", "snap"]:
-            if dtype == "base":
-                d = self.base_declaration
-            else:
-                d = self.snap_declaration
-
-            tmp = {}
-            for side in ["plugs", "slots"]:
-                if dtype == "snap" and d is None:
-                    continue
-                if side not in d or interface not in d[side]:
-                    continue
-
-                to_expand = []
-                template = {side: {interface: {}}}
-                for cstr in d[side][interface]:
-                    if isinstance(d[side][interface][cstr], list):
-                        to_expand.append(cstr)
-                    else:
-                        template[side][interface][cstr] = \
-                            d[side][interface][cstr]
-
-                tmp[side] = []
-                tmp[side] += expand(d, side, interface, to_expand, [template])
-
-                if len(to_expand) > 0:
-                    has_alternates = True
-
-            # Now that we have all the slots combinations and all the plugs
-            # combinations, create combinations of those
-            if "plugs" in tmp and "slots" in tmp:
-                for p in tmp["plugs"]:
-                    for s in tmp["slots"]:
-                        decls[dtype].append({'plugs': p['plugs'],
-                                             'slots': s['slots']})
-            elif "plugs" in tmp:
-                decls[dtype] = tmp["plugs"]
-            elif "slots" in tmp:
-                decls[dtype] = tmp["slots"]
-
-        # We need at least one declaration per list, even if it is None
-        if len(decls['snap']) == 0:
-            decls['snap'].append(None)
-
-        return (decls, has_alternates)
-
-    def _verify_iface_by_declaration(self, base, snap, name, iface, interface, attribs, side, oside):
-        # 'checked' is used to see if a particular check is made (eg, if
-        # 'deny-connection' for this interface was performed).
-        #
-        # 'denied' is used to track if something checked prompted manual review
-        #
-        # _verify_iface_by_declaration() will return if something prompted
-        # manual review (denied > 0) and if this is an exact match (ie, if
-        # checked == denied).
-        checked = 0
-        denied = 0
-
-        def err(key, subkey=None, dtype="base", attrs=None):
-            s = "human review required due to '%s' constraint " % key
-            if subkey is not None:
-                s += "for '%s' " % subkey
-            s += "from %s declaration" % dtype
-
-            if attrs is not None:
-                if 'allow-sandbox' in attrs and attrs['allow-sandbox']:
-                    s += ". If using a chromium webview, you can disable " + \
-                         "the internal sandbox (eg, use --no-sandbox) and " + \
-                         "remove the 'allow-sandbox' attribute instead. " + \
-                         "For Oxide webviews, export OXIDE_NO_SANDBOX=1 " + \
-                         "to disable its internal sandbox. Similarly for " + \
-                         "QtWebEngine, use QTWEBENGINE_DISABLE_SANDBOX=1."
-
-            return s
-
-        # top-level allow/deny-installation/connection
-        # Note: auto-connection is only for snapd, so don't include it here
-        for i in ['installation', 'connection']:
-            for j in ['deny', 'allow']:
-                decl_key = "%s-%s" % (j, i)
-                # flag if deny-* is true or allow-* is false
-                (decl, base_decl, decl_type) = self._get_decl(base, snap, side,
-                                                              interface, i)
-                if side in decl and interface in decl[side] and \
-                        decl_key in decl[side][interface] and \
-                        not isinstance(decl[side][interface][decl_key], dict):
-                    checked += 1
-                    if self._search(decl[side][interface], decl_key,
-                                    j == 'deny'):
-                        self._add_result('error',
-                                         self._get_check_name("%s_%s" %
-                                                              (side, decl_key),
-                                                              app=iface,
-                                                              extra=interface),
-                                         err(decl_key, dtype=decl_type),
-                                         manual_review=True,
-                                         stage=True)
-                        denied += 1
-
-                        # if manual review after 'deny', don't look at allow
-                        break
-
-        # deny/allow-installation snap-type
-        snap_type = 'app'
-        if 'type' in self.snap_yaml:
-            snap_type = self.snap_yaml['type']
-            if snap_type == 'os':
-                snap_type = 'core'
-        decl_subkey = '%s-snap-type' % side[:-1]
-        for j in ['deny', 'allow']:
-            (decl, base_decl, decl_type) = self._get_decl(base, snap, side,
-                                                          interface,
-                                                          'installation')
-            decl_key = "%s-installation" % j
-            # flag if deny-*/snap-type matches or allow-*/snap-type doesn't
-            if side in decl and interface in decl[side] and \
-                    decl_key in decl[side][interface] and \
-                    isinstance(decl[side][interface][decl_key], dict) and \
-                    decl_subkey in decl[side][interface][decl_key]:
-                checked += 1
-                if self._search(decl[side][interface], decl_key,
-                                subkey=decl_subkey, subval=snap_type,
-                                subval_inverted=(j == 'allow')):
-                    self._add_result('error',
-                                     self._get_check_name("%s_%s" %
-                                                          (side, decl_key),
-                                                          app=iface,
-                                                          extra=interface),
-                                     err(decl_key, decl_subkey, decl_type),
-                                     manual_review=True,
-                                     stage=True)
-                    denied += 1
-
-                    # if manual review after 'deny', don't look at allow
-                    break
-
-        # deny/allow-connection/installation on-classic with app snaps
-        # Note: auto-connection is only for snapd, so don't include it here
-        snap_type = 'app'
-        if 'type' in self.snap_yaml:
-            snap_type = self.snap_yaml['type']
-            if snap_type == 'os':
-                snap_type = 'core'
-        decl_subkey = 'on-classic'
-        for i in ['installation', 'connection']:
-            for j in ['deny', 'allow']:
-                (decl, base_decl, decl_type) = self._get_decl(base, snap, side,
-                                                              interface, i)
-                decl_key = "%s-%s" % (j, i)
-                # when an app snap, flag if deny-*/on-classic=false or
-                # allow-*/on-classic=true
-                # when not an app snap, flag if deny-*/on-classic=true or
-                # allow-*/on-classic=false
-                if side in decl and interface in decl[side] and \
-                        decl_key in decl[side][interface] and \
-                        isinstance(decl[side][interface][decl_key], dict) and \
-                        decl_subkey in decl[side][interface][decl_key]:
-                    checked += 1
-                    if self._search(decl[side][interface], decl_key,
-                                    subkey=decl_subkey,
-                                    subval=(snap_type == 'app'),
-                                    subval_inverted=(j == 'deny')):
-                        self._add_result('error',
-                                         self._get_check_name("%s_%s" %
-                                                              (side, decl_key),
-                                                              app=iface,
-                                                              extra=interface),
-                                         err(decl_key, decl_subkey, decl_type),
-                                         manual_review=True,
-                                         stage=True)
-                        denied += 1
-
-                        # if manual review after 'deny', don't look at allow
-                        break
-
-        # deny/allow-connection/installation attributes
-        # Note: auto-connection is only for snapd, so don't include it here
-        decl_subkey = '%s-attributes' % side[:-1]
-        for i in ['installation', 'connection']:
-            if attribs is None:
-                continue
-            for j in ['deny', 'allow']:
-                (decl, base_decl, decl_type) = self._get_decl(base, snap, side,
-                                                              interface, i)
-                decl_key = "%s-%s" % (j, i)
-                # flag if any deny-*/attribs match or any allow-*/attribs don't
-                if side in decl and interface in decl[side] and \
-                        decl_key in decl[side][interface] and \
-                        isinstance(decl[side][interface][decl_key], dict) and \
-                        decl_subkey in decl[side][interface][decl_key]:
-                    checked += 1
-                    if self._search(decl[side][interface], decl_key,
-                                    subkey=decl_subkey, subval=attribs,
-                                    subval_inverted=(j == 'allow')):
-                        self._add_result('error',
-                                         self._get_check_name("%s_%s" %
-                                                              (side, decl_key),
-                                                              app=iface,
-                                                              extra=interface),
-                                         err(decl_key, decl_subkey, decl_type, attribs),
-                                         manual_review=True,
-                                         stage=True)
-                        denied += 1
-
-                        # if manual review after 'deny', don't look at allow
-                        break
-                # Since base declaration mostly has slots side, if plugs, look
-                # at the other side for checking plug-attributes
-                elif base_decl and side == 'plugs' and oside in decl and \
-                        interface in decl[oside] and \
-                        decl_key in decl[oside][interface] and \
-                        decl_subkey in decl[oside][interface][decl_key]:
-                    checked += 1
-                    if self._search(decl[oside][interface], decl_key,
-                                    subkey=decl_subkey, subval=attribs,
-                                    subval_inverted=(j == 'allow')):
-                        self._add_result('error',
-                                         self._get_check_name("%s_%s" %
-                                                              (side, decl_key),
-                                                              app=iface,
-                                                              extra=interface),
-                                         err(decl_key, decl_subkey, decl_type, attribs),
-                                         manual_review=True,
-                                         stage=True)
-                        denied += 1
-
-                        # if manual review after 'deny', don't look at allow
-                        break
-
-        # Return if something prompted for manual review and if everything
-        # checked was denied (an exact match denial)
-        return (denied > 0, checked == denied)
-
-    def _verify_iface(self, name, iface, interface, attribs=None):
-        if name.endswith('slot'):
-            side = 'slots'
-            oside = 'plugs'
-        elif name.endswith('plug'):
-            side = 'plugs'
-            oside = 'slots'
-
-        t = 'info'
-        n = self._get_check_name('%s_known' % name, app=iface, extra=interface)
-        s = 'OK'
-        if side in self.base_declaration and \
-                interface not in self.base_declaration[side] and \
-                oside in self.base_declaration and \
-                interface not in self.base_declaration[oside]:
-            if name.startswith('app_') and side in self.snap_yaml and \
-                    interface in self.snap_yaml[side]:
-                # If it is an interface reference used by an app, skip since it
-                # will be checked in top-level interface checks.
-                return
-            t = 'error'
-            s = "interface '%s' not found in base declaration" % interface
-            self._add_result(t, n, s)
-            return
-
-        # To support alternates in the base and snap declaration, we need to
-        # try each combination of snap alternate constraint and base alternate
-        # constraint. If we have alternates and one passes and there are no
-        # exact denials, then don't report. Otherwise report if require manual
-        # review.
-        (decls, has_alternates) = self._get_all_combinations(interface)
-        require_manual = False
-
-        exact_deny = True
-        for b in decls['base']:
-            for s in decls['snap']:
-                (manual, exact) = \
-                    self._verify_iface_by_declaration(b, s, name, iface,
-                                                      interface, attribs, side,
-                                                      oside)
-                if manual:
-                    require_manual = True
-                    if has_alternates and not exact:
-                        exact_deny = False
-
-        if has_alternates and not exact_deny:
-            require_manual = False
-
-        # Apply our staged results if required, otherwise report all is ok
-        if require_manual:
-            self._apply_staged_results()
-        else:
-            self._add_result('info',
-                             self._get_check_name("%s" % side, app=iface,
-                                                  extra=interface),
-                             "OK", manual_review=False)
-
     def check_declaration(self):
         '''Check base/snap declaration requires manual review for top-level
            plugs/slots
@@ -1047,15 +524,74 @@ class SnapReviewDeclaration(SnapReview):
     # func checkOnClassic() in helpers.go
     def _checkOnClassic(self, side, iface, rules, cstr):
         print("JAMIE5: side=%s, iface=%s, rules=%s, cstr=%s" % (side, iface, rules, cstr))
-        if 'type' in self.snap_yaml and self.snap_yaml['type'] != 'app':
-            return (False, None)
+        snap_type = 'app'
+        if 'type' in self.snap_yaml:
+            snap_type = self.snap_yaml['type']
+            if snap_type == 'os':
+                snap_type = 'core'
 
-        # if on-classic is specified at all, we want to flag since some of
-        # the snaps need special attention
+        # verified elsewhere
+        if snap_type not in ['app', 'core']:
+            return
+
+        # Flag when:
+        # - base decl has plugs/allow-connection/on-classic: True and app
+        #   (indicates when on all-snaps, deny the connection from the app)
+        # - base decl has plugs/deny-connection/on-classic: False and app
+        #   (indicates when on all-snaps, deny the connection from the app)
+        # - base decl has plugs/allow-connection/on-classic: False and core
+        #   (indicates when on all-snaps, deny the connection to core)
+        # - base decl has plugs/deny-connection/on-classic: True and core
+        #   (indicates when on all-snaps, deny the connection to core)
+        #
+        # - base decl has slots/allow-connection/on-classic False and app
+        #   (indicates when on all-snaps, deny the connection to the app)
+        # - base decl has slots/deny-connection/on-classic True and app
+        #   (indicates when on all-snaps, deny the connection to the app)
+        # - base decl has slots/allow-connection/on-classic True and core
+        #   (indicates when on all-snaps, deny the connection to core)
+        # - base decl has slots/deny-connection/on-classic False and core
+        #   (indicates when on all-snaps, deny the connection to core)
+
+        matched = False
+        checked = False
+
         if "on-classic" in rules:
-            return (True, "failed due to %s constraint (on-classic)" % cstr)
+            checked = True
 
-        return (False, None)
+            # We could make this shorter, but do it this way for clarity
+            if side == 'plugs':
+                if cstr.startswith('allow') and rules['on-classic'] and \
+                        snap_type == 'app':
+                    matched = True
+                elif cstr.startswith('deny') and not rules['on-classic'] and \
+                        snap_type == 'app':
+                    matched = True
+                elif cstr.startswith('allow') and not rules['on-classic'] and \
+                        snap_type == 'core':
+                    matched = True
+                elif cstr.startswith('deny') and rules['on-classic'] and \
+                        snap_type == 'core':
+                    matched = True
+            else:
+                if cstr.startswith('allow') and not rules['on-classic'] and \
+                        snap_type == 'app':
+                    matched = True
+                elif cstr.startswith('deny') and rules['on-classic'] and \
+                        snap_type == 'app':
+                    matched = True
+                elif cstr.startswith('allow') and rules['on-classic'] and \
+                        snap_type == 'core':
+                    matched = True
+                elif cstr.startswith('deny') and not rules['on-classic'] and \
+                        snap_type == 'core':
+                    matched = True
+
+        print("JAMIE5.4: matched=%s, checked=%s, cstr=%s" % (matched, checked, cstr))
+        if matched:
+            return (checked, "failed due to %s constraint (on-classic)" % cstr)
+
+        return (checked, None)
 
     # func checkDeviceScope() in helpers.go
     def _checkDeviceScope(self, side, iface, rules, cstr):

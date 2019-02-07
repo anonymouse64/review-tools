@@ -2928,15 +2928,15 @@ slots:
 
         c.check_declaration()
         r = c.click_report
-        expected_counts = {'info': 0, 'warn': 0, 'error': -1}
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
         expected = dict()
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_allow-connection:iface:foo'
-        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint for 'on-classic' from base declaration"}
+        name = 'declaration-snap-v2:plugs:iface:foo'
+        expected['error'][name] = {"text": "failed due to allow-connection constraint (on-classic)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_on_classic_deny_true_core(self):
@@ -2958,15 +2958,15 @@ slots:
 
         c.check_declaration()
         r = c.click_report
-        expected_counts = {'info': 0, 'warn': 0, 'error': -1}
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
         expected = dict()
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_deny-connection:iface:foo'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'on-classic' from base declaration"}
+        name = 'declaration-snap-v2:plugs:iface:foo'
+        expected['error'][name] = {"text": "failed due to deny-connection constraint (on-classic)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_connection_alternates_one_denied(self):
