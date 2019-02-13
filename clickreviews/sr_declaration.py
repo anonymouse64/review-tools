@@ -683,7 +683,7 @@ class SnapReviewDeclaration(SnapReview):
         firstError = None
 
         # OR of alternative constraints
-        if side.startswith('allow'):
+        if cstr.startswith('allow'):
             # With allow, the first success is a match and we allow it
             for i in rules[cstr]:
                 res = self._checkConstraints1(side, iface, i, cstr, whence)
