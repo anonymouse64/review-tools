@@ -3090,6 +3090,35 @@ slots:
         expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
+    def test_check_declaration_plugs_on_classic_allow_installation_true(self):
+        '''Test check_declaration - plugs on-classic allow-installation (true)'''
+        plugs = {'iface': {'interface': 'foo'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            'plugs': {
+                'foo': {
+                    'allow-installation': {
+                        'on-classic': True
+                    }
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs:iface:foo'
+        expected['error'][name] = {"text": "failed due to allow-installation constraint (on-classic)"}
+        self.check_results(r, expected=expected)
+
     def test_check_declaration_plugs_connection_alternates_one_denied(self):
         '''Test check_declaration - plugs connection alternates - core matching attrib'''
         plugs = {'iface': {'interface': 'foo', 'name': 'one'}}
