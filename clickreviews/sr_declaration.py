@@ -425,34 +425,34 @@ class SnapReviewDeclaration(SnapReview):
 
         return (None, None)
 
+    def _is_scoped(self, rules):
+        # NOTE: currently if --on-store/--on-brand is specified to the
+        # review-tools but the constraint here is not scoped (doesn't
+        # contain on-store/on-brand: []) then we treat it as if
+        # --on-store/--on-brand was not specified. If store behavior
+        # changes, this code might have to change.
+        scoped = False
+        if not isinstance(rules, dict):
+            # no defined scoping, so scoped to us
+            scoped = True
+        elif "on-store" not in rules and "on-brand" not in rules:
+            # no defined scoping, so scoped to us
+            scoped = True
+        elif "on-store" in rules and "on-brand" in rules:
+            if self.on_store in rules["on-store"] and \
+                    self.on_brand in rules["on-brand"]:
+                # both store and brand match
+                scoped = True
+        elif "on-store" in rules and self.on_store in rules["on-store"]:
+            # store matches
+            scoped = True
+        elif "on-brand" in rules and self.on_brand in rules["on-brand"]:
+            # brand matches
+            scoped = True
+
+        return scoped
+
     def _getRules(self, decl, cstr_type):
-        def is_scoped(rules):
-            # NOTE: currently if --on-store/--on-brand is specified to the
-            # review-tools but the constraint here is not scoped (doesn't
-            # contain on-store/on-brand: []) then we treat it as if
-            # --on-store/--on-brand was not specified. If store behavior
-            # changes, this code might have to change.
-            scoped = False
-            if not isinstance(rules, dict):
-                # no defined scoping, so scoped to us
-                scoped = True
-            elif "on-store" not in rules and "on-brand" not in rules:
-                # no defined scoping, so scoped to us
-                scoped = True
-            elif "on-store" in rules and "on-brand" in rules:
-                if self.on_store in rules["on-store"] and \
-                        self.on_brand in rules["on-brand"]:
-                    # both store and brand match
-                    scoped = True
-            elif "on-store" in rules and self.on_store in rules["on-store"]:
-                # store matches
-                scoped = True
-            elif "on-brand" in rules and self.on_brand in rules["on-brand"]:
-                # brand matches
-                scoped = True
-
-            return scoped
-
         scoped = True
         rules = {}
         if decl is None:
@@ -463,14 +463,14 @@ class SnapReviewDeclaration(SnapReview):
                 if isinstance(decl[cstr], list):
                     tmp = []
                     for r in decl[cstr]:
-                        if is_scoped(r):
+                        if self._is_scoped(r):
                             tmp.append(r)
                     if len(tmp) == 0:
                         scoped = False
                     else:
                         rules[cstr] = tmp
                 else:
-                    if is_scoped(decl[cstr]):
+                    if self._is_scoped(decl[cstr]):
                         rules[cstr] = [decl[cstr]]
                     else:
                         scoped = False

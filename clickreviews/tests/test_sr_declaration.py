@@ -197,6 +197,56 @@ slots:
         self.assertTrue(res1['allow-connection'])
         self.assertTrue(res2 == "base/fallback")
 
+    def test_zz_is_scoped(self):
+        '''Test _is_scoped()'''
+        c = SnapReviewDeclaration(self.test_name)
+
+        # no defined scoping, so scoped to us
+        self.assertTrue(c._is_scoped(True))
+        self.assertTrue(c._is_scoped(False))
+
+        # no defined scoping, so scoped to us
+        self.assertTrue(c._is_scoped({'allow-installation': True}))
+        self.assertTrue(c._is_scoped({'allow-installation': False}))
+
+        # both store and brand match
+        overrides = {
+            'snap_on_store': 'mystore',
+            'snap_on_brand': 'mybrand'
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        rules = {'on-store': ['mystore', 'foo'],
+                 'on-brand': ['bar', 'mybrand']}
+        self.assertTrue(c._is_scoped(rules))
+
+        # both specified but one doesn't match
+        rules = {'on-store': ['foo'], 'on-brand': ['bar', 'mybrand']}
+        self.assertFalse(c._is_scoped(rules))
+        rules = {'on-store': ['mystore', 'foo'], 'on-brand': ['bar']}
+        self.assertFalse(c._is_scoped(rules))
+        rules = {'on-store': ['foo'], 'on-brand': ['bar']}
+        self.assertFalse(c._is_scoped(rules))
+
+        # store match
+        overrides = {
+            'snap_on_store': 'mystore',
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        rules = {'on-store': ['mystore', 'foo']}
+        self.assertTrue(c._is_scoped(rules))
+        rules = {'on-store': ['foo']}
+        self.assertFalse(c._is_scoped(rules))
+
+        # brand match
+        overrides = {
+            'snap_on_brand': 'mybrand',
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        rules = {'on-brand': ['bar', 'mybrand']}
+        self.assertTrue(c._is_scoped(rules))
+        rules = {'on-brand': ['bar']}
+        self.assertFalse(c._is_scoped(rules))
+
     def test__verify_declaration_valid(self):
         '''Test _verify_declaration - valid'''
         c = SnapReviewDeclaration(self.test_name)
