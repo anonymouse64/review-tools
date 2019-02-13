@@ -587,10 +587,12 @@ class SnapReviewDeclaration(SnapReview):
         # - installation constraint is specified with on-classic, since it
         #   will be blocked somewhere
         # - a providing (slotting) !core snap on all-snaps system has
-        #   allow/on-classic True or deny/on-classic False since it will be
-        #   blocked on core (we omit core snaps since they are blocked for
-        #   other reasons
-        # FIXME: add back plugs tests
+        #   allow/on-classic True or deny/on-classic False with connection
+        #   since it will be blocked on core (we omit core snaps since they are
+        #   blocked for other reasons
+        # - we ignore plugs with on classic for connections since core snaps
+        #   won't plugs and app snaps will obtain their connection ability from
+        #   the providing (slotting) snap
         if "on-classic" in rules:
             checked = True
 
