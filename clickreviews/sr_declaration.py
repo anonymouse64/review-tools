@@ -613,7 +613,7 @@ class SnapReviewDeclaration(SnapReview):
 
         return (checked, None)
 
-    # based on, func checkPlugInstallationConstraints1() in helpers.go
+    # based on, func check*InstallationConstraints1() in helpers.go
     #
     # To avoid superflous manual reviews, we want to limit when we want to
     # check to:
@@ -623,7 +623,7 @@ class SnapReviewDeclaration(SnapReview):
     #   fallback base declaration slot, since as a practical matter, the
     #   slotting snap will have been flagged and require a snap declaration for
     #   snaps to connect to it)
-    def _checkInstallationConstraints1(self, side, iface, rules, cstr, whence):
+    def _checkConstraints1(self, side, iface, rules, cstr, whence):
         print("JAMIE2: side=%s, iface=%s, rules=%s, cstr=%s, whence=%s" % (side, iface, rules, cstr, whence))
 
         # no need to check the others if we have a toplevel constraint
@@ -674,8 +674,8 @@ class SnapReviewDeclaration(SnapReview):
 
         return None
 
-    # func checkPlugInstallationConstraints() in helpers.go
-    def _checkInstallationConstraints(self, side, iface, rules, cstr, whence):
+    # func check*InstallationConstraints() in helpers.go
+    def _checkConstraints(self, side, iface, rules, cstr, whence):
         print("JAMIE1: side=%s, iface=%s, rules=%s, cstr=%s, whence=%s" % (side, iface, rules, cstr, whence))
         if cstr not in rules:
             return None
@@ -686,7 +686,7 @@ class SnapReviewDeclaration(SnapReview):
         if side.startswith('allow'):
             # With allow, the first success is a match and we allow it
             for i in rules[cstr]:
-                res = self._checkInstallationConstraints1(side, iface, i, cstr, whence)
+                res = self._checkConstraints1(side, iface, i, cstr, whence)
                 print("JAMIE1.1: res=%s" % res)
                 if res is None:
                     return res
@@ -698,7 +698,7 @@ class SnapReviewDeclaration(SnapReview):
         else:
             # With deny, the first failure is a match and we deny it
             for i in rules[cstr]:
-                res = self._checkInstallationConstraints1(side, iface, i, cstr, whence)
+                res = self._checkConstraints1(side, iface, i, cstr, whence)
                 print("JAMIE1.2: res=%s" % res)
                 if res is not None:
                     return res
@@ -706,11 +706,11 @@ class SnapReviewDeclaration(SnapReview):
             return None
 
     def _checkRule(self, side, iface, rules, cstr_type, whence):
-        res = self._checkInstallationConstraints(side, iface, rules, 'deny-%s' % cstr_type, whence)
+        res = self._checkConstraints(side, iface, rules, 'deny-%s' % cstr_type, whence)
         if res is not None:
             return res
 
-        res = self._checkInstallationConstraints(side, iface, rules, 'allow-%s' % cstr_type, whence)
+        res = self._checkConstraints(side, iface, rules, 'allow-%s' % cstr_type, whence)
         if res is not None:
             return res
 
