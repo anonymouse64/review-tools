@@ -16,7 +16,6 @@
 
 from __future__ import print_function
 from clickreviews.sr_common import SnapReview, SnapReviewException
-from clickreviews.overrides import iface_attributes_noflag
 import copy
 import re
 
