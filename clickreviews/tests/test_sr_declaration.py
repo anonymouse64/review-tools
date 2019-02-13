@@ -3208,7 +3208,6 @@ slots:
 
     def test_check_declaration_slots_installation_alternates_two_denied(self):
         '''Test check_declaration - slots installation alternates - app matching attrib'''
-        # TODO: verify this test with pedronis
         slots = {'iface': {'interface': 'foo', 'name': 'two'}}
         self.set_test_snap_yaml("slots", slots)
         self.set_test_snap_yaml("type", "app")
@@ -4145,7 +4144,7 @@ slots:
             return
         raise Exception("on-store override should be invalid")  # pragma: nocover
 
-    def test_check_declaration_docker_on_store_no_decl(self):
+    def test_aa_check_declaration_docker_on_store_no_decl(self):
         '''Test check_declaration - override - on-store no decl'''
         overrides = {
             'snap_on_store': 'mystore'
@@ -4157,13 +4156,15 @@ slots:
 
         c.check_declaration()
         r = c.click_report
-        expected_counts = {'info': 0, 'warn': 0, 'error': -2}
+        expected_counts = {'info': 0, 'warn': 0, 'error': 2}
         self.check_results(r, expected_counts)
 
         expected = dict()
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
+        # FIXME: one of there will overwrite the other because we don't add the
+        # constraint to the name
         name = 'declaration-snap-v2:slots_deny-connection:iface:docker'
         expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}
         name = 'declaration-snap-v2:slots_allow-installation:iface:docker'
@@ -4264,7 +4265,7 @@ slots:
         expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
-    def test_check_declaration_docker_on_store_mismatch(self):
+    def test_aa_check_declaration_docker_on_store_mismatch(self):
         '''Test check_declaration - override - on-store mismatch'''
         overrides = {
             'snap_decl_slots': {
@@ -4286,13 +4287,15 @@ slots:
 
         c.check_declaration()
         r = c.click_report
-        expected_counts = {'info': 2, 'warn': 0, 'error': -2}
+        expected_counts = {'info': 2, 'warn': 0, 'error': 2}
         self.check_results(r, expected_counts)
 
         expected = dict()
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
+        # FIXME: one of there will overwrite the other because we don't add the
+        # constraint to the name
         name = 'declaration-snap-v2:slots_deny-connection:iface:docker'
         expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}
         name = 'declaration-snap-v2:slots_allow-installation:iface:docker'
@@ -4458,7 +4461,7 @@ slots:
             return
         raise Exception("on-brand override should be invalid")  # pragma: nocover
 
-    def test_check_declaration_docker_on_brand_no_decl(self):
+    def test_aa_check_declaration_docker_on_brand_no_decl(self):
         '''Test check_declaration - override - on-brand no decl'''
         overrides = {
             'snap_on_brand': 'mybrand'
@@ -4470,13 +4473,15 @@ slots:
 
         c.check_declaration()
         r = c.click_report
-        expected_counts = {'info': 0, 'warn': 0, 'error': -2}
+        expected_counts = {'info': 0, 'warn': 0, 'error': 2}
         self.check_results(r, expected_counts)
 
         expected = dict()
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
+        # FIXME: one of there will overwrite the other because we don't add the
+        # constraint to the name
         name = 'declaration-snap-v2:slots_deny-connection:iface:docker'
         expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}
         name = 'declaration-snap-v2:slots_allow-installation:iface:docker'
@@ -4537,7 +4542,7 @@ slots:
 
         c.check_declaration()
         r = c.click_report
-        expected_counts = {'info': 1, 'warn': 0, 'error': -1}
+        expected_counts = {'info': 1, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
         expected = dict()
@@ -4577,7 +4582,7 @@ slots:
         expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
-    def test_check_declaration_docker_on_brand_mismatch(self):
+    def test_aa_check_declaration_docker_on_brand_mismatch(self):
         '''Test check_declaration - override - on-brand mismatch'''
         overrides = {
             'snap_decl_slots': {
@@ -4599,13 +4604,15 @@ slots:
 
         c.check_declaration()
         r = c.click_report
-        expected_counts = {'info': 2, 'warn': 0, 'error': -2}
+        expected_counts = {'info': 2, 'warn': 0, 'error': 2}
         self.check_results(r, expected_counts)
 
         expected = dict()
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
+        # FIXME: one of there will overwrite the other because we don't add the
+        # constraint to the name
         name = 'declaration-snap-v2:slots_deny-connection:iface:docker'
         expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}
         name = 'declaration-snap-v2:slots_allow-installation:iface:docker'
@@ -4785,7 +4792,7 @@ slots:
 
         c.check_declaration()
         r = c.click_report
-        expected_counts = {'info': -3, 'warn': 0, 'error': 0}
+        expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
         expected = dict()
@@ -4800,7 +4807,7 @@ slots:
         expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
-    def test_check_declaration_docker_on_brand_install_on_store_connect_mismatch(self):
+    def test_aa_check_declaration_docker_on_brand_install_on_store_connect_mismatch(self):
         '''Test check_declaration - override - on-brand install on-store connect
            mismatch
         '''
@@ -4826,7 +4833,7 @@ slots:
 
         c.check_declaration()
         r = c.click_report
-        expected_counts = {'info': 2, 'warn': 0, 'error': -2}
+        expected_counts = {'info': 2, 'warn': 0, 'error': 2}
         self.check_results(r, expected_counts)
 
         expected = dict()
@@ -4834,6 +4841,8 @@ slots:
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'declaration-snap-v2:slots_allow-installation:iface:docker'
+        # FIXME: one of there will overwrite the other because we don't add the
+        # constraint to the name
         expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint from base declaration"}
         name = 'declaration-snap-v2:slots_deny-connection:iface:docker'
         expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}

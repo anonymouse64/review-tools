@@ -426,6 +426,34 @@ class SnapReviewDeclaration(SnapReview):
         return None
 
     def _getRules(self, decl, cstr_type):
+        def is_scoped(rules):
+            # NOTE: currently if --on-store/--on-brand is specified to the
+            # review-tools but the constraint here is not scoped (doesn't
+            # contain on-store/on-brand: []) then we treat it as if
+            # --on-store/--on-brand was not specified. If store behavior
+            # changes, this code might have to change.
+            scoped = False
+            if not isinstance(rules, dict):
+                # no defined scoping, so scoped to us
+                scoped = True
+            elif "on-store" not in rules and "on-brand" not in rules:
+                # no defined scoping, so scoped to us
+                scoped = True
+            elif "on-store" in rules and "on-brand" in rules:
+                if self.on_store in rules["on-store"] and \
+                        self.on_brand in rules["on-brand"]:
+                    # both store and brand match
+                    scoped = True
+            elif "on-store" in rules and self.on_store in rules["on-store"]:
+                # store matches
+                scoped = True
+            elif "on-brand" in rules and self.on_brand in rules["on-brand"]:
+                # brand matches
+                scoped = True
+
+            return scoped
+
+        scoped = True
         rules = {}
         if decl is None:
             return rules
@@ -433,10 +461,21 @@ class SnapReviewDeclaration(SnapReview):
             cstr = '%s-%s' % (i, cstr_type)
             if cstr in decl:
                 if isinstance(decl[cstr], list):
-                    rules[cstr] = decl[cstr]
+                    tmp = []
+                    for r in decl[cstr]:
+                        if is_scoped(r):
+                            tmp.append(r)
+                    if len(tmp) == 0:
+                        scoped = False
+                    else:
+                        rules[cstr] = tmp
                 else:
-                    rules[cstr] = [decl[cstr]]
-        return rules
+                    if is_scoped(decl[cstr]):
+                        rules[cstr] = [decl[cstr]]
+                    else:
+                        scoped = False
+
+        return (rules, scoped)
 
     def _attributesCheck(self, side, iface, rules, cstr):
         def _checkAttrib(val, against, side, rules_attrib):
@@ -447,9 +486,11 @@ class SnapReviewDeclaration(SnapReview):
             if isinstance(val, str):
                 if re.search(r'^(%s)$' % against, val):
                     matched = True
-                elif side == 'plugs' and re.search(r'^\$SLOT\(%s\)$' % rules_attrib, against):
+                elif side == 'plugs' and \
+                        re.search(r'^\$SLOT\(%s\)$' % rules_attrib, against):
                     matched = True
-                elif side == 'slots' and re.search(r'^\$PLUG\(%s\)$' % rules_attrib, against):
+                elif side == 'slots' and \
+                        re.search(r'^\$PLUG\(%s\)$' % rules_attrib, against):
                     matched = True
             elif isinstance(val, list):
                 for i in val:
@@ -549,8 +590,7 @@ class SnapReviewDeclaration(SnapReview):
         #   allow/on-classic True or deny/on-classic False since it will be
         #   blocked on core (we omit core snaps since they are blocked for
         #   other reasons
-        # FIXME: if ever need to prompt with plugs/*-connection/on-classic, then
-        # need to disambiguate the fallback to 'slots' in _getDecl()
+        # FIXME: add back plugs tests
         if "on-classic" in rules:
             checked = True
 
@@ -567,38 +607,6 @@ class SnapReviewDeclaration(SnapReview):
             return (checked, "failed due to %s constraint (on-classic)" % cstr)
 
         return (checked, None)
-
-    # func checkDeviceScope() in helpers.go
-    def _checkDeviceScope(self, side, iface, rules, cstr):
-        print("JAMIE6: side=%s, iface=%s, rules=%s, cstr=%s" % (side, iface, rules, cstr))
-
-        # on-store
-        matched = False
-        checkedStore = False
-        if self.on_store:
-            checkedStore = True
-            if "on-store" in rules and self.on_store in rules['on-store']:
-                matched = True
-
-        print("JAMIE6.4: matched=%s, checkedStore=%s, cstr=%s" % (matched, checkedStore, cstr))
-        if checkedStore and ((matched and cstr.startswith('deny')) or
-                             (not matched and cstr.startswith('allow'))):
-            return (checkedStore, "failed due to %s constraint (on-store)" % cstr)
-
-        # on-brand
-        matched = False
-        checkedBranch = False
-        if self.on_brand:
-            checkedBranch = True
-            if "on-brand" in rules and self.on_brand in rules['on-brand']:
-                matched = True
-
-        print("JAMIE6.5: matched=%s, checkedBranch=%s, cstr=%s" % (matched, checkedBranch, cstr))
-        if checkedBranch and ((matched and cstr.startswith('deny')) or
-                              (not matched and cstr.startswith('allow'))):
-            return (checkedBranch, "failed due to %s constraint (on-brand)" % cstr)
-
-        return (checkedStore or checkedBranch, None)
 
     # based on, func checkPlugInstallationConstraints1() in helpers.go
     #
@@ -627,38 +635,37 @@ class SnapReviewDeclaration(SnapReview):
 
             return None
 
-        results = []
+        tmp = []
         num_checked = 0
 
         (checked, res) = self._attributesCheck(side, iface, rules, cstr)
         if checked:
             num_checked += 1
         if res is not None:
-            results.append(res)
+            tmp.append(res)
 
         (checked, res) = self._checkSnapType(side, iface, rules, cstr)
         if checked:
             num_checked += 1
         if res is not None:
-            results.append(res)
+            tmp.append(res)
 
         (checked, res) = self._checkOnClassic(side, iface, rules, cstr)
         if checked:
             num_checked += 1
         if res is not None:
-            results.append(res)
+            tmp.append(res)
 
-        (checked, res) = self._checkDeviceScope(side, iface, rules, cstr)
-        if checked:
-            num_checked += 1
-        if res is not None:
-            results.append(res)
+        # NOTE: snapd uses checkDeviceScope() here but we instead apply the
+        # scope rules in _getRules() since we need to still flag when nothing
+        # is scoped (ie, base decl is in effect)
 
-        print("JAMIE2.1: cstr=%s, num_checked=%s, results=%s" % (cstr, num_checked, results))
+        # TODO: add num_checked tests
+        print("JAMIE2.2: cstr=%s, num_checked=%s, results=%s" % (cstr, num_checked, tmp))
         # If multiple constraints are specified, they all must match
-        if num_checked > 0 and len(results) == num_checked:
+        if num_checked > 0 and len(tmp) == num_checked:
             # FIXME: perhaps allow showing more than just the first
-            return results[0]
+            return tmp[0]
 
         return None
 
@@ -718,13 +725,17 @@ class SnapReviewDeclaration(SnapReview):
 
         if snapHasSay:
             (decl, whence) = self._getDecl(side, iface['interface'], True)
-            rules = self._getRules(decl, cstr_type)
-            if rules is not None:
-                return self._checkRule(side, iface, rules, cstr_type, whence)
-            return None
+            (rules, scoped) = self._getRules(decl, cstr_type)
+            # if we have no scoped rules, then it is as if the snap decl wasn't
+            # specified for this constraint
+            if scoped:
+                if rules is not None:
+                    return self._checkRule(side, iface, rules, cstr_type, whence)
+                return None
+            print("JAMIE9.1: no scoped rules")
 
         (decl, whence) = self._getDecl(side, iface['interface'], False)
-        rules = self._getRules(decl, cstr_type)
+        (rules, scoped) = self._getRules(decl, cstr_type)
         if rules is not None:
             return self._checkRule(side, iface, rules, cstr_type, whence)
         return None
