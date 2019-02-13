@@ -733,17 +733,18 @@ class SnapReviewDeclaration(SnapReview):
             (rules, scoped) = self._get_rules(decl, cstr_type)
             # if we have no scoped rules, then it is as if the snap decl wasn't
             # specified for this constraint
-            if scoped:
-                if rules is not None:
-                    return self._checkRule(side, iface, rules, cstr_type, whence)
-                return None
+            if scoped and rules is not None:
+                return self._checkRule(side, iface, rules, cstr_type, whence)
             print("JAMIE9.1: no scoped rules")
 
         (decl, whence) = self._getDecl(side, iface['interface'], False)
         (rules, scoped) = self._get_rules(decl, cstr_type)
         if rules is not None:
             return self._checkRule(side, iface, rules, cstr_type, whence)
-        return None
+
+        # unreachable: the base declaration will have something for all
+        # existing interfaces, and nonexistence tests are done elsewhere
+        return None  # pragma: nocover
 
     # func (ic *InstallCandidate) Check() in policy.go
     def _installationCheck(self, side, iname, attribs):
