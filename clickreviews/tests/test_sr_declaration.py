@@ -3887,6 +3887,39 @@ slots:
         expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
+    def test_check_declaration_plugs_match_slot_attrib(self):
+        '''Test check_declaration - plugs match slot attrib'''
+        plugs = {'iface': {'interface': 'foo',
+                           'bar': 'baz'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            'slots': {
+                'foo': {
+                    'allow-connection': {
+                        'slot-attributes': {
+                            'bar': '$PLUG(bar)'
+                        }
+                    }
+                }
+            },
+            'plugs': {}
+        }
+        self._set_base_declaration(c, base)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs:iface:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
     def test_check_declaration_plugs_browser_support(self):
         '''Test check_declaration - plugs browser-support'''
         plugs = {'iface': {'interface': 'browser-support'}}

@@ -491,11 +491,9 @@ class SnapReviewDeclaration(SnapReview):
             if isinstance(val, str):
                 if re.search(r'^(%s)$' % against, val):
                     matched = True
-                elif side == 'plugs' and \
-                        re.search(r'^\$SLOT\(%s\)$' % rules_attrib, against):
+                elif re.search(r'^\$PLUG\(%s\)$' % rules_attrib, against):
                     matched = True
-                elif side == 'slots' and \
-                        re.search(r'^\$PLUG\(%s\)$' % rules_attrib, against):
+                elif re.search(r'^\$SLOT\(%s\)$' % rules_attrib, against):
                     matched = True
             elif isinstance(val, list):
                 for i in val:
@@ -511,7 +509,7 @@ class SnapReviewDeclaration(SnapReview):
         checked = False
 
         for rules_key in rules:
-            if not rules_key == "%s-attributes" % side[:-1]:
+            if rules_key not in ['slot-attributes', 'plug-attributes']:
                 continue
             checked = True
 
