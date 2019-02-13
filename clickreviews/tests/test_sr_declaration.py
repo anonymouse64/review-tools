@@ -197,7 +197,7 @@ slots:
         self.assertTrue(res1['allow-connection'])
         self.assertTrue(res2 == "base/fallback")
 
-    def test_zz_is_scoped(self):
+    def test__is_scoped(self):
         '''Test _is_scoped()'''
         c = SnapReviewDeclaration(self.test_name)
 
@@ -206,8 +206,8 @@ slots:
         self.assertTrue(c._is_scoped(False))
 
         # no defined scoping, so scoped to us
-        self.assertTrue(c._is_scoped({'allow-installation': True}))
-        self.assertTrue(c._is_scoped({'allow-installation': False}))
+        self.assertTrue(c._is_scoped({'on-classic': True}))
+        self.assertTrue(c._is_scoped({'on-classic': False}))
 
         # both store and brand match
         overrides = {
@@ -246,6 +246,59 @@ slots:
         self.assertTrue(c._is_scoped(rules))
         rules = {'on-brand': ['bar']}
         self.assertFalse(c._is_scoped(rules))
+
+    def test_get_rules(self):
+        '''Test _get_rules()'''
+        c = SnapReviewDeclaration(self.test_name)
+        (res1, res2) = c._get_rules(None, "connection")
+        self.assertTrue(res1 is not None)
+        self.assertTrue(len(res1) == 0)
+        self.assertFalse(res2)
+
+        # constraint not in decl
+        decl = {'allow-installation': True}
+        (res1, res2) = c._get_rules(decl, "connection")
+        self.assertTrue(res1 is not None)
+        self.assertTrue(len(res1) == 0)
+        self.assertFalse(res2)
+
+        # constraint in decl (scoped)
+        decl = {'allow-connection': True}
+        (res1, res2) = c._get_rules(decl, "connection")
+        self.assertTrue('allow-connection' in res1)
+        self.assertTrue(res1['allow-connection'])
+        self.assertTrue(res2)
+
+        # constraint in decl (unscoped)
+        overrides = {
+            'snap_on_store': 'mystore',
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        decl = {'allow-connection': {'on-store': ['foo']}}
+        (res1, res2) = c._get_rules(decl, "connection")
+        self.assertTrue(res1 is not None)
+        self.assertTrue(len(res1) == 0)
+        self.assertFalse(res2)
+
+        # alternate constraint in decl (scoped)
+        c = SnapReviewDeclaration(self.test_name)
+        decl = {'allow-connection': [{'on-classic': True}]}
+        (res1, res2) = c._get_rules(decl, "connection")
+        self.assertTrue('allow-connection' in res1)
+        self.assertTrue('on-classic' in res1['allow-connection'][0])
+        self.assertTrue(res1['allow-connection'][0]['on-classic'])
+        self.assertTrue(res2)
+
+        # alternate constraint in decl (unscoped)
+        overrides = {
+            'snap_on_store': 'mystore',
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        decl = {'allow-connection': [{'on-store': ['foo']}]}
+        (res1, res2) = c._get_rules(decl, "connection")
+        self.assertTrue(res1 is not None)
+        self.assertTrue(len(res1) == 0)
+        self.assertFalse(res2)
 
     def test__verify_declaration_valid(self):
         '''Test _verify_declaration - valid'''

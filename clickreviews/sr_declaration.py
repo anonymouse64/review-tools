@@ -452,11 +452,16 @@ class SnapReviewDeclaration(SnapReview):
 
         return scoped
 
-    def _getRules(self, decl, cstr_type):
+    def _get_rules(self, decl, cstr_type):
         scoped = True
         rules = {}
+
         if decl is None:
-            return rules
+            return rules, False
+        elif 'allow-%s' % cstr_type not in decl and \
+                'deny-%s' % cstr_type not in decl:
+            return rules, False
+
         for i in ['allow', 'deny']:
             cstr = '%s-%s' % (i, cstr_type)
             if cstr in decl:
@@ -659,7 +664,7 @@ class SnapReviewDeclaration(SnapReview):
             tmp.append(res)
 
         # NOTE: snapd uses checkDeviceScope() here but we instead apply the
-        # scope rules in _getRules() since we need to still flag when nothing
+        # scope rules in _get_rules() since we need to still flag when nothing
         # is scoped (ie, base decl is in effect)
 
         # TODO: add num_checked tests
@@ -727,7 +732,7 @@ class SnapReviewDeclaration(SnapReview):
 
         if snapHasSay:
             (decl, whence) = self._getDecl(side, iface['interface'], True)
-            (rules, scoped) = self._getRules(decl, cstr_type)
+            (rules, scoped) = self._get_rules(decl, cstr_type)
             # if we have no scoped rules, then it is as if the snap decl wasn't
             # specified for this constraint
             if scoped:
@@ -737,7 +742,7 @@ class SnapReviewDeclaration(SnapReview):
             print("JAMIE9.1: no scoped rules")
 
         (decl, whence) = self._getDecl(side, iface['interface'], False)
-        (rules, scoped) = self._getRules(decl, cstr_type)
+        (rules, scoped) = self._get_rules(decl, cstr_type)
         if rules is not None:
             return self._checkRule(side, iface, rules, cstr_type, whence)
         return None
