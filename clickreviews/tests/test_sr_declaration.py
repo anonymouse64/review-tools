@@ -152,6 +152,51 @@ slots:
             sum += len(c.click_report[i])
         self.assertTrue(sum == 0)
 
+    def test__getDecl_snap_empty(self):
+        '''Test _getDecl() - snap decl empty'''
+        overrides = {'snap_decl_plugs': {}}
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        (res1, res2) = c._getDecl('plugs', 'nonexistent', True)
+        self.assertTrue(res1 is None)
+        self.assertTrue(res2 is None)
+
+    def test__getDecl_snap_iface_found(self):
+        '''Test _getDecl() - snap decl - iface found'''
+        overrides = {'snap_decl_plugs': {'foo': {'allow-connection': True}}}
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        (res1, res2) = c._getDecl('plugs', 'foo', True)
+        self.assertTrue('allow-connection' in res1)
+        self.assertTrue(res1['allow-connection'])
+        self.assertTrue(res2 == "snap/plugs")
+
+    def test__getDecl_base_empty(self):
+        '''Test _getDecl() - base decl empty'''
+        c = SnapReviewDeclaration(self.test_name)
+        self._use_test_base_declaration(c)
+        (res1, res2) = c._getDecl('slots', 'nonexistent', False)
+        self.assertTrue(res1 is None)
+        self.assertTrue(res2 is None)
+
+    def test__getDecl_base_iface_found(self):
+        '''Test _getDecl() - base decl - iface found'''
+        c = SnapReviewDeclaration(self.test_name)
+        decl = {'slots': {'foo': {'allow-connection': True}}}
+        self._set_base_declaration(c, decl)
+        (res1, res2) = c._getDecl('slots', 'foo', False)
+        self.assertTrue('allow-connection' in res1)
+        self.assertTrue(res1['allow-connection'])
+        self.assertTrue(res2 == "base/slots")
+
+    def test__getDecl_base_iface_fallback(self):
+        '''Test _getDecl() - base decl - iface fallback'''
+        c = SnapReviewDeclaration(self.test_name)
+        decl = {'plugs': {}, 'slots': {'foo': {'allow-connection': True}}}
+        self._set_base_declaration(c, decl)
+        (res1, res2) = c._getDecl('plugs', 'foo', False)
+        self.assertTrue('allow-connection' in res1)
+        self.assertTrue(res1['allow-connection'])
+        self.assertTrue(res2 == "base/fallback")
+
     def test__verify_declaration_valid(self):
         '''Test _verify_declaration - valid'''
         c = SnapReviewDeclaration(self.test_name)

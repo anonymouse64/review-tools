@@ -423,7 +423,7 @@ class SnapReviewDeclaration(SnapReview):
             # Fallback to slots in the base declaration if nothing is in plugs
             return (copy.deepcopy(self.base_declaration['slots'][iface]), "base/fallback")
 
-        return None
+        return (None, None)
 
     def _getRules(self, decl, cstr_type):
         def is_scoped(rules):
