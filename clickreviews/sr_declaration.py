@@ -348,6 +348,10 @@ class SnapReviewDeclaration(SnapReview):
                         self._add_result(t, n, s)
 
     def _get_decl(self, side, iface, snapDecl):
+        '''Obtain the declaration for the interface. When snapDecl is False,
+           get the base declaration, falling back to slots as needed.
+           Returns (found decl, [snap|base]/[<side>|fallback])
+        '''
         if snapDecl:
             if iface in self.snap_declaration[side]:
                 return (copy.deepcopy(self.snap_declaration[side][iface]),
@@ -366,6 +370,9 @@ class SnapReviewDeclaration(SnapReview):
         return (None, None)
 
     def _is_scoped(self, rules):
+        '''Return whether or not the specified rules are scoped to the snap as
+           dictated by the --on-store and --on-brand overrides
+        '''
         # NOTE: currently if --on-store/--on-brand is specified to the
         # review-tools but the constraint here is not scoped (doesn't
         # contain on-store/on-brand: []) then we treat it as if
@@ -393,6 +400,9 @@ class SnapReviewDeclaration(SnapReview):
         return scoped
 
     def _get_rules(self, decl, cstr_type):
+        '''Obtain the rules, if any, from the specified decl for this
+           constraint type (eg, 'connection' or 'installation'.
+        '''
         scoped = True
         rules = {}
 
@@ -423,6 +433,9 @@ class SnapReviewDeclaration(SnapReview):
         return (rules, scoped)
 
     def _check_attributes(self, side, iface, rules, cstr):
+        '''Check if there are any matching attributes for this side, interface,
+           rules and constraint.
+        '''
         def _check_attrib(val, against, side, rules_attrib):
             if type(val) not in [str, list, dict, bool]:
                 raise SnapDeclarationException("unknown type '%s'" % val)
@@ -465,7 +478,7 @@ class SnapReviewDeclaration(SnapReview):
                             matched = (num_matched == len(against))
                     else:
                         matched = _check_attrib(val, against, side,
-                                               rules_attrib)
+                                                rules_attrib)
 
         if checked and ((matched and cstr.startswith('deny')) or
                         (not matched and cstr.startswith('allow'))):
@@ -485,6 +498,9 @@ class SnapReviewDeclaration(SnapReview):
 
     # func checkSnapType() in helpers.go
     def _check_snap_type(self, side, iface, rules, cstr):
+        '''Check if there are any matching snap types for this side, interface,
+           rules and constraint.
+        '''
         snap_type = 'app'
         if 'type' in self.snap_yaml:
             snap_type = self.snap_yaml['type']
@@ -509,6 +525,20 @@ class SnapReviewDeclaration(SnapReview):
 
     # func checkOnClassic() in helpers.go
     def _check_on_classic(self, side, iface, rules, cstr):
+        '''Check if there is a matching on-classic for this side, interface,
+           rules and constraint.
+
+           Flag when:
+           - installation constraint is specified with on-classic, since it
+             will be blocked somewhere
+           - a providing (slotting) !core snap on all-snaps system has
+             allow/on-classic True or deny/on-classic False with connection
+             since it will be blocked on core (we omit core snaps since they
+             are blocked for other reasons
+           - we ignore plugs with on classic for connections since core snaps
+             won't plugs and app snaps will obtain their connection ability
+             from the providing (slotting) snap
+        '''
         snap_type = 'app'
         if 'type' in self.snap_yaml:
             snap_type = self.snap_yaml['type']
@@ -518,29 +548,19 @@ class SnapReviewDeclaration(SnapReview):
         matched = False
         checked = False
 
-        # verified elsewhere
-        if snap_type not in ['app', 'core']:
+        # only worry about on-classic with app snaps
+        if snap_type != 'app':
             return (checked, None)
 
-        # Flag when:
-        # - installation constraint is specified with on-classic, since it
-        #   will be blocked somewhere
-        # - a providing (slotting) !core snap on all-snaps system has
-        #   allow/on-classic True or deny/on-classic False with connection
-        #   since it will be blocked on core (we omit core snaps since they are
-        #   blocked for other reasons
-        # - we ignore plugs with on classic for connections since core snaps
-        #   won't plugs and app snaps will obtain their connection ability from
-        #   the providing (slotting) snap
         if "on-classic" in rules:
             checked = True
 
             if 'installation' in cstr:
                 matched = True
             else:
-                if side == 'slots' and snap_type != 'core' and \
-                    ((cstr.startswith('allow') and rules['on-classic']) or
-                     (cstr.startswith('deny') and not rules['on-classic'])):
+                if side == 'slots' and  \
+                        ((cstr.startswith('allow') and rules['on-classic']) or
+                         (cstr.startswith('deny') and not rules['on-classic'])):
                     matched = True
 
         if matched:
@@ -548,18 +568,20 @@ class SnapReviewDeclaration(SnapReview):
 
         return (checked, None)
 
-    # based on, func check*InstallationConstraints1() in helpers.go
-    #
-    # To avoid superflous manual reviews, we want to limit when we want to
-    # check to:
-    # - any installation constraints
-    # - slotting non-core snap connection constraints
-    # - plugging snap connection constraints (excepting when not boolean in the
-    #   fallback base declaration slot, since as a practical matter, the
-    #   slotting snap will have been flagged and require a snap declaration for
-    #   snaps to connect to it)
+    # based on, func check*Constraints1() in helpers.go
     def _check_constraints1(self, side, iface, rules, cstr, whence):
-        # no need to check the others if we have a toplevel constraint
+        '''Check one constraint
+
+           To avoid superflous manual reviews, we want to limit when we want to
+           check to:
+           - any installation constraints
+           - slotting non-core snap connection constraints
+           - plugging snap connection constraints (excepting when not boolean
+             in the fallback base declaration slot, since as a practical
+             matter, the slotting snap will have been flagged and require a
+             snap declaration for snaps to connect to it) no need to check the
+             others if we have a toplevel constraint
+        '''
         if isinstance(rules, bool):
             # don't flag connection constraints in the base/fallback in
             # plugging snaps
@@ -605,8 +627,9 @@ class SnapReviewDeclaration(SnapReview):
 
         return None
 
-    # func check*InstallationConstraints() in helpers.go
+    # func check*Constraints() in helpers.go
     def _check_constraints(self, side, iface, rules, cstr, whence):
+        '''Check alternate constraints'''
         if cstr not in rules:
             return None
 
@@ -634,6 +657,7 @@ class SnapReviewDeclaration(SnapReview):
             return None
 
     def _check_rule(self, side, iface, rules, cstr_type, whence):
+        '''Check any constraints for this set of rules'''
         res = self._check_constraints(side, iface, rules,
                                       'deny-%s' % cstr_type, whence)
         if res is not None:
@@ -646,8 +670,11 @@ class SnapReviewDeclaration(SnapReview):
 
         return None
 
-    # func (ic *InstallCandidate) checkPlug()/checkSlot() from policy.go
+    # func (ic *Candidate) checkPlug()/checkSlot() from policy.go
     def _check_side(self, side, iface, cstr_type):
+        '''Check the set of rules for this side (plugs/slots) for this
+           constraint
+        '''
         # if the snap declaration has something to say for this constraint,
         # only it is consulted (there is no merging with base declaration)
         snapHasSay = False
@@ -678,6 +705,7 @@ class SnapReviewDeclaration(SnapReview):
 
     # func (ic *InstallCandidate) Check() in policy.go
     def _installation_check(self, side, iname, attribs):
+        '''Check for any installation constraints'''
         iface = {}
         if attribs is not None:
             iface = copy.deepcopy(attribs)
@@ -697,6 +725,7 @@ class SnapReviewDeclaration(SnapReview):
 
     # func (ic *ConnectionCandidate) check() in policy.go
     def _connection_check(self, side, iname, attribs):
+        '''Check for any connecttion constraints'''
         iface = {}
         if attribs is not None:
             iface = copy.deepcopy(attribs)
@@ -715,6 +744,7 @@ class SnapReviewDeclaration(SnapReview):
         return None
 
     def _verify_iface(self, name, iface, interface, attribs=None):
+        '''Verify the interface for any matching constraints'''
         if name.endswith('slot'):
             side = 'slots'
             oside = 'plugs'
