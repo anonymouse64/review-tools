@@ -185,9 +185,17 @@ class SnapReviewDeclaration(SnapReview):
 
                                 attr_type = cstr[cstr_key][attrib]
 
-                                # FIXME with rewrite
+                                # Mark as malformed if the attribute type in
+                                # the decl is different from that defined in
+                                # sr_common.py, except when that in
+                                # sr_common.py is a list and the decl specifies
+                                # a string (since in the decl one can specify a
+                                # string as a match/regex for something in the
+                                # list)
                                 if not isinstance(attr_type,
-                                                  type(self.interfaces_attribs[iface][tmp])):
+                                                  type(self.interfaces_attribs[iface][tmp])) \
+                                    and not (isinstance(self.interfaces_attribs[iface][tmp], list) and
+                                             isinstance(attr_type, str)):
                                     malformed(bn,
                                               "wrong type '%s' for attribute '%s'"
                                               % (attr_type, attrib),
@@ -434,7 +442,9 @@ class SnapReviewDeclaration(SnapReview):
 
     def _check_attributes(self, side, iface, rules, cstr):
         '''Check if there are any matching attributes for this side, interface,
-           rules and constraint.
+           rules and constraint. If attributes are specified in the constraint,
+           they all must match. If the attribute is a list, just one must
+           match (it is considered a list of alternatives).
         '''
         def _check_attrib(val, against, side, rules_attrib):
             if type(val) not in [str, list, dict, bool]:
@@ -442,11 +452,17 @@ class SnapReviewDeclaration(SnapReview):
 
             matched = False
             if isinstance(val, str):
-                if re.search(r'^(%s)$' % against, val):
-                    matched = True
-                elif re.search(r'^\$PLUG\(%s\)$' % rules_attrib, against):
-                    matched = True
-                elif re.search(r'^\$SLOT\(%s\)$' % rules_attrib, against):
+                if against.startswith('$'):
+                    if against == '$MISSING':
+                        matched = False  # value must not be set
+                    elif re.search(r'^\$PLUG\(%s\)$' % rules_attrib, against):
+                        matched = True
+                    elif re.search(r'^\$SLOT\(%s\)$' % rules_attrib, against):
+                        matched = True
+                    else:
+                        raise SnapDeclarationException(
+                            "unknown special attrib '%s'" % against)
+                elif re.search(r'^(%s)$' % against, val):
                     matched = True
             elif isinstance(val, list):
                 for i in val:
@@ -459,26 +475,54 @@ class SnapReviewDeclaration(SnapReview):
 
         matched = False
         checked = False
+        attributes_matched = {}
+        num_iface_attribs = len(iface) - 1  # skip the 'interface' key
 
         for rules_key in rules:
             if rules_key not in ['slot-attributes', 'plug-attributes']:
                 continue
+            elif len(rules[rules_key]) == 0:  # if empty, then just ignore
+                continue
+
             checked = True
 
+            attributes_matched[rules_key] = {}
+            attributes_matched[rules_key]['len'] = len(rules[rules_key])
+            attributes_matched[rules_key]['matched'] = 0
             for rules_attrib in rules[rules_key]:
                 if rules_attrib in iface:
                     val = iface[rules_attrib]
                     against = rules[rules_key][rules_attrib]
 
                     if isinstance(against, list):
+                        # when the attribute is a list, all items in the list
+                        # must match
                         num_matched = 0
                         for i in against:
                             if _check_attrib(val, i, side, rules_attrib):
                                 num_matched += 1
-                            matched = (num_matched == len(against))
+                        if (num_matched == len(against)):
+                            attributes_matched[rules_key]['matched'] += 1
                     else:
-                        matched = _check_attrib(val, against, side,
-                                                rules_attrib)
+                        if _check_attrib(val, against, side, rules_attrib):
+                            attributes_matched[rules_key]['matched'] += 1
+
+        # all the attributes specified in the decl must match the interface
+        if 'slot-attributes' in attributes_matched and \
+                'plug-attributes' in attributes_matched:
+            if attributes_matched['slot-attributes']['len'] == \
+                    attributes_matched['slot-attributes']['matched'] and \
+                    attributes_matched['plug-attributes']['len'] == \
+                    attributes_matched['plug-attributes']['matched']:
+                matched = True
+        elif 'slot-attributes' in attributes_matched:
+            if attributes_matched['slot-attributes']['len'] == \
+                    attributes_matched['slot-attributes']['matched']:
+                matched = True
+        elif 'plug-attributes' in attributes_matched:
+            if attributes_matched['plug-attributes']['len'] == \
+                    attributes_matched['plug-attributes']['matched']:
+                matched = True
 
         if checked and ((matched and cstr.startswith('deny')) or
                         (not matched and cstr.startswith('allow'))):
