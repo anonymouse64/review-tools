@@ -347,68 +347,6 @@ class SnapReviewDeclaration(SnapReview):
                     if not base and not found_errors:
                         self._add_result(t, n, s)
 
-    def check_declaration(self):
-        '''Check base/snap declaration requires manual review for top-level
-           plugs/slots
-        '''
-        if not self.is_snap2:
-            return
-
-        for side in ['plugs', 'slots']:
-            if side not in self.snap_yaml:
-                continue
-
-            for iface in self.snap_yaml[side]:
-                # If the 'interface' name is the same as the 'plug/slot' name,
-                # then 'interface' is optional since the interface name and the
-                # plug/slot name are the same
-                interface = iface
-                attribs = None
-
-                spec = self.snap_yaml[side][iface]
-                if isinstance(spec, str):
-                    # Abbreviated syntax (no attributes)
-                    # <plugs|slots>:
-                    #   <alias>: <interface>
-                    interface = spec
-                elif 'interface' in spec:
-                    # Full specification.
-                    # <plugs|slots>:
-                    #   <alias>:
-                    #     interface: <interface>
-                    interface = spec['interface']
-                    if len(spec) > 1:
-                        attribs = spec
-                        del attribs['interface']
-
-                # self._verify_iface(side[:-1], iface, interface, attribs)
-                self._verify_iface2(side[:-1], iface, interface, attribs)
-
-    def check_declaration_apps(self):
-        '''Check base/snap declaration requires manual review for apps
-           plugs/slots
-        '''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
-            return
-
-        for app in self.snap_yaml['apps']:
-            for side in ['plugs', 'slots']:
-                if side not in self.snap_yaml['apps'][app]:
-                    continue
-
-                # The interface referenced in the app's 'plugs' or 'slots'
-                # field can either be a known interface (when the interface
-                # name reference and the interface is the same) or can
-                # reference a name in the snap's toplevel 'plugs' or 'slots'
-                # mapping
-                for ref in self.snap_yaml['apps'][app][side]:
-                    if not isinstance(ref, str):
-                        continue  # checked elsewhere
-
-                    # self._verify_iface('app_%s' % side[:-1], app, ref)
-                    self._verify_iface2('app_%s' % side[:-1], app, ref)
-
-    # helpers
     def _get_decl(self, side, iface, snapDecl):
         if snapDecl:
             if iface in self.snap_declaration[side]:
@@ -757,8 +695,6 @@ class SnapReviewDeclaration(SnapReview):
 
         return None
 
-    # TODO: verify this logic is correct for us since it is different than
-    # snapd
     # func (ic *ConnectionCandidate) check() in policy.go
     def _connection_check(self, side, iname, attribs):
         iface = {}
@@ -778,7 +714,7 @@ class SnapReviewDeclaration(SnapReview):
 
         return None
 
-    def _verify_iface2(self, name, iface, interface, attribs=None):
+    def _verify_iface(self, name, iface, interface, attribs=None):
         if name.endswith('slot'):
             side = 'slots'
             oside = 'plugs'
@@ -817,3 +753,62 @@ class SnapReviewDeclaration(SnapReview):
             t = 'error'
             s = err
         self._add_result(t, n, s)
+
+    def check_declaration(self):
+        '''Check base/snap declaration requires manual review for top-level
+           plugs/slots
+        '''
+        if not self.is_snap2:
+            return
+
+        for side in ['plugs', 'slots']:
+            if side not in self.snap_yaml:
+                continue
+
+            for iface in self.snap_yaml[side]:
+                # If the 'interface' name is the same as the 'plug/slot' name,
+                # then 'interface' is optional since the interface name and the
+                # plug/slot name are the same
+                interface = iface
+                attribs = None
+
+                spec = self.snap_yaml[side][iface]
+                if isinstance(spec, str):
+                    # Abbreviated syntax (no attributes)
+                    # <plugs|slots>:
+                    #   <alias>: <interface>
+                    interface = spec
+                elif 'interface' in spec:
+                    # Full specification.
+                    # <plugs|slots>:
+                    #   <alias>:
+                    #     interface: <interface>
+                    interface = spec['interface']
+                    if len(spec) > 1:
+                        attribs = spec
+                        del attribs['interface']
+
+                self._verify_iface(side[:-1], iface, interface, attribs)
+
+    def check_declaration_apps(self):
+        '''Check base/snap declaration requires manual review for apps
+           plugs/slots
+        '''
+        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+            return
+
+        for app in self.snap_yaml['apps']:
+            for side in ['plugs', 'slots']:
+                if side not in self.snap_yaml['apps'][app]:
+                    continue
+
+                # The interface referenced in the app's 'plugs' or 'slots'
+                # field can either be a known interface (when the interface
+                # name reference and the interface is the same) or can
+                # reference a name in the snap's toplevel 'plugs' or 'slots'
+                # mapping
+                for ref in self.snap_yaml['apps'][app][side]:
+                    if not isinstance(ref, str):
+                        continue  # checked elsewhere
+
+                    self._verify_iface('app_%s' % side[:-1], app, ref)
