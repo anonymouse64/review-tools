@@ -440,11 +440,15 @@ class SnapReviewDeclaration(SnapReview):
 
         return (rules, scoped)
 
-    def _check_attributes(self, side, iface, rules, cstr):
+    def _check_attributes(self, side, iface, rules, cstr, whence):
         '''Check if there are any matching attributes for this side, interface,
            rules and constraint. If attributes are specified in the constraint,
            they all must match. If the attribute is a list, just one must
-           match (it is considered a list of alternatives).
+           match (it is considered a list of alternatives). As a practical
+           matter, don't flag connection constraints for slot-attributes in
+           plugging snaps when checking against the fallback base declaration
+           slot since the slotting snap will have been flagged and require a
+           snap declaration for snaps to connect to it
         '''
         def _check_attrib(val, against, side, rules_attrib):
             if type(val) not in [str, list, dict, bool]:
@@ -476,21 +480,26 @@ class SnapReviewDeclaration(SnapReview):
         matched = False
         checked = False
         attributes_matched = {}
-        num_iface_attribs = len(iface) - 1  # skip the 'interface' key
 
         for rules_key in rules:
             if rules_key not in ['slot-attributes', 'plug-attributes']:
                 continue
             elif len(rules[rules_key]) == 0:  # if empty, then just ignore
                 continue
-
-            checked = True
+            elif side == 'plugs' and 'connection' in cstr \
+                    and rules_key == 'slot-attributes' \
+                    and whence == 'base/fallback':
+                # don't check slot-attributes with plugs in connection
+                # constrains when falling back since the slot's snap
+                # declaration will cover this
+                continue
 
             attributes_matched[rules_key] = {}
             attributes_matched[rules_key]['len'] = len(rules[rules_key])
             attributes_matched[rules_key]['matched'] = 0
             for rules_attrib in rules[rules_key]:
                 if rules_attrib in iface:
+                    checked = True
                     val = iface[rules_attrib]
                     against = rules[rules_key][rules_attrib]
 
@@ -501,11 +510,17 @@ class SnapReviewDeclaration(SnapReview):
                         for i in against:
                             if _check_attrib(val, i, side, rules_attrib):
                                 num_matched += 1
-                        if (num_matched == len(against)):
+                        if num_matched != 0 and num_matched == len(against):
                             attributes_matched[rules_key]['matched'] += 1
                     else:
                         if _check_attrib(val, against, side, rules_attrib):
                             attributes_matched[rules_key]['matched'] += 1
+                else:
+                    # when the attribute is missing from the interface don't
+                    # mark as checked (missing attributes are checked
+                    # elsewwhere in 'interfaces_required' from sr_common.py in
+                    # sr_lint.py
+                    pass
 
         # all the attributes specified in the decl must match the interface
         if 'slot-attributes' in attributes_matched and \
@@ -526,10 +541,11 @@ class SnapReviewDeclaration(SnapReview):
 
         if checked and ((matched and cstr.startswith('deny')) or
                         (not matched and cstr.startswith('allow'))):
-            s = "failed due to %s constraint (interface attributes)" % cstr
+            s = "human review required due to '%s' constraint (interface attributes)" % cstr
             if "plug-attributes" in rules and \
                     'allow-sandbox' in rules['plug-attributes'] and \
                     rules['plug-attributes']['allow-sandbox']:
+                # old Oxide is OXIDE_NO_SANDBOX=1
                 s += ". If using a chromium webview, you can disable the " + \
                      "internal sandbox (eg, use --no-sandbox) and remove " + \
                      "the 'allow-sandbox' attribute instead. For " + \
@@ -563,7 +579,7 @@ class SnapReviewDeclaration(SnapReview):
 
         if checked and ((matched and cstr.startswith('deny')) or
                         (not matched and cstr.startswith('allow'))):
-            return (checked, "failed due to %s constraint (snap-type)" % cstr)
+            return (checked, "human review required due to '%s' constraint (snap-type)" % cstr)
 
         return (checked, None)
 
@@ -608,7 +624,7 @@ class SnapReviewDeclaration(SnapReview):
                     matched = True
 
         if matched:
-            return (checked, "failed due to %s constraint (on-classic)" % cstr)
+            return (checked, "human review required due to '%s' constraint (on-classic)" % cstr)
 
         return (checked, None)
 
@@ -635,14 +651,15 @@ class SnapReviewDeclaration(SnapReview):
 
             if ((rules and cstr.startswith('deny')) or
                     (not rules and cstr.startswith('allow'))):
-                return "failed due to %s constraint (bool)" % cstr
+                return "human review required due to '%s' constraint (bool)" % cstr
 
             return None
 
         tmp = []
         num_checked = 0
 
-        (checked, res) = self._check_attributes(side, iface, rules, cstr)
+        (checked, res) = self._check_attributes(side, iface, rules, cstr,
+                                                whence)
         if checked:
             num_checked += 1
         if res is not None:
@@ -821,7 +838,7 @@ class SnapReviewDeclaration(SnapReview):
             n = self._get_check_name('%s_installation' % side, app=iface,
                                      extra=interface)
             s = err1
-            self._add_result(t, n, s)
+            self._add_result(t, n, s, manual_review=True)
 
         err2 = self._connection_check(side, interface, attribs)
         if err2 is not None:
@@ -829,7 +846,7 @@ class SnapReviewDeclaration(SnapReview):
             n = self._get_check_name('%s_connection' % side, app=iface,
                                      extra=interface)
             s = err2
-            self._add_result(t, n, s)
+            self._add_result(t, n, s, manual_review=True)
 
         if err1 is None and err2 is None:
             t = 'info'
