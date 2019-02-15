@@ -815,18 +815,27 @@ class SnapReviewDeclaration(SnapReview):
 
         # only need to check installation and connection since snapd handles
         # auto-connection
-        t = 'info'
-        n = self._get_check_name('%s' % side, app=iface, extra=interface)
-        s = 'OK'
-        err = self._installation_check(side, interface, attribs)
-        if err is not None:
+        err1 = self._installation_check(side, interface, attribs)
+        if err1 is not None:
             t = 'error'
-            s = err
-        err = self._connection_check(side, interface, attribs)
-        if err is not None:
+            n = self._get_check_name('%s_installation' % side, app=iface,
+                                     extra=interface)
+            s = err1
+            self._add_result(t, n, s)
+
+        err2 = self._connection_check(side, interface, attribs)
+        if err2 is not None:
             t = 'error'
-            s = err
-        self._add_result(t, n, s)
+            n = self._get_check_name('%s_connection' % side, app=iface,
+                                     extra=interface)
+            s = err2
+            self._add_result(t, n, s)
+
+        if err1 is None and err2 is None:
+            t = 'info'
+            n = self._get_check_name('%s' % side, app=iface, extra=interface)
+            s = 'OK'
+            self._add_result(t, n, s)
 
     def check_declaration(self):
         '''Check base/snap declaration requires manual review for top-level
