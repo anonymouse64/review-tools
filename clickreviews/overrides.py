@@ -15,13 +15,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #
-# sr_declaration.py overrides
-#
-# List of attributes that always successfully match (ie, so we don't
-# flag on them).
-iface_attributes_noflag = ['$SLOT(content)']
-
-#
 # sr_lint.py overrides
 #
 # To be removed. For now we know that snap names have a 1 to 1 mapping

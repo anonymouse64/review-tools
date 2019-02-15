@@ -152,6 +152,154 @@ slots:
             sum += len(c.click_report[i])
         self.assertTrue(sum == 0)
 
+    def test__get_decl_snap_empty(self):
+        '''Test _get_decl() - snap decl empty'''
+        overrides = {'snap_decl_plugs': {}}
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        (res1, res2) = c._get_decl('plugs', 'nonexistent', True)
+        self.assertTrue(res1 is None)
+        self.assertTrue(res2 is None)
+
+    def test__get_decl_snap_iface_found(self):
+        '''Test _get_decl() - snap decl - iface found'''
+        overrides = {'snap_decl_plugs': {'foo': {'allow-connection': True}}}
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        (res1, res2) = c._get_decl('plugs', 'foo', True)
+        self.assertTrue('allow-connection' in res1)
+        self.assertTrue(res1['allow-connection'])
+        self.assertTrue(res2 == "snap/plugs")
+
+    def test__get_decl_base_empty(self):
+        '''Test _get_decl() - base decl empty'''
+        c = SnapReviewDeclaration(self.test_name)
+        self._use_test_base_declaration(c)
+        (res1, res2) = c._get_decl('slots', 'nonexistent', False)
+        self.assertTrue(res1 is None)
+        self.assertTrue(res2 is None)
+
+    def test__get_decl_base_iface_found(self):
+        '''Test _get_decl() - base decl - iface found'''
+        c = SnapReviewDeclaration(self.test_name)
+        decl = {'slots': {'foo': {'allow-connection': True}}}
+        self._set_base_declaration(c, decl)
+        (res1, res2) = c._get_decl('slots', 'foo', False)
+        self.assertTrue('allow-connection' in res1)
+        self.assertTrue(res1['allow-connection'])
+        self.assertTrue(res2 == "base/slots")
+
+    def test__get_decl_base_iface_fallback(self):
+        '''Test _get_decl() - base decl - iface fallback'''
+        c = SnapReviewDeclaration(self.test_name)
+        decl = {'plugs': {}, 'slots': {'foo': {'allow-connection': True}}}
+        self._set_base_declaration(c, decl)
+        (res1, res2) = c._get_decl('plugs', 'foo', False)
+        self.assertTrue('allow-connection' in res1)
+        self.assertTrue(res1['allow-connection'])
+        self.assertTrue(res2 == "base/fallback")
+
+    def test__is_scoped(self):
+        '''Test _is_scoped()'''
+        c = SnapReviewDeclaration(self.test_name)
+
+        # no defined scoping, so scoped to us
+        self.assertTrue(c._is_scoped(True))
+        self.assertTrue(c._is_scoped(False))
+
+        # no defined scoping, so scoped to us
+        self.assertTrue(c._is_scoped({'on-classic': True}))
+        self.assertTrue(c._is_scoped({'on-classic': False}))
+
+        # both store and brand match
+        overrides = {
+            'snap_on_store': 'mystore',
+            'snap_on_brand': 'mybrand'
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        rules = {'on-store': ['mystore', 'foo'],
+                 'on-brand': ['bar', 'mybrand']}
+        self.assertTrue(c._is_scoped(rules))
+
+        # both specified but one doesn't match
+        rules = {'on-store': ['foo'], 'on-brand': ['bar', 'mybrand']}
+        self.assertFalse(c._is_scoped(rules))
+        rules = {'on-store': ['mystore', 'foo'], 'on-brand': ['bar']}
+        self.assertFalse(c._is_scoped(rules))
+        rules = {'on-store': ['foo'], 'on-brand': ['bar']}
+        self.assertFalse(c._is_scoped(rules))
+
+        # store match
+        overrides = {
+            'snap_on_store': 'mystore',
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        rules = {'on-store': ['mystore', 'foo']}
+        self.assertTrue(c._is_scoped(rules))
+        rules = {'on-store': ['foo']}
+        self.assertFalse(c._is_scoped(rules))
+
+        # brand match
+        overrides = {
+            'snap_on_brand': 'mybrand',
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        rules = {'on-brand': ['bar', 'mybrand']}
+        self.assertTrue(c._is_scoped(rules))
+        rules = {'on-brand': ['bar']}
+        self.assertFalse(c._is_scoped(rules))
+
+    def test_get_rules(self):
+        '''Test _get_rules()'''
+        c = SnapReviewDeclaration(self.test_name)
+        (res1, res2) = c._get_rules(None, "connection")
+        self.assertTrue(res1 is not None)
+        self.assertTrue(len(res1) == 0)
+        self.assertFalse(res2)
+
+        # constraint not in decl
+        decl = {'allow-installation': True}
+        (res1, res2) = c._get_rules(decl, "connection")
+        self.assertTrue(res1 is not None)
+        self.assertTrue(len(res1) == 0)
+        self.assertFalse(res2)
+
+        # constraint in decl (scoped)
+        decl = {'allow-connection': True}
+        (res1, res2) = c._get_rules(decl, "connection")
+        self.assertTrue('allow-connection' in res1)
+        self.assertTrue(res1['allow-connection'])
+        self.assertTrue(res2)
+
+        # constraint in decl (unscoped)
+        overrides = {
+            'snap_on_store': 'mystore',
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        decl = {'allow-connection': {'on-store': ['foo']}}
+        (res1, res2) = c._get_rules(decl, "connection")
+        self.assertTrue(res1 is not None)
+        self.assertTrue(len(res1) == 0)
+        self.assertFalse(res2)
+
+        # alternate constraint in decl (scoped)
+        c = SnapReviewDeclaration(self.test_name)
+        decl = {'allow-connection': [{'on-classic': True}]}
+        (res1, res2) = c._get_rules(decl, "connection")
+        self.assertTrue('allow-connection' in res1)
+        self.assertTrue('on-classic' in res1['allow-connection'][0])
+        self.assertTrue(res1['allow-connection'][0]['on-classic'])
+        self.assertTrue(res2)
+
+        # alternate constraint in decl (unscoped)
+        overrides = {
+            'snap_on_store': 'mystore',
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        decl = {'allow-connection': [{'on-store': ['foo']}]}
+        (res1, res2) = c._get_rules(decl, "connection")
+        self.assertTrue(res1 is not None)
+        self.assertTrue(len(res1) == 0)
+        self.assertFalse(res2)
+
     def test__verify_declaration_valid(self):
         '''Test _verify_declaration - valid'''
         c = SnapReviewDeclaration(self.test_name)
@@ -1241,7 +1389,7 @@ slots:
                 'browser-support': {
                     'allow-connection': {
                         'plug-attributes': {
-                            'allow-sandbox': []
+                            'allow-sandbox': {}
                         }
                     }
                 }
@@ -1257,7 +1405,7 @@ slots:
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'declaration-snap-v2:valid_slots:browser-support:allow-connection_plug-attributes'
-        expected['error'][name] = {"text": "declaration malformed (wrong type '[]' for attribute 'allow-sandbox')"}
+        expected['error'][name] = {"text": "declaration malformed (wrong type '{}' for attribute 'allow-sandbox')"}
         self.check_results(r, expected=expected)
 
     def test__verify_declaration_invalid_slots_plug_attribs_browser_support_nonexistent(self):
@@ -1332,7 +1480,7 @@ slots:
                 'content': {
                     'allow-connection': {
                         'slot-attributes': {
-                            'read': ""
+                            'read': {}
                         }
                     }
                 }
@@ -1348,7 +1496,7 @@ slots:
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'declaration-snap-v2:valid_slots:content:allow-connection_slot-attributes'
-        expected['error'][name] = {"text": "declaration malformed (wrong type '' for attribute 'read')"}
+        expected['error'][name] = {"text": "declaration malformed (wrong type '{}' for attribute 'read')"}
         self.check_results(r, expected=expected)
 
     def test__verify_declaration_invalid_slots_plug_attribs_content_side(self):
@@ -1529,33 +1677,6 @@ slots:
         expected['error'][name] = {"text": "declaration malformed (invalid format for snap id 'b@d')"}
         self.check_results(r, expected=expected)
 
-    def test__get_all_combinations(self):
-        '''Test _get_all_combinations()'''
-        c = SnapReviewDeclaration(self.test_name)
-        iface = 'someiface'
-        snap = {
-            'slots': {
-                iface: {
-                    'foo': '1',
-                    'bar': ['2', '3'],
-                    'baz': '4',
-                    'norf': ['5', '6'],
-                }
-            },
-            'plugs': {
-                iface: {
-                    'qux': '7',
-                    'quux': ['8', '9'],
-                }
-            }
-        }
-        c.snap_declaration = snap
-
-        (decls, has_alt) = c._get_all_combinations(iface)
-        self.assertTrue(has_alt)
-        self.assertTrue(len(decls['base']) == 0)
-        self.assertTrue(len(decls['snap']) == 8)
-
     def test_check_declaration_unknown_interface(self):
         '''Test check_declaration - unknown interface'''
         slots = {'iface-foo': {'interface': 'bar'}}
@@ -1674,8 +1795,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_deny-installation:iface-foo:foo'
-        expected['error'][name] = {"text": "human review required due to 'deny-installation' constraint from base declaration"}
+        name = 'declaration-snap-v2:slots_installation:iface-foo:foo'
+        expected['error'][name] = {"text": "human review required due to 'deny-installation' constraint (bool)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_deny_installation_true_abbreviated(self):
@@ -1700,8 +1821,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_deny-installation:iface-foo:foo'
-        expected['error'][name] = {"text": "human review required due to 'deny-installation' constraint from base declaration"}
+        name = 'declaration-snap-v2:slots_installation:iface-foo:foo'
+        expected['error'][name] = {"text": "human review required due to 'deny-installation' constraint (bool)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_deny_installation_false(self):
@@ -1721,6 +1842,14 @@ slots:
         r = c.click_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:slots:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_allow_installation_false(self):
         '''Test check_declaration - slots/allow-installation/false'''
@@ -1744,8 +1873,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_allow-installation:iface-foo:foo'
-        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint from base declaration"}
+        name = 'declaration-snap-v2:slots_installation:iface-foo:foo'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint (bool)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_allow_installation_true(self):
@@ -1765,6 +1894,14 @@ slots:
         r = c.click_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:slots:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_deny_connection_true(self):
         '''Test check_declaration - plugs/deny-connection/true'''
@@ -1788,8 +1925,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_deny-connection:iface-foo:foo'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}
+        name = 'declaration-snap-v2:plugs_connection:iface-foo:foo'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (bool)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_deny_connection_false(self):
@@ -1809,6 +1946,14 @@ slots:
         r = c.click_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_allow_connection_false(self):
         '''Test check_declaration - plugs/allow-connection/false'''
@@ -1832,8 +1977,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_allow-connection:iface-foo:foo'
-        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint from base declaration"}
+        name = 'declaration-snap-v2:plugs_connection:iface-foo:foo'
+        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint (bool)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_allow_connection_true(self):
@@ -1854,6 +1999,14 @@ slots:
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
     def test_check_declaration_slots_allow_installation_snap_type_app(self):
         '''Test check_declaration - slots/allow-installation/snap-type'''
         slots = {'iface-foo': {'interface': 'foo'}}
@@ -1873,6 +2026,14 @@ slots:
         r = c.click_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:slots:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_allow_installation_snap_type_gadget(self):
         '''Test check_declaration - slots/allow-installation/snap-type'''
@@ -1895,6 +2056,14 @@ slots:
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:slots:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
     def test_check_declaration_slots_allow_installation_snap_type_core(self):
         '''Test check_declaration - slots/allow-installation/snap-type'''
         slots = {'iface-foo': {'interface': 'foo'}}
@@ -1916,6 +2085,14 @@ slots:
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:slots:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
     def test_check_declaration_slots_allow_installation_snap_type_os(self):
         '''Test check_declaration - slots/allow-installation/snap-type'''
         slots = {'iface-foo': {'interface': 'foo'}}
@@ -1936,6 +2113,14 @@ slots:
         r = c.click_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:slots:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_allow_installation_snap_type_bad(self):
         '''Test check_declaration - bad slots/allow-installation/snap-type'''
@@ -1961,8 +2146,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_allow-installation:iface-foo:foo'
-        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint for 'slot-snap-type' from base declaration"}
+        name = 'declaration-snap-v2:slots_installation:iface-foo:foo'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint (snap-type)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_deny_installation_snap_type_app(self):
@@ -1989,8 +2174,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_deny-installation:iface-foo:foo'
-        expected['error'][name] = {"text": "human review required due to 'deny-installation' constraint for 'plug-snap-type' from base declaration"}
+        name = 'declaration-snap-v2:plugs_installation:iface-foo:foo'
+        expected['error'][name] = {"text": "human review required due to 'deny-installation' constraint (snap-type)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_deny_installation_snap_type_bad(self):
@@ -2012,6 +2197,14 @@ slots:
         r = c.click_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_deny_connection_attrib_str_match(self):
         '''Test check_declaration - plugs/deny-connection/attrib - str match'''
@@ -2039,8 +2232,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_deny-connection:iface-foo:foo'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'plug-attributes' from base declaration"}
+        name = 'declaration-snap-v2:plugs_connection:iface-foo:foo'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_deny_connection_attrib_str_nomatch(self):
@@ -2065,6 +2258,14 @@ slots:
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
     def test_check_declaration_plugs_allow_connection_attrib_str_match(self):
         '''Test check_declaration - plugs/allow-connection/attrib - str match'''
         plugs = {'iface-foo': {'interface': 'foo', 'attrib1': 'val1'}}
@@ -2086,6 +2287,14 @@ slots:
         r = c.click_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_allow_connection_attrib_str_nomatch(self):
         '''Test check_declaration - plugs/allow-connection/attrib - str nomatch'''
@@ -2113,8 +2322,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_allow-connection:iface-foo:foo'
-        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint for 'plug-attributes' from base declaration"}
+        name = 'declaration-snap-v2:plugs_connection:iface-foo:foo'
+        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_deny_connection_attrib_str2_match(self):
@@ -2146,13 +2355,15 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_deny-connection:iface-foo:foo'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'plug-attributes' from base declaration"}
+        name = 'declaration-snap-v2:plugs_connection:iface-foo:foo'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
-    def test_check_declaration_plugs_deny_connection_attrib_str2_match2(self):
-        '''Test check_declaration - plugs/deny-connection/attrib - strs match2'''
-        plugs = {'iface-foo': {'interface': 'foo', 'attrib2': 'val2'}}
+    def test_check_declaration_plugs_deny_connection_attrib_str2_nomatch1(self):
+        '''Test check_declaration - plugs/deny-connection/attrib - strs no match1'''
+        plugs = {'iface-foo': {'interface': 'foo',
+                               'attrib1': 'nomatch',
+                               'attrib2': 'val2'}}
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewDeclaration(self.test_name)
         base = {
@@ -2160,7 +2371,7 @@ slots:
                 'foo': {
                     'deny-connection': {
                         'plug-attributes': {
-                            'attrib1': 'other',
+                            'attrib1': 'val1',
                             'attrib2': 'val2'
                         }
                     }
@@ -2170,19 +2381,20 @@ slots:
         self._set_base_declaration(c, base)
         c.check_declaration()
         r = c.click_report
-        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
         expected = dict()
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_deny-connection:iface-foo:foo'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'plug-attributes' from base declaration"}
+        name = 'declaration-snap-v2:plugs:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
-    def test_check_declaration_plugs_deny_connection_attrib_str2_nomatch(self):
-        '''Test check_declaration - plugs/deny-connection/attrib - strs nomatch'''
+    def test_check_declaration_plugs_deny_connection_attrib_str2_nomatch_both(self):
+        '''Test check_declaration - plugs/deny-connection/attrib - strs nomatch
+           both'''
         plugs = {'iface-foo': {'interface': 'foo',
                                'attrib1': 'val1',
                                'attrib2': 'val2',
@@ -2206,6 +2418,14 @@ slots:
         r = c.click_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_allow_connection_attrib_str2_match(self):
         '''Test check_declaration - plugs/allow-connection/attrib - strs match'''
@@ -2232,9 +2452,19 @@ slots:
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
-    def test_check_declaration_plugs_allow_connection_attrib_str2_match2(self):
-        '''Test check_declaration - plugs/allow-connection/attrib - strs match2'''
-        plugs = {'iface-foo': {'interface': 'foo', 'attrib2': 'val2'}}
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_plugs_allow_connection_attrib_str2_nomatch1(self):
+        '''Test check_declaration - plugs/allow-connection/attrib - strs no match1'''
+        plugs = {'iface-foo': {'interface': 'foo',
+                               'attrib1': 'nomatch',
+                               'attrib2': 'val2'}}
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewDeclaration(self.test_name)
         base = {
@@ -2242,7 +2472,7 @@ slots:
                 'foo': {
                     'allow-connection': {
                         'plug-attributes': {
-                            'attrib1': 'other',
+                            'attrib1': 'val1',
                             'attrib2': 'val2'
                         }
                     }
@@ -2252,11 +2482,20 @@ slots:
         self._set_base_declaration(c, base)
         c.check_declaration()
         r = c.click_report
-        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
-    def test_check_declaration_plugs_allow_connection_attrib_str2_nomatch(self):
-        '''Test check_declaration - plugs/allow-connection/attrib - strs nomatch'''
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs_connection:iface-foo:foo'
+        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint (interface attributes)"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_plugs_allow_connection_attrib_str2_nomatch2(self):
+        '''Test check_declaration - plugs/allow-connection/attrib - strs
+           nomatch2'''
         plugs = {'iface-foo': {'interface': 'foo',
                                'attrib1': 'val1',
                                'attrib2': 'val2',
@@ -2285,8 +2524,568 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_allow-connection:iface-foo:foo'
-        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint for 'plug-attributes' from base declaration"}
+        name = 'declaration-snap-v2:plugs_connection:iface-foo:foo'
+        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint (interface attributes)"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_plugs_allow_connection_attrib_str3_match(self):
+        '''Test check_declaration - plugs/allow-connection/attrib - strs
+           match2 with extra 3rd'''
+        plugs = {'iface-foo': {'interface': 'foo',
+                               'attrib1': 'val1',
+                               'attrib2': 'val2',
+                               'attrib3': 'val3'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            'plugs': {
+                'foo': {
+                    'allow-connection': {
+                        'plug-attributes': {
+                            'attrib1': 'val1',
+                            'attrib2': 'val2'
+                        }
+                    }
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_plugs_allow_connection_attrib_str2_nomatch3(self):
+        '''Test check_declaration - plugs/allow-connection/attrib - strs
+           nomatch3 missing 3rd'''
+        plugs = {'iface-foo': {'interface': 'foo',
+                               'attrib1': 'val1',
+                               'attrib2': 'val2'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            'plugs': {
+                'foo': {
+                    'allow-connection': {
+                        'plug-attributes': {
+                            'attrib1': 'val1',
+                            'attrib2': 'val2',
+                            'attrib3': 'val3'
+                        }
+                    }
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs_connection:iface-foo:foo'
+        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint (interface attributes)"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_both_allow_connection_attrib_str2_match(self):
+        '''Test check_declaration - plugs and slots/allow-connection/attrib'''
+        plugs = {'iface-foo': {'interface': 'foo',
+                               'attrib1': 'val1',
+                               'attrib2': 'val2',
+                               'attrib3': 'val3',
+                               'attrib4': 'val4'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            'plugs': {
+                'foo': {
+                    'allow-connection': {
+                        'plug-attributes': {
+                            'attrib1': 'val1',
+                            'attrib2': 'val2'
+                        },
+                        'slot-attributes': {
+                            'attrib3': 'val3',
+                            'attrib4': 'val4'
+                        }
+                    }
+                }
+            },
+            'slots': {}
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_plugs_allow_connection_empty(self):
+        '''Test check_declaration - plugs/allow-connection/empty'''
+        plugs = {'iface-foo': {'interface': 'foo',
+                               'attrib1': 'val1',
+                               'attrib2': 'val2'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            'plugs': {},
+            'slots': {
+                'foo': {
+                    'allow-connection': {
+                        'plug-attributes': {}
+                    }
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_plugs_allow_connection_list_match(self):
+        '''Test check_declaration - plugs/allow-connection/list all match'''
+        plugs = {'iface-foo': {'interface': 'foo', 'attrib1': 'val1'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            'plugs': {
+                'foo': {
+                    'allow-connection': {
+                        'plug-attributes': {
+                            'attrib1': [
+                                'v.*',
+                                '.*[0-9]'
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_plugs_allow_connection_list_nomatch(self):
+        '''Test check_declaration - plugs/allow-connection/list some don't
+           match'''
+        plugs = {'iface-foo': {'interface': 'foo', 'attrib1': 'val1'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            'plugs': {
+                'foo': {
+                    'allow-connection': {
+                        'plug-attributes': {
+                            'attrib1': [
+                                'val2',
+                                'v.*'
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs_connection:iface-foo:foo'
+        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint (interface attributes)"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_plugs_allow_connection_bad_special(self):
+        '''Test check_declaration - plugs/allow-connection/list some don't
+           match'''
+        plugs = {'iface-foo': {'interface': 'foo', 'attrib1': 'val1'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            'plugs': {
+                'foo': {
+                    'allow-connection': {
+                        'plug-attributes': {
+                            'attrib1': '$BAD'
+                        }
+                    }
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        try:
+            c.check_declaration()
+        except SnapDeclarationException:
+            return
+        raise Exception("base declaration should be invalid")  # pragma: nocover
+
+    def test_check_declaration_plugs_allow_connection_missing(self):
+        '''Test check_declaration - plugs/allow-connection/attrib - missing'''
+        plugs = {'iface-foo': {'interface': 'foo',
+                               'attrib1': 'val1',
+                               'attrib2': 'val2'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            'plugs': {
+                'foo': {
+                    'allow-connection': {
+                        'plug-attributes': {
+                            'attrib1': 'val1',
+                            'attrib2': '$MISSING'
+                        }
+                    }
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs_connection:iface-foo:foo'
+        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint (interface attributes)"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_plugs_dbus_interface(self):
+        '''Test check_declaration - plugs dbus interface'''
+        plugs = {'iface-foo': {'interface': 'dbus',
+                               'name': 'org.foo.bar',
+                               'bus': 'session'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            'plugs': {},
+            'slots': {
+                'dbus': {
+                    'allow-installation': {
+                        'slot-snap-type': ['app']
+                    },
+                    'deny-connection': {
+                        'slot-attributes': {
+                            'name': '.+',
+                        }
+                    }
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        # Don't flag on slot-attributes when falling back with plugging snap
+        name = 'declaration-snap-v2:plugs:iface-foo:dbus'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_plugs_dbus_interface_missing_attrib(self):
+        '''Test check_declaration - plugs dbus interface - missing attrib'''
+        plugs = {'iface-foo': {'interface': 'dbus',
+                               'name': 'org.foo.bar'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            'plugs': {},
+            'slots': {
+                'dbus': {
+                    'allow-installation': {
+                        'slot-snap-type': ['app']
+                    },
+                    'deny-connection': {
+                        'slot-attributes': {
+                            'name': '.+',
+                        }
+                    }
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        # This flagged in lint checks
+        name = 'declaration-snap-v2:plugs:iface-foo:dbus'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_slots_dbus_interface(self):
+        '''Test check_declaration - slots dbus interface'''
+        slots = {'iface-foo': {'interface': 'dbus',
+                               'name': 'org.foo.bar',
+                               'bus': 'session'}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            'plugs': {},
+            'slots': {
+                'dbus': {
+                    'allow-installation': {
+                        'slot-snap-type': ['app']
+                    },
+                    'deny-connection': {
+                        'slot-attributes': {
+                            'name': '.+',
+                        }
+                    }
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:slots_connection:iface-foo:dbus'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (interface attributes)"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_personal_files_regex_match(self):
+        '''Test check_declaration - personal-files - regex match'''
+        plugs = {'iface': {'interface': 'personal-files',
+                           'read': '$HOME/.foo',
+                           'write': '$HOME/.norf'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        overrides = {
+            'snap_decl_plugs': {
+                'personal-files': {
+                    'allow-installation': {
+                        'plug-attributes': {
+                            'read': '(\\$HOME/\\.foo|\\$HOME/\\.bar)',
+                            'write': '(\\$HOME/\\.baz|\\$HOME/\\.norf)'
+                        }
+                    }
+                }
+            }
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        base = {
+            'plugs': {
+                'personal-files': {
+                    'allow-installation': False,
+                    'allow-auto-connection': False
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs:iface:personal-files'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_personal_files_regex_nomatch(self):
+        '''Test check_declaration - personal-files - regex no match'''
+        plugs = {'iface': {'interface': 'personal-files',
+                           'read': '$HOME/.nomatch',
+                           'write': '$HOME/.bar'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        overrides = {
+            'snap_decl_plugs': {
+                'personal-files': {
+                    'allow-installation': {
+                        'plug-attributes': {
+                            'read': '(\\$HOME/\\.foo|\\$HOME/\\.bar)',
+                            'write': '(\\$HOME/\\.baz|\\$HOME/\\.norf)'
+                        }
+                    }
+                }
+            }
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        base = {
+            'plugs': {
+                'personal-files': {
+                    'allow-installation': False,
+                    'allow-auto-connection': False
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:valid_plugs:personal-files:allow-installation'
+        expected['info'][name] = {"text": "OK"}
+        name = 'declaration-snap-v2:plugs_installation:iface:personal-files'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint (interface attributes)"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_personal_files_alt_match(self):
+        '''Test check_declaration - personal-files - alternates match'''
+        plugs = {'iface': {'interface': 'personal-files',
+                           'read': '$HOME/.foo',
+                           'write': '$HOME/.match2'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        overrides = {
+            'snap_decl_plugs': {
+                'personal-files': {
+                    'allow-installation': [
+                        {
+                            'plug-attributes': {
+                                'read': '(\\$HOME/\\.foo|\\$HOME/\\.bar)',
+                                'write': '(\\$HOME/\\.baz|\\$HOME/\\.norf)'
+                            }
+                        },
+                        {
+                            'plug-attributes': {
+                                'read': '\\$HOME/\\.foo',
+                                'write': '(\\$HOME/\\.match[0-9]+)'
+                            }
+                        }
+
+                    ]
+                }
+            }
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        base = {
+            'plugs': {
+                'personal-files': {
+                    'allow-installation': False,
+                    'allow-auto-connection': False
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs:iface:personal-files'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_personal_files_alt_regex_nomatch(self):
+        '''Test check_declaration - personal-files - alternates no match'''
+        plugs = {'iface': {'interface': 'personal-files',
+                           'read': '$HOME/.nomatch',
+                           'write': '$HOME/.match2'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        overrides = {
+            'snap_decl_plugs': {
+                'personal-files': {
+                    'allow-installation': [
+                        {
+                            'plug-attributes': {
+                                'read': '(\\$HOME/\\.foo|\\$HOME/\\.bar)',
+                                'write': '(\\$HOME/\\.baz|\\$HOME/\\.norf)'
+                            }
+                        },
+                        {
+                            'plug-attributes': {
+                                'read': '\\$HOME/\\.foo',
+                                'write': '(\\$HOME/\\.match[0-9]+)'
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        base = {
+            'plugs': {
+                'personal-files': {
+                    'allow-installation': False,
+                    'allow-auto-connection': False
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:valid_plugs:personal-files:allow-installation'
+        expected['info'][name] = {"text": "OK"}
+        name = 'declaration-snap-v2:plugs_installation:iface:personal-files'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_deny_connection_attrib_list_match(self):
@@ -2315,8 +3114,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_deny-connection:iface-foo:foo'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'slot-attributes' from base declaration"}
+        name = 'declaration-snap-v2:slots_connection:iface-foo:foo'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_deny_connection_attrib_list_nomatch(self):
@@ -2341,6 +3140,14 @@ slots:
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:slots:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
     def test_check_declaration_slots_allow_connection_attrib_list_match(self):
         '''Test check_declaration - slots/allow-connection/attrib - list match'''
         slots = {'iface-foo': {'interface': 'foo', 'attrib1': ['b', 'a']}}
@@ -2362,6 +3169,14 @@ slots:
         r = c.click_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:slots:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_allow_connection_attrib_list_nomatch(self):
         '''Test check_declaration - slots/allow-connection/attrib - list nomatch'''
@@ -2389,8 +3204,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_allow-connection:iface-foo:foo'
-        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint for 'slot-attributes' from base declaration"}
+        name = 'declaration-snap-v2:slots_connection:iface-foo:foo'
+        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_deny_connection_attrib_dict_match(self):
@@ -2420,8 +3235,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_deny-connection:iface-foo:foo'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'plug-attributes' from base declaration"}
+        name = 'declaration-snap-v2:plugs_connection:iface-foo:foo'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_deny_connection_attrib_dict_nomatch(self):
@@ -2447,6 +3262,14 @@ slots:
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
     def test_check_declaration_plugs_allow_connection_attrib_dict_match(self):
         '''Test check_declaration - plugs/allow-connection/attrib - dict match'''
         plugs = {'iface-foo': {'interface': 'foo', 'attrib1': {'c': 'd',
@@ -2469,6 +3292,14 @@ slots:
         r = c.click_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_allow_connection_attrib_dict_nomatch(self):
         '''Test check_declaration - plugs/allow-connection/attrib - dict nomatch'''
@@ -2497,8 +3328,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_allow-connection:iface-foo:foo'
-        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint for 'plug-attributes' from base declaration"}
+        name = 'declaration-snap-v2:plugs_connection:iface-foo:foo'
+        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_deny_connection_attrib_str_missing(self):
@@ -2523,6 +3354,14 @@ slots:
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
     def test_check_declaration_plugs_allow_connection_attrib_str_missing(self):
         '''Test check_declaration - plugs/allow-connection/attrib - str missing'''
         plugs = {'iface-foo': {'interface': 'foo'}}
@@ -2544,6 +3383,14 @@ slots:
         r = c.click_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_bad_subsubkey_type(self):
         '''Test _verify_declaration - bad subsubkey_type'''
@@ -2571,7 +3418,7 @@ slots:
 
     def test_check_declaration_plugs_mismatch_subsubkey_type(self):
         '''Test _verify_declaration - mismatched subsubkey_type'''
-        plugs = {'iface-foo': {'interface': 'foo', 'attrib1': ['foo']}}
+        plugs = {'iface-foo': {'interface': 'foo', 'attrib1': True}}
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewDeclaration(self.test_name)
         base = {
@@ -2595,8 +3442,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_allow-connection:iface-foo:foo'
-        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint for 'plug-attributes' from base declaration"}
+        name = 'declaration-snap-v2:plugs_connection:iface-foo:foo'
+        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_on_classic_allow_true(self):
@@ -2618,15 +3465,15 @@ slots:
 
         c.check_declaration()
         r = c.click_report
-        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
         expected = dict()
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_allow-connection:iface:foo'
-        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint for 'on-classic' from base declaration"}
+        name = 'declaration-snap-v2:plugs:iface:foo'
+        expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_on_classic_allow_false(self):
@@ -2708,15 +3555,15 @@ slots:
 
         c.check_declaration()
         r = c.click_report
-        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
         expected = dict()
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_deny-connection:iface:foo'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'on-classic' from base declaration"}
+        name = 'declaration-snap-v2:plugs:iface:foo'
+        expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_on_classic_allow_true_core(self):
@@ -2768,15 +3615,15 @@ slots:
 
         c.check_declaration()
         r = c.click_report
-        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
         expected = dict()
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_allow-connection:iface:foo'
-        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint for 'on-classic' from base declaration"}
+        name = 'declaration-snap-v2:plugs:iface:foo'
+        expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_on_classic_deny_true_core(self):
@@ -2798,6 +3645,35 @@ slots:
 
         c.check_declaration()
         r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs:iface:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_plugs_on_classic_allow_installation_true(self):
+        '''Test check_declaration - plugs on-classic allow-installation (true)'''
+        plugs = {'iface': {'interface': 'foo'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            'plugs': {
+                'foo': {
+                    'allow-installation': {
+                        'on-classic': True
+                    }
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+
+        c.check_declaration()
+        r = c.click_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2805,8 +3681,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_deny-connection:iface:foo'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'on-classic' from base declaration"}
+        name = 'declaration-snap-v2:plugs_installation:iface:foo'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint (on-classic)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_connection_alternates_one_denied(self):
@@ -2840,8 +3716,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_deny-connection:iface:foo'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'plug-attributes' from base declaration"}
+        name = 'declaration-snap-v2:plugs_connection:iface:foo'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_connection_alternates_two_allowed(self):
@@ -2875,8 +3751,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_deny-connection:iface:foo'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'plug-attributes' from base declaration"}
+        name = 'declaration-snap-v2:plugs_connection:iface:foo'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_connection_alternates_three_allowed(self):
@@ -2980,8 +3856,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_deny-connection:iface:foo'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'plug-attributes' from base declaration"}
+        name = 'declaration-snap-v2:plugs_connection:iface:foo'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_connection_alternates_bool3(self):
@@ -3061,8 +3937,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_deny-connection:iface:foo'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'slot-attributes' from base declaration"}
+        name = 'declaration-snap-v2:slots_connection:iface:foo'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_connection_alternates_two_allowed(self):
@@ -3096,8 +3972,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_deny-connection:iface:foo'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'slot-attributes' from base declaration"}
+        name = 'declaration-snap-v2:slots_connection:iface:foo'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_connection_alternates_three_allowed(self):
@@ -3168,8 +4044,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_deny-installation:iface:foo'
-        expected['error'][name] = {"text": "human review required due to 'deny-installation' constraint for 'plug-attributes' from base declaration"}
+        name = 'declaration-snap-v2:plugs_installation:iface:foo'
+        expected['error'][name] = {"text": "human review required due to 'deny-installation' constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_installation_alternates_two_denied(self):
@@ -3205,8 +4081,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_deny-installation:iface:foo'
-        expected['error'][name] = {"text": "human review required due to 'deny-installation' constraint for 'plug-attributes' from base declaration"}
+        name = 'declaration-snap-v2:plugs_installation:iface:foo'
+        expected['error'][name] = {"text": "human review required due to 'deny-installation' constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_installation_alternates_three_allowed(self):
@@ -3279,8 +4155,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_deny-installation:iface:foo'
-        expected['error'][name] = {"text": "human review required due to 'deny-installation' constraint for 'slot-attributes' from base declaration"}
+        name = 'declaration-snap-v2:slots_installation:iface:foo'
+        expected['error'][name] = {"text": "human review required due to 'deny-installation' constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_installation_alternates_two_denied(self):
@@ -3316,8 +4192,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_deny-installation:iface:foo'
-        expected['error'][name] = {"text": "human review required due to 'deny-installation' constraint for 'slot-attributes' from base declaration"}
+        name = 'declaration-snap-v2:slots_installation:iface:foo'
+        expected['error'][name] = {"text": "human review required due to 'deny-installation' constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_installation_alternates_three_allowed(self):
@@ -3423,8 +4299,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_allow-installation:iface:bluetooth-control'
-        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint for 'slot-snap-type' from base declaration"}
+        name = 'declaration-snap-v2:slots_installation:iface:bluetooth-control'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint (snap-type)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_bluetooth_control_core(self):
@@ -3464,8 +4340,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_allow-installation:iface:docker-support'
-        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint from base declaration"}
+        name = 'declaration-snap-v2:plugs_installation:iface:docker-support'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint (bool)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_docker_support_override(self):
@@ -3606,6 +4482,39 @@ slots:
         expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
+    def test_check_declaration_plugs_match_slot_attrib(self):
+        '''Test check_declaration - plugs match slot attrib'''
+        plugs = {'iface': {'interface': 'foo',
+                           'bar': 'baz'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            'plugs': {
+                'foo': {
+                    'allow-connection': {
+                        'slot-attributes': {
+                            'bar': '$PLUG(bar)'
+                        }
+                    }
+                }
+            },
+            'slots': {}
+        }
+        self._set_base_declaration(c, base)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs:iface:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
     def test_check_declaration_plugs_browser_support(self):
         '''Test check_declaration - plugs browser-support'''
         plugs = {'iface': {'interface': 'browser-support'}}
@@ -3664,8 +4573,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_deny-connection:iface:browser-support'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'plug-attributes' from base declaration. If using a chromium webview, you can disable the internal sandbox (eg, use --no-sandbox) and remove the 'allow-sandbox' attribute instead. For Oxide webviews, export OXIDE_NO_SANDBOX=1 to disable its internal sandbox. Similarly for QtWebEngine, use QTWEBENGINE_DISABLE_SANDBOX=1."}
+        name = 'declaration-snap-v2:plugs_connection:iface:browser-support'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (interface attributes). If using a chromium webview, you can disable the internal sandbox (eg, use --no-sandbox) and remove the 'allow-sandbox' attribute instead. For QtWebEngine webviews, export QTWEBENGINE_DISABLE_SANDBOX=1 to disable its internal sandbox."}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_browser_support_simple_override(self):
@@ -3796,8 +4705,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_allow-connection:iface:network'
-        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint from snap declaration"}
+        name = 'declaration-snap-v2:plugs_connection:iface:network'
+        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint (bool)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_network(self):
@@ -3858,8 +4767,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_deny-connection:iface:bluez'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}
+        name = 'declaration-snap-v2:slots_connection:iface:bluez'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (bool)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_docker(self):
@@ -3871,15 +4780,15 @@ slots:
 
         c.check_declaration()
         r = c.click_report
-        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
         expected = dict()
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs:iface:docker'
-        expected['info'][name] = {"text": "OK"}
+        name = 'declaration-snap-v2:plugs_installation:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint (bool)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_docker(self):
@@ -3899,10 +4808,10 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_deny-connection:iface:docker'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}
-        name = 'declaration-snap-v2:slots_allow-installation:iface:docker'
-        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint from base declaration"}
+        name = 'declaration-snap-v2:slots_connection:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (bool)"}
+        name = 'declaration-snap-v2:slots_installation:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint (bool)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_docker_override_install_connect(self):
@@ -3950,8 +4859,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_deny-connection:iface:docker'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}
+        name = 'declaration-snap-v2:slots_connection:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (bool)"}
         name = 'declaration-snap-v2:valid_slots:docker:allow-installation'
         expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
@@ -3993,8 +4902,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_deny-connection:iface:mpris'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'slot-attributes' from base declaration"}
+        name = 'declaration-snap-v2:slots_connection:iface:mpris'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_mir(self):
@@ -4034,8 +4943,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_deny-connection:iface:mir'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}
+        name = 'declaration-snap-v2:slots_connection:iface:mir'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (bool)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_mir_override_connection(self):
@@ -4099,8 +5008,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_deny-connection:iface:network-manager'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'on-classic' from base declaration"}
+        name = 'declaration-snap-v2:slots_connection:iface:network-manager'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (on-classic)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_network_manager_core(self):
@@ -4141,8 +5050,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_allow-installation:iface:network-manager'
-        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint for 'slot-snap-type' from base declaration"}
+        name = 'declaration-snap-v2:slots_installation:iface:network-manager'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint (snap-type)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_network_manager_app_override(self):
@@ -4234,8 +5143,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_deny-connection:iface:browser-support'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'plug-attributes' from base declaration. If using a chromium webview, you can disable the internal sandbox (eg, use --no-sandbox) and remove the 'allow-sandbox' attribute instead. For Oxide webviews, export OXIDE_NO_SANDBOX=1 to disable its internal sandbox. Similarly for QtWebEngine, use QTWEBENGINE_DISABLE_SANDBOX=1."}
+        name = 'declaration-snap-v2:plugs_connection:iface:browser-support'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (interface attributes). If using a chromium webview, you can disable the internal sandbox (eg, use --no-sandbox) and remove the 'allow-sandbox' attribute instead. For QtWebEngine webviews, export QTWEBENGINE_DISABLE_SANDBOX=1 to disable its internal sandbox."}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_override_invalid_on_store(self):
@@ -4268,14 +5177,14 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_deny-connection:iface:docker'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}
-        name = 'declaration-snap-v2:slots_allow-installation:iface:docker'
-        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint from base declaration"}
+        name = 'declaration-snap-v2:slots_connection:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (bool)"}
+        name = 'declaration-snap-v2:slots_installation:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint (bool)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_docker_on_store_install(self):
-        '''Test check_declaration - override - on-store install'''
+        '''Test check_declaration - override - on-store only install'''
         self.set_test_snap_yaml("type", "app")
         overrides = {
             'snap_decl_slots': {
@@ -4303,12 +5212,13 @@ slots:
         expected['info'] = dict()
         name = 'declaration-snap-v2:valid_slots:docker:allow-installation'
         expected['info'][name] = {"text": "OK"}
-        name = 'declaration-snap-v2:slots_deny-connection:iface:docker'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}
+        # specified allow-installation but missing connection
+        name = 'declaration-snap-v2:slots_connection:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (bool)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_docker_on_store_connect(self):
-        '''Test check_declaration - override - on-store connect'''
+        '''Test check_declaration - override - on-store only connect'''
         self.set_test_snap_yaml("type", "app")
         overrides = {
             'snap_decl_slots': {
@@ -4334,8 +5244,9 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_allow-installation:iface:docker'
-        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint from base declaration"}
+        # specified allow-connection, but missing installation
+        name = 'declaration-snap-v2:slots_installation:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint (bool)"}
         name = 'declaration-snap-v2:valid_slots:docker:allow-connection'
         expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
@@ -4395,10 +5306,10 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_deny-connection:iface:docker'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}
-        name = 'declaration-snap-v2:slots_allow-installation:iface:docker'
-        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint from base declaration"}
+        name = 'declaration-snap-v2:slots_connection:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (bool)"}
+        name = 'declaration-snap-v2:slots_installation:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint (bool)"}
         name = 'declaration-snap-v2:valid_slots:docker:allow-installation'
         expected['info'][name] = {"text": "OK"}
         name = 'declaration-snap-v2:valid_slots:docker:allow-connection'
@@ -4507,8 +5418,8 @@ slots:
         expected['info'] = dict()
         name = 'declaration-snap-v2:valid_plugs:browser-support:allow-connection'
         expected['info'][name] = {"text": "OK"}
-        name = 'declaration-snap-v2:plugs_deny-connection:iface:browser-support'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'plug-attributes' from base declaration. If using a chromium webview, you can disable the internal sandbox (eg, use --no-sandbox) and remove the 'allow-sandbox' attribute instead. For Oxide webviews, export OXIDE_NO_SANDBOX=1 to disable its internal sandbox. Similarly for QtWebEngine, use QTWEBENGINE_DISABLE_SANDBOX=1."}
+        name = 'declaration-snap-v2:plugs_connection:iface:browser-support'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (interface attributes). If using a chromium webview, you can disable the internal sandbox (eg, use --no-sandbox) and remove the 'allow-sandbox' attribute instead. For QtWebEngine webviews, export QTWEBENGINE_DISABLE_SANDBOX=1 to disable its internal sandbox."}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_network_on_store_deny_install(self):
@@ -4545,8 +5456,8 @@ slots:
         expected['info'] = dict()
         name = 'declaration-snap-v2:valid_plugs:network:deny-installation'
         expected['info'][name] = {"text": "OK"}
-        name = 'declaration-snap-v2:plugs_deny-installation:iface:network'
-        expected['error'][name] = {"text": "human review required due to 'deny-installation' constraint for 'plug-snap-type' from snap declaration"}
+        name = 'declaration-snap-v2:plugs_installation:iface:network'
+        expected['error'][name] = {"text": "human review required due to 'deny-installation' constraint (snap-type)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_override_invalid_on_brand(self):
@@ -4579,10 +5490,10 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_deny-connection:iface:docker'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}
-        name = 'declaration-snap-v2:slots_allow-installation:iface:docker'
-        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint from base declaration"}
+        name = 'declaration-snap-v2:slots_connection:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (bool)"}
+        name = 'declaration-snap-v2:slots_installation:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint (bool)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_docker_on_brand_install(self):
@@ -4614,8 +5525,9 @@ slots:
         expected['info'] = dict()
         name = 'declaration-snap-v2:valid_slots:docker:allow-installation'
         expected['info'][name] = {"text": "OK"}
-        name = 'declaration-snap-v2:slots_deny-connection:iface:docker'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}
+        # specified allow-installation but missing connection
+        name = 'declaration-snap-v2:slots_connection:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (bool)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_docker_on_brand_connect(self):
@@ -4645,8 +5557,9 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_allow-installation:iface:docker'
-        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint from base declaration"}
+        # specified allow-connection but missing installation
+        name = 'declaration-snap-v2:slots_installation:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint (bool)"}
         name = 'declaration-snap-v2:valid_slots:docker:allow-connection'
         expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
@@ -4706,10 +5619,10 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_deny-connection:iface:docker'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}
-        name = 'declaration-snap-v2:slots_allow-installation:iface:docker'
-        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint from base declaration"}
+        name = 'declaration-snap-v2:slots_connection:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (bool)"}
+        name = 'declaration-snap-v2:slots_installation:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint (bool)"}
         name = 'declaration-snap-v2:valid_slots:docker:allow-installation'
         expected['info'][name] = {"text": "OK"}
         name = 'declaration-snap-v2:valid_slots:docker:allow-connection'
@@ -4818,8 +5731,9 @@ slots:
         expected['info'] = dict()
         name = 'declaration-snap-v2:valid_plugs:browser-support:allow-connection'
         expected['info'][name] = {"text": "OK"}
-        name = 'declaration-snap-v2:plugs_deny-connection:iface:browser-support'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint for 'plug-attributes' from base declaration. If using a chromium webview, you can disable the internal sandbox (eg, use --no-sandbox) and remove the 'allow-sandbox' attribute instead. For Oxide webviews, export OXIDE_NO_SANDBOX=1 to disable its internal sandbox. Similarly for QtWebEngine, use QTWEBENGINE_DISABLE_SANDBOX=1."}
+        name = 'declaration-snap-v2:plugs_connection:iface:browser-support'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (interface attributes). If using a chromium webview, you can disable the internal sandbox (eg, use --no-sandbox) and remove the 'allow-sandbox' attribute instead. For QtWebEngine webviews, export QTWEBENGINE_DISABLE_SANDBOX=1 to disable its internal sandbox."}
+
         self.check_results(r, expected=expected)
 
     def test_check_declaration_network_on_brand_deny_install(self):
@@ -4856,8 +5770,8 @@ slots:
         expected['info'] = dict()
         name = 'declaration-snap-v2:valid_plugs:network:deny-installation'
         expected['info'][name] = {"text": "OK"}
-        name = 'declaration-snap-v2:plugs_deny-installation:iface:network'
-        expected['error'][name] = {"text": "human review required due to 'deny-installation' constraint for 'plug-snap-type' from snap declaration"}
+        name = 'declaration-snap-v2:plugs_installation:iface:network'
+        expected['error'][name] = {"text": "human review required due to 'deny-installation' constraint (snap-type)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_docker_on_brand_install_on_store_connect(self):
@@ -4932,10 +5846,10 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_allow-installation:iface:docker'
-        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint from base declaration"}
-        name = 'declaration-snap-v2:slots_deny-connection:iface:docker'
-        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint from base declaration"}
+        name = 'declaration-snap-v2:slots_installation:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint (bool)"}
+        name = 'declaration-snap-v2:slots_connection:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (bool)"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_docker_on_brand_on_store_install(self):
@@ -4994,8 +5908,8 @@ slots:
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:slots_allow-installation:iface:docker'
-        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint from base declaration"}
+        name = 'declaration-snap-v2:slots_installation:iface:docker'
+        expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint (bool)"}
         name = 'declaration-snap-v2:valid_slots:docker:allow-connection'
         expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
