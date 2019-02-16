@@ -617,7 +617,7 @@ def _calculate_snap_unsquashfs_uncompressed_size(snap_pkg):
     return size
 
 
-def _unpack_snap_squashfs(snap_pkg, dest, item=None):
+def _unpack_snap_squashfs(snap_pkg, dest, items=[]):
     '''Unpack a squashfs based snap package to dest'''
     size = _calculate_snap_unsquashfs_uncompressed_size(snap_pkg)
 
@@ -636,8 +636,8 @@ def _unpack_snap_squashfs(snap_pkg, dest, item=None):
     global MKDTEMP_DIR
     d = tempfile.mkdtemp(prefix=MKDTEMP_PREFIX, dir=MKDTEMP_DIR)
     cmd = ['unsquashfs', '-f', '-d', d, os.path.abspath(snap_pkg)]
-    if item is not None:
-        cmd.append(item)
+    if len(items) != 0:
+        cmd += items
     return _unpack_cmd(cmd, d, dest)
 
 
@@ -649,7 +649,7 @@ def _unpack_click_deb(pkg, dest):
                         os.path.abspath(pkg), d], d, dest)
 
 
-def unpack_pkg(fn, dest=None, item=None):
+def unpack_pkg(fn, dest=None, items=[]):
     '''Unpack package'''
     if not os.path.isfile(fn):
         error("Could not find '%s'" % fn)
@@ -669,7 +669,7 @@ def unpack_pkg(fn, dest=None, item=None):
 
     # check if its a squashfs based snap
     if is_squashfs(pkg):
-        return _unpack_snap_squashfs(fn, dest, item)
+        return _unpack_snap_squashfs(fn, dest, items)
 
     return _unpack_click_deb(fn, dest)
 
@@ -962,9 +962,10 @@ def get_snap_manifest(fn):
         MKDTEMP_DIR = tempfile.gettempdir()
 
     man = "snap/manifest.yaml"
+    dpkg = "usr/share/snappy/dpkg.list"
     # unpack_pkg() fails if this exists, so this is safe
     dir = tempfile.mktemp(prefix=MKDTEMP_PREFIX, dir=MKDTEMP_DIR)
-    unpack_pkg(fn, dir, man)
+    unpack_pkg(fn, dir, [man, dpkg])
 
     man_fn = os.path.join(dir, man)
     if not os.path.isfile(man_fn):
@@ -976,12 +977,21 @@ def get_snap_manifest(fn):
         man_yaml = yaml.safe_load(fd)
     except Exception:
         recursive_rm(dir)
-        error("Could not load snap/manifest.yaml. Is it properly "
-              "formatted?")
+        error("Could not load %s. Is it properly formatted?" % man)
+
+    dpkg_fn = os.path.join(dir, dpkg)
+    dpkg_list = None
+    if os.path.isfile(dpkg_fn):
+        fd = open_file_read(dpkg_fn)
+        try:
+            dpkg_list = fd.readlines()
+        except Exception:
+            recursive_rm(dir)
+            error("Could not load %s. Is it properly formatted?" % dpkg)
 
     recursive_rm(dir)
 
-    return man_yaml
+    return (man_yaml, dpkg_list)
 
 
 def get_os_codename(os, ver):
