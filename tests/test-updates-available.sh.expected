@@ -384,6 +384,9 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 Running: snap-updates-available --usn-db='./tests/test-usn-budgie-2.db' --snap='./tests/test-snapcraft-manifest_0_amd64.snap'
 {'libssl1.0.0': ['3611-1', '3628-1'], 'openssl': ['3611-1', '3628-1']}
 
+Running: snap-updates-available --usn-db='./tests/test-usn-core-with-dpkg-list.db' --snap='./tests/test-core_16-2.37.2_amd64.snap'
+{'libc-bin': ['3323-1', '3534-1'], 'multiarch-support': ['3323-1', '3534-1']}
+
 Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-1.db' --store-db='./tests/test-store-unittest-bad-1.db'
 WARN: 1ad: required field 'revisions' not found
 ERROR: Errors encountered when scanning store entries
