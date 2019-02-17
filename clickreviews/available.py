@@ -231,7 +231,7 @@ def scan_store(secnot_db_fn, store_db_fn, seen_db_fn, pkgname):
     return sent, errors
 
 
-def scan_snap(secnot_db_fn, snap_fn):
+def scan_snap(secnot_db_fn, snap_fn, with_cves=False):
     '''Scan snap for packages with security notices'''
     out = ""
     (man, dpkg) = get_snap_manifest(snap_fn)
@@ -253,7 +253,7 @@ def scan_snap(secnot_db_fn, snap_fn):
                                                                  tmp[2]))
     secnot_db = read_usn_db(secnot_db_fn)
 
-    report = get_secnots_for_manifest(man, secnot_db)
+    report = get_secnots_for_manifest(man, secnot_db, with_cves)
     if len(report) != 0:
         # FIXME: make pretty
         import pprint

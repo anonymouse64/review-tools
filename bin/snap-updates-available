@@ -63,6 +63,9 @@ def main():
 
     parser.add_argument('--snap', type=str,
                         help='use manifest.yaml from snap')
+    parser.add_argument('--with-cves',
+                        help='Show referenced CVEs (with --snap)',
+                        action='store_true')
     parser.add_argument('--check-shared-publishers',
                         help='Report snaps missing publisher overrides',
                         action='store_true')
@@ -89,12 +92,14 @@ def main():
         error("Must not specify --store-db with --snap")
     elif not args.snap and not args.store_db:
         error("Must specify --snap or --store-db")
+    elif args.with_cves and not args.snap:
+        error("--with-cves should only be used with --snap")
 
     report = ""
     if args.check_shared_publishers:
         report = available.scan_shared_publishers(args.store_db)
     elif args.snap:
-        report = available.scan_snap(args.usn_db, args.snap)
+        report = available.scan_snap(args.usn_db, args.snap, args.with_cves)
     elif args.store_db:
         (reports, errors) = available.scan_store(args.usn_db, args.store_db,
                                                  args.seen_db, args.pkg_name)

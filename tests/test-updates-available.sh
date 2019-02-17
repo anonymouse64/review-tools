@@ -107,6 +107,10 @@ echo "Running: snap-updates-available --usn-db='./tests/test-usn-core-with-dpkg-
 PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-core-with-dpkg-list.db' --snap='./tests/test-core_16-2.37.2_amd64.snap' 2>&1 | tee -a "$tmp"
 echo "" | tee -a "$tmp"
 
+echo "Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-core-with-dpkg-list.db' --snap='./tests/test-core_16-2.37.2_amd64.snap'" | tee -a "$tmp"
+PYTHONPATH=./ ./bin/snap-updates-available --with-cves --usn-db='./tests/test-usn-core-with-dpkg-list.db' --snap='./tests/test-core_16-2.37.2_amd64.snap' 2>&1 | tee -a "$tmp"
+echo "" | tee -a "$tmp"
+
 # Test bad store db
 echo "Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-1.db' --store-db='./tests/test-store-unittest-bad-1.db'" | tee -a "$tmp"
 PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-1.db' --store-db='./tests/test-store-unittest-bad-1.db' 2>&1 | tee -a "$tmp"

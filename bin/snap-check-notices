@@ -44,6 +44,8 @@ def main():
     )
     parser.add_argument('--no-fetch', help='use existing security db',
                         action='store_true')
+    parser.add_argument('--with-cves', help='show referenced cves',
+                        action='store_true')
     (args, argv) = parser.parse_known_args()
 
     common.REPORT_OUTPUT = "console"
@@ -99,13 +101,16 @@ def main():
             debug("Skipping %s with revision %s" % (snap, rev))
             continue
 
+        cmd_args = ['--usn-db=%s' %
+                    os.path.join(os.environ['SNAP_USER_COMMON'], usndb),
+                    '--snap=%s' % os.path.abspath(pkg)]
+        if args.with_cves:
+            cmd_args.append('--with-cves')
+
         # this carries through to available
         if had_debug is not None:
             os.unsetenv('SNAP_DEBUG')
-        rc, out = cmd([available,
-                       '--usn-db=%s' %
-                       os.path.join(os.environ['SNAP_USER_COMMON'], usndb),
-                       '--snap=%s' % os.path.abspath(pkg)])
+        rc, out = cmd([available] + cmd_args)
         if had_debug is not None:
             os.environ['SNAP_DEBUG'] = had_debug
 
