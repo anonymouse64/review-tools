@@ -33,6 +33,7 @@ from clickreviews.store import (
     get_pkg_revisions,
     get_secnots_for_manifest,
     get_shared_snap_without_override,
+    get_staged_packages_from_manifest,
 )
 from clickreviews.usn import (
     read_usn_db,
@@ -232,11 +233,27 @@ def scan_store(secnot_db_fn, store_db_fn, seen_db_fn, pkgname):
 
 def scan_snap(secnot_db_fn, snap_fn):
     '''Scan snap for packages with security notices'''
+    out = ""
+    (man, dpkg) = get_snap_manifest(snap_fn)
+
+    # use dpkg.list with os/base snaps if we don't have any stage-packages
+    if 'type' in man and man['type'] in ['base', 'os', 'core'] and \
+            dpkg is not None:
+        p = get_staged_packages_from_manifest(man)
+        fake_key = 'faked-by-review-tools'
+        if p is None and 'parts' in man and fake_key not in man['parts']:
+            man['parts'][fake_key] = {}
+            man['parts'][fake_key]['stage-packages'] = []
+            for line in dpkg:
+                if not line.startswith('ii '):
+                    continue
+                tmp = line.split()
+                man['parts'][fake_key]['stage-packages'].append("%s=%s" %
+                                                                (tmp[1],
+                                                                 tmp[2]))
     secnot_db = read_usn_db(secnot_db_fn)
 
-    out = ""
-    m = get_snap_manifest(snap_fn)
-    report = get_secnots_for_manifest(m, secnot_db)
+    report = get_secnots_for_manifest(man, secnot_db)
     if len(report) != 0:
         # FIXME: make pretty
         import pprint
