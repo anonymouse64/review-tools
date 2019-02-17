@@ -95,7 +95,7 @@ def main():
         snap = os.path.basename(pkg).split('_')[0]
         rev = "unknown"
         if '_' in pkg:
-            rev = os.path.basename(pkg).split('_')[1].split(".")[0]
+            rev = os.path.splitext(os.path.basename(pkg))[0].split('_')[1]
 
         if snap in reports and rev in reports[snap]:
             debug("Skipping %s with revision %s" % (snap, rev))
