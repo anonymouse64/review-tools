@@ -397,7 +397,7 @@ canonical_desktop = ['ken.vandine@canonical.com',
                      'will.cooke@canonical.com',
                      ]
 
-canonical_enablement = ['snappy-canonical-enablement@canonical.com',
+canonical_enablement = ['snap-update-verification@lists.canonical.com',
                         'pascal.morin@canonical.com',
                         'tony.espy@canonical.com',
                         'jim.hodapp@canonical.com',
