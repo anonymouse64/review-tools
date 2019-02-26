@@ -167,7 +167,7 @@ def verify_snap_manifest(m):
         raise ValueError(msg)
 
 
-def get_secnots_for_manifest(m, secnot_db):
+def get_secnots_for_manifest(m, secnot_db, with_cves=False):
     '''Find new security notifications for packages in the manifest'''
     debug("snap/manifest.yaml:\n" + pprint.pformat(m))
 
@@ -188,21 +188,27 @@ def get_secnots_for_manifest(m, secnot_db):
             for v in pkgs[pkg]:
                 pkgversion = debversion.DebVersion(v)
                 for secnot in secnot_db[rel][pkg]:
-                    secnotversion = secnot_db[rel][pkg][secnot]
+                    secnotversion = secnot_db[rel][pkg][secnot]['version']
                     if debversion.compare(pkgversion, secnotversion) < 0:
                         debug('adding %s: %s (pkg:%s < secnot:%s)' %
                               (pkg, secnot, pkgversion.full_version,
                                secnotversion.full_version))
                         if pkg not in pending_secnots:
-                            pending_secnots[pkg] = []
+                            if with_cves:
+                                pending_secnots[pkg] = {}
+                            else:
+                                pending_secnots[pkg] = []
                         if secnot not in pending_secnots[pkg]:
-                            pending_secnots[pkg].append(secnot)
+                            if with_cves:
+                                pending_secnots[pkg][secnot] = secnot_db[rel][pkg][secnot]['cves']
+                            else:
+                                pending_secnots[pkg].append(secnot)
                     else:
                         debug('skipping %s: %s (pkg:%s >= secnot:%s)' %
                               (pkg, secnot, pkgversion.full_version,
                                secnotversion.full_version))
 
-                    if pkg in pending_secnots:
+                    if pkg in pending_secnots and not with_cves:
                         pending_secnots[pkg].sort()
 
     return pending_secnots

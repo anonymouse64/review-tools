@@ -20,6 +20,8 @@ from unittest.mock import patch
 import clickreviews.usn as usn
 import clickreviews.common as common
 
+import pprint
+
 
 class TestUSN(TestCase):
     """Tests for the USN functions."""
@@ -35,28 +37,30 @@ class TestUSN(TestCase):
         res = usn.read_usn_db("./tests/test-usn-unittest-1.db")
 
         expected_db = {
-            'xenial': {'libtiff-doc': {'3602-1': '4.0.6-1ubuntu0.3',
-                                       '3606-1': '4.0.6-1ubuntu0.4'},
-                       'libtiff-opengl': {'3602-1': '4.0.6-1ubuntu0.3',
-                                          '3606-1': '4.0.6-1ubuntu0.4'},
-                       'libtiff-tools': {'3602-1': '4.0.6-1ubuntu0.3',
-                                         '3606-1': '4.0.6-1ubuntu0.4'},
-                       'libtiff5': {'3602-1': '4.0.6-1ubuntu0.3',
-                                    '3606-1': '4.0.6-1ubuntu0.4'},
-                       'libtiff5-dev': {'3602-1': '4.0.6-1ubuntu0.3',
-                                        '3606-1': '4.0.6-1ubuntu0.4'},
-                       'libtiffxx5': {'3602-1': '4.0.6-1ubuntu0.3',
-                                      '3606-1': '4.0.6-1ubuntu0.4'},
+            'xenial': {'libtiff-doc': {'3602-1': {'version': '4.0.6-1ubuntu0.3', 'cves': ['CVE-2016-10266', 'CVE-2016-10267', 'CVE-2016-10268', 'CVE-2016-10269', 'CVE-2016-10371', 'CVE-2017-10688', 'CVE-2017-11335', 'CVE-2017-12944', 'CVE-2017-13726', 'CVE-2017-13727', 'CVE-2017-18013', 'CVE-2017-7592', 'CVE-2017-7593', 'CVE-2017-7594', 'CVE-2017-7595', 'CVE-2017-7596', 'CVE-2017-7597', 'CVE-2017-7598', 'CVE-2017-7599', 'CVE-2017-7600', 'CVE-2017-7601', 'CVE-2017-7602', 'CVE-2017-9403', 'CVE-2017-9404', 'CVE-2017-9815', 'CVE-2017-9936', 'CVE-2018-5784']},
+                                       '3606-1': {'version': '4.0.6-1ubuntu0.4', 'cves': ['CVE-2016-3186', 'CVE-2016-5102', 'CVE-2016-5318', 'CVE-2017-11613', 'CVE-2017-12944', 'CVE-2017-17095', 'CVE-2017-18013', 'CVE-2017-5563', 'CVE-2017-9117', 'CVE-2017-9147', 'CVE-2017-9935', 'CVE-2018-5784']}},
+                       'libtiff-opengl': {'3602-1': {'version': '4.0.6-1ubuntu0.3', 'cves': ['CVE-2016-10266', 'CVE-2016-10267', 'CVE-2016-10268', 'CVE-2016-10269', 'CVE-2016-10371', 'CVE-2017-10688', 'CVE-2017-11335', 'CVE-2017-12944', 'CVE-2017-13726', 'CVE-2017-13727', 'CVE-2017-18013', 'CVE-2017-7592', 'CVE-2017-7593', 'CVE-2017-7594', 'CVE-2017-7595', 'CVE-2017-7596', 'CVE-2017-7597', 'CVE-2017-7598', 'CVE-2017-7599', 'CVE-2017-7600', 'CVE-2017-7601', 'CVE-2017-7602', 'CVE-2017-9403', 'CVE-2017-9404', 'CVE-2017-9815', 'CVE-2017-9936', 'CVE-2018-5784']},
+                                          '3606-1': {'version': '4.0.6-1ubuntu0.4', 'cves': ['CVE-2016-3186', 'CVE-2016-5102', 'CVE-2016-5318', 'CVE-2017-11613', 'CVE-2017-12944', 'CVE-2017-17095', 'CVE-2017-18013', 'CVE-2017-5563', 'CVE-2017-9117', 'CVE-2017-9147', 'CVE-2017-9935', 'CVE-2018-5784']}},
+                       'libtiff-tools': {'3602-1': {'version': '4.0.6-1ubuntu0.3', 'cves': ['CVE-2016-10266', 'CVE-2016-10267', 'CVE-2016-10268', 'CVE-2016-10269', 'CVE-2016-10371', 'CVE-2017-10688', 'CVE-2017-11335', 'CVE-2017-12944', 'CVE-2017-13726', 'CVE-2017-13727', 'CVE-2017-18013', 'CVE-2017-7592', 'CVE-2017-7593', 'CVE-2017-7594', 'CVE-2017-7595', 'CVE-2017-7596', 'CVE-2017-7597', 'CVE-2017-7598', 'CVE-2017-7599', 'CVE-2017-7600', 'CVE-2017-7601', 'CVE-2017-7602', 'CVE-2017-9403', 'CVE-2017-9404', 'CVE-2017-9815', 'CVE-2017-9936', 'CVE-2018-5784']},
+                                         '3606-1': {'version': '4.0.6-1ubuntu0.4', 'cves': ['CVE-2016-3186', 'CVE-2016-5102', 'CVE-2016-5318', 'CVE-2017-11613', 'CVE-2017-12944', 'CVE-2017-17095', 'CVE-2017-18013', 'CVE-2017-5563', 'CVE-2017-9117', 'CVE-2017-9147', 'CVE-2017-9935', 'CVE-2018-5784']}},
+                       'libtiff5': {'3602-1': {'version': '4.0.6-1ubuntu0.3', 'cves': ['CVE-2016-10266', 'CVE-2016-10267', 'CVE-2016-10268', 'CVE-2016-10269', 'CVE-2016-10371', 'CVE-2017-10688', 'CVE-2017-11335', 'CVE-2017-12944', 'CVE-2017-13726', 'CVE-2017-13727', 'CVE-2017-18013', 'CVE-2017-7592', 'CVE-2017-7593', 'CVE-2017-7594', 'CVE-2017-7595', 'CVE-2017-7596', 'CVE-2017-7597', 'CVE-2017-7598', 'CVE-2017-7599', 'CVE-2017-7600', 'CVE-2017-7601', 'CVE-2017-7602', 'CVE-2017-9403', 'CVE-2017-9404', 'CVE-2017-9815', 'CVE-2017-9936', 'CVE-2018-5784']},
+                                    '3606-1': {'version': '4.0.6-1ubuntu0.4', 'cves': ['CVE-2016-3186', 'CVE-2016-5102', 'CVE-2016-5318', 'CVE-2017-11613', 'CVE-2017-12944', 'CVE-2017-17095', 'CVE-2017-18013', 'CVE-2017-5563', 'CVE-2017-9117', 'CVE-2017-9147', 'CVE-2017-9935', 'CVE-2018-5784']}},
+                       'libtiff5-dev': {'3602-1': {'version': '4.0.6-1ubuntu0.3', 'cves': ['CVE-2016-10266', 'CVE-2016-10267', 'CVE-2016-10268', 'CVE-2016-10269', 'CVE-2016-10371', 'CVE-2017-10688', 'CVE-2017-11335', 'CVE-2017-12944', 'CVE-2017-13726', 'CVE-2017-13727', 'CVE-2017-18013', 'CVE-2017-7592', 'CVE-2017-7593', 'CVE-2017-7594', 'CVE-2017-7595', 'CVE-2017-7596', 'CVE-2017-7597', 'CVE-2017-7598', 'CVE-2017-7599', 'CVE-2017-7600', 'CVE-2017-7601', 'CVE-2017-7602', 'CVE-2017-9403', 'CVE-2017-9404', 'CVE-2017-9815', 'CVE-2017-9936', 'CVE-2018-5784']},
+                                        '3606-1': {'version': '4.0.6-1ubuntu0.4', 'cves': ['CVE-2016-3186', 'CVE-2016-5102', 'CVE-2016-5318', 'CVE-2017-11613', 'CVE-2017-12944', 'CVE-2017-17095', 'CVE-2017-18013', 'CVE-2017-5563', 'CVE-2017-9117', 'CVE-2017-9147', 'CVE-2017-9935', 'CVE-2018-5784']}},
+                       'libtiffxx5': {'3602-1': {'version': '4.0.6-1ubuntu0.3', 'cves': ['CVE-2016-10266', 'CVE-2016-10267', 'CVE-2016-10268', 'CVE-2016-10269', 'CVE-2016-10371', 'CVE-2017-10688', 'CVE-2017-11335', 'CVE-2017-12944', 'CVE-2017-13726', 'CVE-2017-13727', 'CVE-2017-18013', 'CVE-2017-7592', 'CVE-2017-7593', 'CVE-2017-7594', 'CVE-2017-7595', 'CVE-2017-7596', 'CVE-2017-7597', 'CVE-2017-7598', 'CVE-2017-7599', 'CVE-2017-7600', 'CVE-2017-7601', 'CVE-2017-7602', 'CVE-2017-9403', 'CVE-2017-9404', 'CVE-2017-9815', 'CVE-2017-9936', 'CVE-2018-5784']},
+                                      '3606-1': {'version': '4.0.6-1ubuntu0.4', 'cves': ['CVE-2016-3186', 'CVE-2016-5102', 'CVE-2016-5318', 'CVE-2017-11613', 'CVE-2017-12944', 'CVE-2017-17095', 'CVE-2017-18013', 'CVE-2017-5563', 'CVE-2017-9117', 'CVE-2017-9147', 'CVE-2017-9935', 'CVE-2018-5784']}},
                        'libxcursor-dev': {'3501-1':
-                                          '1:1.1.14-1ubuntu0.16.04.1'},
+                                          {'cves': ['CVE-2017-16612'], 'version': '1:1.1.14-1ubuntu0.16.04.1'}},
                        'libxcursor1': {'3501-1':
-                                       '1:1.1.14-1ubuntu0.16.04.1'},
+                                       {'cves': ['CVE-2017-16612'], 'version': '1:1.1.14-1ubuntu0.16.04.1'}},
                        'libxcursor1-dbg': {'3501-1':
-                                           '1:1.1.14-1ubuntu0.16.04.1'},
+                                           {'cves': ['CVE-2017-16612'], 'version': '1:1.1.14-1ubuntu0.16.04.1'}},
                        'libxcursor1-udeb': {'3501-1':
-                                            '1:1.1.14-1ubuntu0.16.04.1'},
+                                            {'cves': ['CVE-2017-16612'], 'version': '1:1.1.14-1ubuntu0.16.04.1'}},
                        }}
 
+        print(res)
+        self.maxDiff = None
         self.assertEquals(len(expected_db), len(res))
         for rel in expected_db:
             self.assertTrue(rel in res)
@@ -67,8 +71,12 @@ class TestUSN(TestCase):
                                   len(res[rel][pkg]))
                 for sn in expected_db[rel][pkg]:
                     self.assertTrue(sn in res[rel][pkg])
-                    self.assertEquals(expected_db[rel][pkg][sn],
-                                      str(res[rel][pkg][sn]))
+                    pprint.pprint(expected_db[rel][pkg][sn])
+                    pprint.pprint(res[rel][pkg][sn])
+                    self.assertEquals(expected_db[rel][pkg][sn]['version'],
+                                      str(res[rel][pkg][sn]['version']))
+                    self.assertEquals(expected_db[rel][pkg][sn]['cves'],
+                                      res[rel][pkg][sn]['cves'])
 
     def test_check_read_usn_db_no_release(self):
         '''Test read_usn_db() - no releases'''

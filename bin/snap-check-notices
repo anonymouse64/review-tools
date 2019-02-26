@@ -38,13 +38,17 @@ $ %s SNAP1 SNAP2 ...
 
 
 def main():
+    parser = argparse.ArgumentParser(
+        prog='check-notices',
+        description='Check a snap for needed security notices'
+    )
+    parser.add_argument('--no-fetch', help='use existing security db',
+                        action='store_true')
+    parser.add_argument('--with-cves', help='show referenced cves',
+                        action='store_true')
+    (args, argv) = parser.parse_known_args()
+
     common.REPORT_OUTPUT = "console"
-    if len(sys.argv) < 2:
-        help()
-        error("Please specify the path to the snap(s)")
-    elif sys.argv[1] in ['-h', '--help', 'help']:
-        help()
-        sys.exit(0)
 
     # initialize variables
     if 'SNAP_USER_COMMON' not in os.environ:
@@ -66,10 +70,10 @@ def main():
     os.chdir(os.environ['SNAP_USER_COMMON'])
 
     # download the usndb
-    do_fetch = False
     update_interval = 60 * 60 * 24  # one day
     if not os.path.exists("./" + usndb) or \
-            time.time() - os.path.getmtime("./" + usndb) >= update_interval:
+            (not args.no_fetch and
+             time.time() - os.path.getmtime("./" + usndb) >= update_interval):
         rc, out = cmd([fetchdb, "%s.bz2" % usndb])
         if rc != 0:
             error(out)
@@ -83,7 +87,7 @@ def main():
     if 'SNAP_DEBUG' in os.environ:
         had_debug = os.environ['SNAP_DEBUG']
 
-    for pkg in sys.argv[1:]:
+    for pkg in argv:
         if not os.path.isfile(pkg):
             warn("Skipping '%s', not a regular file" % pkg)
             continue
@@ -91,19 +95,22 @@ def main():
         snap = os.path.basename(pkg).split('_')[0]
         rev = "unknown"
         if '_' in pkg:
-            rev = os.path.basename(pkg).split('_')[1].split(".")[0]
+            rev = os.path.splitext(os.path.basename(pkg))[0].split('_')[1]
 
         if snap in reports and rev in reports[snap]:
             debug("Skipping %s with revision %s" % (snap, rev))
             continue
 
+        cmd_args = ['--usn-db=%s' %
+                    os.path.join(os.environ['SNAP_USER_COMMON'], usndb),
+                    '--snap=%s' % os.path.abspath(pkg)]
+        if args.with_cves:
+            cmd_args.append('--with-cves')
+
         # this carries through to available
         if had_debug is not None:
             os.unsetenv('SNAP_DEBUG')
-        rc, out = cmd([available,
-                       '--usn-db=%s' %
-                       os.path.join(os.environ['SNAP_USER_COMMON'], usndb),
-                       '--snap=%s' % os.path.abspath(pkg)])
+        rc, out = cmd([available] + cmd_args)
         if had_debug is not None:
             os.environ['SNAP_DEBUG'] = had_debug
 

@@ -290,6 +290,14 @@ Revision r12 (i386; channels: candidate, beta)
         self.assertTrue(len(res) > 0)
         self.assertTrue('3501-1' in res)
 
+    def test_check_scan_snap_core(self):
+        '''Test scan_snap() - core'''
+        secnot_fn = "./tests/test-usn-core-with-dpkg-list.db"
+        snap_fn = "./tests/test-core_16-2.37.2_amd64.snap"
+        res = available.scan_snap(secnot_fn, snap_fn)
+        self.assertTrue(len(res) > 0)
+        self.assertTrue('3323-1' in res)
+
     def test_check_scan_store(self):
         '''Test scan_store()'''
         secnot_fn = "./tests/test-usn-unittest-1.db"

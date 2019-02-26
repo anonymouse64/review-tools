@@ -91,6 +91,10 @@ def read_usn_db(fn):
                     if bin not in usn_db[rel]:
                         usn_db[rel][bin] = {}
                     if usn not in usn_db[rel][bin]:
-                        usn_db[rel][bin][usn] = version
+                        usn_db[rel][bin][usn] = {}
+                        usn_db[rel][bin][usn]['version'] = version
+                        if 'cves' in raw[usn]:
+                            usn_db[rel][bin][usn]['cves'] = raw[usn]['cves']
+                            usn_db[rel][bin][usn]['cves'].sort()
 
     return usn_db

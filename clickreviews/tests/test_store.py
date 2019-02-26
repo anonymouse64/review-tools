@@ -264,6 +264,26 @@ class TestStore(TestCase):
         self.assertTrue(isinstance(res, dict))
         self.assertEquals(len(res), 0)
 
+    def test_check_get_secnots_for_manifest_with_cves(self):
+        '''Test get_secnots_for_manifest() - cves'''
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+
+        res = store.get_secnots_for_manifest(m, self.secnot_db, with_cves=True)
+        self.assertTrue(isinstance(res, dict))
+        self.assertEquals(len(res), 2)
+        self.assertTrue('libxcursor1' in res)
+        self.assertEquals(len(res['libxcursor1']), 1)
+        self.assertTrue('3501-1' in res['libxcursor1'])
+        self.assertTrue(isinstance(res['libxcursor1']['3501-1'], list))
+        self.assertEquals(len(res['libxcursor1']['3501-1']), 1)
+        self.assertTrue('CVE-2017-16612' in res['libxcursor1']['3501-1'])
+        self.assertTrue('libtiff5' in res)
+        self.assertEquals(len(res['libtiff5']), 2)
+        self.assertTrue(isinstance(res['libtiff5']['3602-1'], list))
+        self.assertEquals(len(res['libtiff5']['3602-1']), 27)
+        self.assertTrue(isinstance(res['libtiff5']['3606-1'], list))
+        self.assertEquals(len(res['libtiff5']['3606-1']), 12)
+
     def test_check_get_secnots_for_manifest_has_newer(self):
         '''Test get_secnots_for_manifest() - has newer'''
         m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
