@@ -23,7 +23,6 @@
 # NOTE: this will eventually move to assertions
 redflagged_snap_types_overrides = {
     'kernel': ['dragonboard-kernel',  # Canonical reference kernels
-               'linux-generic-bbb',
                'pc-kernel',
                'pi-kernel',
                'pi2-kernel',
@@ -575,6 +574,28 @@ update_publisher_overrides = {
         'wpa-supplicant': canonical_enablement,
     },
 }
+
+# For Canonical supported snaps, add to what is staged (eg, to support git,
+# snaps that don't build from debs, etc). The os and base snaps are currently
+# treated separately and aren't listed here. Format:
+#
+#   update_stage_packages = { '<snap>': { '<deb>': '<version>|auto*' }}
+#
+# where <snap> is the snap to operate on, <deb> is the Ubuntu binary and
+# <version> is the <deb> version. The special case of 'auto*' will use the
+# 'version' field from the snap version in some capacity
+update_stage_packages = {
+    'pc-kernel': {'linux-image-generic': 'auto-kernel'},
+    'pi-kernel': {'linux-image-raspi2': 'auto-kernel'},
+    'pi2-kernel': {'linux-image-raspi2': 'auto-kernel'},  # same as pi-kernel
+    'aws-kernel': {'linux-image-aws': 'auto-kernel'},
+    'azure-kernel': {'linux-image-azure': 'auto-kernel'},
+    'gcp-kernel': {'linux-image-gcp': 'auto-kernel'},
+    'gke-kernel': {'linux-image-gke': 'auto-kernel'},
+    'dragonboard-kernel': {'linux-image-snapdragon': 'auto-kernel'},
+    'linux-generic-bbb': {'linux-image-generic': 'auto-kernelabi'},
+}
+
 
 # Some binary packages aren't worth alerting on since they don't contain
 # affected binaries (eg, a package with only header files)
