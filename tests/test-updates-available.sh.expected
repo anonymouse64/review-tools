@@ -437,6 +437,69 @@ Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-core-with
   }
 }
 
+Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./tests/gke-kernel_4.15.0-1027.28~16.04.1_amd64.snap'
+{
+  "linux-image-gke": {
+    "3871-4": [
+      "CVE-2018-10876",
+      "CVE-2018-10877",
+      "CVE-2018-10878",
+      "CVE-2018-10879",
+      "CVE-2018-10880",
+      "CVE-2018-10882",
+      "CVE-2018-10883",
+      "CVE-2018-14625",
+      "CVE-2018-16882",
+      "CVE-2018-17972",
+      "CVE-2018-18281",
+      "CVE-2018-19407",
+      "CVE-2018-9516"
+    ]
+  }
+}
+
+Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./tests/linux-generic-bbb_4.4.0-140-1_armhf.snap'
+{
+  "linux-image-generic": {
+    "3848-1": [
+      "CVE-2017-18174",
+      "CVE-2018-12896",
+      "CVE-2018-18690",
+      "CVE-2018-18710"
+    ],
+    "3879-1": [
+      "CVE-2018-10883",
+      "CVE-2018-16862",
+      "CVE-2018-19407",
+      "CVE-2018-19824",
+      "CVE-2018-20169"
+    ]
+  }
+}
+
+Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./tests/pc-kernel_4.15.0-44.46_i386.snap'
+{
+  "linux-image-generic": {
+    "3871-2": [
+      "https://launchpad.net/bugs/1813663",
+      "https://launchpad.net/bugs/1813727"
+    ]
+  }
+}
+
+Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./tests/pc-kernel_4.4.0-141.167_amd64.snap'
+{
+  "linux-image-generic": {
+    "3879-1": [
+      "CVE-2018-10883",
+      "CVE-2018-16862",
+      "CVE-2018-19407",
+      "CVE-2018-19824",
+      "CVE-2018-20169"
+    ]
+  }
+}
+
 Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-1.db' --store-db='./tests/test-store-unittest-bad-1.db'
 WARN: 1ad: required field 'revisions' not found
 ERROR: Errors encountered when scanning store entries

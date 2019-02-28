@@ -111,6 +111,12 @@ echo "Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-cor
 PYTHONPATH=./ ./bin/snap-updates-available --with-cves --usn-db='./tests/test-usn-core-with-dpkg-list.db' --snap='./tests/test-core_16-2.37.2_amd64.snap' 2>&1 | tee -a "$tmp"
 echo "" | tee -a "$tmp"
 
+for i in gke-kernel_4.15.0-1027.28~16.04.1_amd64.snap linux-generic-bbb_4.4.0-140-1_armhf.snap pc-kernel_4.15.0-44.46_i386.snap pc-kernel_4.4.0-141.167_amd64.snap ; do
+    echo "Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./tests/$i'" | tee -a "$tmp"
+    PYTHONPATH=./ ./bin/snap-updates-available --with-cves --usn-db='./tests/test-usn-kernel.db' --snap="./tests/$i" 2>&1 | tee -a "$tmp"
+    echo "" | tee -a "$tmp"
+done
+
 # Test bad store db
 echo "Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-1.db' --store-db='./tests/test-store-unittest-bad-1.db'" | tee -a "$tmp"
 PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-1.db' --store-db='./tests/test-store-unittest-bad-1.db' 2>&1 | tee -a "$tmp"

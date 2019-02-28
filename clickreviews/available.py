@@ -15,6 +15,7 @@
 
 import json
 import os
+import re
 import shutil
 import tempfile
 
@@ -37,6 +38,9 @@ from clickreviews.store import (
 )
 from clickreviews.usn import (
     read_usn_db,
+)
+from clickreviews.overrides import (
+    update_stage_packages,
 )
 
 
@@ -231,6 +235,29 @@ def scan_store(secnot_db_fn, store_db_fn, seen_db_fn, pkgname):
     return sent, errors
 
 
+# Used with auto-kernel. Assumes the binary is the meta-package with versions
+# MAJ.MIN.MIC.ABI.NNN where the snap version is MAJ.MIN.MIC-ABI.NNN. Since
+# some snap versions use ~16.04.1, discard that
+def convert_canonical_kernel_version(s, only_abi=False):
+    # discard trailing ~YY.MM.X
+    v = s.split('~')[0]
+
+    if not only_abi and \
+            not re.search(r'^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+\.[0-9]+$', s):
+        return v
+    elif only_abi and not re.search(r'^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+-.*', s):
+        return v
+
+    # if only care about abi, then mock up a build NNN this is very high
+    if only_abi:
+        v = s.rsplit('-', 1)[0]
+        v += '.999999'
+
+    # convert from MAJ.MIN.MIC-ABI.NNN to MAJ.MIN.MIC.ABI.NNN
+    v = v.replace('-', '.')
+    return v
+
+
 def scan_snap(secnot_db_fn, snap_fn, with_cves=False):
     '''Scan snap for packages with security notices'''
     out = ""
@@ -248,9 +275,26 @@ def scan_snap(secnot_db_fn, snap_fn, with_cves=False):
                 if not line.startswith('ii '):
                     continue
                 tmp = line.split()
-                man['parts'][fake_key]['stage-packages'].append("%s=%s" %
-                                                                (tmp[1],
-                                                                 tmp[2]))
+                man['parts'][fake_key]['stage-packages'].append(
+                    "%s=%s" % (tmp[1], tmp[2]))
+    elif man['name'] in update_stage_packages:
+        p = get_staged_packages_from_manifest(man)
+        fake_key = 'faked-by-review-tools'
+        if 'parts' in man and fake_key not in man['parts']:
+            man['parts'][fake_key] = {}
+            man['parts'][fake_key]['stage-packages'] = []
+            for pkg in update_stage_packages[man['name']]:
+                version = update_stage_packages[man['name']][pkg]
+                if version == 'auto':
+                    version = man['version']
+                elif version == 'auto-kernel':
+                    version = convert_canonical_kernel_version(man['version'])
+                elif version == 'auto-kernelabi':
+                    version = convert_canonical_kernel_version(man['version'],
+                                                               only_abi=True)
+                man['parts'][fake_key]['stage-packages'].append(
+                    "%s=%s" % (pkg, version))
+
     secnot_db = read_usn_db(secnot_db_fn)
 
     report = get_secnots_for_manifest(man, secnot_db, with_cves)
