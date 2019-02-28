@@ -421,3 +421,97 @@ class TestStore(TestCase):
         res = store.get_ubuntu_release_from_manifest(m)
         # fallback to old behavior
         self.assertEquals(res, "xenial")
+
+    def test_convert_canonical_kernel_version(self):
+        '''Test convert_canonical_kernel_version()'''
+        # (version, expected, only_abi)
+        tests = [
+            ("1.2", "1.2", False),
+            ("1.3", "1.3", True),
+            ("1.2~", "1.2~", False),
+            ("1.3~", "1.3~", True),
+            ("1.2.3-4.5", "1.2.3.4.5", False),
+            ("1.2.3-4.5~16.04.1", "1.2.3.4.5", False),
+            ("1.2.3-4.6", "1.2.3-4.6", True),
+            ("1.2.3-4-6", "1.2.3.4.999999", True),
+            ("1.2.3-4-6~16.04.1", "1.2.3.4.999999", True),
+        ]
+        for (v, expected, only_abi) in tests:
+            res = store.convert_canonical_kernel_version(v, only_abi)
+            self.assertEquals(res, expected)
+
+    def test_convert_canonical_app_version(self):
+        '''Test convert_canonical_app_version()'''
+        # (version, expected)
+        tests = [
+            ("1.2", "1.2"),
+            ("1.2~", "1.2~"),
+            ("1.2-3", "1.2-3"),
+            ("1.2-3ubuntu4.5", "1.2-3ubuntu4.5"),
+            ("1.2-3ubuntu4.5~16.04.1", "1.2-3ubuntu4.5~16.04.1"),
+            ("1.2-3+git1234ubuntu0.1", "1.2-3+git1234ubuntu0.1"),
+            ("1.2-3+git1234ubuntu0.1+deadbeef", "1.2-3+git1234ubuntu0.1"),
+        ]
+        for (v, expected) in tests:
+            res = store.convert_canonical_app_version(v)
+            self.assertEquals(res, expected)
+
+    def test_get_faked_stage_packages_version(self):
+        '''Test get_faked_stage_packages - version'''
+        from clickreviews.overrides import update_stage_packages
+        update_stage_packages['foo'] = {'bar': '1.2~'}
+        m = {}
+        m['name'] = 'foo'
+        m['version'] = '1.2~'
+        m['parts'] = {}
+
+        res = store.get_faked_stage_packages(m)
+        self.assertTrue('faked-by-review-tools' in res['parts'])
+        self.assertTrue('stage-packages' in res['parts']['faked-by-review-tools'])
+        self.assertTrue('bar=1.2~' in
+                        res['parts']['faked-by-review-tools']['stage-packages'])
+
+    def test_get_faked_stage_packages_auto(self):
+        '''Test get_faked_stage_packages'''
+        from clickreviews.overrides import update_stage_packages
+        update_stage_packages['foo'] = {'bar': 'auto'}
+        m = {}
+        m['name'] = 'foo'
+        m['version'] = '1.2-3ubuntu0.4+gitdeadbeef'
+        m['parts'] = {}
+
+        res = store.get_faked_stage_packages(m)
+        self.assertTrue('faked-by-review-tools' in res['parts'])
+        self.assertTrue('stage-packages' in res['parts']['faked-by-review-tools'])
+        self.assertTrue('bar=1.2-3ubuntu0.4' in
+                        res['parts']['faked-by-review-tools']['stage-packages'])
+
+    def test_get_faked_stage_packages_auto_kernel(self):
+        '''Test get_faked_stage_packages'''
+        from clickreviews.overrides import update_stage_packages
+        update_stage_packages['foo'] = {'linux-image-generic': 'auto-kernel'}
+        m = {}
+        m['name'] = 'foo'
+        m['version'] = '4.4.0-140.141'
+        m['parts'] = {}
+
+        res = store.get_faked_stage_packages(m)
+        self.assertTrue('faked-by-review-tools' in res['parts'])
+        self.assertTrue('stage-packages' in res['parts']['faked-by-review-tools'])
+        self.assertTrue('linux-image-generic=4.4.0.140.141' in
+                        res['parts']['faked-by-review-tools']['stage-packages'])
+
+    def test_get_faked_stage_packages_auto_kernelabi(self):
+        '''Test get_faked_stage_packages'''
+        from clickreviews.overrides import update_stage_packages
+        update_stage_packages['foo'] = {'linux-image-generic': 'auto-kernelabi'}
+        m = {}
+        m['name'] = 'foo'
+        m['version'] = '4.4.0-140-1'
+        m['parts'] = {}
+
+        res = store.get_faked_stage_packages(m)
+        self.assertTrue('faked-by-review-tools' in res['parts'])
+        self.assertTrue('stage-packages' in res['parts']['faked-by-review-tools'])
+        self.assertTrue('linux-image-generic=4.4.0.140.999999' in
+                        res['parts']['faked-by-review-tools']['stage-packages'])

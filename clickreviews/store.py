@@ -13,6 +13,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import pprint
+import re
 import yaml
 
 import clickreviews.debversion as debversion
@@ -27,6 +28,7 @@ import clickreviews.email as email
 from clickreviews.overrides import (
     update_binaries_ignore,
     update_publisher_overrides,
+    update_stage_packages,
 )
 from clickreviews.sr_common import (
     SnapReview,
@@ -37,6 +39,63 @@ snap_to_release = {'base-18': 'bionic',
                    'core16': 'xenial',
                    'core18': 'bionic',
                    }
+
+
+# Used with auto-kernel. Assumes the binary is the meta-package with versions
+# MAJ.MIN.MIC.ABI.NNN where the snap version is MAJ.MIN.MIC-ABI.NNN. Since
+# some snap versions use ~16.04.1, discard that
+def convert_canonical_kernel_version(s, only_abi=False):
+    # discard trailing ~YY.MM.X
+    v = s.split('~')[0]
+
+    if not only_abi and \
+            not re.search(r'^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+\.[0-9]+$', v):
+        return s
+    elif only_abi and not re.search(r'^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+-.*', v):
+        return s
+
+    # if only care about abi, then mock up a build NNN this is very high
+    if only_abi:
+        v = s.rsplit('-', 1)[0]
+        v += '.999999'
+
+    # convert from MAJ.MIN.MIC-ABI.NNN to MAJ.MIN.MIC.ABI.NNN
+    v = v.replace('-', '.')
+    return v
+
+
+# used with auto
+def convert_canonical_app_version(s):
+    v = s
+    # discard last +git.deadbeef after 'ubuntu'
+    if re.search(r'ubuntu.*\+', s):  # simplistic
+        v = s.rsplit('+', 1)[0]
+
+    return v
+
+
+def get_faked_stage_packages(m):
+    '''fake up stage-packages from overrides'''
+    if m['name'] in update_stage_packages:
+        fake_key = 'faked-by-review-tools'
+        if 'parts' in m and fake_key not in m['parts']:
+            m['parts'][fake_key] = {}
+            m['parts'][fake_key]['plugin'] = 'null'
+            for i in ['build-packages', 'prime', 'stage', 'stage-packages']:
+                m['parts'][fake_key][i] = []
+            for pkg in update_stage_packages[m['name']]:
+                version = update_stage_packages[m['name']][pkg]
+                if version == 'auto':
+                    version = convert_canonical_app_version(m['version'])
+                elif version == 'auto-kernel':
+                    version = convert_canonical_kernel_version(m['version'])
+                elif version == 'auto-kernelabi':
+                    version = convert_canonical_kernel_version(
+                        m['version'], only_abi=True)
+                m['parts'][fake_key]['stage-packages'].append(
+                    "%s=%s" % (pkg, version))
+
+    return m
 
 
 def get_pkg_revisions(item, secnot_db, errors):
@@ -69,7 +128,9 @@ def get_pkg_revisions(item, secnot_db, errors):
             continue
 
         m = yaml.load(rev['manifest_yaml'])
+        m = get_faked_stage_packages(m)
         verify_snap_manifest(m)
+
         try:
             report = get_secnots_for_manifest(m, secnot_db)
         except ValueError as e:

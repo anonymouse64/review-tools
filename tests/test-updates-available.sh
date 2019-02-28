@@ -98,6 +98,12 @@ reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-os-release.db test-store-os-release.db
 run "$tmp_seen" test-usn-os-release.db test-store-os-release.db
 
+# should show 3848-1 and 3879-1
+comment "= Test --seen-db updated for linux-generic-bbb ="
+reset_seen "$tmp_seen"
+run "$tmp_seen" test-usn-kernel.db test-store-kernel.db
+run "$tmp_seen" test-usn-kernel.db test-store-kernel.db
+
 # Test --snap
 echo "Running: snap-updates-available --usn-db='./tests/test-usn-budgie-2.db' --snap='./tests/test-snapcraft-manifest_0_amd64.snap'" | tee -a "$tmp"
 PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-budgie-2.db' --snap='./tests/test-snapcraft-manifest_0_amd64.snap' 2>&1 | tee -a "$tmp"
