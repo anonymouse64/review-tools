@@ -255,9 +255,8 @@ def scan_snap(secnot_db_fn, snap_fn, with_cves=False):
 
     report = get_secnots_for_manifest(man, secnot_db, with_cves)
     if len(report) != 0:
-        # FIXME: make pretty
-        import pprint
-        out += pprint.pformat(report)
+        # needs to be json since snap-check-notices parses this output
+        out += json.dumps(report, indent=2, sort_keys=True)
 
     return out
 

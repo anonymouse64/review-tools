@@ -17,7 +17,6 @@
 import argparse
 import json
 import os
-import pprint
 import sys
 import tempfile
 import time
@@ -123,9 +122,9 @@ def main():
         if out == '':
             reports[snap][rev] = dict()
         else:
-            reports[snap][rev] = json.loads(out.replace("'", '"'))
+            reports[snap][rev] = json.loads(out)
 
-    pprint.pprint(reports)
+    print(json.dumps(reports, indent=2, sort_keys=True))
 
 
 if __name__ == '__main__':
