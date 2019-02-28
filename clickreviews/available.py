@@ -243,10 +243,10 @@ def convert_canonical_kernel_version(s, only_abi=False):
     v = s.split('~')[0]
 
     if not only_abi and \
-            not re.search(r'^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+\.[0-9]+$', s):
-        return v
-    elif only_abi and not re.search(r'^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+-.*', s):
-        return v
+            not re.search(r'^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+\.[0-9]+$', v):
+        return s
+    elif only_abi and not re.search(r'^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+-.*', v):
+        return s
 
     # if only care about abi, then mock up a build NNN this is very high
     if only_abi:
@@ -255,6 +255,16 @@ def convert_canonical_kernel_version(s, only_abi=False):
 
     # convert from MAJ.MIN.MIC-ABI.NNN to MAJ.MIN.MIC.ABI.NNN
     v = v.replace('-', '.')
+    return v
+
+
+# used with auto
+def convert_canonical_app_version(s):
+    v = s
+    # discard last +git.deadbeef after 'ubuntu'
+    if re.search(r'ubuntu.*\+', s):  # simplistic
+        v = s.rsplit('+', 1)[0]
+
     return v
 
 
@@ -286,7 +296,7 @@ def scan_snap(secnot_db_fn, snap_fn, with_cves=False):
             for pkg in update_stage_packages[man['name']]:
                 version = update_stage_packages[man['name']][pkg]
                 if version == 'auto':
-                    version = man['version']
+                    version = convert_canonical_app_version(man['version'])
                 elif version == 'auto-kernel':
                     version = convert_canonical_kernel_version(man['version'])
                 elif version == 'auto-kernelabi':

@@ -594,6 +594,7 @@ update_stage_packages = {
     'gke-kernel': {'linux-image-gke': 'auto-kernel'},
     'dragonboard-kernel': {'linux-image-snapdragon': 'auto-kernel'},
     'linux-generic-bbb': {'linux-image-generic': 'auto-kernelabi'},
+    # 'network-manager': {'network-manager': 'auto'},  # eventually
 }
 
 

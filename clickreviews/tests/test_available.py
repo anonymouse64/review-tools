@@ -298,6 +298,37 @@ Revision r12 (i386; channels: candidate, beta)
         self.assertTrue(len(res) > 0)
         self.assertTrue('3323-1' in res)
 
+    def test_check_scan_snap_kernel(self):
+        '''Test scan_snap() - kernel'''
+        from clickreviews.overrides import update_stage_packages
+        update_stage_packages['pc-kernel'] = {'linux-image-generic': 'auto-kernel'}
+        secnot_fn = "./tests/test-usn-kernel.db"
+        snap_fn = "./tests/pc-kernel_4.4.0-141.167_amd64.snap"
+        res = available.scan_snap(secnot_fn, snap_fn)
+        self.assertTrue(len(res) > 0)
+        self.assertTrue('3879-1' in res)
+
+    def test_check_scan_snap_kernel_abi(self):
+        '''Test scan_snap() - kernel abi'''
+        from clickreviews.overrides import update_stage_packages
+        update_stage_packages['linux-generic-bbb'] = {'linux-image-generic': 'auto-kernelabi'}
+        secnot_fn = "./tests/test-usn-kernel.db"
+        snap_fn = "./tests/linux-generic-bbb_4.4.0-140-1_armhf.snap"
+        res = available.scan_snap(secnot_fn, snap_fn)
+        self.assertTrue(len(res) > 0)
+        self.assertTrue('3848-1' in res)
+        self.assertTrue('3879-1' in res)
+
+    def test_check_scan_snap_canonical_snap(self):
+        '''Test scan_snap() - canonical snap - network-manager'''
+        from clickreviews.overrides import update_stage_packages
+        update_stage_packages['network-manager'] = {'network-manager': 'auto'}
+        secnot_fn = "./tests/test-usn-network-manager.db"
+        snap_fn = "./tests/network-manager_1.10.6-2ubuntu1.0+dbce8fd2_amd64.snap"
+        res = available.scan_snap(secnot_fn, snap_fn)
+        self.assertTrue(len(res) > 0)
+        self.assertTrue('3807-1' in res)
+
     def test_check_scan_store(self):
         '''Test scan_store()'''
         secnot_fn = "./tests/test-usn-unittest-1.db"
@@ -354,3 +385,37 @@ Revision r12 (i386; channels: candidate, beta)
                                               "1ad")
         self.assertEquals(len(errors), 1)
         self.assertEquals(len(sent), 0)
+
+    def test_convert_canonical_kernel_version(self):
+        '''Test convert_canonical_kernel_version()'''
+        # (version, expected, only_abi)
+        tests = [
+            ("1.2", "1.2", False),
+            ("1.3", "1.3", True),
+            ("1.2~", "1.2~", False),
+            ("1.3~", "1.3~", True),
+            ("1.2.3-4.5", "1.2.3.4.5", False),
+            ("1.2.3-4.5~16.04.1", "1.2.3.4.5", False),
+            ("1.2.3-4.6", "1.2.3-4.6", True),
+            ("1.2.3-4-6", "1.2.3.4.999999", True),
+            ("1.2.3-4-6~16.04.1", "1.2.3.4.999999", True),
+        ]
+        for (v, expected, only_abi) in tests:
+            res = available.convert_canonical_kernel_version(v, only_abi)
+            self.assertEquals(res, expected)
+
+    def test_convert_canonical_app_version(self):
+        '''Test convert_canonical_app_version()'''
+        # (version, expected)
+        tests = [
+            ("1.2", "1.2"),
+            ("1.2~", "1.2~"),
+            ("1.2-3", "1.2-3"),
+            ("1.2-3ubuntu4.5", "1.2-3ubuntu4.5"),
+            ("1.2-3ubuntu4.5~16.04.1", "1.2-3ubuntu4.5~16.04.1"),
+            ("1.2-3+git1234ubuntu0.1", "1.2-3+git1234ubuntu0.1"),
+            ("1.2-3+git1234ubuntu0.1+deadbeef", "1.2-3+git1234ubuntu0.1"),
+        ]
+        for (v, expected) in tests:
+            res = available.convert_canonical_app_version(v)
+            self.assertEquals(res, expected)
