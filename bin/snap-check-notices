@@ -54,6 +54,10 @@ def main():
             os.environ['HOME']
         debug("SNAP_USER_COMMON not set. Defaulting to %s" %
               os.environ['SNAP_USER_COMMON'])
+        if not os.path.exists(os.environ['SNAP_USER_COMMON']):
+            debug("%s does not exist, creating" %
+                  os.environ['SNAP_USER_COMMON'])
+            os.makedirs(os.environ['SNAP_USER_COMMON'])
 
     usndb = "database.json"
     if 'SNAP' in os.environ:
