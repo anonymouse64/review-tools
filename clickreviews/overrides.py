@@ -423,6 +423,10 @@ canonical_k8s = ['adam.stokes@canonical.com',
                  'tim.van.steenburgh@canonical.com',
                  ]
 
+canonical_lp = ['william.grant@canonical.com',
+                'colin.watson@canonical.com',
+                ]
+
 canonical_lxd = ['stephane.graber@canonical.com',
                  'free.ekanayaka@canonical.com',
                  ]
@@ -452,6 +456,7 @@ canonical_server = ['josh.powers@canonical.com',
                     ]
 
 canonical_snapd = ['gustavo.niemeyer@canonical.com',
+                   'samuele.pedroni@canonical.com',
                    'michael.vogt@canonical.com',
                    ]
 
@@ -506,8 +511,10 @@ update_publisher_overrides = {
         'juju': canonical_juju,
         'jq': canonical_snapd,
         'jq-core18': canonical_snapd,
+        'kubelet': canonical_k8s,
         'libreoffice': canonical_desktop,
         'locationd': canonical_enablement,
+        'lp-build-snap': canonical_lp,
         'lxd': canonical_lxd,
         'maas': canonical_maas,
         'microk8s': canonical_k8s,
