@@ -55,14 +55,13 @@ def main():
         debug("SNAP_USER_COMMON not set. Defaulting to %s" %
               os.environ['SNAP_USER_COMMON'])
         if not os.path.exists(os.environ['SNAP_USER_COMMON']):
-            debug("%s does not exist, creating" %
+            error("SNAP_USER_COMMON not set and %s does not exist" %
                   os.environ['SNAP_USER_COMMON'])
-            os.makedirs(os.environ['SNAP_USER_COMMON'])
 
     usndb = "database.json"
     if 'SNAP' in os.environ:
-        fetchdb = "%s/bin/fetch-db" % os.environ['SNAP']
-        available = "%s/bin/snap-updates-available" % os.environ['SNAP']
+        fetchdb = "%s/bin/fetch-db" % os.path.abspath(os.environ['SNAP'])
+        available = "%s/bin/snap-updates-available" % os.path.abspath(os.environ['SNAP'])
     else:
         fetchdb = "review-tools.fetch-usn-db"
         available = "review-tools.updates-available"
@@ -73,8 +72,8 @@ def main():
 
     # download the usndb
     update_interval = 60 * 60 * 24  # one day
-    if not os.path.exists("./" + usndb) or \
-            (not args.no_fetch and
+    if not args.no_fetch and \
+            (not os.path.exists("./" + usndb) or
              time.time() - os.path.getmtime("./" + usndb) >= update_interval):
         rc, out = cmd([fetchdb, "%s.bz2" % usndb])
         if rc != 0:
@@ -104,7 +103,7 @@ def main():
             continue
 
         usndb_fn = os.path.join(os.environ['SNAP_USER_COMMON'], usndb)
-        if 'USNDB' in os.environ and os.path.exists(os.environ['USNDB']):
+        if 'USNDB' in os.environ:
             usndb_fn = os.environ['USNDB']
 
         cmd_args = ['--usn-db=%s' % usndb_fn,
