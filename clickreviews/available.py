@@ -129,9 +129,10 @@ def _email_report_for_pkg(pkg_db, seen_db):
         email_to_addr += ", %s" % ", ".join(pkg_db['uploaders'])
     if len(pkg_db['additional']) > 0:
         email_to_addr += ", %s" % ", ".join(pkg_db['additional'])
-    email_to_addr += ", security@ubuntu.com"
+    # temporary
+    bcc = "jamie@canonical.com, alex.murray@canonical.com"
 
-    email.send(email_to_addr, subj, body)
+    email.send(email_to_addr, subj, body, bcc)
 
     debug("Sent email for '%s'" % pkgname)
     return (email_to_addr, subj, body)

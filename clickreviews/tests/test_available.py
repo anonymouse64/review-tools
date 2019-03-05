@@ -155,7 +155,7 @@ Revision r12 (i386; channels: candidate, beta)
         (to_addr, subj, body) = available._email_report_for_pkg(self.pkg_db,
                                                                 {})
 
-        for eml in ['olivier.tilloy@canonical.com', 'security@ubuntu.com']:
+        for eml in ['olivier.tilloy@canonical.com']:
             self.assertTrue(eml in to_addr)
 
         self.assertTrue('0ad' in subj)
@@ -337,7 +337,7 @@ Revision r12 (i386; channels: candidate, beta)
         self.assertEquals(len(errors), 0)
         self.assertEquals(len(sent), 1)
         (to_addr, subj, body) = sent[0]
-        for eml in ['olivier.tilloy@canonical.com', 'security@ubuntu.com']:
+        for eml in ['olivier.tilloy@canonical.com']:
             self.assertTrue(eml in to_addr)
 
         self.assertTrue('0ad' in subj)
@@ -358,7 +358,7 @@ Revision r12 (i386; channels: candidate, beta)
         self.assertEquals(len(errors), 0)
         self.assertEquals(len(sent), 1)
         (to_addr, subj, body) = sent[0]
-        for eml in ['olivier.tilloy@canonical.com', 'security@ubuntu.com']:
+        for eml in ['olivier.tilloy@canonical.com']:
             self.assertTrue(eml in to_addr)
 
         self.assertTrue('0ad' in subj)

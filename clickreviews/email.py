@@ -42,16 +42,17 @@ def sanitize_addr(a):
     return addr
 
 
-def send(email_to_addr, subj, body):
+def send(email_to_addr, subj, body, bcc=None):
     '''Send the email'''
     global email_server
     global email_from_addr
 
     if 'CRT_SEND_EMAIL' not in os.environ or \
             os.environ['CRT_SEND_EMAIL'] != "1":
-        print("From: %s\nTo: %s\nSubject: %s\n" % (email_from_addr,
-                                                   email_to_addr,
-                                                   subj))
+        print("From: %s\nTo: %s" % (email_from_addr, email_to_addr))
+        if bcc is not None:
+            print("Bcc: %s" % bcc)
+        print("Subject: %s\n" % (subj))
         print(body)
     else:
         if 'CRT_EMAIL_FROM' in os.environ:
@@ -72,13 +73,25 @@ def send(email_to_addr, subj, body):
                 return False
             email_to_addr = ", ".join(addresses)
 
+        if 'CRT_EMAIL_BCC' in os.environ:
+            addresses = []
+            for i in os.environ['CRT_EMAIL_BCC'].split(', '):
+                addr = sanitize_addr(i.strip())
+                if addr != '':
+                    addresses.append(addr)
+                else:
+                    print("Bad to address: '%s'" % addr)
+            if len(addresses) == 0:
+                return False
+            bcc = ", ".join(addresses)
+
         if 'CRT_EMAIL_SERVER' in os.environ:
             email_server = os.environ['CRT_EMAIL_SERVER']
 
         if 'CRT_EMAIL_NOPROMPT' not in os.environ or \
                 os.environ['CRT_EMAIL_NOPROMPT'] != "1":
-            print("Send (subj='%s',to='%s',from='%s',server='%s')? (y|N) " %
-                  (subj, email_to_addr, email_from_addr, email_server), end='')
+            print("Send (subj='%s',to='%s',from='%s',bcc='%s',server='%s')? (y|N) " %
+                  (subj, email_to_addr, email_from_addr, bcc, email_server), end='')
             sys.stdout.flush()
             ans = sys.stdin.readline().lower().strip()
             if ans != 'y' and ans != 'yes':
@@ -91,6 +104,8 @@ def send(email_to_addr, subj, body):
         msg['Subject'] = subj
         msg['From'] = email_from_addr
         msg['To'] = email_to_addr
+        if bcc is not None:
+            msg['Bcc'] = bcc
         s = smtplib.SMTP(email_server)
         s.send_message(msg)
         s.quit()
