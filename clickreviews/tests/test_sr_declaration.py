@@ -237,9 +237,31 @@ slots:
         rules = {'on-store': ['foo']}
         self.assertFalse(c._is_scoped(rules))
 
+        # store match and store also gave brand (--on-brand ignored)
+        overrides = {
+            'snap_on_store': 'mystore',
+            'snap_on_brand': 'foo',
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        rules = {'on-store': ['mystore', 'foo']}
+        self.assertTrue(c._is_scoped(rules))
+        rules = {'on-store': ['foo']}
+        self.assertFalse(c._is_scoped(rules))
+
         # brand match
         overrides = {
             'snap_on_brand': 'mybrand',
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        rules = {'on-brand': ['bar', 'mybrand']}
+        self.assertTrue(c._is_scoped(rules))
+        rules = {'on-brand': ['bar']}
+        self.assertFalse(c._is_scoped(rules))
+
+        # brand match and store also gave store (--on-store ignored)
+        overrides = {
+            'snap_on_brand': 'mybrand',
+            'snap_on_store': 'bar',
         }
         c = SnapReviewDeclaration(self.test_name, overrides=overrides)
         rules = {'on-brand': ['bar', 'mybrand']}
@@ -5996,6 +6018,88 @@ slots:
                 'docker': {
                     'allow-installation': True,
                     'allow-connection': True,
+                },
+            },
+            'snap_on_store': 'mystore',
+            'snap_on_brand': 'mybrand',
+        }
+        slots = {'iface': {'interface': 'docker'}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 3, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:valid_slots:docker:allow-installation'
+        expected['info'][name] = {"text": "OK"}
+        name = 'declaration-snap-v2:valid_slots:docker:allow-connection'
+        expected['info'][name] = {"text": "OK"}
+        name = 'declaration-snap-v2:slots:iface:docker'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_on_store_with_given_brand_ignored(self):
+        '''Test check_declaration - override - only on-store specified and
+           given --on-store and (ignored) --on-brand
+        '''
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            'snap_decl_slots': {
+                'docker': {
+                    'allow-installation': {
+                        'on-store': ['other-store', 'mystore'],
+                    },
+                    'allow-connection': {
+                        'on-store': ['other-store', 'mystore'],
+                    },
+                },
+            },
+            'snap_on_store': 'mystore',
+            'snap_on_brand': 'mybrand',
+        }
+        slots = {'iface': {'interface': 'docker'}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 3, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:valid_slots:docker:allow-installation'
+        expected['info'][name] = {"text": "OK"}
+        name = 'declaration-snap-v2:valid_slots:docker:allow-connection'
+        expected['info'][name] = {"text": "OK"}
+        name = 'declaration-snap-v2:slots:iface:docker'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_on_brand_with_given_store_ignored(self):
+        '''Test check_declaration - override - only on-brand specified and
+           given --on-brand and (ignored) --on-store
+        '''
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            'snap_decl_slots': {
+                'docker': {
+                    'allow-installation': {
+                        'on-brand': ['other-brand', 'mybrand'],
+                    },
+                    'allow-connection': {
+                        'on-brand': ['other-brand', 'mybrand'],
+                    },
                 },
             },
             'snap_on_store': 'mystore',
