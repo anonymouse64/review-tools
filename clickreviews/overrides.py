@@ -475,6 +475,7 @@ update_publisher_overrides = {
         'base-18': canonical_snapd,
         'bluez': canonical_enablement,
         'caracalla-kernel': canonical_hwe,
+        'cascade-kernel': canonical_hwe,
         'chromium': ['olivier.tilloy@canonical.com'] + canonical_desktop,
         'chromium-ffmpeg': ['olivier.tilloy@canonical.com'] + canonical_desktop,
         'chromium-mir-kiosk': ['olivier.tilloy@canonical.com'] + canonical_mir,
@@ -598,16 +599,18 @@ update_publisher_overrides = {
 # <version> is the <deb> version. The special case of 'auto*' will use the
 # 'version' field from the snap version in some capacity
 update_stage_packages = {
+    'aws-kernel': {'linux-image-aws': 'auto-kernel'},
+    'azure-kernel': {'linux-image-azure': 'auto-kernel'},
+    'caracalla-kernel': {'linux-image-generic': 'auto-kernel'},
+    'cascade-kernel': {'linux-image-generic': 'auto-kernel'},
+    'dragonboard-kernel': {'linux-image-snapdragon': 'auto-kernel'},
+    'gcp-kernel': {'linux-image-gcp': 'auto-kernel'},
+    'gke-kernel': {'linux-image-gke': 'auto-kernel'},
+    'linux-generic-bbb': {'linux-image-generic': 'auto-kernelabi'},
+    # 'network-manager': {'network-manager': 'auto'},  # eventually
     'pc-kernel': {'linux-image-generic': 'auto-kernel'},
     'pi-kernel': {'linux-image-raspi2': 'auto-kernel'},
     'pi2-kernel': {'linux-image-raspi2': 'auto-kernel'},  # same as pi-kernel
-    'aws-kernel': {'linux-image-aws': 'auto-kernel'},
-    'azure-kernel': {'linux-image-azure': 'auto-kernel'},
-    'gcp-kernel': {'linux-image-gcp': 'auto-kernel'},
-    'gke-kernel': {'linux-image-gke': 'auto-kernel'},
-    'dragonboard-kernel': {'linux-image-snapdragon': 'auto-kernel'},
-    'linux-generic-bbb': {'linux-image-generic': 'auto-kernelabi'},
-    # 'network-manager': {'network-manager': 'auto'},  # eventually
 }
 
 
