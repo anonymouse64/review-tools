@@ -399,16 +399,17 @@ To: foo@example.com
 Bcc: jamie@canonical.com, alex.murray@canonical.com
 Subject: linux-generic-bbb contains outdated Ubuntu packages
 
-A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+A scan of this snap shows that it was built using sources based on a kernel
+from the Ubuntu archive that has since received security updates. The following
+lists new USNs for the Ubuntu kernel that the snap is based on in each snap
+revision:
 
 Revision r12 (armhf; channels: stable, beta)
  * linux-image-generic: 3848-1, 3879-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Updating the snap's git tree, adjusting the version in the snapcraft.yaml to
+match that of the Ubuntu kernel this snap is based on and rebuilding the snap
+should pull in the new security updates and resolve this.
 
 Thank you for your snap and for attending to this matter.
 

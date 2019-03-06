@@ -142,6 +142,11 @@ def get_pkg_revisions(item, secnot_db, errors):
         pkg_db['revisions'][r]['channels'] = rev['channels']
         pkg_db['revisions'][r]['architectures'] = rev['architectures']
         pkg_db['revisions'][r]['secnot-report'] = report
+
+        pkg_db['snap_type'] = 'app'
+        if 'type' in m:
+            pkg_db['snap_type'] = m['type']
+
         if 'uploaders' not in pkg_db:
             pkg_db['uploaders'] = []
         if 'uploader_email' in rev:

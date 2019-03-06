@@ -11,7 +11,7 @@
           "stable",
           "beta"
         ],
-        "manifest_yaml": "name: linux-generic-bbb\nversion: 4.4.0-140-1\nsummary: foo\ndescription: foo\nconfinement: strict\napps:\n  foo:\n    command: bar\nparts:\n  launcher:\n    build-packages: []\n    installed-packages: []\n    installed-snaps: []\n    plugin: dump\n    prime: []\n    stage: []\n    stage-packages: []\n    uname: 'Linux 4.4.0-140-generic #166-Ubuntu SMP Wed Nov 14 20:10:44 UTC 2018 armv7l\n      armv7l armv7l GNU/Linux'\ngrade: stable\narchitectures:\n- armhf\nbuild-packages: []\nbuild-snaps: []\n",
+        "manifest_yaml": "name: linux-generic-bbb\nversion: 4.4.0-140-1\nsummary: foo\ndescription: foo\nconfinement: strict\ntype: kernel\napps:\n  foo:\n    command: bar\nparts:\n  launcher:\n    build-packages: []\n    installed-packages: []\n    installed-snaps: []\n    plugin: dump\n    prime: []\n    stage: []\n    stage-packages: []\n    uname: 'Linux 4.4.0-140-generic #166-Ubuntu SMP Wed Nov 14 20:10:44 UTC 2018 armv7l\n      armv7l armv7l GNU/Linux'\ngrade: stable\narchitectures:\n- armhf\nbuild-packages: []\nbuild-snaps: []\n",
         "version": "4.4.0-140-1",
         "architectures": [
           "armhf"

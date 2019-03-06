@@ -341,6 +341,7 @@ Revision r12 (i386; channels: candidate, beta)
             self.assertTrue(eml in to_addr)
 
         self.assertTrue('0ad' in subj)
+        self.assertTrue("built with packages from the Ubuntu" in body)
 
         for pkg in ['libtiff5', 'libxcursor1']:
             self.assertTrue(pkg in body)
@@ -385,3 +386,21 @@ Revision r12 (i386; channels: candidate, beta)
                                               "1ad")
         self.assertEquals(len(errors), 1)
         self.assertEquals(len(sent), 0)
+
+    def test_check_scan_store_kernel(self):
+        '''Test scan_store() - kernel'''
+        secnot_fn = "./tests/test-usn-kernel.db"
+        store_fn = "./tests/test-store-kernel.db"
+        (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
+        self.assertEquals(len(errors), 0)
+        self.assertEquals(len(sent), 1)
+        (to_addr, subj, body) = sent[0]
+        for eml in ['foo@example.com']:
+            self.assertTrue(eml in to_addr)
+        self.assertTrue("using sources based on a kernel" in body)
+        self.assertTrue("linux-image-generic" in body)
+
+        self.assertTrue('linux-generic-bbb' in subj)
+
+        for sn in ['3848-1', '3879-1']:
+            self.assertTrue(sn in body)

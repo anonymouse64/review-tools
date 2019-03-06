@@ -55,6 +55,20 @@ Thank you for your snap and for attending to this matter.
 References:
  * %s
 '''
+email_templates['kernel'] = '''A scan of this snap shows that it was built using sources based on a kernel
+from the Ubuntu archive that has since received security updates. The following
+lists new USNs for the Ubuntu kernel that the snap is based on in each snap
+revision:
+%s
+Updating the snap's git tree, adjusting the version in the snapcraft.yaml to
+match that of the Ubuntu kernel this snap is based on and rebuilding the snap
+should pull in the new security updates and resolve this.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * %s
+'''
 
 
 def _secnot_report_for_pkg(pkg_db, seen_db):
@@ -108,7 +122,10 @@ def _secnot_report_for_pkg(pkg_db, seen_db):
         return ""
 
     reference_urls.sort()
-    return email_templates['default'] % (report, "\n * ".join(reference_urls))
+    template = 'default'
+    if 'snap_type' in pkg_db and pkg_db['snap_type'] == 'kernel':
+        template = 'kernel'
+    return email_templates[template] % (report, "\n * ".join(reference_urls))
 
 
 def _email_report_for_pkg(pkg_db, seen_db):
