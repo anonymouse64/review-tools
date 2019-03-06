@@ -340,7 +340,7 @@ Revision r12 (i386; channels: candidate, beta)
         for eml in ['olivier.tilloy@canonical.com']:
             self.assertTrue(eml in to_addr)
 
-        self.assertTrue('0ad' in subj)
+        self.assertTrue('0ad contains outdated Ubuntu packages' in subj)
         self.assertTrue("built with packages from the Ubuntu" in body)
 
         for pkg in ['libtiff5', 'libxcursor1']:
@@ -400,7 +400,8 @@ Revision r12 (i386; channels: candidate, beta)
         self.assertTrue("using sources based on a kernel" in body)
         self.assertTrue("linux-image-generic" in body)
 
-        self.assertTrue('linux-generic-bbb' in subj)
+        self.assertTrue('linux-generic-bbb built from outdated Ubuntu kernel'
+                        in subj)
 
         for sn in ['3848-1', '3879-1']:
             self.assertTrue(sn in body)

@@ -137,6 +137,8 @@ def _email_report_for_pkg(pkg_db, seen_db):
         return (None, None, None)
 
     subj = "%s contains outdated Ubuntu packages" % pkgname
+    if 'snap_type' in pkg_db and pkg_db['snap_type'] == 'kernel':
+        subj = "%s built from outdated Ubuntu kernel" % pkgname
 
     # Send to the publisher and any affected uploaders
     email_to_addr = pkg_db['publisher']

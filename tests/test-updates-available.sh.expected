@@ -397,7 +397,7 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 From: Snap Store <noreply@canonical.com>
 To: foo@example.com
 Bcc: jamie@canonical.com, alex.murray@canonical.com
-Subject: linux-generic-bbb contains outdated Ubuntu packages
+Subject: linux-generic-bbb built from outdated Ubuntu kernel
 
 A scan of this snap shows that it was built using sources based on a kernel
 from the Ubuntu archive that has since received security updates. The following
