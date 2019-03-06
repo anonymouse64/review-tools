@@ -41,18 +41,29 @@ from clickreviews.usn import (
 )
 
 
-# TODO: templatize this email
+email_templates = {}
+email_templates['default'] = '''A scan of this snap shows that it was built with packages from the Ubuntu
+archive that have since received security updates. The following lists new USNs
+for affected binary packages in each snap revision:
+%s
+Simply rebuilding the snap will pull in the new security updates and resolve
+this. If your snap also contains vendored code, now might be a good time to
+review it for any needed updates.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * %s
+'''
+
+
 def _secnot_report_for_pkg(pkg_db, seen_db):
     '''Generate a report for this pkg, consulting seen_db'''
     pkgname = pkg_db['name']
 
-    report = '''A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
-'''
-
     reference_urls = []
 
+    report = ""
     for r in sorted(pkg_db['revisions']):
         if len(pkg_db['revisions'][r]['secnot-report']) == 0:
             continue
@@ -96,21 +107,8 @@ for affected binary packages in each snap revision:
         # nothing to report
         return ""
 
-    report += '''
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
-
-Thank you for your snap and for attending to this matter.
-'''
-
     reference_urls.sort()
-    report += '''
-References:
- * %s
-''' % "\n * ".join(reference_urls)
-
-    return report
+    return email_templates['default'] % (report, "\n * ".join(reference_urls))
 
 
 def _email_report_for_pkg(pkg_db, seen_db):
