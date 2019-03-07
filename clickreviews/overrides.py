@@ -413,6 +413,7 @@ canonical_kernel = ['brad.figg@canonical.com',
 
 canonical_hwe = ['anthony.wong@canonical.com',
                  'brad.figg@canonical.com',
+                 'shrirang.bagul@canonical.com',
                  ]
 
 canonical_juju = ['ian.booth@canonical.com',
