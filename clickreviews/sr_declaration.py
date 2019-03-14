@@ -1,6 +1,6 @@
 '''sr_declaration.py: click declaration'''
 #
-# Copyright (C) 2014-2018 Canonical Ltd.
+# Copyright (C) 2014-2019 Canonical Ltd.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -443,12 +443,12 @@ class SnapReviewDeclaration(SnapReview):
     def _check_attributes(self, side, iface, rules, cstr, whence):
         '''Check if there are any matching attributes for this side, interface,
            rules and constraint. If attributes are specified in the constraint,
-           they all must match. If the attribute is a list, just one must
-           match (it is considered a list of alternatives). As a practical
-           matter, don't flag connection constraints for slot-attributes in
-           plugging snaps when checking against the fallback base declaration
-           slot since the slotting snap will have been flagged and require a
-           snap declaration for snaps to connect to it
+           they all must match. If the attribute in the constraint is a list,
+           just one must match (it is considered a list of alternatives). As a
+           practical matter, don't flag connection constraints for
+           slot-attributes in plugging snaps when checking against the fallback
+           base declaration slot since the slotting snap will have been flagged
+           and require a snap declaration for snaps to connect to it
         '''
         def _check_attrib(val, against, side, rules_attrib):
             if type(val) not in [str, list, dict, bool]:
@@ -469,9 +469,11 @@ class SnapReviewDeclaration(SnapReview):
                 elif re.search(r'^(%s)$' % against, val):
                     matched = True
             elif isinstance(val, list):
-                for i in val:
-                    if _check_attrib(i, against, side, rules_attrib):
-                        matched = True
+                # if the attribute in the snap (val) is a list, then to match,
+                # the declaration value (against) must also be a list and the
+                # unordered contents of the lists must be the same
+                if isinstance(against, list) and set(val) == set(against):
+                    matched = True
             else:  # bools and dicts (TODO: nested matches for dicts)
                 matched = (against == val)
 
@@ -504,14 +506,12 @@ class SnapReviewDeclaration(SnapReview):
                     against = rules[rules_key][rules_attrib]
 
                     if isinstance(against, list):
-                        # when the attribute is a list, all items in the list
-                        # must match
-                        num_matched = 0
+                        # when the attribute in the declaration is a list, only
+                        # one must match (list of OR constraints)
                         for i in against:
                             if _check_attrib(val, i, side, rules_attrib):
-                                num_matched += 1
-                        if num_matched != 0 and num_matched == len(against):
-                            attributes_matched[rules_key]['matched'] += 1
+                                attributes_matched[rules_key]['matched'] += 1
+                                break
                     else:
                         if _check_attrib(val, against, side, rules_attrib):
                             attributes_matched[rules_key]['matched'] += 1

@@ -2691,7 +2691,7 @@ slots:
         expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
-    def test_check_declaration_plugs_allow_connection_list_match(self):
+    def test_check_declaration_plugs_allow_connection_list_match_all(self):
         '''Test check_declaration - plugs/allow-connection/list all match'''
         plugs = {'iface-foo': {'interface': 'foo', 'attrib1': 'val1'}}
         self.set_test_snap_yaml("plugs", plugs)
@@ -2724,9 +2724,8 @@ slots:
         expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
-    def test_check_declaration_plugs_allow_connection_list_nomatch(self):
-        '''Test check_declaration - plugs/allow-connection/list some don't
-           match'''
+    def test_zz_check_declaration_plugs_allow_connection_list_match_one(self):
+        '''Test check_declaration - plugs/allow-connection/list one matches'''
         plugs = {'iface-foo': {'interface': 'foo', 'attrib1': 'val1'}}
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewDeclaration(self.test_name)
@@ -2747,15 +2746,15 @@ slots:
         self._set_base_declaration(c, base)
         c.check_declaration()
         r = c.click_report
-        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
         expected = dict()
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'declaration-snap-v2:plugs_connection:iface-foo:foo'
-        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint (interface attributes)"}
+        name = 'declaration-snap-v2:plugs:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_plugs_allow_connection_bad_special(self):
@@ -3008,7 +3007,57 @@ slots:
         expected['error'][name] = {"text": "human review required due to 'allow-installation' constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
-    def test_check_declaration_personal_files_alt_match(self):
+    def test_check_declaration_personal_files_alt_regex_match(self):
+        '''Test check_declaration - personal-files - alternates regex match'''
+        plugs = {'iface': {'interface': 'personal-files',
+                           'read': '$HOME/.foo',
+                           'write': '$HOME/.match2'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        overrides = {
+            'snap_decl_plugs': {
+                'personal-files': {
+                    'allow-installation': [
+                        {
+                            'plug-attributes': {
+                                'read': '\\$HOME/\\.(foo|bar)',
+                                'write': '\\$HOME/\\.match[0-9]+'
+                            }
+                        },
+                        {
+                            'plug-attributes': {
+                                'read': '\\$HOME/\\.foo',
+                                'write': '\\$HOME/\\.(baz|norf)'
+                            }
+                        }
+
+                    ]
+                }
+            }
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        base = {
+            'plugs': {
+                'personal-files': {
+                    'allow-installation': False,
+                    'allow-auto-connection': False
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs:iface:personal-files'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_personal_files_alt_nomatch(self):
         '''Test check_declaration - personal-files - alternates match'''
         plugs = {'iface': {'interface': 'personal-files',
                            'read': '$HOME/.foo',
@@ -3020,14 +3069,14 @@ slots:
                     'allow-installation': [
                         {
                             'plug-attributes': {
-                                'read': '(\\$HOME/\\.foo|\\$HOME/\\.bar)',
-                                'write': '(\\$HOME/\\.baz|\\$HOME/\\.norf)'
+                                'read': '\\$HOME/\\.(foo|bar)',
+                                'write': '\\$HOME/\\.(baz|norf)'
                             }
                         },
                         {
                             'plug-attributes': {
                                 'read': '\\$HOME/\\.foo',
-                                'write': '(\\$HOME/\\.match[0-9]+)'
+                                'write': '\\$HOME/\\.match[0-9]+'
                             }
                         }
 
@@ -3111,8 +3160,8 @@ slots:
         self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_deny_connection_attrib_list_match(self):
-        '''Test check_declaration - slots/deny-connection/attrib - list match'''
-        slots = {'iface-foo': {'interface': 'foo', 'attrib1': ['b', 'a']}}
+        '''Test check_declaration - slots/deny-connection/attrib - list match snap attribute str in decl list'''
+        slots = {'iface-foo': {'interface': 'foo', 'attrib1': 'b'}}
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewDeclaration(self.test_name)
         base = {
@@ -3140,9 +3189,39 @@ slots:
         expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (interface attributes)"}
         self.check_results(r, expected=expected)
 
+    def test_check_declaration_slots_deny_connection_attrib_lists_match(self):
+        '''Test check_declaration - slots/deny-connection/attrib - list match snap attribute list in decl list of lists'''
+        slots = {'iface-foo': {'interface': 'foo', 'attrib1': ['b', 'a']}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            'slots': {
+                'foo': {
+                    'deny-connection': {
+                        'slot-attributes': {
+                            'attrib1': [['a', 'b'], ['c', 'd']]
+                        }
+                    }
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:slots_connection:iface-foo:foo'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (interface attributes)"}
+        self.check_results(r, expected=expected)
+
     def test_check_declaration_slots_deny_connection_attrib_list_nomatch(self):
-        '''Test check_declaration - slots/deny-connection/attrib - list nomatch'''
-        slots = {'iface-foo': {'interface': 'foo', 'attrib1': ['z', 'b']}}
+        '''Test check_declaration - slots/deny-connection/attrib - list nomatch snap attribute str not in decl list'''
+        slots = {'iface-foo': {'interface': 'foo', 'attrib1': 'z'}}
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewDeclaration(self.test_name)
         base = {
@@ -3170,9 +3249,39 @@ slots:
         expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
+    def test_check_declaration_slots_deny_connection_attrib_lists_nomatch(self):
+        '''Test check_declaration - slots/deny-connection/attrib - list nomatch snap attribute list not in decl list of lists'''
+        slots = {'iface-foo': {'interface': 'foo', 'attrib1': ['c', 'a']}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            'slots': {
+                'foo': {
+                    'deny-connection': {
+                        'slot-attributes': {
+                            'attrib1': [['a', 'b'], ['c', 'd']]
+                        }
+                    }
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:slots:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
     def test_check_declaration_slots_allow_connection_attrib_list_match(self):
-        '''Test check_declaration - slots/allow-connection/attrib - list match'''
-        slots = {'iface-foo': {'interface': 'foo', 'attrib1': ['b', 'a']}}
+        '''Test check_declaration - slots/allow-connection/attrib - list match snap attribute str in decl list'''
+        slots = {'iface-foo': {'interface': 'foo', 'attrib1': 'b'}}
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewDeclaration(self.test_name)
         base = {
@@ -3200,9 +3309,39 @@ slots:
         expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
+    def test_check_declaration_slots_allow_connection_attrib_lists_match(self):
+        '''Test check_declaration - slots/allow-connection/attrib - lists match snap attribute list in decl list of lists'''
+        slots = {'iface-foo': {'interface': 'foo', 'attrib1': ['b', 'a']}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            'slots': {
+                'foo': {
+                    'allow-connection': {
+                        'slot-attributes': {
+                            'attrib1': [['a', 'b'], ['c', 'd']]
+                        }
+                    }
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:slots:iface-foo:foo'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
     def test_check_declaration_slots_allow_connection_attrib_list_nomatch(self):
-        '''Test check_declaration - slots/allow-connection/attrib - list nomatch'''
-        slots = {'iface-foo': {'interface': 'foo', 'attrib1': ['z', 'a']}}
+        '''Test check_declaration - slots/allow-connection/attrib - list nomatch snap attribute str not in decl list'''
+        slots = {'iface-foo': {'interface': 'foo', 'attrib1': 'z'}}
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewDeclaration(self.test_name)
         base = {
@@ -3211,6 +3350,36 @@ slots:
                     'allow-connection': {
                         'slot-attributes': {
                             'attrib1': ['a', 'b']
+                        }
+                    }
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:slots_connection:iface-foo:foo'
+        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint (interface attributes)"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_slots_allow_connection_attrib_lists_nomatch(self):
+        '''Test check_declaration - slots/allow-connection/attrib - list nomatch snap attribute list not in decl list of lists'''
+        slots = {'iface-foo': {'interface': 'foo', 'attrib1': ['z', 'a']}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            'slots': {
+                'foo': {
+                    'allow-connection': {
+                        'slot-attributes': {
+                            'attrib1': [['a', 'b'], ['c', 'd']]
                         }
                     }
                 }
