@@ -454,8 +454,39 @@ class SnapReviewDeclaration(SnapReview):
             if type(val) not in [str, list, dict, bool]:
                 raise SnapDeclarationException("unknown type '%s'" % val)
 
+            # Keep in mind by this point each OR constraint is being iterated
+            # through such that 'against' as a list is a nested list.
+            # For now, punt on nested lists since they are impractical in use
+            # since they are a list of OR options where one option must match
+            # all of val, but if you have that you may as well just use a
+            # string. Eg for this snap.yaml:
+            #   snap.yaml:
+            #     plugs:
+            #       foo:
+            #         bar: [ baz, norf ]
+            #
+            # a snap decl that uses a list for 'bar' might be:
+            #   snap decl:
+            #     foo:
+            #       plug-attributes:
+            #         bar:
+            #         - baz|norf
+            #         - something|else
+            #
+            # but, 'something|else' is pointless so it will never match, so the
+            # decl should be rewritten more simply as:
+            #   snap decl:
+            #     foo:
+            #       plug-attributes:
+            #         bar: baz|norf
+            # Importantly, the type of the attribute in the snap decl means
+            # something different than the type in snap.yaml
+            if isinstance(against, list):
+                raise SnapDeclarationException(
+                    "attribute lists in the declaration not supported")
+
             matched = False
-            if isinstance(val, str):
+            if isinstance(val, str) and isinstance(against, str):
                 if against.startswith('$'):
                     if against == '$MISSING':
                         matched = False  # value must not be set
@@ -469,11 +500,12 @@ class SnapReviewDeclaration(SnapReview):
                 elif re.search(r'^(%s)$' % against, val):
                     matched = True
             elif isinstance(val, list):
-                # if the attribute in the snap (val) is a list, then to match,
-                # the declaration value (against) must also be a list and the
-                # unordered contents of the lists must be the same
-                if isinstance(against, list) and set(val) == set(against):
-                    matched = True
+                # if the attribute in the snap (val) is a list and the
+                # declaration value (against) is a string, then to match,
+                # against must be a regex that matches all entries in val
+                for i in val:
+                    if _check_attrib(i, against, side, rules_attrib):
+                        matched = True
             else:  # bools and dicts (TODO: nested matches for dicts)
                 matched = (against == val)
 
