@@ -28,6 +28,9 @@
   lxd-support:
     allow-installation: false
     deny-auto-connection: true
+  multipass-support:
+    allow-installation: false
+    deny-auto-connection: true
   personal-files:
     allow-installation: false
     deny-auto-connection: true
@@ -330,6 +333,11 @@
         - gadget
         - core
     deny-auto-connection: true
+  intel-mei:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   io-ports-control:
     allow-installation:
       slot-snap-type:
@@ -440,6 +448,11 @@
       slot-attributes:
         name: .+
     deny-auto-connection: true
+  multipass-support:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   netlink-audit:
     allow-installation:
       slot-snap-type:
@@ -464,6 +477,14 @@
         - core
     deny-auto-connection: true
   network-manager:
+    allow-installation:
+      slot-snap-type:
+        - app
+        - core
+    deny-auto-connection: true
+    deny-connection:
+      on-classic: false
+  network-manager-observe:
     allow-installation:
       slot-snap-type:
         - app
