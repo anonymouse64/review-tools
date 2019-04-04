@@ -40,6 +40,7 @@ redflagged_snap_types_overrides = {
                'marvell-armada3700-kernel',
                'nxp-ls1043a-kernel',
                'odroidxu4-kernel',
+               'pc-lowlatency-kernel',
                'pi2-kernel-rt',
                'roseapple-pi-kernel',
                'roseapple-pi-kernel-ondra',
@@ -536,6 +537,7 @@ update_publisher_overrides = {
         'openwrt': canonical_enablement,
         'pc': canonical_snapd,
         'pc-kernel': canonical_kernel,
+        'pc-lowlatency-kernel': canonical_kernel,
         'pi': canonical_snapd,
         'pi-kernel': canonical_kernel,
         'pi2': canonical_snapd,
@@ -610,6 +612,7 @@ update_stage_packages = {
     'linux-generic-bbb': {'linux-image-generic': 'auto-kernelabi'},
     # 'network-manager': {'network-manager': 'auto'},  # eventually
     'pc-kernel': {'linux-image-generic': 'auto-kernel'},
+    'pc-lowlatency-kernel': {'linux-image-generic': 'auto-kernel'},
     'pi-kernel': {'linux-image-raspi2': 'auto-kernel'},
     'pi2-kernel': {'linux-image-raspi2': 'auto-kernel'},  # same as pi-kernel
 }
