@@ -845,6 +845,12 @@ class SnapReviewDeclaration(SnapReview):
             side = 'plugs'
             oside = 'slots'
 
+        # If it is an interface reference used by an app, skip since it will be
+        # checked in top-level interface checks.
+        if name.startswith('app_') and side in self.snap_yaml and \
+                interface in self.snap_yaml[side]:
+            return
+
         t = 'info'
         n = self._get_check_name('%s_known' % name, app=iface, extra=interface)
         s = 'OK'
@@ -852,11 +858,6 @@ class SnapReviewDeclaration(SnapReview):
                 interface not in self.base_declaration[side] and \
                 oside in self.base_declaration and \
                 interface not in self.base_declaration[oside]:
-            if name.startswith('app_') and side in self.snap_yaml and \
-                    interface in self.snap_yaml[side]:
-                # If it is an interface reference used by an app, skip since it
-                # will be checked in top-level interface checks.
-                return
             t = 'error'
             s = "interface '%s' not found in base declaration" % interface
             self._add_result(t, n, s)
