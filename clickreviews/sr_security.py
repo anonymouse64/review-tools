@@ -29,8 +29,9 @@ from clickreviews.common import (
     MKSQUASHFS_OPTS,
 )
 from clickreviews.overrides import (
-    sec_mode_overrides,
     sec_browser_support_overrides,
+    sec_iface_ref_overrides,
+    sec_mode_overrides,
     sec_resquashfs_overrides,
 )
 import os
@@ -575,3 +576,53 @@ class SnapReviewSecurity(SnapReview):
             t = 'error'
             s = "found errors in file output: %s" % ", ".join(errors)
         self._add_result(t, n, s)
+
+    def _allowed_iface_reference(self, side, interface):
+        if not self.is_snap2 or side not in self.snap_yaml:
+            return
+
+        # no overrides to check
+        if interface not in sec_iface_ref_overrides:
+            return
+
+        refname = None
+        for ref in self.snap_yaml[side]:
+            if ref == interface:
+                refname = ref
+            elif 'interface' in self.snap_yaml[side][ref] and \
+                    self.snap_yaml[side][ref]['interface'] == interface:
+                refname = ref
+            if refname is not None:
+                break
+
+        if refname is None:  # nothing to check
+            return
+
+        t = 'info'
+        n = self._get_check_name('interface-reference', app=interface)
+        s = 'OK'
+        if self.snap_yaml['name'] not in sec_iface_ref_overrides[interface]:
+            t = 'warn'
+            s = "override not found for '%s/%s'. Use of " % (side, refname) + \
+                "the %s interface is reserved for vetted " % interface + \
+                "publishers. If your snap legitimately requires this " + \
+                "access, please make a request in the forum using the " + \
+                "'store' category (https://forum.snapcraft.io/), or if " + \
+                "you would prefer to keep this private, the 'sensitive' " + \
+                "category."
+            self._add_result(t, n, s)
+        elif refname not in \
+                sec_iface_ref_overrides[interface][self.snap_yaml['name']]:
+            t = 'error'
+            s = "interface reference '%s' not allowed. Please " % refname + \
+                "use one of: %s" % ", ".join(
+                    sec_iface_ref_overrides[interface][self.snap_yaml['name']])
+        self._add_result(t, n, s)
+
+    def check_personal_files_iface_reference(self):
+        '''Check personal-files interface references'''
+        self._allowed_iface_reference('plugs', 'personal-files')
+
+    def check_system_files_iface_reference(self):
+        '''Check system-files interface references'''
+        self._allowed_iface_reference('plugs', 'system-files')

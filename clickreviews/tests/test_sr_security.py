@@ -916,6 +916,170 @@ drwx------ root/root                48 2016-03-11 12:26 squashfs-root/meta
         expected['error'][name] = {"text": "found errors in file output: unable to read or access files in 'squashfs-root' due to mode 'rwx------', unable to read or access files in 'squashfs-root/meta' due to mode 'rwx------'"}
         self.check_results(report, expected=expected)
 
+    def test__allowed_iface_reference_no_key(self):
+        '''Test _allowed_iface_reference() - missing key is ok'''
+        plugs = {'not-overidden': {'interface': 'network'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewSecurity(self.test_name)
+        c._allowed_iface_reference("plugs", "network")
+        report = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 0}
+        self.check_results(report, expected_counts)
+
+    def test__allowed_iface_reference_not_overidden(self):
+        '''Test _allowed_iface_reference() - not overidden'''
+        plugs = {'not-overidden': {'interface': 'test-iface'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewSecurity(self.test_name)
+        c._allowed_iface_reference("plugs", "test-iface")
+        report = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 0}
+        self.check_results(report, expected_counts)
+
+    def test__allowed_iface_reference_unknown(self):
+        '''Test _allowed_iface_reference() - unknown'''
+        plugs = {'unknown-ref': {'interface': 'test-iface'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        self.set_test_snap_yaml("name", "test-app")
+        # add this snap to the override
+        from clickreviews.overrides import sec_iface_ref_overrides
+        sec_iface_ref_overrides['test-iface'] = {}
+        c = SnapReviewSecurity(self.test_name)
+        c._allowed_iface_reference("plugs", "test-iface")
+        # then clean up
+        del sec_iface_ref_overrides['test-iface']
+        report = c.click_report
+        expected_counts = {'info': 0, 'warn': 1, 'error': 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'security-snap-v2:interface-reference:test-iface'
+        expected['warn'][name] = {"text": "override not found for 'plugs/unknown-ref'. Use of the test-iface interface is reserved for vetted publishers. If your snap legitimately requires this access, please make a request in the forum using the 'store' category (https://forum.snapcraft.io/), or if you would prefer to keep this private, the 'sensitive' category."}
+        self.check_results(report, expected=expected)
+
+    def test__allowed_iface_reference_known(self):
+        '''Test check__allowed_iface_reference() - known'''
+        plugs = {'known-ref': {'interface': 'test-iface'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        self.set_test_snap_yaml("name", "test-app")
+        # add this snap to the override
+        from clickreviews.overrides import sec_iface_ref_overrides
+        sec_iface_ref_overrides['test-iface'] = {"test-app": ['known-ref']}
+        c = SnapReviewSecurity(self.test_name)
+        c._allowed_iface_reference("plugs", "test-iface")
+        # then clean up
+        del sec_iface_ref_overrides['test-iface']
+        report = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'security-snap-v2:interface-reference:test-iface'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(report, expected=expected)
+
+    def test__allowed_iface_reference_known_same(self):
+        '''Test check__allowed_iface_reference() - known ref is same'''
+        plugs = {'test-iface': {'interface': 'test-iface'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        self.set_test_snap_yaml("name", "test-app")
+        # add this snap to the override
+        from clickreviews.overrides import sec_iface_ref_overrides
+        sec_iface_ref_overrides['test-iface'] = {"test-app": ['test-iface']}
+        c = SnapReviewSecurity(self.test_name)
+        c._allowed_iface_reference("plugs", "test-iface")
+        # then clean up
+        del sec_iface_ref_overrides['test-iface']
+        report = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'security-snap-v2:interface-reference:test-iface'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(report, expected=expected)
+
+    def test__allowed_iface_reference_disallowed(self):
+        '''Test check__allowed_iface_reference() - disallowed'''
+        plugs = {'disallowed': {'interface': 'test-iface'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        self.set_test_snap_yaml("name", "test-app")
+        # add this snap to the override
+        from clickreviews.overrides import sec_iface_ref_overrides
+        sec_iface_ref_overrides['test-iface'] = {"test-app": ['known-ref']}
+        c = SnapReviewSecurity(self.test_name)
+        c._allowed_iface_reference("plugs", "test-iface")
+        # then clean up
+        del sec_iface_ref_overrides['test-iface']
+        report = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'security-snap-v2:interface-reference:test-iface'
+        expected['error'][name] = {"text": "interface reference 'disallowed' not allowed. Please use one of: known-ref"}
+        self.check_results(report, expected=expected)
+
+    def test_check_personal_files_interface_reference_known(self):
+        '''Test check_personal_files_interface_reference() - known'''
+        plugs = {'known-ref': {'interface': 'personal-files'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        self.set_test_snap_yaml("name", "test-app")
+        # add this snap to the override
+        from clickreviews.overrides import sec_iface_ref_overrides
+        sec_iface_ref_overrides['personal-files']['test-app'] = ['known-ref']
+        c = SnapReviewSecurity(self.test_name)
+        c.check_personal_files_iface_reference()
+        # then clean up
+        del sec_iface_ref_overrides['personal-files']['test-app']
+        report = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'security-snap-v2:interface-reference:personal-files'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(report, expected=expected)
+
+    def test_check_system_files_interface_reference_disallowed(self):
+        '''Test check_system_files_interface_reference() - disallowed'''
+        plugs = {'disallowed': {'interface': 'system-files'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        self.set_test_snap_yaml("name", "test-app")
+        # add this snap to the override
+        from clickreviews.overrides import sec_iface_ref_overrides
+        sec_iface_ref_overrides['system-files']['test-app'] = ['known-ref']
+        c = SnapReviewSecurity(self.test_name)
+        c.check_system_files_iface_reference()
+        # then clean up
+        del sec_iface_ref_overrides['system-files']['test-app']
+        report = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'security-snap-v2:interface-reference:system-files'
+        expected['error'][name] = {"text": "interface reference 'disallowed' not allowed. Please use one of: known-ref"}
+        self.check_results(report, expected=expected)
+
 
 class TestSnapReviewSecurityNoMock(TestCase):
     """Tests without mocks where they are not needed."""

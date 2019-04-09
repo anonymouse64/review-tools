@@ -343,6 +343,25 @@ sec_resquashfs_overrides = ['clion',  # jetbrains
                             'rubymine',
                             'webstorm',  # end jetbrains
                             ]
+
+# https://forum.snapcraft.io/t/requesting-auto-connection-of-personal-files-to-sam-cli/10641/10
+# Until snapd has better controls on what the interface reference must be in
+# the snap declaration, we will have a cheap test to ensure that the interface
+# reference is in the list of allowed references. We don't want to encode the
+# snap declaration here too, which means a snap can use any of these with the
+# passing snap declaration constraint.
+sec_iface_ref_overrides = {
+    'personal-files': {
+        'chromium': ['chromium-config'],
+        'glances': ['home-glances-config'],
+        'icdiff': ['gitconfig'],
+        'kubicorn': ['kube-config'],
+    },
+    'system-files': {
+        'glances': ['etc-glances-config'],
+    },
+}
+
 # Snaps that have legitimate need for executable stack but otherwise work fine
 # in strict mode
 func_execstack_overrides = ['checkbox-balboa',
