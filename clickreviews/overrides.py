@@ -401,6 +401,7 @@ canonical_enablement = ['snap-update-verification@lists.canonical.com',
                         'pascal.morin@canonical.com',
                         'tony.espy@canonical.com',
                         'jim.hodapp@canonical.com',
+                        'loic.minier@canonical.com',
                         ]
 
 canonical_foundations = ['daniel.watkins@canonical.com',
@@ -615,6 +616,11 @@ update_stage_packages = {
     'pc-lowlatency-kernel': {'linux-image-generic': 'auto-kernel'},
     'pi-kernel': {'linux-image-raspi2': 'auto-kernel'},
     'pi2-kernel': {'linux-image-raspi2': 'auto-kernel'},  # same as pi-kernel
+    # Canonical Stack Snaps - changes should be approved by awe
+    # - bluez snapcraft.yaml doesn't specify base, so mock the xenial
+    'bluez': {'bluez': '5.37-0ubuntu5.1'},
+    # - modem-manager snapcraft.yaml doesn't specify base, so mock the xenial
+    'modem-manager': {'modemmanager': '1.6.4-1ubuntu0.16.04.1'},
 }
 
 
