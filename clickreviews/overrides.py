@@ -352,6 +352,7 @@ sec_resquashfs_overrides = ['clion',  # jetbrains
 # passing snap declaration constraint.
 sec_iface_ref_overrides = {
     'personal-files': {
+        'aws-sam-cli': ['config-aws'],
         'chromium': ['chromium-config'],
         'glances': ['home-glances-config'],
         'icdiff': ['gitconfig'],
