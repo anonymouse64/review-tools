@@ -987,7 +987,7 @@ def get_snap_manifest(fn):
             os_dpkg_list = fd.readlines()
         except Exception:
             recursive_rm(dir)
-            error("Could not load %s. Is it properly formatted?" % dpkg)
+            error("Could not load %s. Is it properly formatted?" % os_dpkg)
 
     recursive_rm(dir)
 
