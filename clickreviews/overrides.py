@@ -643,6 +643,8 @@ update_stage_packages = {
     'modem-manager': {'modemmanager': '1.6.4-1ubuntu0.16.04.1'},
     # - network-manager snapcraft.yaml doesn't specify base; mock xenial
     'network-manager': {'network-manager': '1.2.2-22'},
+    # - stlouis-kernel maintained by hwe
+    'stlouis-kernel': {'linux-image-generic': 'auto-kernel'},
     # - wifi-ap snapcraft.yaml doesn't specify base; mock xenial versions
     'wifi-ap': {'dnsmasq': '2.75-1', 'wpa': '2.4-0ubuntu6'},
 }
