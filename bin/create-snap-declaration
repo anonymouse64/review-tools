@@ -181,16 +181,16 @@ def print_decl():
     def _print_key(key):
         print(json.dumps(decl[key], sort_keys=True, indent=2))
     if "slots" in decl:
-        print("Paste into slots:")
+        print("Paste into 'slots':")
         _print_key("slots")
     if "plugs" in decl:
-        print("Paste into plugs:")
+        print("Paste into 'plugs':")
         _print_key("plugs")
     if "auto-aliases" in decl:
-        print("aliases (v2):")
+        print("Paste into 'Aliases (v2)':")
         _print_key("auto-aliases")
         # compatibility
-        print("auto-aliases (compat):")
+        print("Paste into 'Auto aliases' (compat):")
         aliases = []
         for item in decl['auto-aliases']:
             aliases.append(item["name"])
@@ -198,7 +198,7 @@ def print_decl():
         print(json.dumps(aliases, sort_keys=True, indent=2))
 
     if "refresh-control" in decl:
-        print("refresh-control:")
+        print("Paste into 'refresh-control':")
         _print_key("refresh-control")
 
 
