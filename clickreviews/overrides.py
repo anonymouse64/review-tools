@@ -637,10 +637,14 @@ update_stage_packages = {
     'pi-kernel': {'linux-image-raspi2': 'auto-kernel'},
     'pi2-kernel': {'linux-image-raspi2': 'auto-kernel'},  # same as pi-kernel
     # Canonical Stack Snaps - changes should be approved by awe
-    # - bluez snapcraft.yaml doesn't specify base, so mock the xenial
-    'bluez': {'bluez': '5.37-0ubuntu5.1'},
-    # - modem-manager snapcraft.yaml doesn't specify base, so mock the xenial
+    # - bluez snapcraft.yaml doesn't specify base; mock xenial version
+    'bluez': {'bluez': '5.37-0ubuntu5'},
+    # - modem-manager snapcraft.yaml doesn't specify base; mock xenial version
     'modem-manager': {'modemmanager': '1.6.4-1ubuntu0.16.04.1'},
+    # - network-manager snapcraft.yaml doesn't specify base; mock xenial
+    'network-manager': {'network-manager': '1.2.2-22'},
+    # - wifi-ap snapcraft.yaml doesn't specify base; mock xenial versions
+    'wifi-ap': {'dnsmasq': '2.75-1', 'wpa': '2.4-0ubuntu6'},
 }
 
 
