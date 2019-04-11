@@ -957,7 +957,7 @@ drwx------ root/root                48 2016-03-11 12:26 squashfs-root/meta
         expected['warn'] = dict()
         expected['info'] = dict()
         name = 'security-snap-v2:interface-reference:test-iface'
-        expected['warn'][name] = {"text": "override not found for 'plugs/unknown-ref'. Use of the test-iface interface is reserved for vetted publishers. If your snap legitimately requires this access, please make a request in the forum using the 'store' category (https://forum.snapcraft.io/), or if you would prefer to keep this private, the 'sensitive' category."}
+        expected['warn'][name] = {"text": "override not found for 'plugs/unknown-ref'. Use of the test-iface interface is reserved for vetted publishers. If your snap legitimately requires this access, please make a request in the forum using the 'store-requests' category (https://forum.snapcraft.io/c/store-requests), or if you would prefer to keep this private, the 'sensitive' category."}
         self.check_results(report, expected=expected)
 
     def test__allowed_iface_reference_known(self):

@@ -1450,7 +1450,7 @@ class SnapReviewLint(SnapReview):
                     self.snap_yaml['confinement']
             else:
                 t = 'error'
-                s = "(NEEDS REVIEW) confinement '%s' not allowed. If your snap needs classic confinement to function, please make a request for this snap to use classic by creating a new topic in the forum using the 'store' category and detail the technical reasons why classic is required." % \
+                s = "(NEEDS REVIEW) confinement '%s' not allowed. If your snap needs classic confinement to function, please make a request for this snap to use classic by creating a new topic in the forum using the 'store-requests' category and detail the technical reasons why classic is required." % \
                     self.snap_yaml['confinement']
                 manual_review = True
                 link = 'https://forum.snapcraft.io/t/process-for-reviewing-classic-confinement-snaps/1460'
