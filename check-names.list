@@ -277,6 +277,7 @@ security:profile_name_length|
 security:redflag_fields|
 security:required_policy_groups_ubuntu_account_plugin|
 security-snap-v2:daemon_with_browser-support|
+security-snap-v2:interface-reference|
 security-snap-v2:profile_name_length|
 security-snap-v2:squashfs_files|
 security-snap-v2:squashfs_files_malformed_line|
