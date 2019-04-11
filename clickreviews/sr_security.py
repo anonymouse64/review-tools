@@ -607,7 +607,8 @@ class SnapReviewSecurity(SnapReview):
                 "the %s interface is reserved for vetted " % interface + \
                 "publishers. If your snap legitimately requires this " + \
                 "access, please make a request in the forum using the " + \
-                "'store' category (https://forum.snapcraft.io/), or if " + \
+                "'store-requests' category (" + \
+                "https://forum.snapcraft.io/c/store-requests), or if " + \
                 "you would prefer to keep this private, the 'sensitive' " + \
                 "category."
             self._add_result(t, n, s)
