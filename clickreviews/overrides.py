@@ -355,7 +355,9 @@ sec_iface_ref_overrides = {
         'aws-sam-cli': ['config-aws'],
         'chromium': ['chromium-config'],
         'glances': ['home-glances-config'],
+        'guvcview': ['config-guvcview2'],
         'icdiff': ['gitconfig'],
+        'kubefwd': ['config-kube'],
         'kubicorn': ['kube-config'],
     },
     'system-files': {
