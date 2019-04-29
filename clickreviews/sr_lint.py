@@ -2524,3 +2524,29 @@ class SnapReviewLint(SnapReview):
                         s = "invalid path: %s " % entry
 
                     self._add_result(t, n, s)
+
+    def check_system_users(self):
+        '''Check system-users'''
+        if not self.is_snap2 or 'system-users' not in self.snap_yaml:
+            return
+
+        t = 'info'
+        n = self._get_check_name('system-users_valid')
+        s = 'OK'
+        if not isinstance(self.snap_yaml['system-users'], list):
+            t = 'error'
+            s = "malformed 'system-users': %s (not a list)" % (
+                self.snap_yaml['system-users'])
+        elif len(self.snap_yaml['system-users']) == 0:
+            t = 'error'
+            s = "empty 'system-users'"
+        else:
+            for i in self.snap_yaml['system-users']:
+                if not isinstance(i, str):
+                    t = 'error'
+                    s = "malformed entry in 'system-users': " + \
+                        "%s (contains non-strings)" % \
+                        self.snap_yaml['system-users']
+                    break
+
+        self._add_result(t, n, s)

@@ -5244,6 +5244,41 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
+    def test_check_system_users(self):
+        '''Test check_system_users'''
+        self.set_test_snap_yaml("system-users", ['daemon'])
+        c = SnapReviewLint(self.test_name)
+        c.check_system_users()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = {
+            'error': {},
+            'warn': {},
+            'info': {
+                'lint-snap-v2:system-users_valid': {
+                    "text": "OK"
+                },
+            },
+        }
+        self.check_results(r, expected=expected)
+
+    def test_check_system_users_bad(self):
+        '''Test check_base - bad values'''
+        bad_values = (
+            True,
+            [False],
+            [],
+        )
+        for v in bad_values:
+            self.set_test_snap_yaml("system-users", v)
+            c = SnapReviewLint(self.test_name)
+            c.check_system_users()
+            r = c.click_report
+            expected_counts = {'info': None, 'warn': 0, 'error': 1}
+            self.check_results(r, expected_counts)
+
 
 class TestSnapReviewLintNoMock(TestCase):
     """Tests without mocks where they are not needed."""
