@@ -359,6 +359,7 @@ sec_iface_ref_overrides = {
         'icdiff': ['gitconfig'],
         'kubefwd': ['config-kube'],
         'kubicorn': ['kube-config'],
+        'redis-desktop-manager': ['dot-rdm'],
     },
     'system-files': {
         'glances': ['etc-glances-config'],
