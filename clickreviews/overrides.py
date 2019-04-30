@@ -545,7 +545,7 @@ update_publisher_overrides = {
         'kubeadm': canonical_k8s,
         'kubectl': canonical_k8s,
         'kubelet': canonical_k8s,
-        'libreoffice': canonical_desktop,
+        'libreoffice': canonical_desktop + ['marcus.tomlinson@canonical.com'],
         'locationd': canonical_enablement,
         'lp-build-snap': canonical_lp,
         'lxd': canonical_lxd,
