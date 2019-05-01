@@ -354,6 +354,7 @@ sec_iface_ref_overrides = {
     'personal-files': {
         'aws-sam-cli': ['config-aws'],
         'chromium': ['chromium-config'],
+        'gallery-dl': ['config-gallery-dl'],
         'glances': ['home-glances-config'],
         'guvcview': ['config-guvcview2'],
         'icdiff': ['gitconfig'],
@@ -362,6 +363,7 @@ sec_iface_ref_overrides = {
         'redis-desktop-manager': ['dot-rdm'],
     },
     'system-files': {
+        'gallery-dl': ['etc-gallery-dl'],
         'glances': ['etc-glances-config'],
     },
 }
