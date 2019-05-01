@@ -537,6 +537,7 @@ update_publisher_overrides = {
         'godd': canonical_snapd,
         'gtk-common-themes': canonical_desktop,
         'gtk2-common-themes': canonical_desktop,
+        'hello': canonical_snapcraft,
         'juju': canonical_juju,
         'jq': canonical_snapd,
         'jq-core18': canonical_snapd,
