@@ -354,6 +354,7 @@ sec_iface_ref_overrides = {
     'personal-files': {
         'aws-sam-cli': ['config-aws'],
         'chromium': ['chromium-config'],
+        'fluxctl': ['kube-config'],
         'gallery-dl': ['config-gallery-dl'],
         'glances': ['home-glances-config'],
         'guvcview': ['config-guvcview2'],
