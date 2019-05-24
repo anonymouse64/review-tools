@@ -12,6 +12,7 @@ if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
     exit
 fi
 
+# TODO: figure out a different way to determine if performing system tests
 testtype="click-review"
 if [ "$1" = "system" ]; then
    testtype="snap-review"
@@ -27,7 +28,7 @@ fi
 tmp=$(mktemp)
 tmpjson=$(mktemp)
 
-for i in ./tests/*.click ./tests/*.snap ; do
+for i in ./tests/*.snap ; do
     for j in "" "--sdk" "--json" ; do
         snap=$(basename "$i")
         echo "= $j $snap ="

@@ -14,17 +14,18 @@ if os.path.exists(changelog):
     if match:
         version = match.group(1)
 
-scripts = glob.glob('bin/click-*') + glob.glob('bin/snap-*')
+scripts = glob.glob('bin/snap-*')
 scripts.append('bin/create-snap-declaration')
 scripts.append('bin/snap-updates-available')
 scripts.append('bin/snap-check-notices')
 scripts.append('bin/fetch-db')
-scripts.remove('bin/click-check-skeleton')
 scripts.remove('bin/snap-check-skeleton')
 setup(
-    name='click-reviewers-tools',
+    name='review-tools',
     version=version,
     scripts=scripts,
     packages=find_packages(),
-    test_suite='clickreviews.tests',
+    test_suite='reviewtools.tests',
+    package_data={'reviewtools': ['data/*.yaml']},
+    include_package_data=True,
 )

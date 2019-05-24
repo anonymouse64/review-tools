@@ -1,29 +1,14 @@
-Runnable click and snap v1 tests:
-- bin/click-check-bin-path: snappy bin-path tests
-- bin/click-check-content-hub: content-hub hook tests
-- bin/click-check-desktop: desktop hook tests
-- bin/click-check-framework: click framework tests
-- bin/click-check-functional: a few functional tests
-- bin/click-check-lint: lint tests
-- bin/click-check-online-accounts: online accounts tests
-- bin/click-check-push-helper: push-helper tests
-- bin/click-check-scope: scope tests
-- bin/click-check-security: security hook tests
-- bin/click-check-systemd: snappy systemd tests
-- bin/click-check-url-dispatcher: url-dispatcher hook tests
-- bin/click-run-checks: all tests
-
 Runnable snap v2 tests:
 - bin/snap-check-declaration: declaration tests
 - bin/snap-check-lint: lint tests
 - bin/snap-check-security: security tests
 - bin/snap-run-checks: all tests
 
-This gives an alternate view on bin/click-run-checks:
-- bin/click-review
+This gives an alternate view on bin/snap-run-checks:
+- bin/snap-review
 
 Running checks locally:
-$ PYTHONPATH=$PWD ./bin/click-review /path/to/package
+$ PYTHONPATH=$PWD ./bin/snap-review /path/to/package
 
 Additional environment variables:
 SNAP_DEBUG=1               - show debug info
@@ -40,8 +25,8 @@ CRT_EMAIL_SERVER=<server>  - use <server> instead of localhost
 CRT_EMAIL_NOPROMPT=1       - force sending of email without prompting
 
 Importable tests:
-- clickreviews/sr_lint.py: lint tests
-- clickreviews/sr_security.py: security tests
+- reviewtools/sr_lint.py: lint tests
+- reviewtools/sr_security.py: security tests
 - ...
 
 In general, add or modify tests and report by using:
@@ -62,8 +47,6 @@ short:
  * add tests to sr_<something>.py. If you name the tests 'check_<sometest>'
    SnapReview.do_checks() will enumerate and run them automatically
 
-(substitute 'cr_' for 'sr_' for snap v1 and click checks)
-
 To run tests, just execute:
 $ ./run-tests                       # all tests
 $ ./run-tests test_sr_security.py   # only security tests
@@ -77,6 +60,7 @@ $ ./tests/test.sh system  # requies 'review-tools' snap to be installed
 All tests (except './tests/test.sh system') can be run with:
 $ make check
 
+TODO: update for git hook
 If you are going to develop the tools regularly, you might want to add a bzr
 hook to run the testsuite before committing. Eg, add something like this to
 ~/.bazaar/plugins/hooks/__init__.py:

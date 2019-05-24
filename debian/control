@@ -1,4 +1,4 @@
-Source: click-reviewers-tools
+Source: review-tools
 Section: devel
 Priority: optional
 Maintainer: Ubuntu Appstore Developers <ubuntu-appstore-developers@lists.launchpad.net>
@@ -20,26 +20,22 @@ Build-Depends: debhelper (>= 9~),
                python3-yaml,
                squashfs-tools
 Standards-Version: 3.9.5
-Homepage: https://launchpad.net/click-reviewers-tools
-Vcs-Bzr: lp:click-reviewers-tools
-Vcs-Browser: http://bazaar.launchpad.net/~click-reviewers/click-reviewers-tools/trunk/files
+Homepage: https://launchpad.net/review-tools
+Vcs-Bzr: lp:review-tools
+Vcs-Browser: https://git.launchpad.net/review-tools
 X-Python3-Version: >= 3.2
 
-Package: click-reviewers-tools
+Package: review-tools
 Architecture: all
 Depends: binutils,
          execstack,
          fakeroot,
-         python3-apt,
-         python3-debian,
-         python3-lxml,
          python3-magic,
          python3-simplejson,
-         python3-xdg,
          python3-yaml,
          ${misc:Depends},
          ${python3:Depends},
          squashfs-tools
-Description: tools to review click packages
- These scripts can be used to review click packages both manually and in a
+Description: tools to review store packages
+ These scripts can be used to review store packages both manually and in a
  programmatic fashion.

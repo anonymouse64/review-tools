@@ -20,8 +20,8 @@ import os
 import sys
 import time
 
-import clickreviews.common as common
-from clickreviews.common import (
+import reviewtools.common as common
+from reviewtools.common import (
     cmd,
     debug,
     warn,

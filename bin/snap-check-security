@@ -17,8 +17,8 @@
 
 from __future__ import print_function
 
-import clickreviews.common as common
-import clickreviews.sr_security as sr_security
+import reviewtools.common as common
+import reviewtools.sr_security as sr_security
 
 if __name__ == "__main__":
     common.run_check(sr_security.SnapReviewSecurity)

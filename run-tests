@@ -21,7 +21,7 @@ import unittest
 # NOTE: changes to this file may also need to be made to
 # 'collect-check-names-from-tests'
 
-test_directory = 'clickreviews/tests/'
+test_directory = 'reviewtools/tests/'
 test_filename = 'test_*'
 if len(sys.argv) > 1:
     test_filename = sys.argv[1]

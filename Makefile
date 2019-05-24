@@ -23,7 +23,6 @@ coverage-report:
 	python3 -m coverage report --show-missing --omit="*skeleton*,*/dist-packages/*"
 
 syntax-check: clean
-	python3 -mjson.tool ./data/*.json >/dev/null
 	CHECK_CLICK_FILES=1 ./run-pyflakes
 	CHECK_CLICK_FILES=1 ./run-pep8
 	CHECK_CLICK_FILES=1 ./run-pylint
@@ -38,8 +37,9 @@ check-names:
 check: test functest-updates functest syntax-check check-names
 
 clean:
-	rm -rf ./clickreviews/__pycache__ ./clickreviews/tests/__pycache__
+	rm -rf ./reviewtools/__pycache__ ./reviewtools/tests/__pycache__
 	rm -rf ./.coverage
+	rm -rf ./build ./review_tools.egg-info
 
 .PHONY: check-names.list
 check-names.list:

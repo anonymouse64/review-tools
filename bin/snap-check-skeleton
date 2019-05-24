@@ -17,8 +17,8 @@
 
 from __future__ import print_function
 
-import clickreviews.common as common
-import clickreviews.sr_skeleton as sr_skeleton
+import reviewtools.common as common
+import reviewtools.sr_skeleton as sr_skeleton
 
 if __name__ == "__main__":
     common.run_check(sr_skeleton.SnapReviewSkeleton)

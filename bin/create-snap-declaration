@@ -2,27 +2,14 @@
 
 import argparse
 import json
-import os
 import re
 import sys
 
-import clickreviews.snapd_base_declaration as snapd_base_declaration
+from reviewtools.common import read_snapd_base_declaration
 
 decl = {}
 printed_review_header = False
-
-# If local_copy is None, then this will check the server to see if
-# we are up to date. However, if we are working within the development
-# tree, use it unconditionally.
-local_copy = None
-branch_fn = os.path.join(os.path.dirname(__file__),
-                         '../data/snapd-base-declaration.yaml')
-if os.path.exists(branch_fn):
-    local_copy = branch_fn
-p = snapd_base_declaration.SnapdBaseDeclaration(local_copy)
-# TODO: don't hardcode
-base_decl_series = "16"
-base_decl = p.decl[base_decl_series]
+base_decl_series, base_decl = read_snapd_base_declaration()
 
 
 def _verify_alias(alias):

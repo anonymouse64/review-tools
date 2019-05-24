@@ -1,0 +1,219 @@
+#!/usr/bin/python3
+
+from reviewtools import modules
+import argparse
+import json
+import os
+import sys
+import textwrap
+import traceback
+
+
+def print_findings(results, description):
+    '''
+    Print a summary of the issues found.
+    '''
+
+    if not description or not results:
+        return ''
+    print(description)
+    print(''.center(len(description), '-'))
+    for key in sorted(results.keys()):
+        print(' - %s' % key)
+        print('\t%s' % results[key]['text'])
+        if 'link' in results[key]:
+            print('\t%s' % results[key]['link'])
+
+
+class Results(object):
+    results = {}
+    errors = {}
+    warnings = {}
+    info = {}
+    rc = 0
+
+    def __init__(self, args):
+        self.args = args
+        self.pkg_fn = self.args.filename
+        self.modules = modules.get_modules()
+
+    def _sumarise_results(self):
+        for module in self.results:
+            for key in self.results[module]['error']:
+                self.errors[key] = self.results[module]['error'][key]
+            for key in self.results[module]['warn']:
+                self.warnings[key] = self.results[module]['warn'][key]
+            if self.args.verbose:
+                for key in self.results[module]['info']:
+                    self.info[key] = self.results[module]['info'][key]
+
+    def _complete_report(self):
+        self._sumarise_results()
+
+        if self.args.json:
+            print(json.dumps(self.results, sort_keys=True, indent=2,
+                             separators=(',', ': ')))
+        else:
+            print_findings(self.errors, 'Errors')
+            print_findings(self.warnings, 'Warnings')
+            if self.args.verbose:
+                print_findings(self.info, 'Info')
+            if self.rc == 1:
+                print('%s: RUNTIME ERROR' % self.args.filename)
+            elif self.warnings or self.errors:
+                print('%s: FAIL' % self.args.filename)
+            else:
+                print('%s: pass' % self.args.filename)
+        if self.rc == 1:
+            # always exit(1) if there are errors
+            pass
+        elif self.errors:
+            self.rc = 2
+        elif self.warnings:
+            self.rc = 3
+
+    def _report_module(self, section):
+        '''
+        This is currently only used in the --sdk option.
+        It will print the output for each section when it's
+        available. This will prevent the SDK from having to wait
+        until all checks have been run.
+        '''
+        output = self.results[section]
+        print('= %s =' % section)
+        print(json.dumps(output, sort_keys=True, indent=2,
+                         separators=(',', ': ')))
+        if output['error'] or output['warn']:
+            self.rc = 1
+
+    def _run_module_checks(self, module, overrides, report_type):
+        # What we are doing here is basically what all the
+        # ./bin/snap-check-* scripts do as well, so for
+        # example something like:
+        #
+        #     review = sr_lint.SnapLint(sys.argv[1])
+        #     review.do_checks()
+        #     rc = review.do_report()
+        #
+        section = module.replace('sr_', 'snap.v2_')
+        try:
+            review = modules.init_main_class(module, self.pkg_fn,
+                                             overrides=overrides,
+                                             report_type=report_type)
+
+            if review:
+                review.do_checks()
+                self.results[section] = review.click_report
+                return section
+        except Exception:
+            print("Caught exception (setting rc=1 and continuing):")
+            traceback.print_exc(file=sys.stdout)
+            self.rc = 1
+        return None
+
+    def run_all_checks(self, overrides):
+        report_type = None
+
+        if self.args.sdk:
+            for module in self.modules:
+                section = self._run_module_checks(module,
+                                                  overrides,
+                                                  report_type)
+                if section:
+                    self._report_module(section)
+        else:
+            # put runtime errors in json if --json is specified, otherwise
+            # output to console
+            report_type = "console"
+            if self.args.json:
+                report_type = "json"
+            for module in self.modules:
+                self._run_module_checks(module, overrides, report_type)
+            self._complete_report()
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        prog='click-review',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description='Check a click or snap package for errors',
+        epilog=textwrap.dedent('''\
+            RETURN CODES
+              0     found no errors or warnings
+              1     checks not run due to fatal error
+              2     found errors and/or warnings
+              3     found warnings
+        '''))
+    parser.add_argument('filename', type=str,
+                        help='file to be inspected')
+    parser.add_argument('overrides', type=str,
+                        nargs='?',
+                        help='overrides to apply (eg, framework, security '
+                             'policies, etc)',
+                        default=None)
+    parser.add_argument('-v', '--verbose',
+                        help='increase output verbosity',
+                        action='store_true')
+    parser.add_argument('--json', help='print json output',
+                        action='store_true')
+    parser.add_argument('--sdk',
+                        help='use output format suitable for the Ubuntu SDK',
+                        action='store_true')
+    parser.add_argument('--plugs', default=None,
+                        help='file specifying snap declaration for plugs')
+    parser.add_argument('--slots', default=None,
+                        help='file specifying snap declaration for slots')
+    parser.add_argument('--allow-classic', help='allow confinement: classic',
+                        action='store_true')
+    parser.add_argument('--on-store', default=None,
+                        help='store id for the snap')
+    parser.add_argument('--on-brand', default=None,
+                        help='brand id for the snap')
+    args = parser.parse_args()
+
+    if not os.path.exists(args.filename):
+        print("file '%s' does not exist." % args.filename)
+        sys.exit(1)
+
+    results = Results(args)
+    if not results.modules:
+        print("No 'reviewtools' modules found.")
+        sys.exit(1)
+
+    overrides = None
+    if args.overrides:
+        overrides = json.loads(args.overrides)
+
+    if args.plugs:
+        if overrides is None:
+            overrides = {}
+        with open(args.plugs, 'r') as plugs_file:
+            overrides['snap_decl_plugs'] = json.loads(plugs_file.read())
+    if args.slots:
+        if overrides is None:
+            overrides = {}
+        with open(args.slots, 'r') as slots_file:
+            overrides['snap_decl_slots'] = json.loads(slots_file.read())
+    if args.allow_classic:
+        if overrides is None:
+            overrides = {}
+        overrides['snap_allow_classic'] = args.allow_classic
+    if args.on_store:
+        if overrides is None:
+            overrides = {}
+        overrides['snap_on_store'] = args.on_store
+    if args.on_brand:
+        if overrides is None:
+            overrides = {}
+        overrides['snap_on_brand'] = args.on_brand
+
+    results.run_all_checks(overrides)
+    sys.exit(results.rc)
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("Aborted.")
+        sys.exit(1)

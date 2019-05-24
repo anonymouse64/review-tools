@@ -19,32 +19,15 @@ case "$1" in
 esac
 
 echo "= $exe ="
-for i in ./clickreviews/*py \
-         ./clickreviews/tests/*py \
-         ./bin/click-review \
+for i in ./reviewtools/*py \
+         ./reviewtools/tests/*py \
+         ./bin/snap-review \
          ./bin/create-snap-declaration \
          ./bin/snap-updates-available \
          ./bin/snap-check-* ; do
-    if echo "$i" | grep -q 'cr_.*\.py' ; then
-        continue
-    fi
     if echo "$i" | grep -q 'snap-check-notices' ; then
         continue  # shell
     fi
-    echo "Checking $i"
-    "$exe" $args "$i"
-done
-
-if [ -z "$CHECK_CLICK_FILES" ]; then
-    echo "Use CHECK_CLICK_FILES=1 to check click support"
-    exit 0
-fi
-
-for i in ./clickreviews/cr_*py \
-         ./clickreviews/tests/test_cr_*py \
-         ./bin/click-check-* \
-         ./bin/click-show-files \
-         ./bin/update-* ; do
     echo "Checking $i"
     "$exe" $args "$i"
 done

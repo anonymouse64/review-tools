@@ -1,7 +1,7 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: click-reviewers-tools
-Upstream-Contact: Ubuntu App Developers <ubuntu-app-devel@lists.ubuntu.com>
-Source: https://launchpad.net/click-reviewers-tools
+Upstream-Name: review-tools
+Upstream-Contact: https://launchpad.net/~myapps-reviewers
+Source: https://launchpad.net/review-tools
 
 Files: *
 Copyright: 2013 Canonical Ltd.

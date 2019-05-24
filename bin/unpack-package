@@ -3,11 +3,11 @@
 import os
 import sys
 
-from clickreviews import common
+from reviewtools import common
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
-        common.error("%s <clickpkg> <dir>" % os.path.basename(sys.argv[0]))
+        common.error("%s <pkg> <dir>" % os.path.basename(sys.argv[0]))
 
     pkg = sys.argv[1]
     dir = sys.argv[2]

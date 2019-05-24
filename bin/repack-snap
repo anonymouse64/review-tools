@@ -20,7 +20,7 @@ if [ "$uid" != "0" ]; then
     exit 1
 fi
 
-MKSQUASHFS_OPTS=$(python3 -c 'from clickreviews.common import MKSQUASHFS_OPTS; print(" ".join(MKSQUASHFS_OPTS))' | sed 's/ -all-root//')
+MKSQUASHFS_OPTS=$(python3 -c 'from reviewtools.common import MKSQUASHFS_OPTS; print(" ".join(MKSQUASHFS_OPTS))' | sed 's/ -all-root//')
 if ! echo "$MKSQUASHFS_OPTS" | grep -q '\-comp' ; then
     echo "Could not determine mksquashfs options. Is PYTHONPATH set?"
     exit 1
