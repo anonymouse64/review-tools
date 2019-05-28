@@ -1,6 +1,29 @@
 #!/bin/sh
 set -e
-set -x
+
+#
+# Run tests
+#
+
+# needed when run from snapcraft
+export PYTHONPATH=./
+SNAPDIR="$(pwd)"
+export MAGIC="$SNAPDIR/../install/usr/share/misc/magic"
+
+# eventually
+#make check
+make functest-updates
+
+make coverage
+make coverage-report
+make syntax-check
+
+# eventually
+#make check-names
+
+#
+# Now fixup
+#
 
 # https://insights.ubuntu.com/2017/02/02/run-scripts-during-snapcraft-builds-with-scriptlets/
 SNAPDIR="$(pwd)/../install"
