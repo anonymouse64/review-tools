@@ -9,7 +9,6 @@ confinement: strict
 base: core
 
 environment:
-  PYTHONPATH: $SNAP/lib/python3.5/site-packages/:$SNAP/usr/lib/python3/dist-packages/
   LANG: C.UTF-8
   LC_ALL: C.UTF-8
 
@@ -76,7 +75,6 @@ parts:
     - python3-swiftclient
     - build-essential
     stage:
-    - -usr/lib/python3.5/
     - -usr/bin/2to3-3.5
     - -usr/bin/py3clean
     - -usr/bin/py3compile
