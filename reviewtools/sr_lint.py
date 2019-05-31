@@ -1613,6 +1613,19 @@ class SnapReviewLint(SnapReview):
             self._verify_env(self.snap_yaml['apps'][app]['environment'],
                              app=app)
 
+    def check_hooks_environment(self):
+        '''Check hooks environment'''
+        if not self.is_snap2 or 'hooks' not in self.snap_yaml:
+            return
+
+        for app in self.snap_yaml['hooks']:
+            key = 'environment'
+            if key not in self.snap_yaml['hooks'][app]:
+                continue
+
+            self._verify_env(self.snap_yaml['hooks'][app]['environment'],
+                             app=app)
+
     def check_apps_aliases(self):
         '''Check apps aliases'''
         if not self.is_snap2 or 'apps' not in self.snap_yaml:

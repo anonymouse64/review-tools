@@ -3952,7 +3952,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.check_results(r, expected_counts)
 
     def test_check_apps_environment(self):
-        '''Test check_environment'''
+        '''Test check_apps_environment'''
         env = {'ENV1': "value",
                'ENV2': "value2",
                }
@@ -3967,6 +3967,34 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c.check_apps_environment()
         r = c.click_report
         expected_counts = {'info': 20, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_hooks_environment(self):
+        '''Test check_hooks_environment'''
+        env = {'ENV1': "value",
+               'ENV2': "value2",
+               }
+        hooks = {'hook1': {'environment': env},
+                 'hook2': {'environment': env},
+                 'hook3': {'environment': env},
+                 'hook4': {'environment': env},
+                 }
+
+        self.set_test_snap_yaml("hooks", hooks)
+        c = SnapReviewLint(self.test_name)
+        c.check_hooks_environment()
+        r = c.click_report
+        expected_counts = {'info': 20, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_hooks_environment_missing(self):
+        '''Test check_hooks_envirnment - missing'''
+        hooks = {'hook1': {}}
+        self.set_test_snap_yaml("hooks", hooks)
+        c = SnapReviewLint(self.test_name)
+        c.check_hooks_environment()
+        r = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
     def test_check_environment_bad_equal(self):
