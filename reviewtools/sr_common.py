@@ -125,7 +125,8 @@ class SnapReview(Review):
         apps_optional_daemon + \
         apps_optional_shared
     hooks_required = []
-    hooks_optional = ['environment',
+    hooks_optional = ['command-chain',
+                      'environment',
                       'plugs',
                       'slots',
                       ]

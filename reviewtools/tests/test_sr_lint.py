@@ -1605,6 +1605,30 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
+    # check_hooks_command_chain() uses the same helper as
+    # check_apps_command_chain() so just check a good command-chain
+    def test_check_hooks_command_chain(self):
+        '''Test check_hooks_command_chain()'''
+        cmd = "bin/foo"
+        self.set_test_snap_yaml("hooks", {"foo": {"command-chain": [cmd]}})
+        c = SnapReviewLint(self.test_name)
+        c.pkg_files.append(os.path.join('/fake', cmd))
+        c.check_hooks_command_chain()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_hooks_command_chain_missing(self):
+        '''Test check_hooks_command_chain() - missing'''
+        cmd = "bin/foo"
+        self.set_test_snap_yaml("hooks", {"foo": {}})
+        c = SnapReviewLint(self.test_name)
+        c.pkg_files.append(os.path.join('/fake', cmd))
+        c.check_hooks_command_chain()
+        r = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
     def test_check_apps_completer(self):
         '''Test check_apps_completer()'''
         cmd = "bin/foo"

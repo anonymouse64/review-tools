@@ -525,6 +525,64 @@ class SnapReviewLint(SnapReview):
 
             self._verify_value_is_file(app, key, True)
 
+    def _verify_apps_hooks_command_chain(self, key, app, hook=False):
+        '''Verify command-chain'''
+        topkey = 'apps'
+        topkey_type = 'app'
+        if hook:
+            topkey = 'hooks'
+            topkey_type = 'hook'
+
+        t = 'info'
+        n = self._get_check_name('%s_%s' % (topkey_type, key), app=app)
+        s = 'OK'
+        if not isinstance(self.snap_yaml[topkey][app][key], list):
+            t = 'error'
+            s = "%s '%s' (not a list)" % (key,
+                                          self.snap_yaml[topkey][app][key])
+            self._add_result(t, n, s)
+            return
+        elif len(self.snap_yaml[topkey][app][key]) < 1:
+            t = 'error'
+            s = "%s is empty" % key
+            self._add_result(t, n, s)
+            return
+
+        nonexistent = []
+        for cmd in self.snap_yaml[topkey][app][key]:
+            if not isinstance(cmd, str):
+                t = 'error'
+                s = "%s '%s' (not a str)" % (key, cmd)
+                self._add_result(t, n, s)
+                break
+            elif len(cmd) < 1:
+                t = 'error'
+                s = "%s has an empty entry" % key
+                self._add_result(t, n, s)
+                break
+
+            try:
+                val = shlex.split(cmd)[0]
+            except ValueError:
+                t = 'error'
+                s = "invalid %s '%s' (unmatched quotes)" % (key, cmd)
+                self._add_result(t, n, s)
+                break
+
+            fn = self._path_join(self._get_unpack_dir(),
+                                 os.path.normpath(val))
+            if fn not in self.pkg_files:
+                nonexistent.append(val)
+
+            if len(nonexistent) != 0:
+                t = 'error'
+                plural = ''
+                if len(nonexistent) == 1:
+                    plural = 'es'
+                s = "'%s' do%s not exist" % ("', '".join(nonexistent), plural)
+
+            self._add_result(t, n, s)
+
     def check_apps_command_chain(self):
         '''Check apps - command-chain'''
         if not self.is_snap2 or 'apps' not in self.snap_yaml:
@@ -535,56 +593,19 @@ class SnapReviewLint(SnapReview):
             if key not in self.snap_yaml['apps'][app]:
                 # We check for required elsewhere
                 continue
+            self._verify_apps_hooks_command_chain(key, app)
 
-            t = 'info'
-            n = self._get_check_name('%s' % key, app=app)
-            s = 'OK'
-            if not isinstance(self.snap_yaml['apps'][app][key], list):
-                t = 'error'
-                s = "%s '%s' (not a list)" % (key,
-                                              self.snap_yaml['apps'][app][key])
-                self._add_result(t, n, s)
+    def check_hooks_command_chain(self):
+        '''Check hooks - command-chain'''
+        if not self.is_snap2 or 'hooks' not in self.snap_yaml:
+            return
+
+        for hook in self.snap_yaml['hooks']:
+            key = 'command-chain'
+            if key not in self.snap_yaml['hooks'][hook]:
+                # We check for required elsewhere
                 continue
-            elif len(self.snap_yaml['apps'][app][key]) < 1:
-                t = 'error'
-                s = "%s is empty" % key
-                self._add_result(t, n, s)
-                continue
-
-            nonexistent = []
-            for cmd in self.snap_yaml['apps'][app][key]:
-                if not isinstance(cmd, str):
-                    t = 'error'
-                    s = "%s '%s' (not a str)" % (key, cmd)
-                    self._add_result(t, n, s)
-                    break
-                elif len(cmd) < 1:
-                    t = 'error'
-                    s = "%s has an empty entry" % key
-                    self._add_result(t, n, s)
-                    break
-
-                try:
-                    val = shlex.split(cmd)[0]
-                except ValueError:
-                    t = 'error'
-                    s = "invalid %s '%s' (unmatched quotes)" % (key, cmd)
-                    self._add_result(t, n, s)
-                    break
-
-                fn = self._path_join(self._get_unpack_dir(),
-                                     os.path.normpath(val))
-                if fn not in self.pkg_files:
-                    nonexistent.append(val)
-
-                if len(nonexistent) != 0:
-                    t = 'error'
-                    plural = ''
-                    if len(nonexistent) == 1:
-                        plural = 'es'
-                    s = "'%s' do%s not exist" % ("', '".join(nonexistent), plural)
-
-                self._add_result(t, n, s)
+            self._verify_apps_hooks_command_chain(key, hook, hook=True)
 
     def check_apps_reload_command(self):
         '''Check apps - reload-command'''
