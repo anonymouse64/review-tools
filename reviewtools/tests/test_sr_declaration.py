@@ -1727,7 +1727,7 @@ slots:
         self.check_results(r, expected=expected)
 
     def test_check_declaration_unknown_interface_app(self):
-        '''Test check_declaration - unknown interface - app'''
+        '''Test check_declaration_apps - unknown interface'''
         apps = {'app1': {'slots': ['bar']}}
         self.set_test_snap_yaml("apps", apps)
 
@@ -1755,7 +1755,7 @@ slots:
         self.check_results(r, expected=expected)
 
     def test_check_declaration_interface_app_bad_ref(self):
-        '''Test check_declaration - interface - app - bad ref'''
+        '''Test check_declaration_apps - interface - bad ref'''
         apps = {'app1': {'slots': [{}]}}
         self.set_test_snap_yaml("apps", apps)
 
@@ -1774,7 +1774,7 @@ slots:
         self.check_results(r, expected_counts)
 
     def test_check_declaration_interface_app_nonexistent_ref_skipped(self):
-        '''Test check_declaration - interface - app - skip nonexistent ref'''
+        '''Test check_declaration_apps - interface - skip nonexistent ref'''
         plugs = {'someref': {'interface': 'nonexistent'}}
         self.set_test_snap_yaml("plugs", plugs)
         apps = {'app1': {'plugs': ['someref']}}
@@ -1794,6 +1794,118 @@ slots:
         r = c.click_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
+
+    def test_check_declaration_interface_app_plugs(self):
+        '''Test check_declaration_apps - plugs'''
+        apps = {'app1': {'plugs': ['foo']}}
+        self.set_test_snap_yaml("apps", apps)
+
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            'slots': {
+                'foo': {
+                    'deny-installation': True
+                }
+            },
+            'plugs': {}
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration_apps()
+        r = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs_installation:app1:foo'
+        expected['error'][name] = {"text": "human review required due to 'deny-installation' constraint (bool)"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_interface_app_slots(self):
+        '''Test check_declaration_apps - slots'''
+        apps = {'app1': {'slots': ['foo']}}
+        self.set_test_snap_yaml("apps", apps)
+
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            'slots': {
+                'foo': {
+                    'deny-connection': True
+                }
+            },
+            'plugs': {}
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration_apps()
+        r = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:slots_connection:app1:foo'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (bool)"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_interface_hook_plugs(self):
+        '''Test check_declaration_hooks - plugs'''
+        hooks = {'hook1': {'plugs': ['foo']}}
+        self.set_test_snap_yaml("hooks", hooks)
+
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            'slots': {
+                'foo': {
+                    'deny-installation': True
+                }
+            },
+            'plugs': {}
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration_hooks()
+        r = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs_installation:hook1:foo'
+        expected['error'][name] = {"text": "human review required due to 'deny-installation' constraint (bool)"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_interface_hook_slots(self):
+        '''Test check_declaration_hooks - slots'''
+        hooks = {'hook1': {'slots': ['foo']}}
+        self.set_test_snap_yaml("hooks", hooks)
+
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            'slots': {
+                'foo': {
+                    'deny-connection': True
+                }
+            },
+            'plugs': {}
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration_hooks()
+        r = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:slots_connection:hook1:foo'
+        expected['error'][name] = {"text": "human review required due to 'deny-connection' constraint (bool)"}
+        self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_deny_installation_true(self):
         '''Test check_declaration - slots/deny-installation/true'''

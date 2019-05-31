@@ -847,7 +847,8 @@ class SnapReviewDeclaration(SnapReview):
 
         # If it is an interface reference used by an app, skip since it will be
         # checked in top-level interface checks.
-        if name.startswith('app_') and side in self.snap_yaml and \
+        if (name.startswith('app_') or name.startswith('hook_')) and \
+                side in self.snap_yaml and \
                 interface in self.snap_yaml[side]:
             return
 
@@ -923,16 +924,14 @@ class SnapReviewDeclaration(SnapReview):
 
                 self._verify_iface(side[:-1], iface, interface, attribs)
 
-    def check_declaration_apps(self):
-        '''Check base/snap declaration requires manual review for apps
-           plugs/slots
-        '''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+    def _verify_declaration_apps_hooks(self, key):
+        '''Verify declaration for apps and hooks'''
+        if not self.is_snap2 or key not in self.snap_yaml:
             return
 
-        for app in self.snap_yaml['apps']:
+        for app in self.snap_yaml[key]:
             for side in ['plugs', 'slots']:
-                if side not in self.snap_yaml['apps'][app]:
+                if side not in self.snap_yaml[key][app]:
                     continue
 
                 # The interface referenced in the app's 'plugs' or 'slots'
@@ -940,8 +939,21 @@ class SnapReviewDeclaration(SnapReview):
                 # name reference and the interface is the same) or can
                 # reference a name in the snap's toplevel 'plugs' or 'slots'
                 # mapping
-                for ref in self.snap_yaml['apps'][app][side]:
+                for ref in self.snap_yaml[key][app][side]:
                     if not isinstance(ref, str):
                         continue  # checked elsewhere
 
-                    self._verify_iface('app_%s' % side[:-1], app, ref)
+                    self._verify_iface('%s_%s' % (key[:-1], side[:-1]),
+                                       app, ref)
+
+    def check_declaration_apps(self):
+        '''Check base/snap declaration requires manual review for apps
+           plugs/slots
+        '''
+        self._verify_declaration_apps_hooks('apps')
+
+    def check_declaration_hooks(self):
+        '''Check base/snap declaration requires manual review for hooks
+           plugs/slots
+        '''
+        self._verify_declaration_apps_hooks('hooks')

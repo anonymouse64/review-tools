@@ -44,7 +44,9 @@ review-tools (0.48) UNRELEASED; urgency=medium
   * add 2.36 interfaces
   * add 2.37 interfaces
   * add 2.38 interfaces
-  * sr_declaration.py: support verifying on-store and on-brand constraints
+  * sr_declaration.py:
+    - support verifying on-store and on-brand constraints
+    - add plugs and slots checks for apps and slots
   * common.py:
     - add 'top=True' to recursive_rm and chmod the dirPath when set
       (LP: #1786071)
