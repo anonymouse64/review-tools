@@ -17,6 +17,7 @@ functional-snap-v2:execstack|https://forum.snapcraft.io/t/snap-and-executable-st
 lint-snap-v2:after_exists|
 lint-snap-v2:aliases_valid|https://forum.snapcraft.io/t/process-for-reviewing-aliases-auto-connections-and-track-requests/455
 lint-snap-v2:alias_valid|
+lint-snap-v2:app_command-chain|
 lint-snap-v2:app_plugs|
 lint-snap-v2:app_plugs_plug_reference|
 lint-snap-v2:apps|
@@ -37,7 +38,6 @@ lint-snap-v2:before|
 lint-snap-v2:before_exists|
 lint-snap-v2:cli_required|
 lint-snap-v2:command|
-lint-snap-v2:command-chain|
 lint-snap-v2:common-id|
 lint-snap-v2:common-id_duplicates|
 lint-snap-v2:completer|
@@ -65,11 +65,14 @@ lint-snap-v2:environment_value_valid|
 lint-snap-v2:epoch_valid|
 lint-snap-v2:external_symlinks|
 lint-snap-v2:grade_valid|
+lint-snap-v2:hook_command-chain|
 lint-snap-v2:hook_executable|
 lint-snap-v2:hook_plugs|
 lint-snap-v2:hook_plugs_plug_reference|
 lint-snap-v2:hooks|
 lint-snap-v2:hooks_entry|
+lint-snap-v2:hook_slots|
+lint-snap-v2:hook_slots_plug_reference|
 lint-snap-v2:hooks_present|
 lint-snap-v2:hooks_unknown|
 lint-snap-v2:icon_absolute_path|
@@ -99,6 +102,8 @@ lint-snap-v2:post-stop-command|
 lint-snap-v2:refresh-mode|
 lint-snap-v2:reload-command|
 lint-snap-v2:restart-condition|
+lint-snap-v2:restart-delay|
+lint-snap-v2:restart-delay_range|
 lint-snap-v2:slots|
 lint-snap-v2:slots_attributes|
 lint-snap-v2:slots_required_attributes|
@@ -109,6 +114,8 @@ lint-snap-v2:sockets|
 lint-snap-v2:sockets_listen_stream|
 lint-snap-v2:sockets_socket-mode|
 lint-snap-v2:sockets_type|
+lint-snap-v2:start-timeout|
+lint-snap-v2:start-timeout_range|
 lint-snap-v2:stop-command|
 lint-snap-v2:stop-mode|
 lint-snap-v2:stop-timeout|
@@ -128,6 +135,8 @@ lint-snap-v2:valid_contents_for_architecture|
 lint-snap-v2:valid_unicode|
 lint-snap-v2:vcs_files|
 lint-snap-v2:version_valid|
+lint-snap-v2:watchdog-timeout|
+lint-snap-v2:watchdog-timeout_range|
 security-snap-v2:daemon_with_browser-support|
 security-snap-v2:interface-reference|
 security-snap-v2:profile_name_length|
