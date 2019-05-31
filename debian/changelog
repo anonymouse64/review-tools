@@ -31,6 +31,7 @@ review-tools (0.48) UNRELEASED; urgency=medium
     - add checks for command-chain
     - add checks for restart-delay, start-timeout and watchdog-timeout
     - add environment check for hooks
+    - add slots check for hooks
   * sr_security.py:
     - fix evaluation of SNAP_ENFORCE_RESQUASHFS so '0' turns it off
     - turn on resquash tests by default

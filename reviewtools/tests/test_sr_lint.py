@@ -3286,6 +3286,78 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
+    def test_check_hooks_slots(self):
+        '''Test check_hooks_slots()'''
+        slots = self._create_top_slots()
+        self.set_test_snap_yaml("slots", slots)
+        hooks_slots = self._create_apps_slots()
+        self.set_test_snap_yaml("hooks", hooks_slots)
+        c = SnapReviewLint(self.test_name)
+        c.check_hooks_slots()
+        r = c.click_report
+        expected_counts = {'info': 6, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_hooks_no_slots(self):
+        '''Test check_hooks_slots() - no slots'''
+        slots = self._create_top_slots()
+        hooks_slots = {'bar': {'command': 'bin/bar'}}
+        self.set_test_snap_yaml("slots", slots)
+        self.set_test_snap_yaml("hooks", hooks_slots)
+        c = SnapReviewLint(self.test_name)
+        c.check_hooks_slots()
+        r = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_hooks_slots_bad(self):
+        '''Test check_hooks_slots() - bad (dict)'''
+        slots = self._create_top_slots()
+        hooks_slots = {'bar': {'slots': {}}}
+        self.set_test_snap_yaml("slots", slots)
+        self.set_test_snap_yaml("hooks", hooks_slots)
+        c = SnapReviewLint(self.test_name)
+        c.check_hooks_slots()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_hooks_slots_empty(self):
+        '''Test check_hooks_slots() - empty'''
+        slots = self._create_top_slots()
+        hooks_slots = {'bar': {'slots': []}}
+        self.set_test_snap_yaml("slots", slots)
+        self.set_test_snap_yaml("hooks", hooks_slots)
+        c = SnapReviewLint(self.test_name)
+        c.check_hooks_slots()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_hooks_slots_bad_entry(self):
+        '''Test check_hooks_slots() - bad entry (dict)'''
+        slots = self._create_top_slots()
+        hooks_slots = {'bar': {'slots': [{}]}}
+        self.set_test_snap_yaml("slots", slots)
+        self.set_test_snap_yaml("hooks", hooks_slots)
+        c = SnapReviewLint(self.test_name)
+        c.check_hooks_slots()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_hooks_slots_unknown_entry(self):
+        '''Test check_hooks_slots() - unknown'''
+        slots = self._create_top_slots()
+        hooks_slots = {'bar': {'slots': ['nonexistent']}}
+        self.set_test_snap_yaml("slots", slots)
+        self.set_test_snap_yaml("hooks", hooks_slots)
+        c = SnapReviewLint(self.test_name)
+        c.check_hooks_slots()
+        r = c.click_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
     def test_check_epoch_simple(self):
         '''Test check_epoch - simple integer'''
         self.set_test_snap_yaml("epoch", 2)

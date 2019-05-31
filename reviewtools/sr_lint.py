@@ -1256,6 +1256,18 @@ class SnapReviewLint(SnapReview):
 
             self._verify_app_and_hook_interfaces(app, key)
 
+    def check_hooks_slots(self):
+        '''Check hooks slots'''
+        if not self.is_snap2 or 'hooks' not in self.snap_yaml:
+            return
+
+        for hook in self.snap_yaml['hooks']:
+            key = 'slots'
+            if key not in self.snap_yaml['hooks'][hook]:
+                continue
+
+            self._verify_app_and_hook_interfaces(hook, key, hook=True)
+
     def check_external_symlinks(self):
         '''Check snap for external symlinks'''
         if not self.is_snap2:

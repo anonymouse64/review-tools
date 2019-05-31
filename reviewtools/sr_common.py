@@ -126,7 +126,9 @@ class SnapReview(Review):
         apps_optional_shared
     hooks_required = []
     hooks_optional = ['environment',
-                      'plugs']
+                      'plugs',
+                      'slots',
+                      ]
 
     # Valid values for 'type' in packaging yaml
     # - app
