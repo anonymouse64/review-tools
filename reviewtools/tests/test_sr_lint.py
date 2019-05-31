@@ -2590,6 +2590,35 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
+    # start-timeout, watchdog-timeout and restart-delay all use the same
+    # helper as stop-timeout, so only test that a simple valid value works
+    def test_check_apps_start_timeout(self):
+        '''Test check_apps_start_timeout()'''
+        self.set_test_snap_yaml("apps", {"bar": {"start-timeout": 30}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_start_timeout()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_watchdog_timeout(self):
+        '''Test check_apps_watchdog_timeout()'''
+        self.set_test_snap_yaml("apps", {"bar": {"watchdog-timeout": 30}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_watchdog_timeout()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_restart_delay(self):
+        '''Test check_apps_restart_delay()'''
+        self.set_test_snap_yaml("apps", {"bar": {"restart-delay": 30}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_restart_delay()
+        r = c.click_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
     def test_check_plugs(self):
         '''Test check_plugs()'''
         plugs = self._create_top_plugs()

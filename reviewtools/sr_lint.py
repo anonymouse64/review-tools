@@ -625,6 +625,63 @@ class SnapReviewLint(SnapReview):
 
             self._verify_value_is_file(app, key, True)
 
+    def _verify_timeout(self, app, key):
+        '''Verify timeout for key'''
+        suffix = 'ns|us|ms|s|m'
+        t = 'info'
+        n = self._get_check_name('%s' % key, app=app)
+        s = "OK"
+        if not isinstance(self.snap_yaml['apps'][app][key], int) and \
+                not isinstance(self.snap_yaml['apps'][app][key], str):
+            t = 'error'
+            s = "'%s' is not a string or integer" % key
+        elif not re.search(r'[0-9]+(%s)?$' % suffix,
+                           str(self.snap_yaml['apps'][app][key])):
+            t = 'error'
+            s = "'%s' is not of form NN[ms] (%s)" % \
+                (self.snap_yaml['apps'][app][key], key)
+        self._add_result(t, n, s)
+
+        if t == 'error':
+            return
+
+        t = 'info'
+        n = self._get_check_name('%s_range' % key, app=app)
+        s = "OK"
+        st = int(re.sub(r'%s' % suffix, '',
+                        str(self.snap_yaml['apps'][app][key])))
+        if st < 0:
+            t = 'error'
+            s = "%s '%s' should be a positive" % (
+                key, str(self.snap_yaml['apps'][app][key]))
+        self._add_result(t, n, s)
+
+    def check_apps_restart_delay(self):
+        '''Check apps - restart-delay'''
+        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+            return
+
+        for app in self.snap_yaml['apps']:
+            key = 'restart-delay'
+            if key not in self.snap_yaml['apps'][app]:
+                # We check for required elsewhere
+                continue
+
+            self._verify_timeout(app, key)
+
+    def check_apps_start_timeout(self):
+        '''Check apps - start-timeout'''
+        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+            return
+
+        for app in self.snap_yaml['apps']:
+            key = 'start-timeout'
+            if key not in self.snap_yaml['apps'][app]:
+                # We check for required elsewhere
+                continue
+
+            self._verify_timeout(app, key)
+
     def check_apps_stop_timeout(self):
         '''Check apps - stop-timeout'''
         if not self.is_snap2 or 'apps' not in self.snap_yaml:
@@ -636,34 +693,20 @@ class SnapReviewLint(SnapReview):
                 # We check for required elsewhere
                 continue
 
-            suffix = 'ns|us|ms|s|m'
-            t = 'info'
-            n = self._get_check_name('%s' % key, app=app)
-            s = "OK"
-            if not isinstance(self.snap_yaml['apps'][app][key], int) and \
-                    not isinstance(self.snap_yaml['apps'][app][key], str):
-                t = 'error'
-                s = "'%s' is not a string or integer" % key
-            elif not re.search(r'[0-9]+(%s)?$' % suffix,
-                               str(self.snap_yaml['apps'][app][key])):
-                t = 'error'
-                s = "'%s' is not of form NN[ms] (%s)" % \
-                    (self.snap_yaml['apps'][app][key], key)
-            self._add_result(t, n, s)
+            self._verify_timeout(app, key)
 
-            if t == 'error':
+    def check_apps_watchdog_timeout(self):
+        '''Check apps - watchdog-timeout'''
+        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+            return
+
+        for app in self.snap_yaml['apps']:
+            key = 'watchdog-timeout'
+            if key not in self.snap_yaml['apps'][app]:
+                # We check for required elsewhere
                 continue
 
-            t = 'info'
-            n = self._get_check_name('%s_range' % key, app=app)
-            s = "OK"
-            st = int(re.sub(r'%s' % suffix, '',
-                            str(self.snap_yaml['apps'][app][key])))
-            if st < 0:
-                t = 'error'
-                s = "stop-timeout '%s' should be a positive" % \
-                    str(self.snap_yaml['apps'][app][key])
-            self._add_result(t, n, s)
+            self._verify_timeout(app, key)
 
     def _verify_valid_values(self, app, key, valid):
         '''Verify valid values for key in app'''
