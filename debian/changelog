@@ -29,6 +29,7 @@ review-tools (0.48) UNRELEASED; urgency=medium
     - bases are allowed with 'type: gadget'
     - add checks for personal-files/system-files
     - add checks for command-chain
+    - add checks for restart-delay, start-timeout and watchdog-timeout
   * sr_security.py:
     - fix evaluation of SNAP_ENFORCE_RESQUASHFS so '0' turns it off
     - turn on resquash tests by default
