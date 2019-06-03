@@ -12,4 +12,9 @@ debian/tmp
 .coverage
 check-names.list.orig
 setup.cfg
-squashfs-root
+snap/.snapcraft
+parts
+prime
+stage
+review-tools_*.snap
+*.swp
