@@ -1,0 +1,86 @@
+name: review-tools
+version: '0.48+git'
+summary: Review tools for snappy
+description: |
+  This snap provides the snap-review command as well as well as other tools
+  related to snap review processes. These tools are used by the Ubuntu store
+  and can be used to verify your snap before upload.
+confinement: strict
+
+apps:
+  snap-review:
+    command: snap-review
+    plugs: [ home, mount-observe ]
+    environment:
+      MAGIC: $SNAP/usr/share/misc/magic
+      FAKEROOTDONTTRYCHOWN: "1"
+  snap-declaration:
+    command: create-snap-declaration
+  updates-available:
+    command: snap-updates-available
+    plugs: [ home, mount-observe, network ]
+  check-notices:
+    command: snap-check-notices
+    plugs: [ home, mount-observe, network ]
+  fetch-usn-db:
+    command: bin/fetch-db
+    plugs: [ network ]
+    environment:
+      SYSTEM_WGETRC: $SNAP/etc/wgetrc
+  swift:
+    command: usr/bin/python3-swift
+    plugs: [ mount-observe, network ]
+
+parts:
+  review-tools:
+    source: .
+    plugin: python
+  data:
+    plugin: dump
+    source: data
+    organize:
+      snapd-base-declaration.yaml: data/snapd-base-declaration.yaml
+  mypackages:
+    plugin: nil
+    prepare: ./run-snap-build-tests
+    install: ./snap-fixup.sh
+    build-packages:
+    - binutils
+    - dpkg
+    - execstack
+    - fakeroot
+    - file
+    - libmagic1
+    - pep8
+    - pyflakes3
+    - pylint3
+    - python3-coverage
+    - python3-magic
+    - python3-simplejson
+    - python3-yaml
+    - squashfs-tools
+    stage-packages:
+    - binutils
+    - dpkg
+    - execstack
+    - fakeroot
+    - file
+    - libdb5.3
+    - libmagic1
+    - python3-coverage
+    - python3-magic
+    - python3-simplejson
+    - python3-yaml
+    - squashfs-tools
+    - python3-swiftclient
+    - build-essential
+    stage:
+    - -usr/lib/python3.5/
+    - -usr/bin/2to3-3.5
+    - -usr/bin/py3clean
+    - -usr/bin/py3compile
+    - -usr/bin/pydoc3.5
+    - -usr/share/dh-python
+    - -usr/share/python3/py3versions.py
+    - -var/lib/ieee-data/mam.txt
+    - -var/lib/ieee-data/oui36.txt
