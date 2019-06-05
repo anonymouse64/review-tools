@@ -339,3 +339,114 @@ type: os
         self.assertTrue(name in report['info'])
         self.assertTrue('text' in report['info'][name])
         self.assertTrue(report['info'][name]['text'] == ("OK (skipped on arm64)"))
+
+    def test_check_base_mountpoints(self):
+        '''Test check_base_mountpoints()'''
+        test_files = ['/dev/',
+                      '/etc/',
+                      '/home/',
+                      '/root/',
+                      '/proc/',
+                      '/sys/',
+                      '/tmp/',
+                      '/var/snap/',
+                      '/var/lib/snapd/',
+                      '/var/tmp/',
+                      '/run/',
+                      '/usr/src/',
+                      '/var/log/',
+                      '/media/',
+                      '/usr/lib/snapd/',
+                      '/lib/modules/',
+                      '/mnt/',
+                      ]
+
+        yaml = '''
+name: test
+version: 1.0
+type: base
+'''
+        package = utils.make_snap2(extra_files=test_files, yaml=yaml)
+        c = SnapReviewFunctional(package)
+        c.check_base_mountpoints()
+        report = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(report, expected_counts)
+
+    def test_check_base_mountpoints_missing(self):
+        '''Test check_base_mountpoints() - missing'''
+        test_files = ['/dev/',
+                      '/home/',
+                      '/root/',
+                      '/proc/',
+                      '/sys/',
+                      '/tmp/',
+                      '/var/snap/',
+                      '/var/lib/snapd/',
+                      '/var/tmp/',
+                      '/run/',
+                      '/usr/src/',
+                      '/var/log/',
+                      '/media/',
+                      '/usr/lib/snapd/',
+                      '/lib/modules/',
+                      '/mnt/',
+                      ]
+
+        yaml = '''
+name: test
+version: 1.0
+type: base
+'''
+        package = utils.make_snap2(extra_files=test_files, yaml=yaml)
+        c = SnapReviewFunctional(package)
+        c.check_base_mountpoints()
+        report = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        self.check_results(report, expected_counts)
+
+        self.assertTrue('info' in report)
+        name = 'functional-snap-v2:base_mountpoints'
+        self.assertTrue(name in report['error'])
+        self.assertTrue('text' in report['error'][name])
+        self.assertTrue(report['error'][name]['text'] == ("missing required mountpoints: /etc"))
+
+    def test_check_base_mountpoints_missing_overridden(self):
+        '''Test check_base_mountpoints() - missing (overridden)'''
+        test_files = ['/dev/',
+                      '/home/',
+                      '/root/',
+                      '/proc/',
+                      '/sys/',
+                      '/tmp/',
+                      '/var/snap/',
+                      '/var/lib/snapd/',
+                      '/var/tmp/',
+                      '/run/',
+                      '/usr/src/',
+                      '/var/log/',
+                      '/media/',
+                      '/usr/lib/snapd/',
+                      '/lib/modules/',
+                      '/mnt/',
+                      ]
+
+        yaml = '''
+name: test-override
+version: 1.0
+type: base
+'''
+        package = utils.make_snap2(extra_files=test_files, yaml=yaml)
+        c = SnapReviewFunctional(package)
+        from reviewtools.overrides import func_base_mountpoints_overrides
+        func_base_mountpoints_overrides.append("test-override")
+        c.check_base_mountpoints()
+        report = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(report, expected_counts)
+
+        self.assertTrue('info' in report)
+        name = 'functional-snap-v2:base_mountpoints'
+        self.assertTrue(name in report['info'])
+        self.assertTrue('text' in report['info'][name])
+        self.assertTrue(report['info'][name]['text'] == ("missing required mountpoints: /etc (overridden)"))

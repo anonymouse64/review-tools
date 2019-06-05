@@ -53,6 +53,7 @@ review-tools (0.48) UNRELEASED; urgency=medium
       (LP: #1786071)
     - ensure the original directory is moveable in _unpack_cmd() (LP: #1801788)
   * add snap-check-notices
+  * sr_functional.py: add base snap mountpoint checks
 
  -- Jamie Strandboge <jamie@ubuntu.com>  Fri, 24 May 2019 14:21:13 -0500
 

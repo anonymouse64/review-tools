@@ -276,6 +276,28 @@ class SnapReview(Review):
         }
     }
 
+    # most are from cmd/snap-confine/mount-support.c:sc_populate_mount_ns()
+    # Must be absolute paths
+    base_required_dirs = [
+        '/dev',
+        '/etc',
+        '/home',
+        '/root',
+        '/proc',
+        '/sys',
+        '/tmp',
+        '/var/snap',
+        '/var/lib/snapd',
+        '/var/tmp',
+        '/run',
+        '/usr/src',
+        '/var/log',
+        '/media',
+        '/usr/lib/snapd',
+        # '/lib/modules', # optional
+        # '/mnt',
+    ]
+
     def __init__(self, fn, review_type, overrides=None):
         Review.__init__(self, fn, review_type, overrides=overrides)
 

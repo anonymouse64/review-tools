@@ -1,6 +1,6 @@
 '''sr_functional.py: snap functional'''
 #
-# Copyright (C) 2017 Canonical Ltd.
+# Copyright (C) 2017-2019 Canonical Ltd.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,13 +24,14 @@ from reviewtools.common import (
 from reviewtools.overrides import (
     func_execstack_overrides,
     func_execstack_skipped_pats,
+    func_base_mountpoints_overrides,
 )
 import os
 import re
 
 
 class SnapReviewFunctional(SnapReview):
-    '''This class represents snap lint reviews'''
+    '''This class represents snap functional reviews'''
     def __init__(self, fn, overrides=None):
         SnapReview.__init__(self, fn, "functional-snap-v2", overrides=overrides)
         self._list_all_compiled_binaries()
@@ -97,3 +98,28 @@ class SnapReviewFunctional(SnapReview):
                 link = 'https://forum.snapcraft.io/t/snap-and-executable-stacks/1812'
 
         self._add_result(t, n, s, link=link)
+
+    def check_base_mountpoints(self):
+        '''Verify base snap has all the expected mountpoints'''
+        if not self.is_snap2 or self.snap_yaml['type'] != 'base':
+            return
+
+        t = 'info'
+        n = self._get_check_name('base_mountpoints')
+        s = "OK"
+        missing = []
+
+        for i in self.base_required_dirs:
+            # self.base_required_dirs are absolute paths
+            mp = os.path.join(self.unpack_dir, i[1:])
+            if not os.path.isdir(mp):
+                missing.append(i)
+
+        if len(missing) > 0:
+            missing.sort()
+            s = 'missing required mountpoints: %s' % ", ".join(missing)
+            if self.snap_yaml['name'] not in func_base_mountpoints_overrides:
+                t = 'error'
+            else:
+                s += " (overridden)"
+        self._add_result(t, n, s)

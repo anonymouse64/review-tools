@@ -431,6 +431,11 @@ func_execstack_skipped_pats = ['boot/.*',
                                'usr/lib/arm-linux-gnueabihf/libvolk.so.1.1',
                                ]
 
+# Most base snaps require certain mountpoints to be present. Snaps listed here
+# won't be flagged for manual review.
+func_base_mountpoints_overrides = ['bare',
+                                   ]
+
 # By default we don't regulate which snaps specify which base snaps, but some
 # base snaps are highly specialized, so we limit what can use them. Base snaps
 # whose name is not a key in this dict don't flag for review. For base snaps
