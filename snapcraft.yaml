@@ -35,6 +35,9 @@ apps:
   swift:
     command: usr/bin/python3-swift
     plugs: [ mount-observe, network ]
+  diffsquash:
+    command: bin/diffsquash
+    plugs: [ home ]
 
 parts:
   review-tools:

@@ -19,6 +19,7 @@ scripts.append('bin/create-snap-declaration')
 scripts.append('bin/snap-updates-available')
 scripts.append('bin/snap-check-notices')
 scripts.append('bin/fetch-db')
+scripts.append('bin/diffsquash')
 scripts.remove('bin/snap-check-skeleton')
 setup(
     name='review-tools',

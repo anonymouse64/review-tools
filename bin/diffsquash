@@ -1,0 +1,62 @@
+#!/bin/sh
+set -e
+
+usage() {
+    cat <<EOM
+$(basename "$0") [-f] <squash1> <squash2>
+
+diffsquash by default diffs the output of 'unsquashfs -lls' of two squashfs
+files. When given the '-f' option it will diff the contents of the squashfs
+files.
+EOM
+}
+
+full=
+if [ "$1" = "-f" ]; then
+    full="yes"
+    shift
+fi
+
+first="$1"
+second="$2"
+if [ -z "$first" ] || [ -z "$second" ]; then
+    usage
+    exit 1
+fi
+
+for f in "$first" "$second" ; do
+    if [ ! -f "$f" ]; then
+        echo "'$f' is not a regular file" >&2
+        exit 1
+    fi
+done
+
+cwd=$(pwd)
+tmpdir=
+if [ "$full" = "yes" ] && [ -d "$SNAP_USER_COMMON" ]; then
+    tmpdir=$(mktemp -d -p "$SNAP_USER_COMMON" -t diffsquash-XXXXXXXX)
+else
+    tmpdir=$(mktemp -d -t diffsquash-XXXXXXXX)
+fi
+cleanup() {
+    cd "$cwd"
+    if [ -d "$tmpdir" ]; then
+        rm -rf "$tmpdir"
+    fi
+}
+trap cleanup EXIT HUP INT QUIT TERM
+
+
+if [ "$full" = "yes" ]; then
+    unsquashfs -n -d "$tmpdir/a" "$first" >/dev/null
+    unsquashfs -n -d "$tmpdir/b" "$second" >/dev/null
+else
+    mkdir "$tmpdir/a" "$tmpdir/b"
+    unsquashfs -s "$first" > "$tmpdir/a/info"
+    unsquashfs -lls "$first" >> "$tmpdir/a/info"
+    unsquashfs -s "$second" > "$tmpdir/b/info"
+    unsquashfs -lls "$second" >> "$tmpdir/b/info"
+fi
+
+cd "$tmpdir"
+diff -Naur a b
