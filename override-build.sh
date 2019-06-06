@@ -10,13 +10,16 @@ export PYTHONPATH=./
 SNAPDIR="$(pwd)"
 export MAGIC="$SNAPDIR/../install/usr/share/misc/magic"
 
-# eventually
-#make check
-make functest-updates
+RT_IGNORE_TESTS=
+if [ -z "$RT_IGNORE_TESTS" ]; then
+    # eventually
+    #make check
+    make functest-updates
 
-make coverage
-make coverage-report
-make syntax-check
+    make coverage
+    make coverage-report
+    make syntax-check
+fi
 
 # eventually
 #make check-names
@@ -37,7 +40,7 @@ SNAPDIR="$(pwd)/../install"
 
 cd "$SNAPDIR"/usr/bin
 echo "Symlinking fakeroot-sysv to fakeroot"
-ln -s fakeroot-sysv fakeroot
+ln -sf fakeroot-sysv fakeroot
 
 echo "Patching fakeroot-sysv for snappy paths"
 SNAPTMP=$(mktemp -d)
@@ -53,7 +56,7 @@ cd -
 echo "Symlinking libmagic.so"
 libmagic=$(find "$SNAPDIR"/usr/lib -name libmagic.so.1.0.0)
 cd $(dirname "$libmagic")
-ln -s libmagic.so.1.0.0 libmagic.so
+ln -sf libmagic.so.1.0.0 libmagic.so
 cd -
 
 rmdir "$SNAPTMP"
