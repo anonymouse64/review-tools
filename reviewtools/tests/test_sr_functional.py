@@ -357,6 +357,9 @@ type: os
                       '/var/log/',
                       '/media/',
                       '/usr/lib/snapd/',
+                      '/usr/local/share/fonts/',
+                      '/usr/share/fonts/',
+                      '/var/cache/fontconfig/',
                       '/lib/modules/',
                       '/mnt/',
                       ]
@@ -389,6 +392,9 @@ type: base
                       '/var/log/',
                       '/media/',
                       '/usr/lib/snapd/',
+                      '/usr/local/share/fonts/',
+                      '/usr/share/fonts/',
+                      '/var/cache/fontconfig/',
                       '/lib/modules/',
                       '/mnt/',
                       ]
@@ -427,6 +433,9 @@ type: base
                       '/var/log/',
                       '/media/',
                       '/usr/lib/snapd/',
+                      '/usr/local/share/fonts/',
+                      '/usr/share/fonts/',
+                      '/var/cache/fontconfig/',
                       '/lib/modules/',
                       '/mnt/',
                       ]

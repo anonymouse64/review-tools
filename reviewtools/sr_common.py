@@ -294,6 +294,10 @@ class SnapReview(Review):
         '/var/log',
         '/media',
         '/usr/lib/snapd',
+        # for desktop
+        '/usr/share/fonts',
+        '/usr/local/share/fonts',
+        '/var/cache/fontconfig',
         # '/lib/modules', # optional
         # '/mnt',
     ]
