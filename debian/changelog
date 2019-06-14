@@ -3,7 +3,7 @@ review-tools (0.48) UNRELEASED; urgency=medium
   * renamed as review-tools
     - adjust debian/links to link click-review to snap-review
     - remove all click review code
-    - mv clickreviews reviews
+    - mv clickreviews reviewtools
   * sr_common:py:
     - update the pkgversion regexp, add tests. Patch from John R. Lenton
     - update the pkgname checks, add tests. Patch from John R. Lenton
@@ -33,6 +33,7 @@ review-tools (0.48) UNRELEASED; urgency=medium
     - add environment check for hooks
     - add slots check for hooks
     - add command-chain checks for hooks
+    - specially handle snaps for symlinks which use 'base: nix-base'
   * sr_security.py:
     - fix evaluation of SNAP_ENFORCE_RESQUASHFS so '0' turns it off
     - turn on resquash tests by default
@@ -52,10 +53,12 @@ review-tools (0.48) UNRELEASED; urgency=medium
     - add 'top=True' to recursive_rm and chmod the dirPath when set
       (LP: #1786071)
     - ensure the original directory is moveable in _unpack_cmd() (LP: #1801788)
+    - support valid previxes in find_external_symlinks()
   * add snap-check-notices
   * sr_functional.py: add base snap mountpoint checks
+  * add diffsquash tool
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Fri, 24 May 2019 14:21:13 -0500
+ -- Jamie Strandboge <jamie@ubuntu.com>  Fri, 14 Jun 2019 15:30:00 -0400
 
 click-reviewers-tools (0.47) RELEASED; urgency=medium
 
