@@ -196,12 +196,12 @@ class Review(object):
 
         self.review_type = review_type
         # TODO: rename as pkg_report
-        self.click_report = dict()
+        self.review_report = dict()
         self.stage_report = dict()
 
         global RESULT_TYPES
         for r in RESULT_TYPES:
-            self.click_report[r] = dict()
+            self.review_report[r] = dict()
             self.stage_report[r] = dict()
 
         global MKDTEMP_DIR
@@ -214,30 +214,14 @@ class Review(object):
             UNPACK_DIR = unpack_pkg(fn)
         self.unpack_dir = UNPACK_DIR
 
+        # unpack_pkg() now only supports snap v2, so just hardcode these
+        self.is_snap2 = True
+        self.pkgfmt = {"type": "snap", "version": "16.04"}
+
         global RAW_UNPACK_DIR
         if RAW_UNPACK_DIR is None:
             RAW_UNPACK_DIR = raw_unpack_pkg(fn)
         self.raw_unpack_dir = RAW_UNPACK_DIR
-
-        self.is_click = False
-        self.is_snap1 = False
-        self.is_snap2 = False
-        self.pkgfmt = {"type": "", "version": ""}
-
-        (self.pkgfmt["type"], pkgver) = detect_package(fn, self.unpack_dir)
-
-        if self._pkgfmt_type() == "snap":
-            if pkgver < 2:
-                self.is_snap1 = True
-                self.pkgfmt["version"] = "15.04"
-            else:
-                self.is_snap2 = True
-                self.pkgfmt["version"] = "16.04"
-        elif self._pkgfmt_type() == "click":
-            self.pkgfmt["version"] = "0.4"
-            self.is_click = True
-        else:
-            error("Unknown package type: '%s'" % self._pkgfmt_type())
 
         # Get a list of all unpacked files
         self.pkg_files = []
@@ -309,7 +293,7 @@ class Review(object):
             error("Could not find '%s'" % self.pkg_filename)
 
     def _list_all_files(self):
-        '''List all files included in this click package.'''
+        '''List all files included in this package.'''
         global PKG_FILES
         if PKG_FILES is None:
             PKG_FILES = []
@@ -326,7 +310,7 @@ class Review(object):
         return False
 
     def _list_all_compiled_binaries(self):
-        '''List all compiled binaries in this click package.'''
+        '''List all compiled binaries in this package.'''
         global PKG_BIN_FILES
         if PKG_BIN_FILES is None:
             self.mime = magic.open(magic.MAGIC_MIME)
@@ -366,7 +350,7 @@ class Review(object):
             return True
         return False
 
-    # click_report[<result_type>][<review_name>] = <result>
+    # review_report[<result_type>][<review_name>] = <result>
     #   result_type: info, warn, error
     #   review_name: name of the check (prefixed with self.review_type)
     #   result: contents of the review
@@ -382,7 +366,7 @@ class Review(object):
         if stage:
             report = self.stage_report
         else:
-            report = self.click_report
+            report = self.review_report
 
         if result_type not in RESULT_TYPES:
             error("Invalid result type '%s'" % result_type)
@@ -421,29 +405,29 @@ class Review(object):
                 error("Invalid result type '%s'" % result_type)
 
             for review_name in self.stage_report[result_type]:
-                if review_name not in self.click_report[result_type]:
-                    self.click_report[result_type][review_name] = dict()
+                if review_name not in self.review_report[result_type]:
+                    self.review_report[result_type][review_name] = dict()
                 for key in self.stage_report[result_type][review_name]:
-                    self.click_report[result_type][review_name][key] = \
+                    self.review_report[result_type][review_name][key] = \
                         self.stage_report[result_type][review_name][key]
             # reset the staged report
             self.stage_report[result_type] = dict()
 
-    # Only called by ./bin/* individually, not 'click-review'
+    # Only called by ./bin/* individually, not 'snap-review'
     def do_report(self):
         '''Print report'''
         global REPORT_OUTPUT
 
         if REPORT_OUTPUT == "json":
-            jsonmsg(self.click_report)
+            jsonmsg(self.review_report)
         else:
             import pprint
-            pprint.pprint(self.click_report)
+            pprint.pprint(self.review_report)
 
         rc = 0
-        if len(self.click_report['error']):
+        if len(self.review_report['error']):
             rc = 2
-        elif len(self.click_report['warn']):
+        elif len(self.review_report['warn']):
             rc = 1
         return rc
 
@@ -642,14 +626,6 @@ def _unpack_snap_squashfs(snap_pkg, dest, items=[]):
     return _unpack_cmd(cmd, d, dest)
 
 
-def _unpack_click_deb(pkg, dest):
-    global MKDTEMP_PREFIX
-    global MKDTEMP_DIR
-    d = tempfile.mkdtemp(prefix=MKDTEMP_PREFIX, dir=MKDTEMP_DIR)
-    return _unpack_cmd(['dpkg-deb', '-R',
-                        os.path.abspath(pkg), d], d, dest)
-
-
 def unpack_pkg(fn, dest=None, items=[]):
     '''Unpack package'''
     if not os.path.isfile(fn):
@@ -672,7 +648,7 @@ def unpack_pkg(fn, dest=None, items=[]):
     if is_squashfs(pkg):
         return _unpack_snap_squashfs(fn, dest, items)
 
-    return _unpack_click_deb(fn, dest)
+    error("Unsupported package format (not squashfs)")
 
 
 def is_squashfs(filename):
@@ -793,44 +769,6 @@ def run_check(cls):
     review.do_checks()
     rc = review.do_report()
     sys.exit(rc)
-
-
-def detect_package(fn, dir):
-    '''Detect what type of package this is'''
-    pkgtype = None
-    pkgver = None
-
-    if not os.path.isfile(fn):
-        error("Could not find '%s'" % fn)
-
-    if dir is None:
-        error("Invalid unpack directory 'None'")
-
-    unpack_dir = dir
-    if not os.path.isdir(unpack_dir):
-        error("Could not find '%s'" % unpack_dir)
-
-    pkg = fn
-    if not pkg.startswith('/'):
-        pkg = os.path.abspath(pkg)
-
-    # check if its a squashfs based snap
-    if is_squashfs(pkg):
-        # 16.04+ squashfs snaps
-        pkgtype = "snap"
-        pkgver = 2
-    elif os.path.exists(os.path.join(unpack_dir, "meta/package.yaml")):
-        # 15.04 ar-based snaps
-        pkgtype = "snap"
-        pkgver = 1
-    else:
-        pkgtype = "click"
-        pkgver = 1
-
-    if dir is None and os.path.isdir(unpack_dir):
-        recursive_rm(unpack_dir)
-
-    return (pkgtype, pkgver)
 
 
 def find_external_symlinks(unpack_dir, pkg_files, pkgname, prefix_ok=None):

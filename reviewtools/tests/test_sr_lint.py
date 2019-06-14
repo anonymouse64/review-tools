@@ -113,36 +113,16 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.do_checks()
         sum = 0
-        for i in c.click_report:
-            sum += len(c.click_report[i])
+        for i in c.review_report:
+            sum += len(c.review_report[i])
         self.assertTrue(sum != 0)
-
-    def test_all_checks_as_v1(self):
-        '''Test snap v1 has no checks'''
-        self.set_test_pkgfmt("snap", "15.04")
-        c = SnapReviewLint(self.test_name)
-        c.do_checks()
-        sum = 0
-        for i in c.click_report:
-            sum += len(c.click_report[i])
-        self.assertTrue(sum == 0)
-
-    def test_all_checks_as_click(self):
-        '''Test click format has no checks'''
-        self.set_test_pkgfmt("click", "0.4")
-        c = SnapReviewLint(self.test_name)
-        c.do_checks()
-        sum = 0
-        for i in c.click_report:
-            sum += len(c.click_report[i])
-        self.assertTrue(sum == 0)
 
     def test_check_name_toplevel(self):
         '''Test check_name - toplevel'''
         self.set_test_snap_yaml("name", "foo")
         c = SnapReviewLint(self.test_name)
         c.check_name()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -151,7 +131,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", "01game")
         c = SnapReviewLint(self.test_name)
         c.check_name()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -160,7 +140,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa40chars")
         c = SnapReviewLint(self.test_name)
         c.check_name()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -169,7 +149,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", "aa")
         c = SnapReviewLint(self.test_name)
         c.check_name()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -178,7 +158,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa41chars")
         c = SnapReviewLint(self.test_name)
         c.check_name()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -195,7 +175,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", "a")
         c = SnapReviewLint(self.test_name)
         c.check_name()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -212,7 +192,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", "u-94903713687486543234157734673284536758")
         c = SnapReviewLint(self.test_name)
         c.check_name()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -221,7 +201,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", "foo.bar")
         c = SnapReviewLint(self.test_name)
         c.check_name()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -230,7 +210,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", "com.ubuntu.develeper.baz.foo")
         c = SnapReviewLint(self.test_name)
         c.check_name()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -239,7 +219,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", "foo?bar")
         c = SnapReviewLint(self.test_name)
         c.check_name()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -248,7 +228,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", "foo/bar")
         c = SnapReviewLint(self.test_name)
         c.check_name()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -257,7 +237,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", "")
         c = SnapReviewLint(self.test_name)
         c.check_name()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -266,7 +246,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", [])
         c = SnapReviewLint(self.test_name)
         c.check_name()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -275,7 +255,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", {})
         c = SnapReviewLint(self.test_name)
         c.check_name()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -284,7 +264,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", "foo--bar")
         c = SnapReviewLint(self.test_name)
         c.check_name()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -293,7 +273,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", "foo-bar-")
         c = SnapReviewLint(self.test_name)
         c.check_name()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -302,7 +282,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", "-foo-bar")
         c = SnapReviewLint(self.test_name)
         c.check_name()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -311,7 +291,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", "foo-Bar")
         c = SnapReviewLint(self.test_name)
         c.check_name()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -320,7 +300,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", "01")
         c = SnapReviewLint(self.test_name)
         c.check_name()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -329,7 +309,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", "0-1")
         c = SnapReviewLint(self.test_name)
         c.check_name()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -338,7 +318,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", None)
         c = SnapReviewLint(self.test_name)
         c.check_name()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -347,7 +327,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("version", 1)
         c = SnapReviewLint(self.test_name)
         c.check_version()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -356,7 +336,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("version", 1)
         c = SnapReviewLint(self.test_name)
         c.check_version()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -365,7 +345,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("version", 1.0)
         c = SnapReviewLint(self.test_name)
         c.check_version()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -374,7 +354,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("version", "1.0.1")
         c = SnapReviewLint(self.test_name)
         c.check_version()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -383,7 +363,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("version", "1.0a")
         c = SnapReviewLint(self.test_name)
         c.check_version()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -392,7 +372,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("version", "a.b")
         c = SnapReviewLint(self.test_name)
         c.check_version()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -401,7 +381,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("version", "foo?bar")
         c = SnapReviewLint(self.test_name)
         c.check_version()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -410,7 +390,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("version", "")
         c = SnapReviewLint(self.test_name)
         c.check_version()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -419,7 +399,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("version", [])
         c = SnapReviewLint(self.test_name)
         c.check_version()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -428,7 +408,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("version", {})
         c = SnapReviewLint(self.test_name)
         c.check_version()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -437,7 +417,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("version", "1.0.20160315-alpha2-git.c6fadc4+test1")
         c = SnapReviewLint(self.test_name)
         c.check_version()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -446,7 +426,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("version", None)
         c = SnapReviewLint(self.test_name)
         c.check_version()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -455,7 +435,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("type", None)
         c = SnapReviewLint(self.test_name)
         c.check_type()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -464,7 +444,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("type", "app")
         c = SnapReviewLint(self.test_name)
         c.check_type()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -473,7 +453,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("type", "framework")
         c = SnapReviewLint(self.test_name)
         c.check_type()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -482,7 +462,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("type", None)
         c = SnapReviewLint(self.test_name)
         c.check_type_redflagged()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -491,7 +471,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("type", "app")
         c = SnapReviewLint(self.test_name)
         c.check_type_redflagged()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -500,7 +480,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("type", "gadget")
         c = SnapReviewLint(self.test_name)
         c.check_type_redflagged()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
         name = c._get_check_name('snap_type_redflag')
@@ -511,7 +491,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("type", "kernel")
         c = SnapReviewLint(self.test_name)
         c.check_type_redflagged()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
         name = c._get_check_name('snap_type_redflag')
@@ -522,7 +502,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("type", "os")
         c = SnapReviewLint(self.test_name)
         c.check_type_redflagged()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
         name = c._get_check_name('snap_type_redflag')
@@ -533,7 +513,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("type", "snapd")
         c = SnapReviewLint(self.test_name)
         c.check_type_redflagged()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
         name = c._get_check_name('snap_type_redflag')
@@ -545,7 +525,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", "core")
         c = SnapReviewLint(self.test_name)
         c.check_type_redflagged()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -563,7 +543,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", "ubuntu-core")
         c = SnapReviewLint(self.test_name)
         c.check_type_redflagged()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -581,7 +561,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", "pc-kernel")
         c = SnapReviewLint(self.test_name)
         c.check_type_redflagged()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -599,7 +579,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", "pc")
         c = SnapReviewLint(self.test_name)
         c.check_type_redflagged()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -617,7 +597,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", "snapd")
         c = SnapReviewLint(self.test_name)
         c.check_type_redflagged()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -634,7 +614,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("type", "base")
         c = SnapReviewLint(self.test_name)
         c.check_type_redflagged()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
         name = c._get_check_name('snap_type_redflag')
@@ -645,7 +625,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("type", "nonexistent")
         c = SnapReviewLint(self.test_name)
         c.check_type()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -657,7 +637,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.pkg_files.append(os.path.join(c._get_unpack_dir(), 'someicon'))
         c.check_icon()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 4, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -668,7 +648,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.pkg_files.append(os.path.join(c._get_unpack_dir(), 'someicon'))
         c.check_icon()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 1, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -678,7 +658,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("type", "gadget")
         c = SnapReviewLint(self.test_name)
         c.check_icon()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -688,7 +668,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("type", "gadget")
         c = SnapReviewLint(self.test_name)
         c.check_icon()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -699,7 +679,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.pkg_files.append('/foo/bar/someicon')
         c.check_icon()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -712,7 +692,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         # since the icon isn't in c.pkg_files, don't add it for this test
         # c.pkg_files.append(os.path.join(c._get_unpack_dir(), 'someicon'))
         c.check_icon()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -721,7 +701,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("architectures", {})
         c = SnapReviewLint(self.test_name)
         c.check_architectures()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -730,7 +710,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("architectures", None)
         c = SnapReviewLint(self.test_name)
         c.check_architectures()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -739,7 +719,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("architectures", ["all"])
         c = SnapReviewLint(self.test_name)
         c.check_architectures()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -748,7 +728,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("architectures", ["armhf"])
         c = SnapReviewLint(self.test_name)
         c.check_architectures()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -757,7 +737,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("architectures", ["arm64"])
         c = SnapReviewLint(self.test_name)
         c.check_architectures()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -766,7 +746,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("architectures", ["i386"])
         c = SnapReviewLint(self.test_name)
         c.check_architectures()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -775,7 +755,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("architectures", ["amd64"])
         c = SnapReviewLint(self.test_name)
         c.check_architectures()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -784,7 +764,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("architectures", ["s390x"])
         c = SnapReviewLint(self.test_name)
         c.check_architectures()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -793,7 +773,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("architectures", ["ppc64el"])
         c = SnapReviewLint(self.test_name)
         c.check_architectures()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -802,7 +782,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("architectures", ["nonexistent"])
         c = SnapReviewLint(self.test_name)
         c.check_architectures()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -811,7 +791,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("architectures", ["amd64", "armhf"])
         c = SnapReviewLint(self.test_name)
         c.check_architectures()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -820,7 +800,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("architectures", ["armhf", "arm64", "i386"])
         c = SnapReviewLint(self.test_name)
         c.check_architectures()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -829,7 +809,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("architectures", [{}])
         c = SnapReviewLint(self.test_name)
         c.check_architectures()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -838,7 +818,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("assumes", None)
         c = SnapReviewLint(self.test_name)
         c.check_assumes()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -847,7 +827,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("assumes", [])
         c = SnapReviewLint(self.test_name)
         c.check_assumes()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -856,7 +836,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("assumes", {})
         c = SnapReviewLint(self.test_name)
         c.check_assumes()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -865,7 +845,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("assumes", [{}])
         c = SnapReviewLint(self.test_name)
         c.check_assumes()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -874,7 +854,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("assumes", ['name', 'version'])
         c = SnapReviewLint(self.test_name)
         c.check_assumes()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -882,7 +862,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         '''Test check_unknown_entries - none'''
         c = SnapReviewLint(self.test_name)
         c.check_unknown_entries()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -891,7 +871,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("nonexistent", "bar")
         c = SnapReviewLint(self.test_name)
         c.check_unknown_entries()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 1, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -900,7 +880,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("description", "This is a test description")
         c = SnapReviewLint(self.test_name)
         c.check_description()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -909,7 +889,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("description", None)
         c = SnapReviewLint(self.test_name)
         c.check_description()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -918,7 +898,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("description", "a")
         c = SnapReviewLint(self.test_name)
         c.check_description()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -927,7 +907,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("description", "")
         c = SnapReviewLint(self.test_name)
         c.check_description()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -936,7 +916,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("description", [])
         c = SnapReviewLint(self.test_name)
         c.check_description()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -945,7 +925,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("title", "This is a test title")
         c = SnapReviewLint(self.test_name)
         c.check_title()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -954,7 +934,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("title", None)
         c = SnapReviewLint(self.test_name)
         c.check_title()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -963,7 +943,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("title", "a")
         c = SnapReviewLint(self.test_name)
         c.check_title()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -972,7 +952,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("title", "")
         c = SnapReviewLint(self.test_name)
         c.check_title()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -981,7 +961,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("title", [])
         c = SnapReviewLint(self.test_name)
         c.check_title()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -990,7 +970,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("title", "0123456789012345678901234567890123456789a")
         c = SnapReviewLint(self.test_name)
         c.check_title()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -999,7 +979,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("summary", "This is a test summary")
         c = SnapReviewLint(self.test_name)
         c.check_summary()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1008,7 +988,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("summary", None)
         c = SnapReviewLint(self.test_name)
         c.check_summary()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1017,7 +997,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("summary", "a")
         c = SnapReviewLint(self.test_name)
         c.check_summary()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1026,7 +1006,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("summary", "")
         c = SnapReviewLint(self.test_name)
         c.check_summary()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1035,7 +1015,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("summary", [])
         c = SnapReviewLint(self.test_name)
         c.check_summary()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1044,7 +1024,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"command": "bin/foo"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 5, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1053,7 +1033,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"Fo0-Bar": {"command": "bin/foo"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 5, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1064,7 +1044,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 5, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1075,7 +1055,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 8, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1087,7 +1067,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 8, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1100,7 +1080,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 8, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1109,7 +1089,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", None)
         c = SnapReviewLint(self.test_name)
         c.check_apps()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1118,7 +1098,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", [])
         c = SnapReviewLint(self.test_name)
         c.check_apps()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1127,7 +1107,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {})
         c = SnapReviewLint(self.test_name)
         c.check_apps()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1137,7 +1117,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1148,7 +1128,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 1, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1157,7 +1137,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": []})
         c = SnapReviewLint(self.test_name)
         c.check_apps()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1166,7 +1146,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {}})
         c = SnapReviewLint(self.test_name)
         c.check_apps()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1177,7 +1157,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 1, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1186,7 +1166,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo.bar": {"command": "bin/foo"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1195,7 +1175,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo_bar": {"command": "bin/foo"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1204,7 +1184,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo/bar": {"command": "bin/foo"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1213,7 +1193,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo-bar-": {"command": "bin/foo"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1222,7 +1202,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo--bar": {"command": "bin/foo"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1231,7 +1211,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", {"foo": {}})
         c = SnapReviewLint(self.test_name)
         c.check_hooks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 4, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1240,7 +1220,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", {"Fo0-Bar": {}})
         c = SnapReviewLint(self.test_name)
         c.check_hooks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 4, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1251,7 +1231,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                           })
         c = SnapReviewLint(self.test_name)
         c.check_hooks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 6, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1260,7 +1240,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", None)
         c = SnapReviewLint(self.test_name)
         c.check_hooks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1269,7 +1249,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", [])
         c = SnapReviewLint(self.test_name)
         c.check_hooks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1278,7 +1258,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", {})
         c = SnapReviewLint(self.test_name)
         c.check_hooks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1288,7 +1268,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", hooks_plugs)
         c = SnapReviewLint(self.test_name)
         c.check_hooks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1297,7 +1277,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", {"foo": {"nonexistent": "abc"}})
         c = SnapReviewLint(self.test_name)
         c.check_hooks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 1, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1306,7 +1286,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", {"foo": []})
         c = SnapReviewLint(self.test_name)
         c.check_hooks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1315,7 +1295,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", {"foo.bar": {}})
         c = SnapReviewLint(self.test_name)
         c.check_hooks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1324,7 +1304,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", {"foo_bar": {}})
         c = SnapReviewLint(self.test_name)
         c.check_hooks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1333,7 +1313,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", {"foo/bar": {}})
         c = SnapReviewLint(self.test_name)
         c.check_hooks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1342,7 +1322,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", {"foo-bar-": {}})
         c = SnapReviewLint(self.test_name)
         c.check_hooks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1351,7 +1331,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", {"foo--bar": {}})
         c = SnapReviewLint(self.test_name)
         c.check_hooks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1363,7 +1343,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.pkg_files.append(os.path.join('/fake', cmd))
         c.check_apps_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1375,7 +1355,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.pkg_files.append(os.path.join('/fake', cmd))
         c.check_apps_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1384,7 +1364,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1394,7 +1374,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1404,7 +1384,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1415,7 +1395,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1426,7 +1406,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.pkg_files.append(os.path.join('/fake', cmd))
         c.check_apps_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1437,7 +1417,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.pkg_files.append(os.path.join('/fake', cmd))
         c.check_apps_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1448,7 +1428,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.pkg_files.append(os.path.join('/fake', cmd))
         c.check_apps_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1457,7 +1437,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"command": "'bin/foo bar"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1466,7 +1446,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"command": "bin/foo'bar"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1478,7 +1458,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.pkg_files.append(os.path.join('/fake', cmd))
         c.check_apps_command_chain()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1490,7 +1470,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.pkg_files.append(os.path.join('/fake', cmd))
         c.check_apps_command_chain()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1499,7 +1479,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_command_chain()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1509,7 +1489,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps_command_chain()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1519,7 +1499,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps_command_chain()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1529,7 +1509,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps_command_chain()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1539,7 +1519,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps_command_chain()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1550,7 +1530,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps_command_chain()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1561,7 +1541,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.pkg_files.append(os.path.join('/fake', cmd))
         c.check_apps_command_chain()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1572,7 +1552,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.pkg_files.append(os.path.join('/fake', cmd))
         c.check_apps_command_chain()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1583,7 +1563,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.pkg_files.append(os.path.join('/fake', cmd))
         c.check_apps_command_chain()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1592,7 +1572,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"command-chain": ["'bin/foo bar"]}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_command_chain()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1601,7 +1581,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"command-chain": ["bin/foo'bar"]}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_command_chain()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1614,7 +1594,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.pkg_files.append(os.path.join('/fake', cmd))
         c.check_hooks_command_chain()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1625,7 +1605,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.pkg_files.append(os.path.join('/fake', cmd))
         c.check_hooks_command_chain()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1637,7 +1617,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.pkg_files.append(os.path.join('/fake', cmd))
         c.check_apps_completer()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1649,7 +1629,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.pkg_files.append(os.path.join('/fake', cmd))
         c.check_apps_completer()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1658,7 +1638,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_completer()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1668,7 +1648,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps_completer()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1678,7 +1658,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps_completer()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1689,7 +1669,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps_completer()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1701,7 +1681,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.pkg_files.append(os.path.join('/fake', cmd))
         c.check_apps_stop_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1710,7 +1690,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_stop_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1720,7 +1700,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps_stop_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1730,7 +1710,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps_stop_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1741,7 +1721,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps_stop_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1753,7 +1733,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.pkg_files.append(os.path.join('/fake', cmd))
         c.check_apps_post_stop_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1762,7 +1742,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_post_stop_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1772,7 +1752,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps_post_stop_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1782,7 +1762,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps_post_stop_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1793,7 +1773,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps_post_stop_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1805,7 +1785,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c = SnapReviewLint(self.test_name)
         c.pkg_files.append(os.path.join('/fake', cmd))
         c.check_apps_reload_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1814,7 +1794,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_reload_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1824,7 +1804,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps_reload_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1834,7 +1814,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps_reload_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1845,7 +1825,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps_reload_command()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1855,7 +1835,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"daemon": entry}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_daemon()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1865,7 +1845,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"daemon": entry}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_daemon()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1875,7 +1855,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"daemon": entry}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_daemon()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1885,7 +1865,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"daemon": entry}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_daemon()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1895,7 +1875,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"daemon": entry}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_daemon()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1904,7 +1884,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_daemon()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1914,7 +1894,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps_daemon()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1924,7 +1904,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps_daemon()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1934,7 +1914,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"daemon": entry}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_daemon()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1944,7 +1924,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                                  "nonexistent": "bar"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_invalid_combinations()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1953,7 +1933,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"nonexistent": "bar"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_invalid_combinations()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1964,7 +1944,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                                  "stop-command": "bin/bar"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_invalid_combinations()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1973,7 +1953,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"command": "bin/bar"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_invalid_combinations()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1983,7 +1963,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                                  "plugs": {}}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_invalid_combinations()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1993,7 +1973,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                                  "stop-command": "bin/bar"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_invalid_combinations()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2003,7 +1983,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                                  "stop-timeout": 59}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_invalid_combinations()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2014,7 +1994,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                                  "never"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_invalid_combinations()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2024,7 +2004,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                                  "post-stop-command": "bin/bar"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_invalid_combinations()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2035,7 +2015,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                                  "ports": ports}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_invalid_combinations()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2045,7 +2025,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                                  "refresh-mode": "endure"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_invalid_combinations()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2055,7 +2035,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                                  "stop-mode": "sigterm"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_invalid_combinations()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2065,7 +2045,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                                  "timer": "0:00-24:00/96"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_invalid_combinations()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2076,7 +2056,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                                  "autostart": "foo.desktop"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_invalid_combinations()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2092,7 +2072,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                                  "slots": ["system"]}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_invalid_combinations()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 5, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2108,7 +2088,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                                  "slots": ["system"]}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_invalid_combinations()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': None, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2118,7 +2098,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                                  "daemon": "dbus"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_invalid_combinations()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2129,7 +2109,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                                  "bus-name": []}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_invalid_combinations()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2143,7 +2123,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                                  "bus-name": "foo"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_invalid_combinations()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2163,7 +2143,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                                  }})
         c = SnapReviewLint(self.test_name)
         c.check_apps_invalid_combinations()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2179,7 +2159,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                                  "slots": ["system"]}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_invalid_combinations()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 1, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2194,7 +2174,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                                  "slots": ["system"]}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_invalid_combinations()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2204,7 +2184,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"restart-condition": entry}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_restart_condition()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2214,7 +2194,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"restart-condition": entry}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_restart_condition()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2224,7 +2204,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"restart-condition": entry}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_restart_condition()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2234,7 +2214,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"restart-condition": entry}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_restart_condition()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2244,7 +2224,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"restart-condition": entry}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_restart_condition()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2254,7 +2234,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"restart-condition": entry}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_restart_condition()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2263,7 +2243,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_restart_condition()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2273,7 +2253,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps_restart_condition()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2283,7 +2263,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.check_apps_restart_condition()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2293,7 +2273,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"restart-condition": entry}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_restart_condition()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2303,7 +2283,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"ports": ports}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_ports()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 7, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2314,7 +2294,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"ports": ports}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_ports()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2325,7 +2305,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"ports": ports}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_ports()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 5, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2334,7 +2314,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"ports": {}}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_ports()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2343,7 +2323,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"ports": []}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_ports()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2356,7 +2336,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"ports": ports}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_ports()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2368,7 +2348,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"ports": ports}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_ports()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2381,7 +2361,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"ports": ports}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_ports()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2393,7 +2373,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"ports": ports}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_ports()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2406,7 +2386,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"ports": ports}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_ports()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2418,7 +2398,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"ports": ports}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_ports()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 7, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2430,7 +2410,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"ports": ports}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_ports()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2442,7 +2422,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"ports": ports}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_ports()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2454,7 +2434,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"ports": ports}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_ports()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2466,7 +2446,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"ports": ports}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_ports()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2478,7 +2458,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"ports": ports}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_ports()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2490,7 +2470,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"ports": ports}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_ports()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2502,7 +2482,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"ports": ports}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_ports()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2511,7 +2491,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"stop-timeout": 30}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_stop_timeout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2520,7 +2500,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_stop_timeout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2529,7 +2509,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"stop-timeout": '30s'}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_stop_timeout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2538,7 +2518,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"stop-timeout": '30ms'}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_stop_timeout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2547,7 +2527,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"stop-timeout": '30m'}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_stop_timeout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2556,7 +2536,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"stop-timeout": '30ns'}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_stop_timeout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2565,7 +2545,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"stop-timeout": '30us'}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_stop_timeout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2574,7 +2554,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"stop-timeout": ''}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_stop_timeout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2583,7 +2563,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"stop-timeout": 'a'}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_stop_timeout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2592,7 +2572,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"stop-timeout": []}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_stop_timeout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2601,7 +2581,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"stop-timeout": '30a'}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_stop_timeout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2610,7 +2590,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"stop-timeout": -1}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_stop_timeout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2621,7 +2601,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"start-timeout": 30}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_start_timeout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2630,7 +2610,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"watchdog-timeout": 30}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_watchdog_timeout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2639,7 +2619,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"restart-delay": 30}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_restart_delay()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2649,7 +2629,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewLint(self.test_name)
         c.check_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 8, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2659,7 +2639,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewLint(self.test_name)
         c.check_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2669,7 +2649,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewLint(self.test_name)
         c.check_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2679,7 +2659,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewLint(self.test_name)
         c.check_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2689,7 +2669,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewLint(self.test_name)
         c.check_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2700,7 +2680,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewLint(self.test_name)
         c.check_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2710,7 +2690,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewLint(self.test_name)
         c.check_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2722,7 +2702,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewLint(self.test_name)
         c.check_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2733,7 +2713,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewLint(self.test_name)
         c.check_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2745,7 +2725,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewLint(self.test_name)
         c.check_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2756,7 +2736,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewLint(self.test_name)
         c.check_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': None, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2765,7 +2745,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("plugs", {'nm': 'network-manager'})
         c = SnapReviewLint(self.test_name)
         c.check_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2777,7 +2757,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps_plugs)
         c = SnapReviewLint(self.test_name)
         c.check_apps_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 8, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2789,7 +2769,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps_plugs)
         c = SnapReviewLint(self.test_name)
         c.check_apps_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2801,7 +2781,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps_plugs)
         c = SnapReviewLint(self.test_name)
         c.check_apps_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2813,7 +2793,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps_plugs)
         c = SnapReviewLint(self.test_name)
         c.check_apps_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2825,7 +2805,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps_plugs)
         c = SnapReviewLint(self.test_name)
         c.check_apps_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2837,7 +2817,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps_plugs)
         c = SnapReviewLint(self.test_name)
         c.check_apps_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2849,7 +2829,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", hooks_plugs)
         c = SnapReviewLint(self.test_name)
         c.check_hooks_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 8, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2861,7 +2841,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", hooks_plugs)
         c = SnapReviewLint(self.test_name)
         c.check_hooks_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2873,7 +2853,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", hooks_plugs)
         c = SnapReviewLint(self.test_name)
         c.check_hooks_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2885,7 +2865,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", hooks_plugs)
         c = SnapReviewLint(self.test_name)
         c.check_hooks_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2897,7 +2877,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", hooks_plugs)
         c = SnapReviewLint(self.test_name)
         c.check_hooks_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2909,7 +2889,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", hooks_plugs)
         c = SnapReviewLint(self.test_name)
         c.check_hooks_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2919,7 +2899,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 16, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2929,7 +2909,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2939,7 +2919,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2949,7 +2929,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2961,7 +2941,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2973,7 +2953,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2985,7 +2965,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2996,7 +2976,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_interface_content_slot_source()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3007,7 +2987,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_interface_content_slot_source()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3018,7 +2998,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_interface_content_slot_source()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3034,7 +3014,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_interface_content_slot_source()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3045,7 +3025,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_interface_content_slot_source()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3056,7 +3036,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_interface_content_slot_source()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3067,7 +3047,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_interface_content_slot_source()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3078,7 +3058,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_interface_content_slot_source()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3092,7 +3072,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_interface_content_slot_source()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3103,7 +3083,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 4, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3114,7 +3094,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3125,7 +3105,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 4, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3138,7 +3118,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 6, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3148,7 +3128,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3161,7 +3141,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 2}
         self.check_results(r, expected_counts)
 
@@ -3181,7 +3161,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3192,7 +3172,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3202,7 +3182,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3214,7 +3194,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3225,7 +3205,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3234,7 +3214,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", {'nm': 'network-manager'})
         c = SnapReviewLint(self.test_name)
         c.check_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3246,7 +3226,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps_slots)
         c = SnapReviewLint(self.test_name)
         c.check_apps_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 6, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3258,7 +3238,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps_slots)
         c = SnapReviewLint(self.test_name)
         c.check_apps_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3270,7 +3250,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps_slots)
         c = SnapReviewLint(self.test_name)
         c.check_apps_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3282,7 +3262,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps_slots)
         c = SnapReviewLint(self.test_name)
         c.check_apps_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3294,7 +3274,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps_slots)
         c = SnapReviewLint(self.test_name)
         c.check_apps_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3306,7 +3286,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps_slots)
         c = SnapReviewLint(self.test_name)
         c.check_apps_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3318,7 +3298,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", hooks_slots)
         c = SnapReviewLint(self.test_name)
         c.check_hooks_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 6, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3330,7 +3310,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", hooks_slots)
         c = SnapReviewLint(self.test_name)
         c.check_hooks_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3342,7 +3322,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", hooks_slots)
         c = SnapReviewLint(self.test_name)
         c.check_hooks_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3354,7 +3334,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", hooks_slots)
         c = SnapReviewLint(self.test_name)
         c.check_hooks_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3366,7 +3346,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", hooks_slots)
         c = SnapReviewLint(self.test_name)
         c.check_hooks_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3378,7 +3358,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", hooks_slots)
         c = SnapReviewLint(self.test_name)
         c.check_hooks_slots()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3387,7 +3367,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("epoch", 2)
         c = SnapReviewLint(self.test_name)
         c.check_epoch()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3396,7 +3376,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("epoch", "3*")
         c = SnapReviewLint(self.test_name)
         c.check_epoch()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3405,7 +3385,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("epoch", 0)
         c = SnapReviewLint(self.test_name)
         c.check_epoch()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3414,7 +3394,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("epoch", "abc")
         c = SnapReviewLint(self.test_name)
         c.check_epoch()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3423,7 +3403,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("epoch", -1)
         c = SnapReviewLint(self.test_name)
         c.check_epoch()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3432,7 +3412,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("epoch", "-1*")
         c = SnapReviewLint(self.test_name)
         c.check_epoch()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3441,7 +3421,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("epoch", 1.01)
         c = SnapReviewLint(self.test_name)
         c.check_epoch()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3450,7 +3430,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("epoch", {})
         c = SnapReviewLint(self.test_name)
         c.check_epoch()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3459,7 +3439,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("epoch", {'bad': [1]})
         c = SnapReviewLint(self.test_name)
         c.check_epoch()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3468,7 +3448,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("epoch", {'read': [3, 4, 5]})
         c = SnapReviewLint(self.test_name)
         c.check_epoch()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3477,7 +3457,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("epoch", {'read': [0, 1]})
         c = SnapReviewLint(self.test_name)
         c.check_epoch()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3486,7 +3466,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("epoch", {'read': ["3*"]})
         c = SnapReviewLint(self.test_name)
         c.check_epoch()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3495,7 +3475,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("epoch", {'read': 3})
         c = SnapReviewLint(self.test_name)
         c.check_epoch()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3504,7 +3484,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("epoch", {'read': [1, -2, 3]})
         c = SnapReviewLint(self.test_name)
         c.check_epoch()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3513,7 +3493,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("epoch", {'write': [3, 4, 5]})
         c = SnapReviewLint(self.test_name)
         c.check_epoch()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3522,7 +3502,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("epoch", {'write': ["3*"]})
         c = SnapReviewLint(self.test_name)
         c.check_epoch()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3531,7 +3511,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("epoch", {'write': 3})
         c = SnapReviewLint(self.test_name)
         c.check_epoch()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3541,7 +3521,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                           'write': [4, 5]})
         c = SnapReviewLint(self.test_name)
         c.check_epoch()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3551,7 +3531,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                           'write': ["3*"]})
         c = SnapReviewLint(self.test_name)
         c.check_epoch()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3561,7 +3541,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                           'write': [4, 5]})
         c = SnapReviewLint(self.test_name)
         c.check_epoch()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3570,7 +3550,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("epoch", None)
         c = SnapReviewLint(self.test_name)
         c.check_epoch()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3579,7 +3559,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("confinement", "strict")
         c = SnapReviewLint(self.test_name)
         c.check_confinement()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3596,7 +3576,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("confinement", "devmode")
         c = SnapReviewLint(self.test_name)
         c.check_confinement()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3605,7 +3585,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("confinement", "classic")
         c = SnapReviewLint(self.test_name)
         c.check_confinement()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3626,7 +3606,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
         c = SnapReviewLint(self.test_name, overrides=overrides)
         c.check_confinement()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3648,7 +3628,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
         c = SnapReviewLint(self.test_name, overrides=overrides)
         c.check_confinement()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3670,7 +3650,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
         c = SnapReviewLint(self.test_name, overrides=overrides)
         c.check_confinement()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3694,7 +3674,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
         c = SnapReviewLint(self.test_name, overrides=overrides)
         c.check_confinement()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3712,7 +3692,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("type", "os")
         c = SnapReviewLint(self.test_name)
         c.check_confinement()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3730,7 +3710,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("type", "kernel")
         c = SnapReviewLint(self.test_name)
         c.check_confinement()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3748,7 +3728,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("type", "gadget")
         c = SnapReviewLint(self.test_name)
         c.check_confinement()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3765,7 +3745,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("confinement", None)
         c = SnapReviewLint(self.test_name)
         c.check_confinement()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3774,7 +3754,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("confinement", "nonexistent")
         c = SnapReviewLint(self.test_name)
         c.check_confinement()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3783,7 +3763,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("confinement", True)
         c = SnapReviewLint(self.test_name)
         c.check_confinement()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3792,7 +3772,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("confinement", 'true')
         c = SnapReviewLint(self.test_name)
         c.check_confinement()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3801,7 +3781,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("grade", "stable")
         c = SnapReviewLint(self.test_name)
         c.check_grade()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3821,7 +3801,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("grade", "devel")
         c = SnapReviewLint(self.test_name)
         c.check_grade()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3831,7 +3811,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("type", "os")
         c = SnapReviewLint(self.test_name)
         c.check_grade()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3852,7 +3832,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("type", "kernel")
         c = SnapReviewLint(self.test_name)
         c.check_grade()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3873,7 +3853,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("type", "gadget")
         c = SnapReviewLint(self.test_name)
         c.check_grade()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3893,7 +3873,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("grade", None)
         c = SnapReviewLint(self.test_name)
         c.check_grade()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3902,7 +3882,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("grade", "nonexistent")
         c = SnapReviewLint(self.test_name)
         c.check_grade()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3916,7 +3896,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             self.set_test_snap_yaml("grade", v)
             c = SnapReviewLint(self.test_name)
             c.check_grade()
-            r = c.click_report
+            r = c.review_report
             expected_counts = {'info': None, 'warn': 0, 'error': 1}
             self.check_results(r, expected_counts)
 
@@ -3925,7 +3905,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("base", "bare")
         c = SnapReviewLint(self.test_name)
         c.check_base()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3950,7 +3930,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             self.set_test_snap_yaml("base", v)
             c = SnapReviewLint(self.test_name)
             c.check_base()
-            r = c.click_report
+            r = c.review_report
             expected_counts = {'info': None, 'warn': 0, 'error': 1}
             self.check_results(r, expected_counts)
 
@@ -3959,7 +3939,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("base", None)
         c = SnapReviewLint(self.test_name)
         c.check_base()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3976,7 +3956,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             self.set_test_snap_yaml("type", v)
             c = SnapReviewLint(self.test_name)
             c.check_base()
-            r = c.click_report
+            r = c.review_report
 
             expected = {
                 'info': {},
@@ -3994,7 +3974,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("type", "base")
         c = SnapReviewLint(self.test_name)
         c.check_base_interfaces()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 4, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4007,7 +3987,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_base_interfaces()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 2}
         self.check_results(r, expected_counts)
 
@@ -4018,7 +3998,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps_plugs)
         c = SnapReviewLint(self.test_name)
         c.check_base_interfaces()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 4}
         self.check_results(r, expected_counts)
 
@@ -4029,7 +4009,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps_slots)
         c = SnapReviewLint(self.test_name)
         c.check_base_interfaces()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 3}
         self.check_results(r, expected_counts)
 
@@ -4043,7 +4023,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("environment", env)
         c = SnapReviewLint(self.test_name)
         c.check_environment()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 9, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4061,7 +4041,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps)
         c = SnapReviewLint(self.test_name)
         c.check_apps_environment()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 20, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4079,7 +4059,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", hooks)
         c = SnapReviewLint(self.test_name)
         c.check_hooks_environment()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 20, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4089,7 +4069,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("hooks", hooks)
         c = SnapReviewLint(self.test_name)
         c.check_hooks_environment()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4100,7 +4080,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("environment", env)
         c = SnapReviewLint(self.test_name)
         c.check_environment()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4111,7 +4091,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("environment", env)
         c = SnapReviewLint(self.test_name)
         c.check_environment()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4122,7 +4102,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("environment", env)
         c = SnapReviewLint(self.test_name)
         c.check_environment()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4133,7 +4113,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("environment", env)
         c = SnapReviewLint(self.test_name)
         c.check_environment()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4144,7 +4124,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("environment", env)
         c = SnapReviewLint(self.test_name)
         c.check_environment()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 1, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4154,7 +4134,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("environment", env)
         c = SnapReviewLint(self.test_name)
         c.check_environment()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4165,7 +4145,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("environment", env)
         c = SnapReviewLint(self.test_name)
         c.check_environment()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4179,7 +4159,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps)
         c = SnapReviewLint(self.test_name)
         c.check_apps_aliases()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 5, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4198,7 +4178,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps)
         c = SnapReviewLint(self.test_name)
         c.check_apps_aliases()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4209,7 +4189,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps)
         c = SnapReviewLint(self.test_name)
         c.check_apps_aliases()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4220,7 +4200,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps)
         c = SnapReviewLint(self.test_name)
         c.check_apps_aliases()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4233,7 +4213,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps)
         c = SnapReviewLint(self.test_name)
         c.check_apps_aliases()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4242,7 +4222,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("license", "GPL-3.0")
         c = SnapReviewLint(self.test_name)
         c.check_license()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4251,7 +4231,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("license", "")
         c = SnapReviewLint(self.test_name)
         c.check_license()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4260,7 +4240,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("license", None)
         c = SnapReviewLint(self.test_name)
         c.check_license()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4269,7 +4249,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("license", [])
         c = SnapReviewLint(self.test_name)
         c.check_license()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4287,7 +4267,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
         c = SnapReviewLint(self.test_name)
         c.check_apps_sockets()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4305,7 +4285,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
         c = SnapReviewLint(self.test_name)
         c.check_apps_sockets()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4323,7 +4303,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
         c = SnapReviewLint(self.test_name)
         c.check_apps_sockets()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4341,7 +4321,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
         c = SnapReviewLint(self.test_name)
         c.check_apps_sockets()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4359,7 +4339,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
         c = SnapReviewLint(self.test_name)
         c.check_apps_sockets()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4376,7 +4356,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         })
         c = SnapReviewLint(self.test_name)
         c.check_apps_sockets()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4385,7 +4365,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"sockets": []}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_sockets()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4403,7 +4383,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
         c = SnapReviewLint(self.test_name)
         c.check_apps_sockets()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4421,7 +4401,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
         c = SnapReviewLint(self.test_name)
         c.check_apps_sockets()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4439,7 +4419,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
         c = SnapReviewLint(self.test_name)
         c.check_apps_sockets()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4460,7 +4440,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
         c = SnapReviewLint(self.test_name)
         c.check_apps_sockets()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 2}
         self.check_results(r, expected_counts)
 
@@ -4478,7 +4458,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
         c = SnapReviewLint(self.test_name)
         c.check_apps_sockets()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4496,7 +4476,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
         c = SnapReviewLint(self.test_name)
         c.check_apps_sockets()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4514,7 +4494,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
         c = SnapReviewLint(self.test_name)
         c.check_apps_sockets()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4532,7 +4512,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
         c = SnapReviewLint(self.test_name)
         c.check_apps_sockets()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4551,7 +4531,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
         c = SnapReviewLint(self.test_name)
         c.check_apps_sockets()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4570,7 +4550,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
         c = SnapReviewLint(self.test_name)
         c.check_apps_sockets()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4593,7 +4573,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
         c = SnapReviewLint(self.test_name)
         c.check_apps_sockets()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 2}
         self.check_results(r, expected_counts)
 
@@ -4616,7 +4596,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
         c = SnapReviewLint(self.test_name)
         c.check_apps_sockets()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 2}
         self.check_results(r, expected_counts)
 
@@ -4625,7 +4605,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("base", "allowed")
         c = SnapReviewLint(self.test_name)
         c.check_base()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4634,7 +4614,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("base", "solus-runtime-gaming")
         c = SnapReviewLint(self.test_name)
         c.check_base()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
         name = c._get_check_name('base_allowed')
@@ -4646,7 +4626,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("name", "linux-steam-integration")
         c = SnapReviewLint(self.test_name)
         c.check_base()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4664,7 +4644,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"common-id": entry}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_common_id()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4673,7 +4653,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"common-id": []}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_common_id()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4684,7 +4664,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          "bar": {"common-id": entry}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_common_id()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4726,7 +4706,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             })
         c = SnapReviewLint(self.test_name)
         c.check_layout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 23, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4735,7 +4715,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("layout", [])
         c = SnapReviewLint(self.test_name)
         c.check_layout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4744,7 +4724,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("layout", {})
         c = SnapReviewLint(self.test_name)
         c.check_layout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4753,7 +4733,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("layout", {'/etc/demo': []})
         c = SnapReviewLint(self.test_name)
         c.check_layout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4762,7 +4742,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("layout", {'/etc/demo': {}})
         c = SnapReviewLint(self.test_name)
         c.check_layout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4776,7 +4756,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             })
         c = SnapReviewLint(self.test_name)
         c.check_layout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4790,7 +4770,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             })
         c = SnapReviewLint(self.test_name)
         c.check_layout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4804,7 +4784,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             })
         c = SnapReviewLint(self.test_name)
         c.check_layout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4818,7 +4798,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             })
         c = SnapReviewLint(self.test_name)
         c.check_layout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4832,7 +4812,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             })
         c = SnapReviewLint(self.test_name)
         c.check_layout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4847,7 +4827,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             })
         c = SnapReviewLint(self.test_name)
         c.check_layout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4866,7 +4846,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             })
         c = SnapReviewLint(self.test_name)
         c.check_layout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 2}
         self.check_results(r, expected_counts)
 
@@ -4880,7 +4860,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             })
         c = SnapReviewLint(self.test_name)
         c.check_layout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4894,7 +4874,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             })
         c = SnapReviewLint(self.test_name)
         c.check_layout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4908,7 +4888,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             })
         c = SnapReviewLint(self.test_name)
         c.check_layout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4922,7 +4902,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             })
         c = SnapReviewLint(self.test_name)
         c.check_layout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4936,7 +4916,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             })
         c = SnapReviewLint(self.test_name)
         c.check_layout()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4945,7 +4925,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"refresh-mode": "endure"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_refresh_mode()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4954,7 +4934,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"refresh-mode": []}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_refresh_mode()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4964,7 +4944,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                                  "nonexistent"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_refresh_mode()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 1, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4973,7 +4953,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"stop-mode": "sigterm"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_stop_mode()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4982,7 +4962,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"stop-mode": []}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_stop_mode()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4992,7 +4972,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                                  "nonexistent"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_stop_mode()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 1, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5003,7 +4983,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             self.set_test_snap_manifest_yaml(f, m[f])
         c = SnapReviewLint(self.test_name)
         c.check_snap_manifest()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5015,7 +4995,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                 self.set_test_snap_manifest_yaml(f, m[f])
         c = SnapReviewLint(self.test_name)
         c.check_snap_manifest()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5028,7 +5008,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_manifest_yaml('build-packages', {})
         c = SnapReviewLint(self.test_name)
         c.check_snap_manifest()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5041,7 +5021,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_manifest_yaml('parts', "")
         c = SnapReviewLint(self.test_name)
         c.check_snap_manifest()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5053,7 +5033,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_manifest_yaml('unknown', {})
         c = SnapReviewLint(self.test_name)
         c.check_snap_manifest()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5067,7 +5047,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_manifest_yaml('parts', m['parts'])
         c = SnapReviewLint(self.test_name)
         c.check_snap_manifest()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5081,7 +5061,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_manifest_yaml('parts', m['parts'])
         c = SnapReviewLint(self.test_name)
         c.check_snap_manifest()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5108,7 +5088,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             self.set_test_snap_yaml("apps", {"bar": {"timer": timer}})
             c = SnapReviewLint(self.test_name)
             c.check_apps_timer()
-            r = c.click_report
+            r = c.review_report
             expected_counts = {'info': 1, 'warn': 0, 'error': 0}
             self.check_results(r, expected_counts)
 
@@ -5117,7 +5097,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"timer": {}}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_timer()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5126,7 +5106,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"bar": {"timer": "m0n5,1o:oo"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_timer()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5138,7 +5118,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                 })
         c = SnapReviewLint(self.test_name)
         c.check_apps_before_after()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5150,7 +5130,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                 })
         c = SnapReviewLint(self.test_name)
         c.check_apps_before_after()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5163,7 +5143,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                 })
         c = SnapReviewLint(self.test_name)
         c.check_apps_before_after()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5175,7 +5155,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                 })
         c = SnapReviewLint(self.test_name)
         c.check_apps_before_after()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5187,7 +5167,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                 })
         c = SnapReviewLint(self.test_name)
         c.check_apps_before_after()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5199,7 +5179,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                 })
         c = SnapReviewLint(self.test_name)
         c.check_apps_before_after()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5211,7 +5191,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                 })
         c = SnapReviewLint(self.test_name)
         c.check_apps_before_after()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5219,7 +5199,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         '''Test check_unicode_fields()'''
         c = SnapReviewLint(self.test_name)
         c.check_unicode_fields()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5228,7 +5208,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("description", "invalid\nnewline")
         c = SnapReviewLint(self.test_name)
         c.check_unicode_fields()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5237,7 +5217,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("description", "new\ninvalid \u200b")
         c = SnapReviewLint(self.test_name)
         c.check_unicode_fields()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5254,7 +5234,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("summary", "invalid \u200b")
         c = SnapReviewLint(self.test_name)
         c.check_unicode_fields()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5271,7 +5251,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("summary", "invalid\nnewline")
         c = SnapReviewLint(self.test_name)
         c.check_unicode_fields()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5280,7 +5260,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"autostart": "foo.desktop"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_autostart()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5289,7 +5269,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"autostart": []}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_autostart()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5298,7 +5278,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"autostart": "foo.bad"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_autostart()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5307,7 +5287,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", {"foo": {"autostart": "f/b.desktop"}})
         c = SnapReviewLint(self.test_name)
         c.check_apps_autostart()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5317,7 +5297,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewLint(self.test_name)
         c.check_interface_personal_system_files_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5327,7 +5307,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewLint(self.test_name)
         c.check_interface_personal_system_files_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5337,7 +5317,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewLint(self.test_name)
         c.check_interface_personal_system_files_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5347,7 +5327,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewLint(self.test_name)
         c.check_interface_personal_system_files_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5357,7 +5337,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewLint(self.test_name)
         c.check_interface_personal_system_files_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5373,7 +5353,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewLint(self.test_name)
         c.check_interface_personal_system_files_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5383,7 +5363,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewLint(self.test_name)
         c.check_interface_personal_system_files_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5393,7 +5373,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewLint(self.test_name)
         c.check_interface_personal_system_files_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5402,7 +5382,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("system-users", ['daemon'])
         c = SnapReviewLint(self.test_name)
         c.check_system_users()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5428,7 +5408,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             self.set_test_snap_yaml("system-users", v)
             c = SnapReviewLint(self.test_name)
             c.check_system_users()
-            r = c.click_report
+            r = c.review_report
             expected_counts = {'info': None, 'warn': 0, 'error': 1}
             self.check_results(r, expected_counts)
 
@@ -5462,7 +5442,7 @@ class TestSnapReviewLintNoMock(TestCase):
         package = utils.make_snap2(output_dir=self.mkdtemp())
         c = SnapReviewLint(package)
         c.check_external_symlinks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5473,7 +5453,7 @@ class TestSnapReviewLintNoMock(TestCase):
                                    )
         c = SnapReviewLint(package)
         c.check_external_symlinks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5484,7 +5464,7 @@ class TestSnapReviewLintNoMock(TestCase):
                                    )
         c = SnapReviewLint(package)
         c.check_external_symlinks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5495,7 +5475,7 @@ class TestSnapReviewLintNoMock(TestCase):
                                    )
         c = SnapReviewLint(package)
         c.check_external_symlinks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5506,7 +5486,7 @@ class TestSnapReviewLintNoMock(TestCase):
                                    )
         c = SnapReviewLint(package)
         c.check_external_symlinks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5517,7 +5497,7 @@ class TestSnapReviewLintNoMock(TestCase):
                                    )
         c = SnapReviewLint(package)
         c.check_external_symlinks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5531,7 +5511,7 @@ class TestSnapReviewLintNoMock(TestCase):
                                    )
         c = SnapReviewLint(package)
         c.check_external_symlinks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5554,7 +5534,7 @@ base: nix-base
                                    )
         c = SnapReviewLint(package)
         c.check_external_symlinks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5566,7 +5546,7 @@ base: nix-base
                                    )
         c = SnapReviewLint(package)
         c.check_external_symlinks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5591,7 +5571,7 @@ type: kernel
                                    )
         c = SnapReviewLint(package)
         c.check_external_symlinks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5615,7 +5595,7 @@ type: gadget
                                    )
         c = SnapReviewLint(package)
         c.check_external_symlinks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5638,7 +5618,7 @@ type: os
                                    )
         c = SnapReviewLint(package)
         c.check_external_symlinks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5661,7 +5641,7 @@ type: base
                                    )
         c = SnapReviewLint(package)
         c.check_external_symlinks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5670,7 +5650,7 @@ type: base
         package = utils.make_snap2(output_dir=self.mkdtemp())
         c = SnapReviewLint(package)
         c.check_architecture_all()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5693,7 +5673,7 @@ architectures: [ amd64 ]
                                    )
         c = SnapReviewLint(package)
         c.check_architecture_all()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5704,7 +5684,7 @@ architectures: [ amd64 ]
                                    )
         c = SnapReviewLint(package)
         c.check_architecture_all()
-        r = c.click_report
+        r = c.review_report
         if platform.machine() == 'x86_64':
             expected_counts = {'info': None, 'warn': 0, 'error': 1}
         else:  # ignore test on non-amd64
@@ -5719,7 +5699,7 @@ architectures: [ amd64 ]
                                    )
         c = SnapReviewLint(package)
         c.check_architecture_all()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5744,7 +5724,7 @@ type: gadget
                                    )
         c = SnapReviewLint(package)
         c.check_architecture_all()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5780,7 +5760,7 @@ architectures: [ amd64 ]
                                    )
         c = SnapReviewLint(package)
         c.check_architecture_specified_needed()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5803,7 +5783,7 @@ architectures: [ amd64 ]
                                    )
         c = SnapReviewLint(package)
         c.check_architecture_specified_needed()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5820,7 +5800,7 @@ architectures: [ amd64 ]
         package = utils.make_snap2(output_dir=self.mkdtemp())
         c = SnapReviewLint(package)
         c.check_vcs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5831,7 +5811,7 @@ architectures: [ amd64 ]
                                    )
         c = SnapReviewLint(package)
         c.check_vcs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 1, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5843,7 +5823,7 @@ architectures: [ amd64 ]
                                    )
         c = SnapReviewLint(package)
         c.check_valid_hook()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5854,7 +5834,7 @@ architectures: [ amd64 ]
                                    )
         c = SnapReviewLint(package)
         c.check_valid_hook()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5866,7 +5846,7 @@ architectures: [ amd64 ]
                                    )
         c = SnapReviewLint(package)
         c.check_valid_hook()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5877,7 +5857,7 @@ architectures: [ amd64 ]
                                    )
         c = SnapReviewLint(package)
         c.check_valid_hook()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5888,7 +5868,7 @@ architectures: [ amd64 ]
                                    )
         c = SnapReviewLint(package)
         c.check_valid_hook()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 1, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5900,7 +5880,7 @@ architectures: [ amd64 ]
                                    )
         c = SnapReviewLint(package)
         c.check_valid_hook()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5909,7 +5889,7 @@ architectures: [ amd64 ]
         package = utils.make_snap2(output_dir=self.mkdtemp())
         c = SnapReviewLint(package)
         c.check_iffy()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5921,7 +5901,7 @@ architectures: [ amd64 ]
                                    )
         c = SnapReviewLint(package)
         c.check_iffy()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 1, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5954,7 +5934,7 @@ plugs:
                                    )
         c = SnapReviewLint(package)
         c.check_plugs()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5996,7 +5976,7 @@ Type=Application
                                    )
         c = SnapReviewLint(package)
         c.check_meta_gui_desktop()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -6023,7 +6003,7 @@ apps:
                                    )
         c = SnapReviewLint(package)
         c.check_meta_gui_desktop()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -6068,7 +6048,7 @@ Type=Application
                                    )
         c = SnapReviewLint(package)
         c.check_meta_gui_desktop()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -6111,7 +6091,7 @@ Type=Application
                                    )
         c = SnapReviewLint(package)
         c.check_meta_gui_desktop()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -6155,7 +6135,7 @@ Type=Application
                                    )
         c = SnapReviewLint(package)
         c.check_meta_gui_desktop()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -6199,7 +6179,7 @@ Type=Application
                                    )
         c = SnapReviewLint(package)
         c.check_meta_gui_desktop()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -6239,7 +6219,7 @@ Type=Application
                                    )
         c = SnapReviewLint(package)
         c.check_meta_gui_desktop()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -6267,7 +6247,7 @@ apps:
                                    )
         c = SnapReviewLint(package)
         c.check_meta_gui_desktop()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -6303,7 +6283,7 @@ apps:
                                    )
         c = SnapReviewLint(package)
         c.check_meta_gui_desktop()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -6342,7 +6322,7 @@ apps:
                                    )
         c = SnapReviewLint(package)
         c.check_meta_gui_desktop()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -6381,7 +6361,7 @@ apps:
                                    )
         c = SnapReviewLint(package)
         c.check_meta_gui_desktop()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -6419,7 +6399,7 @@ apps:
                                    )
         c = SnapReviewLint(package)
         c.check_meta_gui_desktop()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -6456,7 +6436,7 @@ apps:
                                    )
         c = SnapReviewLint(package)
         c.check_meta_gui_desktop()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -6494,7 +6474,7 @@ apps:
                                    )
         c = SnapReviewLint(package)
         c.check_meta_gui_desktop()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -6531,7 +6511,7 @@ apps:
                                    )
         c = SnapReviewLint(package)
         c.check_meta_gui_desktop()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -6580,7 +6560,7 @@ Type=Application
                                    )
         c = SnapReviewLint(package)
         c.check_meta_gui_desktop()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -6612,7 +6592,7 @@ apps:
                                    )
         c = SnapReviewLint(package)
         c.check_meta_gui_desktop()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -6652,7 +6632,7 @@ apps:
                                    )
         c = SnapReviewLint(package)
         c.check_meta_gui_desktop()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 

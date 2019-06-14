@@ -103,7 +103,7 @@ class Results(object):
 
             if review:
                 review.do_checks()
-                self.results[section] = review.click_report
+                self.results[section] = review.review_report
                 return section
         except Exception:
             print("Caught exception (setting rc=1 and continuing):")
@@ -134,9 +134,9 @@ class Results(object):
 
 def main():
     parser = argparse.ArgumentParser(
-        prog='click-review',
+        prog='snap-review',
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        description='Check a click or snap package for errors',
+        description='Check a snap package for errors',
         epilog=textwrap.dedent('''\
             RETURN CODES
               0     found no errors or warnings

@@ -40,7 +40,7 @@ class TestAvailable(TestCase):
                                               errors)
         self.assertEquals(len(errors), 0)
 
-        os.environ['CRT_SEND_EMAIL'] = '0'
+        os.environ['RT_SEND_EMAIL'] = '0'
 
         self.tmpdir = None
 

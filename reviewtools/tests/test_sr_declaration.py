@@ -128,8 +128,8 @@ slots:
         c = SnapReviewDeclaration(self.test_name)
         c.do_checks()
         sum = 0
-        for i in c.click_report:
-            sum += len(c.click_report[i])
+        for i in c.review_report:
+            sum += len(c.review_report[i])
         self.assertTrue(sum == 0)
 
     def test_all_checks_as_v1(self):
@@ -138,8 +138,8 @@ slots:
         c = SnapReviewDeclaration(self.test_name)
         c.do_checks()
         sum = 0
-        for i in c.click_report:
-            sum += len(c.click_report[i])
+        for i in c.review_report:
+            sum += len(c.review_report[i])
         self.assertTrue(sum == 0)
 
     def test_all_checks_as_click(self):
@@ -148,8 +148,8 @@ slots:
         c = SnapReviewDeclaration(self.test_name)
         c.do_checks()
         sum = 0
-        for i in c.click_report:
-            sum += len(c.click_report[i])
+        for i in c.review_report:
+            sum += len(c.review_report[i])
         self.assertTrue(sum == 0)
 
     def test__get_decl_snap_empty(self):
@@ -806,7 +806,7 @@ slots:
             },
         }
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 74, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -815,7 +815,7 @@ slots:
         c = SnapReviewDeclaration(self.test_name)
         decl = {}
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -843,7 +843,7 @@ slots:
         c = SnapReviewDeclaration(self.test_name)
         decl = []
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -860,7 +860,7 @@ slots:
         c = SnapReviewDeclaration(self.test_name)
         decl = {'slots': True}
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -877,7 +877,7 @@ slots:
         c = SnapReviewDeclaration(self.test_name)
         decl = {'plugs': False}
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -894,7 +894,7 @@ slots:
         c = SnapReviewDeclaration(self.test_name)
         decl = {'non-existent': {'foo': True}}
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -911,7 +911,7 @@ slots:
         c = SnapReviewDeclaration(self.test_name)
         decl = {'slots': {'foo': True}}
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -928,7 +928,7 @@ slots:
         c = SnapReviewDeclaration(self.test_name)
         decl = {'plugs': {'foo': True}}
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -945,7 +945,7 @@ slots:
         c = SnapReviewDeclaration(self.test_name)
         decl = {'slots': {'foo': "true"}}
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -962,7 +962,7 @@ slots:
         c = SnapReviewDeclaration(self.test_name)
         decl = {'plugs': {'foo': "false"}}
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -979,7 +979,7 @@ slots:
         c = SnapReviewDeclaration(self.test_name)
         decl = {'slots': {'foo': []}}
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -998,7 +998,7 @@ slots:
         c = SnapReviewDeclaration(self.test_name)
         decl = {'slots': {'foo': {'allow-installation': True}}}
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1015,7 +1015,7 @@ slots:
         c = SnapReviewDeclaration(self.test_name)
         decl = {'plugs': {'foo': {'deny-installation': True}}}
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1033,7 +1033,7 @@ slots:
         c = SnapReviewDeclaration(self.test_name)
         decl = {'slots': {'foo': {'allow-connection': "true"}}}
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1051,7 +1051,7 @@ slots:
         c = SnapReviewDeclaration(self.test_name)
         decl = {'slots': {'foo': {'allow-connection': "false"}}}
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1069,7 +1069,7 @@ slots:
         c = SnapReviewDeclaration(self.test_name)
         decl = {'slots': {'foo': {'allow-installation': None}}}
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1087,7 +1087,7 @@ slots:
         c = SnapReviewDeclaration(self.test_name)
         decl = {'slots': {'foo': {'nonexistent': True}}}
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1114,7 +1114,7 @@ slots:
             },
         }
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 2}
         self.check_results(r, expected_counts)
 
@@ -1134,7 +1134,7 @@ slots:
         c = SnapReviewDeclaration(self.test_name)
         decl = {'slots': {'foo': {'allow-connection': None}}}
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1161,7 +1161,7 @@ slots:
             },
         }
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 2}
         self.check_results(r, expected_counts)
 
@@ -1180,7 +1180,7 @@ slots:
         c = SnapReviewDeclaration(self.test_name)
         decl = {'plugs': {'foo': {'allow-installation': {'on-classic': "true"}}}}
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1197,7 +1197,7 @@ slots:
         c = SnapReviewDeclaration(self.test_name)
         decl = {'plugs': {'foo': {'allow-installation': {'on-classic': "false"}}}}
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1214,7 +1214,7 @@ slots:
         c = SnapReviewDeclaration(self.test_name)
         decl = {'slots': {'foo': {'allow-installation': {'on-classic': []}}}}
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1231,7 +1231,7 @@ slots:
         c = SnapReviewDeclaration(self.test_name)
         decl = {'slots': {'foo': {'allow-connection': {'plug-snap-id': ""}}}}
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1257,7 +1257,7 @@ slots:
             }
         }
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1282,7 +1282,7 @@ slots:
             }
         }
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1307,7 +1307,7 @@ slots:
             }
         }
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1332,7 +1332,7 @@ slots:
             }
         }
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1361,7 +1361,7 @@ slots:
             }
         }
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1390,7 +1390,7 @@ slots:
             }
         }
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1418,7 +1418,7 @@ slots:
             }
         }
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1446,7 +1446,7 @@ slots:
             }
         }
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1480,7 +1480,7 @@ slots:
             }
         }
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1509,7 +1509,7 @@ slots:
             }
         }
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1537,7 +1537,7 @@ slots:
             }
         }
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1562,7 +1562,7 @@ slots:
             }
         }
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1587,7 +1587,7 @@ slots:
             }
         }
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1612,7 +1612,7 @@ slots:
             }
         }
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1637,7 +1637,7 @@ slots:
             }
         }
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1662,7 +1662,7 @@ slots:
             }
         }
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1687,7 +1687,7 @@ slots:
             }
         }
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1714,7 +1714,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1742,7 +1742,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration_apps()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1769,7 +1769,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration_apps()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1791,7 +1791,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration_apps()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1811,7 +1811,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration_apps()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1839,7 +1839,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration_apps()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1867,7 +1867,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration_hooks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1895,7 +1895,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration_hooks()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1921,7 +1921,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1947,7 +1947,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -1973,7 +1973,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -1999,7 +1999,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2025,7 +2025,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2051,7 +2051,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2077,7 +2077,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2103,7 +2103,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2129,7 +2129,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2157,7 +2157,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2186,7 +2186,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2215,7 +2215,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2244,7 +2244,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2272,7 +2272,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2300,7 +2300,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2328,7 +2328,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2358,7 +2358,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2388,7 +2388,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2418,7 +2418,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2448,7 +2448,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2481,7 +2481,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2514,7 +2514,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2549,7 +2549,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2582,7 +2582,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2615,7 +2615,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2650,7 +2650,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2685,7 +2685,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2720,7 +2720,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2760,7 +2760,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2791,7 +2791,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2824,7 +2824,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2857,7 +2857,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2914,7 +2914,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -2950,7 +2950,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -2986,7 +2986,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3023,7 +3023,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3064,7 +3064,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3105,7 +3105,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3157,7 +3157,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3207,7 +3207,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3257,7 +3257,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3289,7 +3289,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3319,7 +3319,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3349,7 +3349,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3402,7 +3402,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3433,7 +3433,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3464,7 +3464,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3495,7 +3495,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3526,7 +3526,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3556,7 +3556,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3586,7 +3586,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3640,7 +3640,7 @@ slots:
         }
         self._set_base_declaration(c, base)
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3670,7 +3670,7 @@ slots:
         self._set_base_declaration(c, base)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3700,7 +3700,7 @@ slots:
         self._set_base_declaration(c, base)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3730,7 +3730,7 @@ slots:
         self._set_base_declaration(c, base)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3760,7 +3760,7 @@ slots:
         self._set_base_declaration(c, base)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3790,7 +3790,7 @@ slots:
         self._set_base_declaration(c, base)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3820,7 +3820,7 @@ slots:
         self._set_base_declaration(c, base)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3850,7 +3850,7 @@ slots:
         self._set_base_declaration(c, base)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -3879,7 +3879,7 @@ slots:
         self._set_base_declaration(c, base)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3914,7 +3914,7 @@ slots:
         self._set_base_declaration(c, base)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3949,7 +3949,7 @@ slots:
         self._set_base_declaration(c, base)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -3984,7 +3984,7 @@ slots:
         self._set_base_declaration(c, base)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4019,7 +4019,7 @@ slots:
         self._set_base_declaration(c, base)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4054,7 +4054,7 @@ slots:
         self._set_base_declaration(c, base)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4100,7 +4100,7 @@ slots:
             }
         }
         c._verify_declaration(decl=decl)
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4135,7 +4135,7 @@ slots:
         self._set_base_declaration(c, base)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4170,7 +4170,7 @@ slots:
         self._set_base_declaration(c, base)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4205,7 +4205,7 @@ slots:
         self._set_base_declaration(c, base)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4242,7 +4242,7 @@ slots:
         self._set_base_declaration(c, base)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4279,7 +4279,7 @@ slots:
         self._set_base_declaration(c, base)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4316,7 +4316,7 @@ slots:
         self._set_base_declaration(c, base)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4353,7 +4353,7 @@ slots:
         self._set_base_declaration(c, base)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4390,7 +4390,7 @@ slots:
         self._set_base_declaration(c, base)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4427,7 +4427,7 @@ slots:
         self._set_base_declaration(c, base)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4457,7 +4457,7 @@ slots:
         self._set_base_declaration(c, base)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4477,7 +4477,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4497,7 +4497,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4518,7 +4518,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4538,7 +4538,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4565,7 +4565,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4588,7 +4588,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4608,7 +4608,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4629,7 +4629,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4652,7 +4652,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4676,7 +4676,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4709,7 +4709,7 @@ slots:
         self._set_base_declaration(c, base)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4729,7 +4729,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4750,7 +4750,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4771,7 +4771,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4799,7 +4799,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4833,7 +4833,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4856,7 +4856,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4876,7 +4876,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4903,7 +4903,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4924,7 +4924,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4944,7 +4944,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -4965,7 +4965,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -4985,7 +4985,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5006,7 +5006,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 2}
         self.check_results(r, expected_counts)
 
@@ -5031,7 +5031,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5057,7 +5057,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5079,7 +5079,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5100,7 +5100,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5120,7 +5120,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5141,7 +5141,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5163,7 +5163,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5185,7 +5185,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5206,7 +5206,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5227,7 +5227,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5248,7 +5248,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5270,7 +5270,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5292,7 +5292,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5313,7 +5313,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5341,7 +5341,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5375,7 +5375,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 2}
         self.check_results(r, expected_counts)
 
@@ -5408,7 +5408,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5442,7 +5442,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5479,7 +5479,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5504,7 +5504,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 2}
         self.check_results(r, expected_counts)
 
@@ -5546,7 +5546,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5574,7 +5574,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5614,7 +5614,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5652,7 +5652,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5688,7 +5688,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 2}
         self.check_results(r, expected_counts)
 
@@ -5721,7 +5721,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5755,7 +5755,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5792,7 +5792,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5817,7 +5817,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 2}
         self.check_results(r, expected_counts)
 
@@ -5859,7 +5859,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5887,7 +5887,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -5927,7 +5927,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -5966,7 +5966,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -6003,7 +6003,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -6044,7 +6044,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 2}
         self.check_results(r, expected_counts)
 
@@ -6080,7 +6080,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -6106,7 +6106,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 2, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
@@ -6140,7 +6140,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -6176,7 +6176,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -6213,7 +6213,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -6254,7 +6254,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
@@ -6295,7 +6295,7 @@ slots:
         self._use_test_base_declaration(c)
 
         c.check_declaration()
-        r = c.click_report
+        r = c.review_report
         expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 

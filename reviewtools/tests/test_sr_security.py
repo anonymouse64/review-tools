@@ -67,29 +67,9 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
         c = SnapReviewSecurity(self.test_name)
         c.do_checks()
         sum = 0
-        for i in c.click_report:
-            sum += len(c.click_report[i])
+        for i in c.review_report:
+            sum += len(c.review_report[i])
         self.assertTrue(sum != 0)
-
-    def test_all_checks_as_v1(self):
-        '''Test snap v1 has no checks'''
-        self.set_test_pkgfmt("snap", "15.04")
-        c = SnapReviewSecurity(self.test_name)
-        c.do_checks()
-        sum = 0
-        for i in c.click_report:
-            sum += len(c.click_report[i])
-        self.assertTrue(sum == 0)
-
-    def test_all_checks_as_click(self):
-        '''Test click format has no checks'''
-        self.set_test_pkgfmt("click", "0.4")
-        c = SnapReviewSecurity(self.test_name)
-        c.do_checks()
-        sum = 0
-        for i in c.click_report:
-            sum += len(c.click_report[i])
-        self.assertTrue(sum == 0)
 
     def test_check_security_plugs_browser_support_with_daemon_top_plugs(self):
         ''' Test check_security_plugs() - daemon with toplevel plugs'''
@@ -100,7 +80,7 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps)
         c = SnapReviewSecurity(self.test_name)
         c.check_security_plugs_browser_support_with_daemon()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 1, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -112,7 +92,7 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps)
         c = SnapReviewSecurity(self.test_name)
         c.check_security_plugs_browser_support_with_daemon()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -124,7 +104,7 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps)
         c = SnapReviewSecurity(self.test_name)
         c.check_security_plugs_browser_support_with_daemon()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 1, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -136,7 +116,7 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps)
         c = SnapReviewSecurity(self.test_name)
         c.check_security_plugs_browser_support_with_daemon()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -147,7 +127,7 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps)
         c = SnapReviewSecurity(self.test_name)
         c.check_security_plugs_browser_support_with_daemon()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 1, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -157,7 +137,7 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps)
         c = SnapReviewSecurity(self.test_name)
         c.check_security_plugs_browser_support_with_daemon()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -168,7 +148,7 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps)
         c = SnapReviewSecurity(self.test_name)
         c.check_security_plugs_browser_support_with_daemon()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -178,7 +158,7 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps)
         c = SnapReviewSecurity(self.test_name)
         c.check_security_plugs_browser_support_with_daemon()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -191,7 +171,7 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps)
         c = SnapReviewSecurity(self.test_name)
         c.check_security_plugs_browser_support_with_daemon()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -210,7 +190,7 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
         # then cleanup the overrides
         sec_browser_support_overrides.remove(self.test_snap_yaml["name"])
 
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
         expected = dict()
@@ -227,7 +207,7 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps)
         c = SnapReviewSecurity(self.test_name)
         c.check_apparmor_profile_name_length()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -237,7 +217,7 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps)
         c = SnapReviewSecurity(self.test_name)
         c.check_apparmor_profile_name_length()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -248,7 +228,7 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps)
         c = SnapReviewSecurity(self.test_name)
         c.check_apparmor_profile_name_length()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -259,7 +239,7 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("apps", apps)
         c = SnapReviewSecurity(self.test_name)
         c.check_apparmor_profile_name_length()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 1, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -283,7 +263,7 @@ drwxrwxr-x root/root                48 2016-03-11 12:26 squashfs-root/meta
         self.set_test_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -296,7 +276,7 @@ short
         self.set_test_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -310,7 +290,7 @@ short
         self.set_test_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -332,7 +312,7 @@ short
         self.set_test_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -354,7 +334,7 @@ short
         self.set_test_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -376,7 +356,7 @@ short
         self.set_test_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -399,7 +379,7 @@ short
         self.set_test_snap_yaml("name", "ubuntu-core")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -422,7 +402,7 @@ short
         self.set_test_snap_yaml("name", "ubuntu-core")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -437,7 +417,7 @@ short
         self.set_test_snap_yaml("name", "bare")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected = dict()
         expected['error'] = dict()
         expected['warn'] = dict()
@@ -458,7 +438,7 @@ short
         self.set_test_snap_yaml("name", "chrome-test")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -473,7 +453,7 @@ short
         self.set_test_snap_yaml("name", "openwrt")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -487,7 +467,7 @@ drwxrwxrwt root/root                38 2016-03-11 12:25 squashfs-root/foo
         self.set_test_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -501,7 +481,7 @@ drwxrwxrwt root/root                38 2016-03-11 12:25 squashfs-root/foo
         self.set_test_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -523,7 +503,7 @@ lrwxrwxrw- root/root                38 2016-03-11 12:25 squashfs-root/foo
         self.set_test_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -546,7 +526,7 @@ brw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
         self.set_test_snap_yaml("type", "os")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -561,7 +541,7 @@ brw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
         self.set_test_snap_yaml("type", "base")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -575,7 +555,7 @@ brw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
         self.set_test_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -597,7 +577,7 @@ crw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
         self.set_test_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -619,7 +599,7 @@ prw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
         self.set_test_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -641,7 +621,7 @@ srw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
         self.set_test_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -663,7 +643,7 @@ srw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
         self.set_test_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -685,7 +665,7 @@ srw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
         self.set_test_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -707,7 +687,7 @@ srw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
         self.set_test_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -730,7 +710,7 @@ srw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
         self.set_test_snap_yaml("type", "os")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -745,7 +725,7 @@ crw-rw-rw- root/root                a,  0 2016-03-11 12:25 squashfs-root/foo
         self.set_test_snap_yaml("type", "os")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -768,7 +748,7 @@ crw-rw-rw- root/root                a,120 2016-03-11 12:25 squashfs-root/foo
         self.set_test_snap_yaml("type", "os")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -791,7 +771,7 @@ brw-rw-rw- root/root                8,  a 2016-03-11 12:25 squashfs-root/foo
         self.set_test_snap_yaml("type", "os")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -814,7 +794,7 @@ brw-rw-rw- root/root                8,12a 2016-03-11 12:25 squashfs-root/foo
         self.set_test_snap_yaml("type", "os")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -836,7 +816,7 @@ brw-rw-rw- root/root                8,12a 2016-03-11 12:25 squashfs-root/foo
         self.set_test_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -858,7 +838,7 @@ brw-rw-rw- root/root                8,12a 2016-03-11 12:25 squashfs-root/foo
         self.set_test_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -880,7 +860,7 @@ brw-rw-rw- root/root                8,12a 2016-03-11 12:25 squashfs-root/foo
         self.set_test_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -904,7 +884,7 @@ drwx------ root/root                48 2016-03-11 12:26 squashfs-root/meta
         self.set_test_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -922,7 +902,7 @@ drwx------ root/root                48 2016-03-11 12:26 squashfs-root/meta
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewSecurity(self.test_name)
         c._allowed_iface_reference("plugs", "network")
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -932,7 +912,7 @@ drwx------ root/root                48 2016-03-11 12:26 squashfs-root/meta
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewSecurity(self.test_name)
         c._allowed_iface_reference("plugs", "test-iface")
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -948,7 +928,7 @@ drwx------ root/root                48 2016-03-11 12:26 squashfs-root/meta
         c._allowed_iface_reference("plugs", "test-iface")
         # then clean up
         del sec_iface_ref_overrides['test-iface']
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 0, 'warn': 1, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -972,7 +952,7 @@ drwx------ root/root                48 2016-03-11 12:26 squashfs-root/meta
         c._allowed_iface_reference("plugs", "test-iface")
         # then clean up
         del sec_iface_ref_overrides['test-iface']
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -996,7 +976,7 @@ drwx------ root/root                48 2016-03-11 12:26 squashfs-root/meta
         c._allowed_iface_reference("plugs", "test-iface")
         # then clean up
         del sec_iface_ref_overrides['test-iface']
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -1020,7 +1000,7 @@ drwx------ root/root                48 2016-03-11 12:26 squashfs-root/meta
         c._allowed_iface_reference("plugs", "test-iface")
         # then clean up
         del sec_iface_ref_overrides['test-iface']
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -1044,7 +1024,7 @@ drwx------ root/root                48 2016-03-11 12:26 squashfs-root/meta
         c.check_personal_files_iface_reference()
         # then clean up
         del sec_iface_ref_overrides['personal-files']['test-app']
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -1068,7 +1048,7 @@ drwx------ root/root                48 2016-03-11 12:26 squashfs-root/meta
         c.check_system_files_iface_reference()
         # then clean up
         del sec_iface_ref_overrides['system-files']['test-app']
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -1109,7 +1089,7 @@ class TestSnapReviewSecurityNoMock(TestCase):
         package = utils.make_snap2(output_dir=self.mkdtemp())
         c = SnapReviewSecurity(package)
         c.check_squashfs_resquash()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -1145,7 +1125,7 @@ exit 1
 
         c.check_squashfs_resquash()
         os.environ['PATH'] = old_path
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 1, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -1176,7 +1156,7 @@ exit 1
 
         c.check_squashfs_resquash()
         os.environ['PATH'] = old_path
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -1217,7 +1197,7 @@ exit 1
         c.check_squashfs_resquash()
         os.environ.pop('SNAP_ENFORCE_RESQUASHFS')
         os.environ['PATH'] = old_path
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -1266,7 +1246,7 @@ exit 0
         sec_resquashfs_overrides.remove("test")
         os.environ.pop('SNAP_ENFORCE_RESQUASHFS')
         os.environ['PATH'] = old_path
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -1315,7 +1295,7 @@ exit 1
         c.check_squashfs_resquash()
         os.environ.pop('SNAP_ENFORCE_RESQUASHFS')
         os.environ['PATH'] = old_path
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -1345,7 +1325,7 @@ exit 1
         c.check_squashfs_resquash()
         os.environ.pop('SNAP_ENFORCE_RESQUASHFS')
         os.environ['PATH'] = old_path
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -1379,7 +1359,7 @@ exit 0
         c.check_squashfs_resquash()
         os.environ.pop('SNAP_ENFORCE_RESQUASHFS')
         os.environ['PATH'] = old_path
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -1414,7 +1394,7 @@ exit 0
         c.check_squashfs_resquash()
         os.environ.pop('SNAP_ENFORCE_RESQUASHFS')
         os.environ['PATH'] = old_path
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -1449,7 +1429,7 @@ exit 0
         c.check_squashfs_resquash()
         os.environ.pop('SNAP_ENFORCE_RESQUASHFS')
         os.environ['PATH'] = old_path
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -1486,7 +1466,7 @@ exit 0
         os.environ.pop('SNAP_DEBUG_RESQUASHFS')
         os.environ.pop('SNAP_ENFORCE_RESQUASHFS')
         os.environ['PATH'] = old_path
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -1538,7 +1518,7 @@ exit 0
         os.environ.pop('SNAP_DEBUG_RESQUASHFS')
         os.environ.pop('SNAP_ENFORCE_RESQUASHFS')
         os.environ['PATH'] = old_path
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -1597,7 +1577,7 @@ exit 0
         c.check_squashfs_resquash()
         os.environ.pop('SNAP_ENFORCE_RESQUASHFS')
         os.environ['PATH'] = old_path
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -1657,7 +1637,7 @@ exit 0
         c.check_squashfs_resquash()
         os.environ.pop('SNAP_ENFORCE_RESQUASHFS')
         os.environ['PATH'] = old_path
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -1746,7 +1726,7 @@ exit 1
         c = SnapReviewSecurity(package)
 
         c.check_squashfs_files()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -1774,6 +1754,6 @@ exit 1
 
         c.check_squashfs_files()
         os.environ['PATH'] = old_path
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)

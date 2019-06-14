@@ -47,23 +47,23 @@ def send(email_to_addr, subj, body, bcc=None):
     global email_server
     global email_from_addr
 
-    if 'CRT_SEND_EMAIL' not in os.environ or \
-            os.environ['CRT_SEND_EMAIL'] != "1":
+    if 'RT_SEND_EMAIL' not in os.environ or \
+            os.environ['RT_SEND_EMAIL'] != "1":
         print("From: %s\nTo: %s" % (email_from_addr, email_to_addr))
         if bcc is not None:
             print("Bcc: %s" % bcc)
         print("Subject: %s\n" % (subj))
         print(body)
     else:
-        if 'CRT_EMAIL_FROM' in os.environ:
-            email_from_addr = sanitize_addr(os.environ['CRT_EMAIL_FROM'])
+        if 'RT_EMAIL_FROM' in os.environ:
+            email_from_addr = sanitize_addr(os.environ['RT_EMAIL_FROM'])
             if email_from_addr == '':
                 print("Bad from address: '%s'" % email_from_addr)
                 return False
 
-        if 'CRT_EMAIL_TO' in os.environ:
+        if 'RT_EMAIL_TO' in os.environ:
             addresses = []
-            for i in os.environ['CRT_EMAIL_TO'].split(', '):
+            for i in os.environ['RT_EMAIL_TO'].split(', '):
                 addr = sanitize_addr(i.strip())
                 if addr != '':
                     addresses.append(addr)
@@ -73,9 +73,9 @@ def send(email_to_addr, subj, body, bcc=None):
                 return False
             email_to_addr = ", ".join(addresses)
 
-        if 'CRT_EMAIL_BCC' in os.environ:
+        if 'RT_EMAIL_BCC' in os.environ:
             addresses = []
-            for i in os.environ['CRT_EMAIL_BCC'].split(', '):
+            for i in os.environ['RT_EMAIL_BCC'].split(', '):
                 addr = sanitize_addr(i.strip())
                 if addr != '':
                     addresses.append(addr)
@@ -85,11 +85,11 @@ def send(email_to_addr, subj, body, bcc=None):
                 return False
             bcc = ", ".join(addresses)
 
-        if 'CRT_EMAIL_SERVER' in os.environ:
-            email_server = os.environ['CRT_EMAIL_SERVER']
+        if 'RT_EMAIL_SERVER' in os.environ:
+            email_server = os.environ['RT_EMAIL_SERVER']
 
-        if 'CRT_EMAIL_NOPROMPT' not in os.environ or \
-                os.environ['CRT_EMAIL_NOPROMPT'] != "1":
+        if 'RT_EMAIL_NOPROMPT' not in os.environ or \
+                os.environ['RT_EMAIL_NOPROMPT'] != "1":
             print("Send (subj='%s',to='%s',from='%s',bcc='%s',server='%s')? (y|N) " %
                   (subj, email_to_addr, email_from_addr, bcc, email_server), end='')
             sys.stdout.flush()

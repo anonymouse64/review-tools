@@ -23,9 +23,9 @@ coverage-report:
 	python3 -m coverage report --show-missing --omit="*skeleton*,*/dist-packages/*"
 
 syntax-check: clean
-	CHECK_CLICK_FILES=1 ./run-pyflakes
-	CHECK_CLICK_FILES=1 ./run-pep8
-	CHECK_CLICK_FILES=1 ./run-pylint
+	./run-pyflakes
+	./run-pep8
+	./run-pylint
 
 check-names:
 	# make sure check-names.list is up to date

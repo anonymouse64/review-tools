@@ -25,7 +25,7 @@ class TestSnapReviewSkeleton(sr_tests.TestSnapReview):
         '''Test check_foo()'''
         c = SnapReviewSkeleton(self.test_name)
         c.check_foo()
-        r = c.click_report
+        r = c.review_report
         # We should end up with 1 info
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
@@ -34,7 +34,7 @@ class TestSnapReviewSkeleton(sr_tests.TestSnapReview):
         '''Test check_bar()'''
         c = SnapReviewSkeleton(self.test_name)
         c.check_bar()
-        r = c.click_report
+        r = c.review_report
         # We should end up with 1 error
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
@@ -43,7 +43,7 @@ class TestSnapReviewSkeleton(sr_tests.TestSnapReview):
         '''Test check_baz()'''
         c = SnapReviewSkeleton(self.test_name)
         c.check_baz()
-        r = c.click_report
+        r = c.review_report
         # We should end up with 1 warning
         expected_counts = {'info': 0, 'warn': 1, 'error': 0}
         self.check_results(r, expected_counts)

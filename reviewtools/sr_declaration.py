@@ -1,4 +1,4 @@
-'''sr_declaration.py: click declaration'''
+'''sr_declaration.py: snap declaration'''
 #
 # Copyright (C) 2014-2019 Canonical Ltd.
 #
@@ -28,7 +28,7 @@ class SnapDeclarationException(SnapReviewException):
 
 
 class SnapReviewDeclaration(SnapReview):
-    '''This class represents click lint reviews'''
+    '''This class represents snap declaration reviews'''
     def __init__(self, fn, overrides=None):
         SnapReview.__init__(self, fn, "declaration-snap-v2",
                             overrides=overrides)

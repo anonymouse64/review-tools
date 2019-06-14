@@ -18,11 +18,11 @@ SNAP_DEBUG_RESQUASHFS=1    - show debug info with failed resquashfs tests
 SNAP_DEBUG_RESQUASHFS=2    - drop to a shell with failed resquashfs
 
 For snap-updates-available:
-CRT_SEND_EMAIL=1           - enable sending emails
-CRT_EMAIL_FROM=<addr>      - override configured From address
-CRT_EMAIL_TO=<addr>        - override calculated To addresses
-CRT_EMAIL_SERVER=<server>  - use <server> instead of localhost
-CRT_EMAIL_NOPROMPT=1       - force sending of email without prompting
+RT_SEND_EMAIL=1           - enable sending emails
+RT_EMAIL_FROM=<addr>      - override configured From address
+RT_EMAIL_TO=<addr>        - override calculated To addresses
+RT_EMAIL_SERVER=<server>  - use <server> instead of localhost
+RT_EMAIL_NOPROMPT=1       - force sending of email without prompting
 
 Importable tests:
 - reviewtools/sr_lint.py: lint tests
@@ -42,7 +42,7 @@ See snap-check-skeleton and sr_skeleton.py for how to create new tests. In
 short:
  * create a snap-check-<something> and a sr_<something>.py script based off of
    the skeleton. IMPORTANT: the new script must be snap-check-<something> so
-   other tools that use click-reviewers-tools (eg, ubuntu-sdk) can find them.
+   other tools that use review-tools (eg, ubuntu-sdk) can find them.
  * modify snap-check-<something> to use sr_<something>.py
  * add tests to sr_<something>.py. If you name the tests 'check_<sometest>'
    SnapReview.do_checks() will enumerate and run them automatically
@@ -68,8 +68,8 @@ hook to run the testsuite before committing. Eg, add something like this to
   #!/usr/bin/python
   from bzrlib.branch import Branch
 
-  def run_tests_crt(local, master, old_revno, old_revid, new_revno, new_revid,
-                    seven, eight):
+  def run_tests_rt(local, master, old_revno, old_revid, new_revno, new_revid,
+                   seven, eight):
       #print local, master, old_revno, old_revid, new_revno, new_revid, seven, eight
       if 'click-reviewers-tools' in master.base:
           import subprocess
@@ -80,6 +80,6 @@ hook to run the testsuite before committing. Eg, add something like this to
               sys.exit(1)
 
   Branch.hooks.install_named_hook('pre_commit',
-                                  run_tests_crt,
+                                  run_tests_rt,
                                   'click-reviewers-tools tests')
 

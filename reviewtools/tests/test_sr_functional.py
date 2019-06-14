@@ -40,29 +40,9 @@ class TestSnapReviewFunctional(sr_tests.TestSnapReview):
         c = SnapReviewFunctional(self.test_name)
         c.do_checks()
         sum = 0
-        for i in c.click_report:
-            sum += len(c.click_report[i])
+        for i in c.review_report:
+            sum += len(c.review_report[i])
         self.assertTrue(sum != 0)
-
-    def test_all_checks_as_v1(self):
-        '''Test snap v1 has no checks'''
-        self.set_test_pkgfmt("snap", "15.04")
-        c = SnapReviewFunctional(self.test_name)
-        c.do_checks()
-        sum = 0
-        for i in c.click_report:
-            sum += len(c.click_report[i])
-        self.assertTrue(sum == 0)
-
-    def test_all_checks_as_click(self):
-        '''Test click format has no checks'''
-        self.set_test_pkgfmt("click", "0.4")
-        c = SnapReviewFunctional(self.test_name)
-        c.do_checks()
-        sum = 0
-        for i in c.click_report:
-            sum += len(c.click_report[i])
-        self.assertTrue(sum == 0)
 
 
 class TestSnapReviewFunctionalNoMock(TestCase):
@@ -100,7 +80,7 @@ class TestSnapReviewFunctionalNoMock(TestCase):
                                    )
         c = SnapReviewFunctional(package)
         c.check_execstack()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -120,7 +100,7 @@ class TestSnapReviewFunctionalNoMock(TestCase):
         c = SnapReviewFunctional(package)
         c.pkg_bin_files = [fn]
         c.check_execstack()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 1, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -155,7 +135,7 @@ confinement: devmode
         c = SnapReviewFunctional(package)
         c.pkg_bin_files = [fn]
         c.check_execstack()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -186,7 +166,7 @@ confinement: devmode
         from reviewtools.overrides import func_execstack_overrides
         func_execstack_overrides.append("test-override")
         c.check_execstack()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -221,7 +201,7 @@ type: os
         c = SnapReviewFunctional(package)
         c.pkg_bin_files = [fn]
         c.check_execstack()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -235,7 +215,7 @@ type: os
         c = SnapReviewFunctional(package)
         c.pkg_bin_files = ["path/to/nonexistent/file"]
         c.check_execstack()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -279,7 +259,7 @@ type: os
         c = SnapReviewFunctional(package)
         c.pkg_bin_files = pkg_bin_files
         c.check_execstack()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -309,7 +289,7 @@ type: os
         c = SnapReviewFunctional(package)
         c.pkg_bin_files = pkg_bin_files
         c.check_execstack()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': None, 'warn': 1, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -330,7 +310,7 @@ type: os
         package = utils.make_snap2()
         c = SnapReviewFunctional(package)
         c.check_execstack()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -372,7 +352,7 @@ type: base
         package = utils.make_snap2(extra_files=test_files, yaml=yaml)
         c = SnapReviewFunctional(package)
         c.check_base_mountpoints()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 
@@ -407,7 +387,7 @@ type: base
         package = utils.make_snap2(extra_files=test_files, yaml=yaml)
         c = SnapReviewFunctional(package)
         c.check_base_mountpoints()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 1}
         self.check_results(report, expected_counts)
 
@@ -450,7 +430,7 @@ type: base
         from reviewtools.overrides import func_base_mountpoints_overrides
         func_base_mountpoints_overrides.append("test-override")
         c.check_base_mountpoints()
-        report = c.click_report
+        report = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(report, expected_counts)
 

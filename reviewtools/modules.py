@@ -61,7 +61,7 @@ def find_main_class(module_name):
     return init_object
 
 
-def init_main_class(module_name, click_file, overrides=None, report_type=None):
+def init_main_class(module_name, pkg_file, overrides=None, report_type=None):
     '''
     This function will instantiate the main Click*Review
     class of a given module and instantiate it with the
@@ -72,7 +72,7 @@ def init_main_class(module_name, click_file, overrides=None, report_type=None):
     if not init_object:
         return None
     try:
-        ob = init_object(click_file, overrides)
+        ob = init_object(pkg_file, overrides)
         # set the report_type separately since it is in the common class
         ob.set_report_type(report_type)
     except TypeError as e:

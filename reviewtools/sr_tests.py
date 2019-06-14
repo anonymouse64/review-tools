@@ -69,14 +69,6 @@ def _pkgfmt_type(self):
     return TEST_PKGFMT_TYPE
 
 
-def _detect_package(self, fn):
-    '''Pretend we detected the package'''
-    ver = 2
-    if TEST_PKGFMT_VERSION == "15.04":
-        ver = 1
-    return (TEST_PKGFMT_TYPE, ver)
-
-
 def __get_unpack_dir(self):
     '''Pretend we found the unpack dir'''
     return TEST_UNPACK_DIR
@@ -105,8 +97,6 @@ def create_patches():
         _path_join))
     patches.append(patch('reviewtools.common.unpack_pkg', _mock_func))
     patches.append(patch('reviewtools.common.raw_unpack_pkg', _mock_func))
-    patches.append(patch('reviewtools.common.detect_package',
-                   _detect_package))
     patches.append(patch('reviewtools.sr_common.SnapReview._list_all_files',
                    _mock_func))
     patches.append(patch(
