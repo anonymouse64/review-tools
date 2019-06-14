@@ -5535,6 +5535,41 @@ class TestSnapReviewLintNoMock(TestCase):
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
+    def test_check_external_symlinks_has_symlink_to_nix(self):
+        '''Test check_external_symlinks() - /nix/store/...'''
+        output_dir = self.mkdtemp()
+        path = os.path.join(output_dir, 'snap.yaml')
+        content = '''
+name: test
+version: 0.1
+base: nix-base
+'''
+        with open(path, 'w') as f:
+            f.write(content)
+
+        package = utils.make_snap2(output_dir=output_dir,
+                                   extra_files=['%s:meta/snap.yaml' % path,
+                                                'nix/store/foo/thing',
+                                                '/nix/store/foo/thing,nix/store/bar/thing']
+                                   )
+        c = SnapReviewLint(package)
+        c.check_external_symlinks()
+        r = c.click_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_external_symlinks_has_symlink_to_nix_not_nix_base(self):
+        '''Test check_external_symlinks() - /nix/store/... (no nix-base)'''
+        package = utils.make_snap2(output_dir=self.mkdtemp(),
+                                   extra_files=['nix/store/foo/thing',
+                                                '/nix/store/foo/thing,nix/store/bar/thing']
+                                   )
+        c = SnapReviewLint(package)
+        c.check_external_symlinks()
+        r = c.click_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
     def test_check_external_symlinks_type_kernel(self):
         '''Test check_external_symlinks() - type kernel'''
         output_dir = self.mkdtemp()

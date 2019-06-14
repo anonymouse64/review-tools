@@ -1304,11 +1304,18 @@ class SnapReviewLint(SnapReview):
                                          self.snap_yaml['type'] == 'kernel'):
             return
 
+        # XXX: since nix-base is currently the only exceptional base, just do
+        # the calculation here. If we get more like this, refactor.
+        prefix_ok = None
+        if 'base' in self.snap_yaml and self.snap_yaml['base'] == 'nix-base':
+            prefix_ok = "/nix/store/"
+
         t = 'info'
         n = self._get_check_name('external_symlinks')
         s = 'OK'
         links = find_external_symlinks(self._get_unpack_dir(), self.pkg_files,
-                                       self.snap_yaml['name'])
+                                       self.snap_yaml['name'],
+                                       prefix_ok=prefix_ok)
         if len(links) > 0:
             t = 'error'
             s = 'package contains external symlinks: %s' % ', '.join(links)
