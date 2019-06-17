@@ -21,6 +21,7 @@ apps:
       FAKEROOTDONTTRYCHOWN: "1"
   snap-declaration:
     command: create-snap-declaration
+    plugs: [ mount-observe ]
   updates-available:
     command: snap-updates-available
     plugs: [ home, mount-observe, network ]
