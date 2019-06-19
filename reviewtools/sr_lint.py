@@ -504,8 +504,15 @@ class SnapReviewLint(SnapReview):
                     return
             else:
                 val = self.snap_yaml['apps'][app][key]
-            fn = self._path_join(self._get_unpack_dir(),
-                                 os.path.normpath(val))
+
+            # XXX: since nix-base is currently the only exceptional base, just
+            # do the calculation here. If we get more like this, refactor.
+            if 'base' in self.snap_yaml and \
+                    self.snap_yaml['base'] == 'nix-base' and \
+                    val.startswith('/'):
+                val = val.lstrip('/')
+
+            fn = self._path_join(self._get_unpack_dir(), os.path.normpath(val))
             if fn not in self.pkg_files:
                 t = 'error'
                 s = "%s does not exist" % (
@@ -569,8 +576,14 @@ class SnapReviewLint(SnapReview):
                 self._add_result(t, n, s)
                 break
 
-            fn = self._path_join(self._get_unpack_dir(),
-                                 os.path.normpath(val))
+            # XXX: since nix-base is currently the only exceptional base, just
+            # do the calculation here. If we get more like this, refactor.
+            if 'base' in self.snap_yaml and \
+                    self.snap_yaml['base'] == 'nix-base' and \
+                    val.startswith('/'):
+                val = val.lstrip('/')
+
+            fn = self._path_join(self._get_unpack_dir(), os.path.normpath(val))
             if fn not in self.pkg_files:
                 nonexistent.append(val)
 

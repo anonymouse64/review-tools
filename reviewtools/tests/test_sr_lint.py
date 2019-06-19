@@ -1359,6 +1359,31 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
+    def test_check_apps_command_abs(self):
+        '''Test check_apps_command() - absolute path'''
+        cmd = "/bin/foo"
+        self.set_test_snap_yaml("apps", {"foo": {"command": cmd},
+                                         })
+        c = SnapReviewLint(self.test_name)
+        c.pkg_files.append('/fake' + cmd)
+        c.check_apps_command()
+        r = c.review_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_command_abs_nix(self):
+        '''Test check_apps_command() - absolute path (nix)'''
+        cmd = "/bin/foo"
+        self.set_test_snap_yaml("apps", {"foo": {"command": cmd},
+                                         })
+        self.set_test_snap_yaml("base", "nix-base")
+        c = SnapReviewLint(self.test_name)
+        c.pkg_files.append('/fake' + cmd)
+        c.check_apps_command()
+        r = c.review_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
     def test_check_apps_command_missing(self):
         '''Test check_apps_command() - missing'''
         self.set_test_snap_yaml("apps", {"foo": {}})
@@ -1457,6 +1482,31 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                                          })
         c = SnapReviewLint(self.test_name)
         c.pkg_files.append(os.path.join('/fake', cmd))
+        c.check_apps_command_chain()
+        r = c.review_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_command_chain_abs(self):
+        '''Test check_apps_command_chain() - absolute path'''
+        cmd = "/bin/foo"
+        self.set_test_snap_yaml("apps", {"foo": {"command-chain": [cmd]},
+                                         })
+        c = SnapReviewLint(self.test_name)
+        c.pkg_files.append('/fake' + cmd)
+        c.check_apps_command_chain()
+        r = c.review_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_command_chain_abs_nix(self):
+        '''Test check_apps_command_chain() - absolute path (nix)'''
+        cmd = "/bin/foo"
+        self.set_test_snap_yaml("apps", {"foo": {"command-chain": [cmd]},
+                                         })
+        self.set_test_snap_yaml("base", "nix-base")
+        c = SnapReviewLint(self.test_name)
+        c.pkg_files.append('/fake' + cmd)
         c.check_apps_command_chain()
         r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
