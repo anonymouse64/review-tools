@@ -107,9 +107,30 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
         return m
 
+    # The next two checks just make sure every check is run. One with the
+    # default snap from the tests and one empty. We do it this way so as not
+    # to add separate tests for short-circuit returns like:
+    #   if 'apps' not in self.snap_yaml:
+    #     return
     def test_all_checks_as_v2(self):
         '''Test snap v2 has checks'''
         self.set_test_pkgfmt("snap", "16.04")
+        c = SnapReviewLint(self.test_name)
+        c.do_checks()
+        sum = 0
+        for i in c.review_report:
+            sum += len(c.review_report[i])
+        self.assertTrue(sum != 0)
+
+    def test_all_checks_as_empty_v2(self):
+        '''Test snap v2 has checks - (mostly) empty yaml'''
+        self.set_test_pkgfmt("snap", "16.04")
+        tmp = []
+        for key in self.test_snap_yaml:
+            if key not in ['name', 'version']:  # required
+                tmp.append(key)
+        for key in tmp:
+            self.set_test_snap_yaml(key, None)
         c = SnapReviewLint(self.test_name)
         c.do_checks()
         sum = 0

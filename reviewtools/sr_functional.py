@@ -38,9 +38,6 @@ class SnapReviewFunctional(SnapReview):
 
     def check_execstack(self):
         '''Check execstack'''
-        if not self.is_snap2:
-            return
-
         # core snap is known to have these due to klibc. Executable stack
         # checks only make sense for app snaps anyway.
         if self.snap_yaml['type'] != 'app':
@@ -101,7 +98,7 @@ class SnapReviewFunctional(SnapReview):
 
     def check_base_mountpoints(self):
         '''Verify base snap has all the expected mountpoints'''
-        if not self.is_snap2 or self.snap_yaml['type'] != 'base':
+        if self.snap_yaml['type'] != 'base':
             return
 
         t = 'info'

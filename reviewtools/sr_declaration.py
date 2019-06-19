@@ -33,9 +33,6 @@ class SnapReviewDeclaration(SnapReview):
         SnapReview.__init__(self, fn, "declaration-snap-v2",
                             overrides=overrides)
 
-        if not self.is_snap2:
-            return
-
         self._verify_declaration(self.base_declaration, base=True)
 
         self.on_store = None
@@ -892,9 +889,6 @@ class SnapReviewDeclaration(SnapReview):
         '''Check base/snap declaration requires manual review for top-level
            plugs/slots
         '''
-        if not self.is_snap2:
-            return
-
         for side in ['plugs', 'slots']:
             if side not in self.snap_yaml:
                 continue
@@ -926,7 +920,7 @@ class SnapReviewDeclaration(SnapReview):
 
     def _verify_declaration_apps_hooks(self, key):
         '''Verify declaration for apps and hooks'''
-        if not self.is_snap2 or key not in self.snap_yaml:
+        if key not in self.snap_yaml:
             return
 
         for app in self.snap_yaml[key]:

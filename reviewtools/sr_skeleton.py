@@ -25,9 +25,6 @@ class SnapReviewSkeleton(SnapReview):
 
     def check_foo(self):
         '''Check foo'''
-        if not self.is_snap2:
-            return
-
         t = 'info'
         n = self._get_check_name('foo')
         s = "OK"
@@ -38,9 +35,6 @@ class SnapReviewSkeleton(SnapReview):
 
     def check_bar(self):
         '''Check bar'''
-        if not self.is_snap2:
-            return
-
         t = 'info'
         n = self._get_check_name('bar')
         s = "OK"
@@ -51,9 +45,6 @@ class SnapReviewSkeleton(SnapReview):
 
     def check_baz(self):
         '''Check baz'''
-        if not self.is_snap2:
-            return
-
         n = self._get_check_name('baz')
         self._add_result('warn', n, 'TODO', link="http://example.com")
 

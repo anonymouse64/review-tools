@@ -54,16 +54,51 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
         return slots
 
     def _create_apps_slots(self):
-        slots = {'app1': {'slots': ['iface-slot1']},
-                 'app2': {'slots': ['network-bind']},
+        slots = {'app4': {'slots': ['iface-slot1']},
+                 'app5': {'slots': ['network-bind']},
                  }
         return slots
 
+    # The next two checks just make sure every check is run. One with the
+    # default snap from the tests and one empty. We do it this way so as not
+    # to add separate tests for short-circuit returns like:
+    #   if 'apps' not in self.snap_yaml:
+    #     return
     def test_all_checks_as_v2(self):
         '''Test snap v2 has checks'''
         self.set_test_pkgfmt("snap", "16.04")
+
         plugs = self._create_top_plugs()
         self.set_test_snap_yaml("plugs", plugs)
+
+        slots = self._create_top_slots()
+        self.set_test_snap_yaml("slots", slots)
+
+        apps = {}
+        apps_plugs = self._create_apps_plugs()
+        apps_slots = self._create_apps_slots()
+        for key in apps_plugs:
+            apps[key] = apps_plugs[key]
+        for key in apps_slots:
+            apps[key] = apps_slots[key]
+        print("JAMIE: %s" % self.test_snap_yaml)
+
+        c = SnapReviewSecurity(self.test_name)
+        c.do_checks()
+        sum = 0
+        for i in c.review_report:
+            sum += len(c.review_report[i])
+        self.assertTrue(sum != 0)
+
+    def test_all_checks_as_empty_v2(self):
+        '''Test snap v2 has checks - (mostly) empty yaml'''
+        self.set_test_pkgfmt("snap", "16.04")
+        tmp = []
+        for key in self.test_snap_yaml:
+            if key not in ['name', 'version']:  # required
+                tmp.append(key)
+        for key in tmp:
+            self.set_test_snap_yaml(key, None)
         c = SnapReviewSecurity(self.test_name)
         c.do_checks()
         sum = 0

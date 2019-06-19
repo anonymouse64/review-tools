@@ -41,9 +41,6 @@ class SnapReviewLint(SnapReview):
     def __init__(self, fn, overrides=None):
         '''Set up the class.'''
         SnapReview.__init__(self, fn, "lint-snap-v2", overrides=overrides)
-        if not self.is_snap2:
-            return
-
         self.valid_compiled_architectures = ['armhf',
                                              'i386',
                                              'amd64',
@@ -82,9 +79,6 @@ class SnapReviewLint(SnapReview):
 
     def check_architectures(self):
         '''Check architectures in snap.yaml is valid'''
-        if not self.is_snap2:
-            return
-
         t = 'info'
         n = self._get_check_name('architecture_valid')
         s = 'OK'
@@ -114,9 +108,6 @@ class SnapReviewLint(SnapReview):
 
     def check_assumes(self):
         '''Check assumes in snap.yaml is valid'''
-        if not self.is_snap2:
-            return
-
         t = 'info'
         n = self._get_check_name('assumes_valid')
         s = 'OK'
@@ -143,9 +134,6 @@ class SnapReviewLint(SnapReview):
 
     def _check_description_summary_title(self, key, maxlen):
         '''Check description, summary or title fields'''
-        if not self.is_snap2:
-            return
-
         t = 'info'
         n = self._get_check_name('%s_present' % key)
         s = 'OK'
@@ -192,9 +180,6 @@ class SnapReviewLint(SnapReview):
 
     def check_name(self):
         '''Check package name'''
-        if not self.is_snap2:
-            return
-
         t = 'info'
         n = self._get_check_name('name_valid')
         s = 'OK'
@@ -222,9 +207,6 @@ class SnapReviewLint(SnapReview):
 
     def check_type(self):
         '''Check type'''
-        if not self.is_snap2 or 'type' not in self.snap_yaml:
-            return
-
         t = 'info'
         n = self._get_check_name('snap_type_valid')
         s = 'OK'
@@ -235,9 +217,6 @@ class SnapReviewLint(SnapReview):
 
     def check_type_redflagged(self):
         '''Check if type is redflagged'''
-        if not self.is_snap2 or 'type' not in self.snap_yaml:
-            return
-
         t = 'info'
         n = self._get_check_name('snap_type_redflag')
         s = "OK"
@@ -258,9 +237,6 @@ class SnapReviewLint(SnapReview):
 
     def check_version(self):
         '''Check package version'''
-        if not self.is_snap2:
-            return
-
         t = 'info'
         n = self._get_check_name('version_valid')
         s = 'OK'
@@ -279,9 +255,6 @@ class SnapReviewLint(SnapReview):
 
     def check_valid_hook(self):
         '''Check valid hook'''
-        if not self.is_snap2:
-            return
-
         hooks = glob.glob("%s/meta/hooks/*" % self._get_unpack_dir())
         if len(hooks) == 0:
             return
@@ -321,7 +294,7 @@ class SnapReviewLint(SnapReview):
     def check_icon(self):
         '''Check icon'''
         # see docs/meta.md and docs/gadget.md
-        if not self.is_snap2 or 'icon' not in self.snap_yaml:
+        if 'icon' not in self.snap_yaml:
             return
 
         # Snappy icons may be specified in the gadget snap.yaml, but not in
@@ -367,9 +340,6 @@ class SnapReviewLint(SnapReview):
 
     def check_unknown_entries(self):
         '''Check for any unknown fields'''
-        if not self.is_snap2:
-            return
-
         t = 'info'
         n = self._get_check_name('unknown_field')
         s = 'OK'
@@ -470,14 +440,10 @@ class SnapReviewLint(SnapReview):
 
     def check_apps(self):
         '''Check apps'''
-        if not self.is_snap2:
-            return
         self._verify_apps_and_hooks()
 
     def check_hooks(self):
         '''Check hooks'''
-        if not self.is_snap2:
-            return
         self._verify_apps_and_hooks(hook=True)
 
     def _verify_value_is_file(self, app, key, use_shell_quoting=False):
@@ -521,7 +487,7 @@ class SnapReviewLint(SnapReview):
 
     def check_apps_command(self):
         '''Check apps - command'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         for app in self.snap_yaml['apps']:
@@ -598,7 +564,7 @@ class SnapReviewLint(SnapReview):
 
     def check_apps_command_chain(self):
         '''Check apps - command-chain'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         for app in self.snap_yaml['apps']:
@@ -610,7 +576,7 @@ class SnapReviewLint(SnapReview):
 
     def check_hooks_command_chain(self):
         '''Check hooks - command-chain'''
-        if not self.is_snap2 or 'hooks' not in self.snap_yaml:
+        if 'hooks' not in self.snap_yaml:
             return
 
         for hook in self.snap_yaml['hooks']:
@@ -622,7 +588,7 @@ class SnapReviewLint(SnapReview):
 
     def check_apps_reload_command(self):
         '''Check apps - reload-command'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         for app in self.snap_yaml['apps']:
@@ -635,7 +601,7 @@ class SnapReviewLint(SnapReview):
 
     def check_apps_stop_command(self):
         '''Check apps - stop-command'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         for app in self.snap_yaml['apps']:
@@ -648,7 +614,7 @@ class SnapReviewLint(SnapReview):
 
     def check_apps_post_stop_command(self):
         '''Check apps - post-stop-command'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         for app in self.snap_yaml['apps']:
@@ -692,7 +658,7 @@ class SnapReviewLint(SnapReview):
 
     def check_apps_restart_delay(self):
         '''Check apps - restart-delay'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         for app in self.snap_yaml['apps']:
@@ -705,7 +671,7 @@ class SnapReviewLint(SnapReview):
 
     def check_apps_start_timeout(self):
         '''Check apps - start-timeout'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         for app in self.snap_yaml['apps']:
@@ -718,7 +684,7 @@ class SnapReviewLint(SnapReview):
 
     def check_apps_stop_timeout(self):
         '''Check apps - stop-timeout'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         for app in self.snap_yaml['apps']:
@@ -731,7 +697,7 @@ class SnapReviewLint(SnapReview):
 
     def check_apps_watchdog_timeout(self):
         '''Check apps - watchdog-timeout'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         for app in self.snap_yaml['apps']:
@@ -763,7 +729,7 @@ class SnapReviewLint(SnapReview):
 
     def check_apps_daemon(self):
         '''Check apps - daemon'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         valid = ["simple",
@@ -783,7 +749,7 @@ class SnapReviewLint(SnapReview):
 
     def check_apps_invalid_combinations(self):
         '''Check apps - invalid combinations'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         # Certain options require 'daemon' be specified
@@ -943,7 +909,7 @@ class SnapReviewLint(SnapReview):
 
     def check_apps_restart_condition(self):
         '''Check apps - restart-condition'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         valid = ["always",
@@ -964,7 +930,7 @@ class SnapReviewLint(SnapReview):
 
     def check_apps_ports(self):
         '''Check apps - ports'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         valid_keys = ['internal', 'external']
@@ -1195,7 +1161,7 @@ class SnapReviewLint(SnapReview):
     def check_plugs(self):
         '''Check plugs'''
         iface_type = 'plugs'
-        if not self.is_snap2 or iface_type not in self.snap_yaml:
+        if iface_type not in self.snap_yaml:
             return
 
         self._verify_interfaces(iface_type)
@@ -1247,7 +1213,7 @@ class SnapReviewLint(SnapReview):
 
     def check_apps_plugs(self):
         '''Check apps plugs'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         for app in self.snap_yaml['apps']:
@@ -1259,7 +1225,7 @@ class SnapReviewLint(SnapReview):
 
     def check_hooks_plugs(self):
         '''Check hooks plugs'''
-        if not self.is_snap2 or 'hooks' not in self.snap_yaml:
+        if 'hooks' not in self.snap_yaml:
             return
 
         for hook in self.snap_yaml['hooks']:
@@ -1273,14 +1239,14 @@ class SnapReviewLint(SnapReview):
     def check_slots(self):
         '''Check slots'''
         iface_type = 'slots'
-        if not self.is_snap2 or iface_type not in self.snap_yaml:
+        if iface_type not in self.snap_yaml:
             return
 
         self._verify_interfaces(iface_type)
 
     def check_apps_slots(self):
         '''Check apps slots'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         for app in self.snap_yaml['apps']:
@@ -1292,7 +1258,7 @@ class SnapReviewLint(SnapReview):
 
     def check_hooks_slots(self):
         '''Check hooks slots'''
-        if not self.is_snap2 or 'hooks' not in self.snap_yaml:
+        if 'hooks' not in self.snap_yaml:
             return
 
         for hook in self.snap_yaml['hooks']:
@@ -1304,9 +1270,6 @@ class SnapReviewLint(SnapReview):
 
     def check_external_symlinks(self):
         '''Check snap for external symlinks'''
-        if not self.is_snap2:
-            return
-
         # Note: unclear if gadget snaps can legitimately have external
         # symlinks, but err on side of caution. kernel snaps for reference
         # kernels ship a dangling lib/modules/.../build (like on desktop) but
@@ -1336,9 +1299,6 @@ class SnapReviewLint(SnapReview):
 
     def check_architecture_all(self):
         '''Check if actually architecture all'''
-        if not self.is_snap2:
-            return
-
         if 'architectures' in self.snap_yaml and \
                 'all' not in self.snap_yaml['architectures']:
             return
@@ -1369,7 +1329,7 @@ class SnapReviewLint(SnapReview):
 
     def check_architecture_specified_needed(self):
         '''Check if the specified architecture is actually needed'''
-        if not self.is_snap2 or 'architectures' not in self.snap_yaml:
+        if 'architectures' not in self.snap_yaml:
             return
 
         if 'all' in self.snap_yaml['architectures']:
@@ -1389,9 +1349,6 @@ class SnapReviewLint(SnapReview):
 
     def check_vcs(self):
         '''Check for VCS files in the package'''
-        if not self.is_snap2:
-            return
-
         t = 'info'
         n = self._get_check_name('vcs_files')
         s = 'OK'
@@ -1408,9 +1365,6 @@ class SnapReviewLint(SnapReview):
 
     def check_iffy(self):
         '''Check for iffy files in the package'''
-        if not self.is_snap2:
-            return
-
         t = 'info'
         n = self._get_check_name('iffy_files')
         s = 'OK'
@@ -1430,7 +1384,7 @@ class SnapReviewLint(SnapReview):
 
     def check_epoch(self):
         '''Check epoch'''
-        if not self.is_snap2 or 'epoch' not in self.snap_yaml:
+        if 'epoch' not in self.snap_yaml:
             return
 
         t = 'info'
@@ -1509,7 +1463,7 @@ class SnapReviewLint(SnapReview):
 
     def check_confinement(self):
         '''Check confinement'''
-        if not self.is_snap2 or 'confinement' not in self.snap_yaml:
+        if 'confinement' not in self.snap_yaml:
             return
 
         allowed = ['strict', 'devmode', 'classic']
@@ -1576,7 +1530,7 @@ class SnapReviewLint(SnapReview):
 
     def check_grade(self):
         '''Check grade'''
-        if not self.is_snap2 or 'grade' not in self.snap_yaml:
+        if 'grade' not in self.snap_yaml:
             return
 
         allowed = ['stable', 'devel']
@@ -1648,14 +1602,14 @@ class SnapReviewLint(SnapReview):
 
     def check_environment(self):
         '''Check environment'''
-        if not self.is_snap2 or 'environment' not in self.snap_yaml:
+        if 'environment' not in self.snap_yaml:
             return
 
         self._verify_env(self.snap_yaml['environment'])
 
     def check_apps_environment(self):
         '''Check apps environment'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         for app in self.snap_yaml['apps']:
@@ -1668,7 +1622,7 @@ class SnapReviewLint(SnapReview):
 
     def check_hooks_environment(self):
         '''Check hooks environment'''
-        if not self.is_snap2 or 'hooks' not in self.snap_yaml:
+        if 'hooks' not in self.snap_yaml:
             return
 
         for app in self.snap_yaml['hooks']:
@@ -1681,7 +1635,7 @@ class SnapReviewLint(SnapReview):
 
     def check_apps_aliases(self):
         '''Check apps aliases'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         seen = []
@@ -1800,9 +1754,6 @@ class SnapReviewLint(SnapReview):
 
     def check_meta_gui_desktop(self):
         '''Check meta/gui/*.desktop'''
-        if not self.is_snap2:
-            return
-
         default_provider_is_mir = False
         if self._uses_interface("plugs", "content"):
             if "plugs" in self.snap_yaml:
@@ -1864,7 +1815,7 @@ class SnapReviewLint(SnapReview):
 
     def check_apps_completer(self):
         '''Check apps - completer'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         for app in self.snap_yaml['apps']:
@@ -1876,7 +1827,7 @@ class SnapReviewLint(SnapReview):
 
     def check_base(self):
         '''Check base'''
-        if not self.is_snap2 or 'base' not in self.snap_yaml:
+        if 'base' not in self.snap_yaml:
             return
 
         use_with = ['app', 'gadget']
@@ -1910,9 +1861,7 @@ class SnapReviewLint(SnapReview):
 
     def check_base_interfaces(self):
         '''Check base interfaces'''
-        if not self.is_snap2 or \
-                'type' not in self.snap_yaml or \
-                self.snap_yaml['type'] != 'base':
+        if self.snap_yaml['type'] != 'base':
             return
 
         for i in ['plugs', 'slots']:
@@ -1938,7 +1887,7 @@ class SnapReviewLint(SnapReview):
 
     def check_license(self):
         '''Check license'''
-        if not self.is_snap2 or 'license' not in self.snap_yaml:
+        if 'license' not in self.snap_yaml:
             return
 
         t = 'info'
@@ -1956,7 +1905,7 @@ class SnapReviewLint(SnapReview):
 
     def check_apps_sockets(self):
         '''Check apps - sockets'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         for app in self.snap_yaml['apps']:
@@ -2078,7 +2027,7 @@ class SnapReviewLint(SnapReview):
 
     def check_apps_common_id(self):
         '''Check apps - common-id'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         dupes = []
@@ -2112,7 +2061,7 @@ class SnapReviewLint(SnapReview):
 
     def check_interface_content_slot_source(self):
         '''Check content interface slot source'''
-        if not self.is_snap2 or 'slots' not in self.snap_yaml:
+        if 'slots' not in self.snap_yaml:
             return
 
         for slot in self.snap_yaml['slots']:
@@ -2183,7 +2132,7 @@ class SnapReviewLint(SnapReview):
 
     def check_layout(self):
         '''Check layout'''
-        if not self.is_snap2 or 'layout' not in self.snap_yaml:
+        if 'layout' not in self.snap_yaml:
             return
 
         def _verify_layout_target(p):
@@ -2335,7 +2284,7 @@ class SnapReviewLint(SnapReview):
 
     def check_apps_refresh_mode(self):
         '''Check apps - refresh-mode'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         unknown = []
@@ -2372,7 +2321,7 @@ class SnapReviewLint(SnapReview):
 
     def check_apps_stop_mode(self):
         '''Check apps - stop-mode'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         unknown = []
@@ -2409,7 +2358,7 @@ class SnapReviewLint(SnapReview):
 
     def check_snap_manifest(self):
         '''Check snap/manifest.yaml'''
-        if not self.is_snap2 or len(self.snap_manifest_yaml) == 0:
+        if len(self.snap_manifest_yaml) == 0:
             return
 
         t = 'info'
@@ -2421,7 +2370,7 @@ class SnapReviewLint(SnapReview):
 
     def check_apps_timer(self):
         '''Check apps - timer'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         # timers are a complex format. For now, let's just use a simple regex
@@ -2452,7 +2401,7 @@ class SnapReviewLint(SnapReview):
 
     def check_apps_before_after(self):
         '''Check apps - before/after'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         for key in ['after', 'before']:
@@ -2513,9 +2462,6 @@ class SnapReviewLint(SnapReview):
 
     def check_unicode_fields(self):
         '''Check various fields for valid unicode'''
-        if not self.is_snap2:
-            return
-
         errors = []
         for field in self.snappy_required + self.snappy_optional:
             if field not in self.snap_yaml:
@@ -2544,7 +2490,7 @@ class SnapReviewLint(SnapReview):
 
     def check_apps_autostart(self):
         '''Check apps - autostart'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         # We intentionally don't check for existence since the application may
@@ -2581,7 +2527,7 @@ class SnapReviewLint(SnapReview):
 
     def check_interface_personal_system_files_plugs(self):
         '''Check personal-files/system-files interface plug attributes'''
-        if not self.is_snap2 or 'plugs' not in self.snap_yaml:
+        if 'plugs' not in self.snap_yaml:
             return
 
         for plug in self.snap_yaml['plugs']:
@@ -2636,7 +2582,7 @@ class SnapReviewLint(SnapReview):
 
     def check_system_users(self):
         '''Check system-users'''
-        if not self.is_snap2 or 'system-users' not in self.snap_yaml:
+        if 'system-users' not in self.snap_yaml:
             return
 
         t = 'info'

@@ -44,9 +44,6 @@ class SnapReviewSecurity(SnapReview):
     def __init__(self, fn, overrides=None):
         SnapReview.__init__(self, fn, "security-snap-v2", overrides=overrides)
 
-        if not self.is_snap2:
-            return
-
     def _unsquashfs_lls(self, snap_pkg):
         '''Run unsquashfs -lls on a snap package'''
         return cmd(['unsquashfs', '-lls', snap_pkg])
@@ -63,7 +60,7 @@ class SnapReviewSecurity(SnapReview):
                 return True
             return False
 
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         found_app_plugs = False
@@ -102,7 +99,7 @@ class SnapReviewSecurity(SnapReview):
 
     def check_apparmor_profile_name_length(self):
         '''Check AppArmor profile name length'''
-        if not self.is_snap2 or 'apps' not in self.snap_yaml:
+        if 'apps' not in self.snap_yaml:
             return
 
         maxlen = AA_PROFILE_NAME_MAXLEN
@@ -168,9 +165,6 @@ class SnapReviewSecurity(SnapReview):
 
     def check_squashfs_resquash(self):
         '''Check resquash of squashfs'''
-        if not self.is_snap2:
-            return
-
         fn = os.path.abspath(self.pkg_filename)
 
         # Verify squashfs has no fragments. If it does, it will not resquash
@@ -404,9 +398,6 @@ class SnapReviewSecurity(SnapReview):
                     return False
             return True
 
-        if not self.is_snap2:
-            return
-
         pkgname = self.snap_yaml['name']
 
         snap_type = 'app'
@@ -578,7 +569,7 @@ class SnapReviewSecurity(SnapReview):
         self._add_result(t, n, s)
 
     def _allowed_iface_reference(self, side, interface):
-        if not self.is_snap2 or side not in self.snap_yaml:
+        if side not in self.snap_yaml:
             return
 
         # no overrides to check

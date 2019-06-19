@@ -305,6 +305,7 @@ class SnapReview(Review):
     def __init__(self, fn, review_type, overrides=None):
         Review.__init__(self, fn, review_type, overrides=overrides)
 
+        # Anything importing this is assumed to be a snap v2 check
         if not self.is_snap2:
             return
 
