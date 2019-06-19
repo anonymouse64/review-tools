@@ -30,7 +30,6 @@ TEST_SNAP_MANIFEST_YAML = ""
 TEST_PKGFMT_TYPE = "snap"
 TEST_PKGFMT_VERSION = "16.04"
 TEST_UNPACK_DIR = "/fake"
-TEST_SECURITY_PROFILES = dict()
 TEST_UNSQUASHFS_LLS = ""
 
 
@@ -55,13 +54,6 @@ def _extract_snap_manifest_yaml(self):
 def _path_join(self, d, fn):
     '''Pretend we have a tempdir'''
     return os.path.join("/fake", fn)
-
-
-def _check_innerpath_executable(self, fn):
-    '''Pretend we a file'''
-    if '.nonexec' in fn:
-        return False
-    return True
 
 
 def _pkgfmt_type(self):
@@ -108,9 +100,6 @@ def create_patches():
     patches.append(patch(
         'reviewtools.common.Review._list_all_compiled_binaries',
         _mock_func))
-    patches.append(patch(
-        'reviewtools.common.Review._check_innerpath_executable',
-        _check_innerpath_executable))
 
     # sr_common
     patches.append(patch('reviewtools.sr_common.SnapReview._get_unpack_dir',
@@ -150,9 +139,6 @@ class TestSnapReview(TestCase):
         # mockup a package name
         self._update_test_name()
 
-        # reset the security profiles
-        self.test_security_profiles = dict()
-
     def _update_test_snap_yaml(self):
         global TEST_SNAP_YAML
         TEST_SNAP_YAML = yaml.dump(self.test_snap_yaml,
@@ -164,16 +150,6 @@ class TestSnapReview(TestCase):
         TEST_SNAP_MANIFEST_YAML = yaml.dump(self.test_snap_manifest_yaml,
                                             default_flow_style=False,
                                             indent=4)
-
-    def _update_test_security_profiles(self):
-        global TEST_SECURITY_PROFILES
-        TEST_SECURITY_PROFILES = dict()
-        if len(self.test_security_profiles.keys()) == 0:
-            TEST_SECURITY_PROFILES = dict()
-        else:
-            for plug in self.test_security_profiles.keys():
-                TEST_SECURITY_PROFILES[plug] = \
-                    self.test_security_profiles[plug]
 
     def _update_test_name(self):
         self.test_name = "%s.origin_%s_%s.snap" % (
@@ -211,24 +187,6 @@ class TestSnapReview(TestCase):
             self.test_snap_manifest_yaml[key] = value
         self._update_test_snap_manifest_yaml()
 
-    def set_test_security_profile(self, plug, key, policy):
-        '''Set policy in security profile for key'''
-        if policy is None:
-            if plug in self.test_security_profiles and \
-                    key in self.test_security_profiles[plug]:
-                self.test_security_profiles[plug].pop(key)
-        elif key is None:
-            if plug in self.test_security_profiles:
-                self.test_security_profiles.pop(plug)
-        elif plug is None:
-            self.test_security_profiles = dict()
-        else:
-            if plug not in self.test_security_profiles:
-                self.test_security_profiles[plug] = dict()
-            self.test_security_profiles[plug][key] = policy
-
-        self._update_test_security_profiles()
-
     def set_test_pkgfmt(self, t, v):
         global TEST_PKGFMT_TYPE
         global TEST_PKGFMT_VERSION
@@ -256,8 +214,6 @@ class TestSnapReview(TestCase):
         TEST_SNAP_YAML = ""
         global TEST_SNAP_MANIFEST_YAML
         TEST_SNAP_MANIFEST_YAML = ""
-        global TEST_SECURITY_PROFILES
-        TEST_SECURITY_PROFILES = dict()
         global TEST_PKGFMT_TYPE
         TEST_PKGFMT_TYPE = "snap"
         global TEST_PKGFMT_VERSION
