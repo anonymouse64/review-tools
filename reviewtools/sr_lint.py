@@ -2135,16 +2135,22 @@ class SnapReviewLint(SnapReview):
         if 'layout' not in self.snap_yaml:
             return
 
-        def _verify_layout_target(p):
-            if '\0' in p or os.path.normpath(p) != p:
+        def _verify_layout_target(p, disallowed):
+            if '\0' in p or os.path.normpath(p) != p or not p.startswith('/'):
                 return False
+
+            # p is guaranteed to start with '/' and not '//...'
+            top = p.split('/')[1]
+            if "/%s" % top in disallowed:
+                return False
+
             return True
 
         def _verify_layout_source(p, allowed):
-            if not _verify_layout_target(p):
+            if '\0' in p or os.path.normpath(p) != p or not p.startswith('$'):
                 return False
 
-            # we can't os.path.split a non-absolute path
+            # p is guaranteed to start with '$'
             top = p.split('/')[0]
             if top not in allowed:
                 return False
@@ -2169,6 +2175,13 @@ class SnapReviewLint(SnapReview):
 
         self._add_result(t, n, s)
 
+        # snap/validate.go - ValidateLayout()
+        source_prefixes = ["$SNAP", "$SNAP_COMMON", "$SNAP_DATA"]
+        target_bad_prefixes = [
+            "/boot", "/dev", "/home", "/lib/firmware", "/lib/modules",
+            "/lost+found", "/media", "/proc", "/run", "/sys", "/tmp",
+            "/var/lib/snapd", "/var/snap",
+        ]
         for target in self.snap_yaml[key]:
             t = 'info'
             n = self._get_check_name('%s_target' % key, app=target)
@@ -2185,9 +2198,11 @@ class SnapReviewLint(SnapReview):
                 s = "invalid target '%s' (empty)" % (target)
                 self._add_result(t, n, s)
                 continue
-            elif not _verify_layout_target(target):
+            elif not _verify_layout_target(target, target_bad_prefixes):
                 t = 'error'
-                s = "invalid target mount: '%s'" % target
+                s = "invalid source mount: '%s'" % target + "(should be a " + \
+                    "legal path and not start with: " + \
+                    "%s" % ", ".join(target_bad_prefixes)
                 self._add_result(t, n, s)
                 continue
             self._add_result(t, n, s)
@@ -2216,15 +2231,14 @@ class SnapReviewLint(SnapReview):
                                              extra=source)
                     s = 'OK'
 
-                    layout_prefixes = ["$SNAP", "$SNAP_COMMON", "$SNAP_DATA"]
                     if not isinstance(source, str):
                         t = 'error'
                         s = "invalid source: %s (not a str)" % source
-                    elif not _verify_layout_source(source, layout_prefixes):
+                    elif not _verify_layout_source(source, source_prefixes):
                         t = 'error'
-                        s = "invalid source mount: '%s'" % source + \
+                        s = "invalid source mount: '%s' " % source + \
                             "(should be a legal path and start with one " + \
-                            "of: %s" % ", ".join(layout_prefixes)
+                            "of: %s" % ", ".join(source_prefixes)
                 elif ltype == 'mode':
                     ltype = 'mode'
                     rdata = self.snap_yaml[key][target][ltype]

@@ -4831,12 +4831,40 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
+    def test_check_layout_target_bad_prefix(self):
+        '''Test check_layout() - bad target (prefix)'''
+        self.set_test_snap_yaml(
+            "layout", {
+                '/proc/cmdline': {
+                    'bind': '$SNAP/etc/demo'
+                },
+            })
+        c = SnapReviewLint(self.test_name)
+        c.check_layout()
+        r = c.review_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
     def test_check_layout_source_bad_prefix(self):
         '''Test check_layout() - bad source (prefix)'''
         self.set_test_snap_yaml(
             "layout", {
                 '/etc/demo': {
                     'bind': '/bad/etc/demo'
+                },
+            })
+        c = SnapReviewLint(self.test_name)
+        c.check_layout()
+        r = c.review_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_layout_source_bad_prefix_home(self):
+        '''Test check_layout() - bad source (prefix $HOME)'''
+        self.set_test_snap_yaml(
+            "layout", {
+                '/var/tmp/other': {
+                    'bind': '$HOME/snap/other'
                 },
             })
         c = SnapReviewLint(self.test_name)
