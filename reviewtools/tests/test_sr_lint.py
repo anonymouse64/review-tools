@@ -4817,6 +4817,27 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
+    def test_check_layout_target_bad_too_many(self):
+        '''Test check_layout() - bad target (too many)'''
+        self.set_test_snap_yaml("layout", {
+            '/a/1': {'bind': '$SNAP/1'},
+            '/a/2': {'bind': '$SNAP/2'},
+            '/a/3': {'bind': '$SNAP/3'},
+            '/a/4': {'bind': '$SNAP/4'},
+            '/a/5': {'bind': '$SNAP/5'},
+            '/a/6': {'bind': '$SNAP/6'},
+            '/a/7': {'bind': '$SNAP/7'},
+            '/a/8': {'bind': '$SNAP/8'},
+            '/a/9': {'bind': '$SNAP/9'},
+            '/a/10': {'bind': '$SNAP/10'},
+            '/a/11': {'bind': '$SNAP/11'},
+        })
+        c = SnapReviewLint(self.test_name)
+        c.check_layout()
+        r = c.review_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
     def test_check_layout_target_bad(self):
         '''Test check_layout() - bad target (normpath)'''
         self.set_test_snap_yaml(

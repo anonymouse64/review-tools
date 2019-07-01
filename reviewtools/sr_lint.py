@@ -2157,6 +2157,9 @@ class SnapReviewLint(SnapReview):
 
             return True
 
+        # arbitrary, but agreed upon with snapd team (zyga)
+        maximum_layouts = 10
+
         key = 'layout'
         t = 'info'
         n = self._get_check_name(key)
@@ -2172,7 +2175,12 @@ class SnapReviewLint(SnapReview):
             s = "invalid %s entry (empty)" % (key)
             self._add_result(t, n, s)
             return
-
+        elif len(self.snap_yaml[key].keys()) > maximum_layouts:
+            t = 'error'
+            s = "too many defined layouts (%d > %d)" % (
+                len(self.snap_yaml[key].keys()), maximum_layouts)
+            self._add_result(t, n, s)
+            return
         self._add_result(t, n, s)
 
         # snap/validate.go - ValidateLayout()
