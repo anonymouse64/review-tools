@@ -971,7 +971,7 @@ drwx------ root/root                48 2016-03-11 12:26 squashfs-root/meta
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'security-snap-v2:interface-reference:test-iface'
+        name = 'security-snap-v2:interface-reference:unknown-ref:test-iface'
         expected['warn'][name] = {"text": "override not found for 'plugs/unknown-ref'. Use of the test-iface interface is reserved for vetted publishers. If your snap legitimately requires this access, please make a request in the forum using the 'store-requests' category (https://forum.snapcraft.io/c/store-requests), or if you would prefer to keep this private, the 'sensitive' category."}
         self.check_results(report, expected=expected)
 
@@ -995,7 +995,7 @@ drwx------ root/root                48 2016-03-11 12:26 squashfs-root/meta
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'security-snap-v2:interface-reference:test-iface'
+        name = 'security-snap-v2:interface-reference:known-ref:test-iface'
         expected['info'][name] = {"text": "OK"}
         self.check_results(report, expected=expected)
 
@@ -1019,7 +1019,7 @@ drwx------ root/root                48 2016-03-11 12:26 squashfs-root/meta
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'security-snap-v2:interface-reference:test-iface'
+        name = 'security-snap-v2:interface-reference:test-iface:test-iface'
         expected['info'][name] = {"text": "OK"}
         self.check_results(report, expected=expected)
 
@@ -1043,7 +1043,7 @@ drwx------ root/root                48 2016-03-11 12:26 squashfs-root/meta
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'security-snap-v2:interface-reference:test-iface'
+        name = 'security-snap-v2:interface-reference:disallowed:test-iface'
         expected['error'][name] = {"text": "interface reference 'disallowed' not allowed. Please use one of: known-ref"}
         self.check_results(report, expected=expected)
 
@@ -1067,7 +1067,7 @@ drwx------ root/root                48 2016-03-11 12:26 squashfs-root/meta
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'security-snap-v2:interface-reference:personal-files'
+        name = 'security-snap-v2:interface-reference:known-ref:personal-files'
         expected['info'][name] = {"text": "OK"}
         self.check_results(report, expected=expected)
 
@@ -1091,8 +1091,93 @@ drwx------ root/root                48 2016-03-11 12:26 squashfs-root/meta
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'security-snap-v2:interface-reference:system-files'
+        name = 'security-snap-v2:interface-reference:disallowed:system-files'
         expected['error'][name] = {"text": "interface reference 'disallowed' not allowed. Please use one of: known-ref"}
+        self.check_results(report, expected=expected)
+
+    def test_check_personal_files_interface_references_known(self):
+        '''Test check_personal_files_interface_reference() - two known'''
+        plugs = {'known-ref': {'interface': 'personal-files'},
+                 'known-ref2': {'interface': 'personal-files'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        self.set_test_snap_yaml("name", "test-app")
+        # add this snap to the override
+        from reviewtools.overrides import sec_iface_ref_overrides
+        sec_iface_ref_overrides['personal-files']['test-app'] = ['known-ref',
+                                                                 'known-ref2']
+        c = SnapReviewSecurity(self.test_name)
+        c.check_personal_files_iface_reference()
+        # then clean up
+        del sec_iface_ref_overrides['personal-files']['test-app']
+        report = c.review_report
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'security-snap-v2:interface-reference:known-ref:personal-files'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(report, expected=expected)
+        name = 'security-snap-v2:interface-reference:known-ref2:personal-files'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(report, expected=expected)
+
+    def test_check_system_files_interface_references_one_disallowed(self):
+        '''Test check_system_files_interface_reference() - one disallowed'''
+        plugs = {'known-ref': {'interface': 'system-files'},
+                 'disallowed': {'interface': 'system-files'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        self.set_test_snap_yaml("name", "test-app")
+        # add this snap to the override
+        from reviewtools.overrides import sec_iface_ref_overrides
+        sec_iface_ref_overrides['system-files']['test-app'] = ['known-ref']
+        c = SnapReviewSecurity(self.test_name)
+        c.check_system_files_iface_reference()
+        # then clean up
+        del sec_iface_ref_overrides['system-files']['test-app']
+        report = c.review_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 1}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'security-snap-v2:interface-reference:known-ref:system-files'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(report, expected=expected)
+        name = 'security-snap-v2:interface-reference:disallowed:system-files'
+        expected['error'][name] = {"text": "interface reference 'disallowed' not allowed. Please use one of: known-ref"}
+        self.check_results(report, expected=expected)
+
+    def test_check_system_files_interface_references_both_disallowed(self):
+        '''Test check_system_files_interface_reference() - both disallowed'''
+        plugs = {'disallowed': {'interface': 'system-files'},
+                 'disallowed2': {'interface': 'system-files'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        self.set_test_snap_yaml("name", "test-app")
+        # add this snap to the override
+        from reviewtools.overrides import sec_iface_ref_overrides
+        sec_iface_ref_overrides['system-files']['test-app'] = ['known-ref']
+        c = SnapReviewSecurity(self.test_name)
+        c.check_system_files_iface_reference()
+        # then clean up
+        del sec_iface_ref_overrides['system-files']['test-app']
+        report = c.review_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 2}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'security-snap-v2:interface-reference:disallowed:system-files'
+        expected['error'][name] = {"text": "interface reference 'disallowed' not allowed. Please use one of: known-ref"}
+        self.check_results(report, expected=expected)
+        name = 'security-snap-v2:interface-reference:disallowed2:system-files'
+        expected['error'][name] = {"text": "interface reference 'disallowed2' not allowed. Please use one of: known-ref"}
         self.check_results(report, expected=expected)
 
 

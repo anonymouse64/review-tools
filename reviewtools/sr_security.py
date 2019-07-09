@@ -583,33 +583,31 @@ class SnapReviewSecurity(SnapReview):
             elif 'interface' in self.snap_yaml[side][ref] and \
                     self.snap_yaml[side][ref]['interface'] == interface:
                 refname = ref
-            if refname is not None:
-                break
+            if refname is None:
+                continue  # nothing to check
 
-        if refname is None:  # nothing to check
-            return
-
-        t = 'info'
-        n = self._get_check_name('interface-reference', app=interface)
-        s = 'OK'
-        if self.snap_yaml['name'] not in sec_iface_ref_overrides[interface]:
-            t = 'warn'
-            s = "override not found for '%s/%s'. Use of " % (side, refname) + \
-                "the %s interface is reserved for vetted " % interface + \
-                "publishers. If your snap legitimately requires this " + \
-                "access, please make a request in the forum using the " + \
-                "'store-requests' category (" + \
-                "https://forum.snapcraft.io/c/store-requests), or if " + \
-                "you would prefer to keep this private, the 'sensitive' " + \
-                "category."
+            t = 'info'
+            n = self._get_check_name('interface-reference', app=refname,
+                                     extra=interface)
+            s = 'OK'
+            if self.snap_yaml['name'] not in sec_iface_ref_overrides[interface]:
+                t = 'warn'
+                s = "override not found for '%s/%s'. " % (side, refname) + \
+                    "Use of the %s interface is reserved for " % interface + \
+                    "vetted publishers. If your snap legitimately " + \
+                    "requires this access, please make a request in " + \
+                    "the forum using the 'store-requests' category (" + \
+                    "https://forum.snapcraft.io/c/store-requests), or if " + \
+                    "you would prefer to keep this private, the 'sensitive' " + \
+                    "category."
+                self._add_result(t, n, s)
+            elif refname not in \
+                    sec_iface_ref_overrides[interface][self.snap_yaml['name']]:
+                t = 'error'
+                s = "interface reference '%s' not allowed. " % refname + \
+                    "Please use one of: %s" % ", ".join(
+                        sec_iface_ref_overrides[interface][self.snap_yaml['name']])
             self._add_result(t, n, s)
-        elif refname not in \
-                sec_iface_ref_overrides[interface][self.snap_yaml['name']]:
-            t = 'error'
-            s = "interface reference '%s' not allowed. Please " % refname + \
-                "use one of: %s" % ", ".join(
-                    sec_iface_ref_overrides[interface][self.snap_yaml['name']])
-        self._add_result(t, n, s)
 
     def check_personal_files_iface_reference(self):
         '''Check personal-files interface references'''
