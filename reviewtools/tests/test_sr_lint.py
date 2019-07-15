@@ -5497,11 +5497,11 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
-    def test_check_system_users(self):
-        '''Test check_system_users'''
-        self.set_test_snap_yaml("system-users", ['daemon'])
+    def test_check_system_usernames(self):
+        '''Test check_system_usernames'''
+        self.set_test_snap_yaml("system-usernames", ['snap_daemon'])
         c = SnapReviewLint(self.test_name)
-        c.check_system_users()
+        c.check_system_usernames()
         r = c.review_report
         expected_counts = {'info': 1, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
@@ -5510,14 +5510,14 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             'error': {},
             'warn': {},
             'info': {
-                'lint-snap-v2:system-users_valid': {
+                'lint-snap-v2:system-usernames_valid': {
                     "text": "OK"
                 },
             },
         }
         self.check_results(r, expected=expected)
 
-    def test_check_system_users_bad(self):
+    def test_check_system_usernames_bad(self):
         '''Test check_base - bad values'''
         bad_values = (
             True,
@@ -5525,9 +5525,9 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             [],
         )
         for v in bad_values:
-            self.set_test_snap_yaml("system-users", v)
+            self.set_test_snap_yaml("system-usernames", v)
             c = SnapReviewLint(self.test_name)
-            c.check_system_users()
+            c.check_system_usernames()
             r = c.review_report
             expected_counts = {'info': None, 'warn': 0, 'error': 1}
             self.check_results(r, expected_counts)

@@ -2602,28 +2602,28 @@ class SnapReviewLint(SnapReview):
 
                     self._add_result(t, n, s)
 
-    def check_system_users(self):
-        '''Check system-users'''
-        if 'system-users' not in self.snap_yaml:
+    def check_system_usernames(self):
+        '''Check system-usernames'''
+        if 'system-usernames' not in self.snap_yaml:
             return
 
         t = 'info'
-        n = self._get_check_name('system-users_valid')
+        n = self._get_check_name('system-usernames_valid')
         s = 'OK'
-        if not isinstance(self.snap_yaml['system-users'], list):
+        if not isinstance(self.snap_yaml['system-usernames'], list):
             t = 'error'
-            s = "malformed 'system-users': %s (not a list)" % (
-                self.snap_yaml['system-users'])
-        elif len(self.snap_yaml['system-users']) == 0:
+            s = "malformed 'system-usernames': %s (not a list)" % (
+                self.snap_yaml['system-usernames'])
+        elif len(self.snap_yaml['system-usernames']) == 0:
             t = 'error'
-            s = "empty 'system-users'"
+            s = "empty 'system-usernames'"
         else:
-            for i in self.snap_yaml['system-users']:
+            for i in self.snap_yaml['system-usernames']:
                 if not isinstance(i, str):
                     t = 'error'
-                    s = "malformed entry in 'system-users': " + \
+                    s = "malformed entry in 'system-usernames': " + \
                         "%s (contains non-strings)" % \
-                        self.snap_yaml['system-users']
+                        self.snap_yaml['system-usernames']
                     break
 
         self._add_result(t, n, s)

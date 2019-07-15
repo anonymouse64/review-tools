@@ -62,7 +62,7 @@ class SnapReview(Review):
                        'type',
                        'plugs',
                        'slots',
-                       'system-users',
+                       'system-usernames',
                        ]
 
     snap_manifest_required = {'build-packages': [],
