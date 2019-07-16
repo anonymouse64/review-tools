@@ -151,6 +151,8 @@ class SnapReview(Review):
     valid_hook_types = ['configure',
                         'connect-plug-',
                         'connect-slot-',
+                        'disconnect-plug-',
+                        'disconnect-slot-',
                         'install',
                         'post-refresh',
                         'pre-refresh',
@@ -158,6 +160,8 @@ class SnapReview(Review):
                         'prepare-plug-',
                         'prepare-slot-',
                         'remove',
+                        'unprepare-plug-',
+                        'unprepare-slot-',
                         ]
 
     # snap/validate.go
