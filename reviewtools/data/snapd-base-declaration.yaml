@@ -343,6 +343,11 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  jack1:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   joystick:
     allow-installation:
       slot-snap-type:
@@ -396,6 +401,11 @@
     deny-connection: true
     deny-auto-connection: true
   log-observe:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
+  login-session-control:
     allow-installation:
       slot-snap-type:
         - core
