@@ -498,7 +498,7 @@ canonical_lxd = ['stephane.graber@canonical.com',
                  'free.ekanayaka@canonical.com',
                  ]
 
-canonical_maas = ['andres.rodriguez@canonical.com',
+canonical_maas = ['adam.collard@canonical.com',
                   'blake.rouse@canonical.com',
                   ]
 
@@ -527,7 +527,7 @@ canonical_snapd = ['gustavo.niemeyer@canonical.com',
                    'michael.vogt@canonical.com',
                    ]
 
-canonical_snapcraft = ['evan.dandrea@canonical.com',
+canonical_snapcraft = ['martin.wimpress@canonical.com',
                        'sergio.schvezov@canonical.com',
                        ]
 
@@ -535,7 +535,7 @@ canonical_snapcraft = ['evan.dandrea@canonical.com',
 # but it was changed a little while ago
 update_publisher_overrides = {
     'snaps@canonical.com': {
-        'alsa_utils': canonical_enablement,
+        'alsa-utils': canonical_enablement,
         'avahi': canonical_enablement,
         'aws-kernel': canonical_kernel,
         'azure-kernel': canonical_kernel,
