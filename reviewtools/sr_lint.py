@@ -2135,11 +2135,28 @@ class SnapReviewLint(SnapReview):
         if 'layout' not in self.snap_yaml:
             return
 
+        # snap/validate.go - ValidateLayout()
+        snap_vars = ["$SNAP", "$SNAP_COMMON", "$SNAP_DATA"]
+        target_bad_prefixes = [
+            "/boot", "/dev", "/home", "/lib/firmware", "/lib/modules",
+            "/lost+found", "/media", "/proc", "/run", "/sys", "/tmp",
+            "/var/lib/snapd", "/var/snap",
+        ]
+
         def _verify_layout_target(p, disallowed):
-            if '\0' in p or os.path.normpath(p) != p or not p.startswith('/'):
+            if '\0' in p or os.path.normpath(p) != p:
                 return False
 
-            # p is guaranteed to start with '/' and not '//...'
+            # if the normalized path starts with snap_vars, then it is ok
+            for prefix in snap_vars:
+                if p.startswith("%s/" % prefix):
+                    return True
+
+            # otherwise it must be an absolute path
+            if not p.startswith('/'):
+                return False
+
+            # p is now guaranteed to start with '/' and not '//...'
             top = p.split('/')[1]
             if "/%s" % top in disallowed:
                 return False
@@ -2157,8 +2174,9 @@ class SnapReviewLint(SnapReview):
 
             return True
 
-        # arbitrary, but agreed upon with snapd team (zyga)
-        maximum_layouts = 10
+        # arbitrary; 10 was agreed upon with snapd team (zyga) but found snaps
+        # with 8, so bumping to 15
+        maximum_layouts = 15
 
         key = 'layout'
         t = 'info'
@@ -2183,13 +2201,6 @@ class SnapReviewLint(SnapReview):
             return
         self._add_result(t, n, s)
 
-        # snap/validate.go - ValidateLayout()
-        source_prefixes = ["$SNAP", "$SNAP_COMMON", "$SNAP_DATA"]
-        target_bad_prefixes = [
-            "/boot", "/dev", "/home", "/lib/firmware", "/lib/modules",
-            "/lost+found", "/media", "/proc", "/run", "/sys", "/tmp",
-            "/var/lib/snapd", "/var/snap",
-        ]
         for target in self.snap_yaml[key]:
             t = 'info'
             n = self._get_check_name('%s_target' % key, app=target)
@@ -2208,9 +2219,10 @@ class SnapReviewLint(SnapReview):
                 continue
             elif not _verify_layout_target(target, target_bad_prefixes):
                 t = 'error'
-                s = "invalid source mount: '%s'" % target + "(should be a " + \
-                    "legal path and not start with: " + \
-                    "%s" % ", ".join(target_bad_prefixes)
+                s = "invalid mount target: '%s'" % target + " (should be " + \
+                    "a legal path (ie, absolute path or one that starts " + \
+                    "with: %s)" % ", ".join(snap_vars) + ". If absolute, " + \
+                    "should not start with: %s" % ", ".join(target_bad_prefixes)
                 self._add_result(t, n, s)
                 continue
             self._add_result(t, n, s)
@@ -2242,11 +2254,11 @@ class SnapReviewLint(SnapReview):
                     if not isinstance(source, str):
                         t = 'error'
                         s = "invalid source: %s (not a str)" % source
-                    elif not _verify_layout_source(source, source_prefixes):
+                    elif not _verify_layout_source(source, snap_vars):
                         t = 'error'
                         s = "invalid source mount: '%s' " % source + \
                             "(should be a legal path and start with one " + \
-                            "of: %s" % ", ".join(source_prefixes)
+                            "of: %s" % ", ".join(snap_vars)
                 elif ltype == 'mode':
                     ltype = 'mode'
                     rdata = self.snap_yaml[key][target][ltype]

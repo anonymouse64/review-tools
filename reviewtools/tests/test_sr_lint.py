@@ -4799,6 +4799,34 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
+    def test_check_layout_source_target_use_snap_vars(self):
+        '''Test check_layout() - source/target use $SNAP...'''
+        self.set_test_snap_yaml(
+            "layout", {
+                '$SNAP/db': {
+                    'bind': '$SNAP_DATA/db'
+                },
+            })
+        c = SnapReviewLint(self.test_name)
+        c.check_layout()
+        r = c.review_report
+        expected_counts = {'info': 3, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_layout_target_bad_snap_var(self):
+        '''Test check_layout() - bad target (SNAP_USER_COMMON)'''
+        self.set_test_snap_yaml(
+            "layout", {
+                '$SNAP_USER_COMMON/db': {
+                    'bind': '$SNAP_DATA/db'
+                },
+            })
+        c = SnapReviewLint(self.test_name)
+        c.check_layout()
+        r = c.review_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
     def test_check_layout_target_bad_val(self):
         '''Test check_layout() - bad target (list)'''
         self.set_test_snap_yaml("layout", {'/etc/demo': []})
@@ -4831,6 +4859,11 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             '/a/9': {'bind': '$SNAP/9'},
             '/a/10': {'bind': '$SNAP/10'},
             '/a/11': {'bind': '$SNAP/11'},
+            '/a/12': {'bind': '$SNAP/12'},
+            '/a/13': {'bind': '$SNAP/13'},
+            '/a/14': {'bind': '$SNAP/14'},
+            '/a/15': {'bind': '$SNAP/15'},
+            '/a/16': {'bind': '$SNAP/16'},
         })
         c = SnapReviewLint(self.test_name)
         c.check_layout()
