@@ -394,6 +394,7 @@ sec_iface_ref_overrides = {
         'kubefwd': ['config-kube'],
         'kubicorn': ['kube-config'],
         'popeye': ['kube-config'],
+        'rain': ['config-aws'],
         'redis-desktop-manager': ['dot-rdm'],
     },
     'system-files': {
