@@ -686,6 +686,8 @@ update_stage_packages = {
     'pi-kernel': {'linux-image-raspi2': 'auto-kernel'},
     'pi2-kernel': {'linux-image-raspi2': 'auto-kernel'},  # same as pi-kernel
     # Canonical Stack Snaps - changes should be approved by awe
+    # - alsa-utils snapcraft.yaml doesn't specify base; mock xenial version
+    'alsa-utils': {'alsa-utils': '1.1.0-0ubuntu5'},
     # - bluez snapcraft.yaml doesn't specify base; mock xenial version
     'bluez': {'bluez': '5.37-0ubuntu5'},
     # - modem-manager snapcraft.yaml doesn't specify base; mock xenial version
@@ -694,8 +696,12 @@ update_stage_packages = {
     'network-manager': {'network-manager': '1.2.2-22'},
     # - stlouis-kernel maintained by hwe
     'stlouis-kernel': {'linux-image-generic': 'auto-kernel'},
+    # - udisks2 snapcraft.yaml doesn't specify base; mock xenial versions
+    'udisks2': {'udisks2': '2.1.7-1ubuntu1'},
     # - wifi-ap snapcraft.yaml doesn't specify base; mock xenial versions
     'wifi-ap': {'dnsmasq': '2.75-1', 'wpa': '2.4-0ubuntu6'},
+    # - wpa-supplicant snapcraft.yaml doesn't specify base; mock xenial
+    'wpa-supplicant': {'wpa': '2.4-0ubuntu6'},
 }
 
 
