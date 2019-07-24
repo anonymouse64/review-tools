@@ -690,6 +690,8 @@ update_stage_packages = {
     'alsa-utils': {'alsa-utils': '1.1.0-0ubuntu5'},
     # - bluez snapcraft.yaml doesn't specify base; mock xenial version
     'bluez': {'bluez': '5.37-0ubuntu5'},
+    # - locationd snapcraft.yaml doesn't specify base; mock xenial version
+    'locationd': {'location-service': '3.0.0+16.04.20160405-0ubuntu1'},
     # - modem-manager snapcraft.yaml doesn't specify base; mock xenial version
     'modem-manager': {'modemmanager': '1.6.4-1ubuntu0.16.04.1'},
     # - network-manager snapcraft.yaml doesn't specify base; mock xenial
