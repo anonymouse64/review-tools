@@ -601,6 +601,7 @@ update_publisher_overrides = {
         'mir-kiosk-apps': canonical_mir,
         'modem-manager': canonical_enablement,
         'multipass': canonical_multipass,
+        'multipass-sshfs': canonical_multipass,
         'network-manager': canonical_enablement,
         'openstack': canonical_openstack,
         'openwrt': canonical_enablement,
