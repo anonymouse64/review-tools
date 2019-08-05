@@ -82,6 +82,7 @@ redflagged_snap_types_overrides = {
                'pi3-unipi',
                'pi2kyle',
                'pi3testbootsplash',
+               'pocketbeagle',
                'roseapple-pi',
                'sabrelite',
                'wdl-nextcloud',
