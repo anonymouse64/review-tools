@@ -67,6 +67,7 @@ redflagged_snap_types_overrides = {
                'pi3',
                'cm3-ondra',  # @canonical.com gadgets
                'cm3-openhab',
+               'cubox-i',
                'hikey-snappy-gadget',
                'hummingboard',
                'joule',
