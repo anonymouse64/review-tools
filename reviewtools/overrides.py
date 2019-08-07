@@ -568,6 +568,8 @@ update_publisher_overrides = {
         'gke-kernel': canonical_kernel,
         'gnome-3-26-1604': canonical_desktop,
         'gnome-3-28-1804': canonical_desktop,
+        'gnome-3-32-1804': canonical_desktop,
+        'gnome-3-32-1804-sdk': canonical_desktop,
         'gnome-calculator': canonical_desktop,
         'gnome-calendar': canonical_desktop,
         'gnome-characters': canonical_desktop,
