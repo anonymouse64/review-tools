@@ -63,6 +63,21 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  audio-playback:
+    allow-installation:
+      slot-snap-type:
+        - app
+        - core
+    deny-connection:
+      on-classic: false
+  audio-record:
+    allow-installation:
+      slot-snap-type:
+        - app
+        - core
+    deny-connection:
+      on-classic: false
+    deny-auto-connection: true
   autopilot-introspection:
     allow-installation:
       slot-snap-type:
