@@ -180,6 +180,9 @@ class SnapReview(Review):
                         'sigusr2-all',
                         ]
 
+    # overlord/snapstate/check_snap.go (but eventually store side)
+    valid_system_usernames = ['snap_daemon']
+
     # https://docs.google.com/document/d/1Q5_T00yTq0wobm_nHzCV-KV8R4jdk-PXcrtm80ETTLU/edit#
     # 'plugs':
     #    'interface': name

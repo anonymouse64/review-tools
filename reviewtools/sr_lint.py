@@ -2622,20 +2622,67 @@ class SnapReviewLint(SnapReview):
         t = 'info'
         n = self._get_check_name('system-usernames_valid')
         s = 'OK'
-        if not isinstance(self.snap_yaml['system-usernames'], list):
+        if not isinstance(self.snap_yaml['system-usernames'], dict):
             t = 'error'
-            s = "malformed 'system-usernames': %s (not a list)" % (
+            s = "malformed 'system-usernames': %s (not a dict)" % (
                 self.snap_yaml['system-usernames'])
         elif len(self.snap_yaml['system-usernames']) == 0:
             t = 'error'
             s = "empty 'system-usernames'"
-        else:
-            for i in self.snap_yaml['system-usernames']:
-                if not isinstance(i, str):
-                    t = 'error'
-                    s = "malformed entry in 'system-usernames': " + \
-                        "%s (contains non-strings)" % \
-                        self.snap_yaml['system-usernames']
-                    break
-
         self._add_result(t, n, s)
+        if t != 'info':
+            return
+
+        supported_scopes = ['shared']
+        unsupported_scopes = ['external', 'private']
+        for name in self.snap_yaml['system-usernames']:
+            t = 'info'
+            n = self._get_check_name('system-usernames', app=name)
+            s = 'OK'
+            if name not in self.valid_system_usernames:
+                t = 'error'
+                s = 'unsupported system-username: %s' % name
+                self._add_result(t, n, s)
+                continue
+
+            entry = self.snap_yaml['system-usernames'][name]
+            if not isinstance(entry, str) and not isinstance(entry, dict):
+                t = 'error'
+                s = "malformed entry 'system-usernames[%s]': " % name + \
+                    "(should be string or dict)"
+                self._add_result(t, n, s)
+                continue
+
+            unknown_keys = []
+            if isinstance(entry, dict):
+                for i in entry:
+                    if i != 'scope' and i not in unknown_keys:
+                        unknown_keys.append(i)
+                if len(unknown_keys) > 0:
+                    t = 'error'
+                    s = "unknown keys for system-username '%s': " % name + \
+                        ", ".join(unknown_keys)
+                    self._add_result(t, n, s)
+                    continue
+
+            scope = None
+            if isinstance(entry, str):
+                scope = entry
+            else:
+                if 'scope' not in entry:
+                    t = 'error'
+                    s = "required scope missing for system-username " + \
+                        "'%s'" % name
+                    self._add_result(t, n, s)
+                    continue
+                scope = entry['scope']
+
+            if scope not in supported_scopes + unsupported_scopes:
+                t = 'error'
+                s = "unknown scope '%s' for system-username '%s'" % (scope,
+                                                                     name)
+            elif scope in unsupported_scopes:
+                t = 'error'
+                s = "unsupported scope '%s' for system-username '%s'" % (scope,
+                                                                         name)
+            self._add_result(t, n, s)

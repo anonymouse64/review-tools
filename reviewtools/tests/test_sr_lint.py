@@ -5532,11 +5532,11 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
     def test_check_system_usernames(self):
         '''Test check_system_usernames'''
-        self.set_test_snap_yaml("system-usernames", ['snap_daemon'])
+        self.set_test_snap_yaml("system-usernames", {'snap_daemon': 'shared'})
         c = SnapReviewLint(self.test_name)
         c.check_system_usernames()
         r = c.review_report
-        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
         expected = {
@@ -5546,12 +5546,15 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                 'lint-snap-v2:system-usernames_valid': {
                     "text": "OK"
                 },
+                'lint-snap-v2:system-usernames:snap_daemon': {
+                    "text": "OK"
+                },
             },
         }
         self.check_results(r, expected=expected)
 
     def test_check_system_usernames_bad(self):
-        '''Test check_base - bad values'''
+        '''Test check_system_usernames - bad values'''
         bad_values = (
             True,
             [False],
@@ -5564,6 +5567,175 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             r = c.review_report
             expected_counts = {'info': None, 'warn': 0, 'error': 1}
             self.check_results(r, expected_counts)
+
+            d = {'snap_daemon': v}
+            self.set_test_snap_yaml("system-usernames", d)
+            c = SnapReviewLint(self.test_name)
+            c.check_system_usernames()
+            r = c.review_report
+            expected_counts = {'info': 1, 'warn': 0, 'error': 1}
+            self.check_results(r, expected_counts)
+            expected = {
+                'error': {
+                    'lint-snap-v2:system-usernames:snap_daemon': {
+                        'text': "malformed entry 'system-usernames[snap_daemon]': (should be string or dict)",
+                    },
+                },
+                'warn': {},
+                'info': {
+                    'lint-snap-v2:system-usernames_valid': {
+                        "text": "OK"
+                    },
+                },
+            }
+            self.check_results(r, expected=expected)
+
+    def test_check_system_usernames_empty(self):
+        '''Test check_system_usernames - empty'''
+        self.set_test_snap_yaml("system-usernames", {})
+        c = SnapReviewLint(self.test_name)
+        c.check_system_usernames()
+        r = c.review_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+        expected = {
+            'error': {
+                'lint-snap-v2:system-usernames_valid': {
+                    'text': "empty 'system-usernames'",
+                },
+            },
+            'warn': {},
+            'info': {},
+        }
+        self.check_results(r, expected=expected)
+
+    def test_check_system_usernames_unsupported_user(self):
+        '''Test check_system_usernames - unsupported user'''
+        d = {'snap_unsupported': 'shared'}
+        self.set_test_snap_yaml("system-usernames", d)
+        c = SnapReviewLint(self.test_name)
+        c.check_system_usernames()
+        r = c.review_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+        expected = {
+            'error': {
+                'lint-snap-v2:system-usernames:snap_unsupported': {
+                    'text': "unsupported system-username: snap_unsupported",
+                },
+            },
+            'warn': {},
+            'info': {
+                'lint-snap-v2:system-usernames_valid': {
+                    "text": "OK"
+                },
+            },
+        }
+        self.check_results(r, expected=expected)
+
+    def test_check_system_usernames_unknown_key(self):
+        '''Test check_system_usernames - unknown key'''
+        d = {'snap_daemon': {'unknown': 'foo'}}
+        self.set_test_snap_yaml("system-usernames", d)
+        c = SnapReviewLint(self.test_name)
+        c.check_system_usernames()
+        r = c.review_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+        expected = {
+            'error': {
+                'lint-snap-v2:system-usernames:snap_daemon': {
+                    'text': "unknown keys for system-username 'snap_daemon': unknown",
+                },
+            },
+            'warn': {},
+            'info': {
+                'lint-snap-v2:system-usernames_valid': {
+                    "text": "OK"
+                },
+            },
+        }
+        self.check_results(r, expected=expected)
+
+    def test_check_system_usernames_missing_scope(self):
+        '''Test check_system_usernames - missing scope'''
+        d = {'snap_daemon': {}}
+        self.set_test_snap_yaml("system-usernames", d)
+        c = SnapReviewLint(self.test_name)
+        c.check_system_usernames()
+        r = c.review_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+        expected = {
+            'error': {
+                'lint-snap-v2:system-usernames:snap_daemon': {
+                    'text': "required scope missing for system-username 'snap_daemon'",
+                },
+            },
+            'warn': {},
+            'info': {
+                'lint-snap-v2:system-usernames_valid': {
+                    "text": "OK"
+                },
+            },
+        }
+        self.check_results(r, expected=expected)
+
+    def test_check_system_usernames_unknown_scope(self):
+        '''Test check_system_usernames - unknown scope'''
+        entries = (
+            {'snap_daemon': 'unknown'},
+            {'snap_daemon': {'scope': 'unknown'}},
+        )
+        for d in entries:
+            self.set_test_snap_yaml("system-usernames", d)
+            c = SnapReviewLint(self.test_name)
+            c.check_system_usernames()
+            r = c.review_report
+            expected_counts = {'info': 1, 'warn': 0, 'error': 1}
+            self.check_results(r, expected_counts)
+            expected = {
+                'error': {
+                    'lint-snap-v2:system-usernames:snap_daemon': {
+                        'text': "unknown scope 'unknown' for system-username 'snap_daemon'",
+                    },
+                },
+                'warn': {},
+                'info': {
+                    'lint-snap-v2:system-usernames_valid': {
+                        "text": "OK"
+                    },
+                },
+            }
+            self.check_results(r, expected=expected)
+
+    def test_check_system_usernames_unsupported_scope(self):
+        '''Test check_system_usernames - unsupported scope'''
+        entries = (
+            {'snap_daemon': 'private'},
+            {'snap_daemon': {'scope': 'private'}},
+        )
+        for d in entries:
+            self.set_test_snap_yaml("system-usernames", d)
+            c = SnapReviewLint(self.test_name)
+            c.check_system_usernames()
+            r = c.review_report
+            expected_counts = {'info': 1, 'warn': 0, 'error': 1}
+            self.check_results(r, expected_counts)
+            expected = {
+                'error': {
+                    'lint-snap-v2:system-usernames:snap_daemon': {
+                        'text': "unsupported scope 'private' for system-username 'snap_daemon'",
+                    },
+                },
+                'warn': {},
+                'info': {
+                    'lint-snap-v2:system-usernames_valid': {
+                        "text": "OK"
+                    },
+                },
+            }
+            self.check_results(r, expected=expected)
 
 
 class TestSnapReviewLintNoMock(TestCase):
