@@ -51,6 +51,12 @@ To run tests, just execute:
 $ ./run-tests                       # all tests
 $ ./run-tests test_sr_security.py   # only security tests
 
+Or to run a specific test:
+$ python3 -m unittest reviewtools.tests.<filename>.<class>.<test>
+
+Eg:
+$ python3 -m unittest reviewtools.tests.test_sr_security.TestSnapReviewSecurity.test_all_checks_as_v2
+
 Additional checks are:
 $ ./run-pep8
 $ ./run-pyflakes

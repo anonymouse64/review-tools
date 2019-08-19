@@ -302,7 +302,9 @@ def build_package(path, name, version, pkgfmt_type, pkgfmt_version,
         # debugging
         # subprocess.check_call(args)
         # subprocess.check_call(['unsquashfs', '-lls', output_path])
-        subprocess.check_call(args, stdout=open(os.devnull, 'w'))
+        fd = open(os.devnull, 'w')
+        subprocess.check_call(args, stdout=fd)
+        fd.close()
     else:  # click and snap v1
         # Note: We're not using 'click build' here as it corrects errors (such
         # as filtering out a .click directory present in the build). We want

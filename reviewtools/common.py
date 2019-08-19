@@ -958,7 +958,11 @@ def read_snapd_base_declaration():
                                   'data/snapd-base-declaration.yaml')
         if not os.path.exists(bd_fn):
             error("could not find '%s'" % bd_fn)
-    bd_yaml = yaml.safe_load(open(bd_fn, 'r').read())
+    fd = open_file_read(bd_fn)
+    contents = fd.read()
+    fd.close()
+
+    bd_yaml = yaml.safe_load(contents)
     # FIXME: don't hardcode series
     series = "16"
     return series, bd_yaml[series]

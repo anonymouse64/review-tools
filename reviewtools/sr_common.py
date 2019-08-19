@@ -321,12 +321,14 @@ class SnapReview(Review):
             self.snap_yaml = yaml.safe_load(snap_yaml)
         except Exception:  # pragma: nocover
             error("Could not load snap.yaml. Is it properly formatted?")
+        snap_yaml.close()
 
         self.snap_manifest_yaml = {}
         manifest_yaml = self._extract_snap_manifest_yaml()
         if manifest_yaml is not None:
             try:
                 self.snap_manifest_yaml = yaml.safe_load(manifest_yaml)
+                manifest_yaml.close()
                 if self.snap_manifest_yaml is None:
                     self.snap_manifest_yaml = {}
             except Exception:  # pragma: nocover
