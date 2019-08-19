@@ -1728,16 +1728,25 @@ class SnapReviewLint(SnapReview):
             return False
 
         if '/' in fn:
-            # explicit file paths must point into the snap with extension (if
+            # Explicit file paths must point into the snap with extension (if
             # this is relaxed, must consider snap-controlled paths that symlink
             # outside of the snap (${SNAP}/ is in the read-only area, so it is
             # fine).
             if fn.startswith('${SNAP}/') and (fn.endswith('.png') or
                                               fn.endswith('.svg')):
                 return True
+
+            # As a special consideration to not break existing snaps, allow
+            # /snap/<snap name>/.... People should use ${SNAP}/ instead since
+            # /snap is not portable (eg, Fedora puts this in /var/lib/snap
+            # instead of /snap), but '${SNAP}' wasn't always available.
+            if fn.startswith('/snap/%s/' % self.snap_yaml['name']) and \
+                    (fn.endswith('.png') or fn.endswith('.svg')):
+                return True
+
             return False
         elif fn.startswith('snap.'):
-            # icons specific to this snap can be used with or without extension
+            # Icons specific to this snap can be used with or without extension
             if fn.startswith('snap.%s.' % self.snap_yaml['name']):
                 return True
             return False
