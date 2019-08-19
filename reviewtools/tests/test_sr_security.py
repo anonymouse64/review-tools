@@ -81,7 +81,6 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
             apps[key] = apps_plugs[key]
         for key in apps_slots:
             apps[key] = apps_slots[key]
-        print("JAMIE: %s" % self.test_snap_yaml)
 
         c = SnapReviewSecurity(self.test_name)
         c.do_checks()
