@@ -1721,6 +1721,31 @@ class SnapReviewLint(SnapReview):
 
         return False
 
+    # see snapd wrappers/desktop.go
+    def _verify_icon_path(self, fn):
+        '''Verify the icon file'''
+        if fn != os.path.normpath(fn):
+            return False
+
+        if '/' in fn:
+            # explicit file paths must point into the snap with extension (if
+            # this is relaxed, must consider snap-controlled paths that symlink
+            # outside of the snap (${SNAP}/ is in the read-only area, so it is
+            # fine).
+            if fn.startswith('${SNAP}/') and (fn.endswith('.png') or
+                                              fn.endswith('.svg')):
+                return True
+            return False
+        elif fn.startswith('snap.'):
+            # icons specific to this snap can be used with or without extension
+            if fn.startswith('snap.%s.' % self.snap_yaml['name']):
+                return True
+            return False
+
+        # Allow use of system icons. Ideally this would be limited since these
+        # could be used to spoof other applications.
+        return True
+
     def _verify_desktop_file(self, fn):
         '''Verify the desktop file'''
         if 'apps' not in self.snap_yaml:
@@ -1734,15 +1759,26 @@ class SnapReviewLint(SnapReview):
                 appnames.append("%s.%s" % (self.snap_yaml['name'], app))
 
         fh = self._extract_file(fn)
+        lines = fh.readlines()
+        fh.close()
 
-        # For now, just check Exec= since snapd strips out anything it
-        # doesn't understand. TODO: implement full checks
+        # For now, just check Exec=, Icon= and bools since:
+        # - snapd strips out anything it doesn't understand
+        # - Exec is rewritten but needs to be present
+        # - Icon can point outside of the snap
+        # - Type can be verified
+        # - bools can be verified
+        #
+        # With the exception of TryExec (which is not supported and filtered
+        # out), the other supported fields are freeform strings
+
+        # Exec=
         found_exec = False
         t = 'info'
-        n = self._get_check_name('desktop_file',
+        n = self._get_check_name('desktop_file', app='exec',
                                  extra=os.path.basename(fn))
         s = 'OK'
-        for line in fh.readlines():
+        for line in lines:
             line = line.rstrip()
             if line.startswith('Exec='):
                 found_exec = True
@@ -1751,6 +1787,80 @@ class SnapReviewLint(SnapReview):
             t = 'error'
             s = "Could not find 'Exec=' in desktop file"
         self._add_result(t, n, s)
+
+        # Bools
+        bool_fields = ['DBusActivatable', 'Hidden', 'NoDisplay', 'StartupNotify', 'Terminal']
+        for line in lines:
+            # snap-filtered
+            if line.startswith('#') or '=' not in line:
+                continue
+
+            line = line.rstrip()
+            tmp = line.split('=')
+            key = tmp[0]
+            value = tmp[1]
+
+            if key not in bool_fields:
+                continue
+
+            t = 'info'
+            n = self._get_check_name('desktop_file', app=key.lower(),
+                                     extra=os.path.basename(fn))
+            s = 'OK'
+            if value not in ['true', 'false']:
+                t = 'warn'
+                s = "invalid value for '%s' (should be 'true' or " % key + \
+                    "'false')"
+            self._add_result(t, n, s)
+
+        # Type=Application
+        found_type = False
+        t = 'info'
+        n = self._get_check_name('desktop_file', app='type',
+                                 extra=os.path.basename(fn))
+        s = 'OK'
+        count = 0
+        for line in lines:
+            line = line.rstrip()
+            if line.startswith('Type='):
+                count += 1
+            if line == "Type=Application":
+                found_type = True
+
+        if not found_type:
+            t = 'error'
+            s = "Could not find 'Type=Application' in desktop file"
+        elif count > 1:
+            t = 'error'
+            s = "malformed desktop file: 'Type=' specified multiple times"
+        self._add_result(t, n, s)
+
+        # Icon=
+        t = 'info'
+        n = self._get_check_name('desktop_file', app='icon',
+                                 extra=os.path.basename(fn))
+        s = 'OK'
+        count = 0
+        icon_fn = None
+        for line in lines:
+            line = line.rstrip()
+            # snap-filtered
+            if not line.startswith("Icon="):
+                continue
+            count += 1
+            icon_fn = line.split('=')[1]
+
+        if count > 1:
+            t = 'error'
+            s = "malformed desktop file: 'Icon=' specified multiple times"
+        elif icon_fn is not None and not self._verify_icon_path(icon_fn):
+            t = 'error'
+            s = "invalid icon path '%s'. Should either specify " % icon_fn + \
+                "the basename of the file (with or without file " + \
+                "extension), snap.<snap name>.<snap command>[.(png|svg)] " + \
+                "or ${SNAP}/path/to/icon.(png|svg)"
+        if count != 0:
+            self._add_result(t, n, s)
 
     def check_meta_gui_desktop(self):
         '''Check meta/gui/*.desktop'''

@@ -5737,6 +5737,33 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             }
             self.check_results(r, expected=expected)
 
+    def test__verify_icon_path(self):
+        '''Test _verify_icon_path()'''
+        c = SnapReviewLint(self.test_name)
+
+        invalid = ['/foo/../bar',
+                   'foo/../bar',
+                   '${SNAP}/../foo.png',
+                   '${SNAP}/foo',
+                   '/usr/share/icons/foo.svg',
+                   'snap.other.thing',
+                   'snap.other.thing.png',
+                   'snap.other.thing.svg',
+                   ]
+        for fn in invalid:
+            self.assertFalse(c._verify_icon_path(fn))
+
+        valid = ['foo',
+                 'foo.png',
+                 'foo.svg',
+                 '${SNAP}/foo.png',
+                 '${SNAP}/foo.svg',
+                 'snap.foo.foo.png',
+                 'snap.foo.bar.svg',
+                 ]
+        for fn in valid:
+            self.assertTrue(c._verify_icon_path(fn))
+
 
 class TestSnapReviewLintNoMock(TestCase):
     """Tests without mocks where they are not needed."""
@@ -6287,7 +6314,6 @@ Version=1.0
 Name=Test
 GenericName=Test Generic
 Exec=testme
-Terminal=false
 Type=Application
 '''
         with open(desktop, 'w') as f:
@@ -6302,7 +6328,7 @@ Type=Application
         c = SnapReviewLint(package)
         c.check_meta_gui_desktop()
         r = c.review_report
-        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
     def test_check_meta_gui_desktop_no_plugs(self):
@@ -6359,7 +6385,6 @@ Version=1.0
 Name=Test
 GenericName=Test Generic
 Exec=testme
-Terminal=false
 Type=Application
 '''
         with open(desktop, 'w') as f:
@@ -6374,7 +6399,7 @@ Type=Application
         c = SnapReviewLint(package)
         c.check_meta_gui_desktop()
         r = c.review_report
-        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
     def test_check_meta_gui_desktop_top_plug(self):
@@ -6402,7 +6427,6 @@ Version=1.0
 Name=Test
 GenericName=Test Generic
 Exec=testme
-Terminal=false
 Type=Application
 '''
         with open(desktop, 'w') as f:
@@ -6417,7 +6441,7 @@ Type=Application
         c = SnapReviewLint(package)
         c.check_meta_gui_desktop()
         r = c.review_report
-        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
     def test_check_meta_gui_desktop_top_plug_reference(self):
@@ -6446,7 +6470,6 @@ Version=1.0
 Name=Test
 GenericName=Test Generic
 Exec=testme
-Terminal=false
 Type=Application
 '''
         with open(desktop, 'w') as f:
@@ -6461,7 +6484,7 @@ Type=Application
         c = SnapReviewLint(package)
         c.check_meta_gui_desktop()
         r = c.review_report
-        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
     def test_check_meta_gui_desktop_app_plug_second_command(self):
@@ -6490,7 +6513,6 @@ Version=1.0
 Name=Test
 GenericName=Test Generic
 Exec=testme.other
-Terminal=false
 Type=Application
 '''
         with open(desktop, 'w') as f:
@@ -6505,7 +6527,7 @@ Type=Application
         c = SnapReviewLint(package)
         c.check_meta_gui_desktop()
         r = c.review_report
-        expected_counts = {'info': 2, 'warn': 0, 'error': 0}
+        expected_counts = {'info': 3, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
 
     def test_check_meta_gui_desktop_no_apps(self):
@@ -6530,7 +6552,6 @@ Version=1.0
 Name=Test
 GenericName=Test Generic
 Exec=testme
-Terminal=false
 Type=Application
 '''
         with open(desktop, 'w') as f:
@@ -6871,7 +6892,6 @@ apps:
 Version=1.0
 Name=Test
 GenericName=Test Generic
-Terminal=false
 Type=Application
 '''
         with open(desktop, 'w') as f:
@@ -6967,4 +6987,168 @@ apps:
         expected['info'] = dict()
         name = 'lint-snap-v2:meta_gui_desktop'
         expected['info'][name] = {"text": "desktop interfaces (x11) specified without a corresponding meta/gui/*.desktop file. If your application does not require a desktop file, you may ignore this. Otherwise, if using snapcraft, please see https://snapcraft.io/docs/build-snaps/metadata#fixed-assets or provide a desktop file in meta/gui/*.desktop (it should reference one of the 'apps' from your snapcraft/snap.yaml)."}
+        self.check_results(r, expected=expected)
+
+    def test_check_meta_gui_desktop_valid(self):
+        '''Test check_meta_gui_desktop() - valid'''
+        output_dir = self.mkdtemp()
+        path = os.path.join(output_dir, 'snap.yaml')
+        content = '''
+name: testme
+version: 0.1
+summary: some thing
+description: some desc
+apps:
+  testme:
+    command: bin/foo
+    plugs: [ desktop ]
+'''
+        with open(path, 'w') as f:
+            f.write(content)
+
+        desktop = os.path.join(output_dir, 'test.desktop')
+        content = '''
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Test
+GenericName=Test Generic
+Exec=testme
+DBusActivatable=false
+NoDisplay=true
+Icon=foobar
+#Icon=old
+'''
+        with open(desktop, 'w') as f:
+            f.write(content)
+
+        package = utils.make_snap2(output_dir=output_dir,
+                                   extra_files=[
+                                       '%s:meta/snap.yaml' % path,
+                                       '%s:meta/gui/test.desktop' % desktop,
+                                   ]
+                                   )
+        c = SnapReviewLint(package)
+        c.check_meta_gui_desktop()
+        r = c.review_report
+        expected_counts = {'info': 6, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_meta_gui_desktop_bad_entries(self):
+        '''Test check_meta_gui_desktop() - bad entries'''
+        output_dir = self.mkdtemp()
+        path = os.path.join(output_dir, 'snap.yaml')
+        content = '''
+name: testme
+version: 0.1
+summary: some thing
+description: some desc
+apps:
+  testme:
+    command: bin/foo
+    plugs: [ desktop ]
+'''
+        with open(path, 'w') as f:
+            f.write(content)
+
+        desktop = os.path.join(output_dir, 'test.desktop')
+        content = '''
+[Desktop Entry]
+Version=1.0
+Name=Test
+GenericName=Test Generic
+Exec=testme
+DBusActivatable
+Hidden=
+NoDisplay=flse
+Icon=/etc/passwd
+'''
+        with open(desktop, 'w') as f:
+            f.write(content)
+
+        package = utils.make_snap2(output_dir=output_dir,
+                                   extra_files=[
+                                       '%s:meta/snap.yaml' % path,
+                                       '%s:meta/gui/test.desktop' % desktop,
+                                   ]
+                                   )
+        c = SnapReviewLint(package)
+        c.check_meta_gui_desktop()
+        r = c.review_report
+        expected_counts = {'info': None, 'warn': 2, 'error': 2}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+
+        name = 'lint-snap-v2:desktop_file:type:test.desktop'
+        expected['error'][name] = {"text": "Could not find 'Type=Application' in desktop file"}
+
+        name = 'lint-snap-v2:desktop_file:icon:test.desktop'
+        expected['error'][name] = {"text": "invalid icon path '/etc/passwd'. Should either specify the basename of the file (with or without file extension), snap.<snap name>.<snap command>[.(png|svg)] or ${SNAP}/path/to/icon.(png|svg)"}
+
+        name = 'lint-snap-v2:desktop_file:hidden:test.desktop'
+        expected['warn'][name] = {"text": "invalid value for 'Hidden' (should be 'true' or 'false')"}
+
+        name = 'lint-snap-v2:desktop_file:nodisplay:test.desktop'
+        expected['warn'][name] = {"text": "invalid value for 'NoDisplay' (should be 'true' or 'false')"}
+        self.check_results(r, expected=expected)
+
+    def test_check_meta_gui_desktop_multiple_entries(self):
+        '''Test check_meta_gui_desktop() - multiple entries'''
+        output_dir = self.mkdtemp()
+        path = os.path.join(output_dir, 'snap.yaml')
+        content = '''
+name: testme
+version: 0.1
+summary: some thing
+description: some desc
+apps:
+  testme:
+    command: bin/foo
+    plugs: [ desktop ]
+'''
+        with open(path, 'w') as f:
+            f.write(content)
+
+        desktop = os.path.join(output_dir, 'test.desktop')
+        content = '''
+[Desktop Entry]
+Version=1.0
+Name=Test
+GenericName=Test Generic
+Exec=testme
+Type=Application
+Type=Link
+Icon=foobar
+Icon=/etc/passwd
+'''
+        with open(desktop, 'w') as f:
+            f.write(content)
+
+        package = utils.make_snap2(output_dir=output_dir,
+                                   extra_files=[
+                                       '%s:meta/snap.yaml' % path,
+                                       '%s:meta/gui/test.desktop' % desktop,
+                                   ]
+                                   )
+        c = SnapReviewLint(package)
+        c.check_meta_gui_desktop()
+        r = c.review_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 2}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+
+        name = 'lint-snap-v2:desktop_file:type:test.desktop'
+        expected['error'][name] = {"text": "malformed desktop file: 'Type=' specified multiple times"}
+
+        name = 'lint-snap-v2:desktop_file:icon:test.desktop'
+        expected['error'][name] = {"text": "malformed desktop file: 'Icon=' specified multiple times"}
+
         self.check_results(r, expected=expected)
