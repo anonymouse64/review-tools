@@ -7209,3 +7209,71 @@ Icon=/snap/testme/current/foo.png
         r = c.review_report
         expected_counts = {'info': 6, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
+
+    def test_check_valid_icon_sets(self):
+        '''Test check_valid_icon_sets()'''
+        output_dir = self.mkdtemp()
+        package = utils.make_snap2(output_dir=output_dir,
+                                   extra_files=[
+                                       'meta/gui/icons/snap.test.0.png',
+                                       'meta/gui/icons/1/snap.test.1.png',
+                                       'meta/gui/icons/1/2/snap.test.2.png',
+                                   ])
+        c = SnapReviewLint(package)
+        c.check_valid_icon_sets()
+        r = c.review_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_valid_icon_sets_bad_filename(self):
+        '''Test check_valid_icon_sets() - bad filename'''
+        output_dir = self.mkdtemp()
+        package = utils.make_snap2(output_dir=output_dir,
+                                   extra_files=[
+                                       'meta/gui/icons/snap.test.foo;sh',
+                                   ])
+        c = SnapReviewLint(package)
+        c.check_valid_icon_sets()
+        r = c.review_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'lint-snap-v2:icon_theme_quoting'
+        expected['error'][name] = {"text": "icon files should not use shell metacharacters: meta/gui/icons/snap.test.foo;sh"}
+        self.check_results(r, expected=expected)
+
+    def test_check_valid_icon_sets_notsnap_filename(self):
+        '''Test check_valid_icon_sets() - not snap-specific'''
+        output_dir = self.mkdtemp()
+        package = utils.make_snap2(output_dir=output_dir,
+                                   extra_files=[
+                                       'meta/gui/icons/test.foo',
+                                       'meta/gui/icons/snap.other.foo',
+                                   ])
+        c = SnapReviewLint(package)
+        c.check_valid_icon_sets()
+        r = c.review_report
+        expected_counts = {'info': None, 'warn': 1, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'lint-snap-v2:icon_theme_filenames'
+        expected['warn'][name] = {"text": "icon files should start with 'snap.test.': meta/gui/icons/snap.other.foo, meta/gui/icons/test.foo"}
+        self.check_results(r, expected=expected)
+
+    def test_check_valid_icon_sets_none(self):
+        '''Test check_valid_icon_sets() - none'''
+        output_dir = self.mkdtemp()
+        package = utils.make_snap2(output_dir=output_dir)
+        c = SnapReviewLint(package)
+        c.check_valid_icon_sets()
+        r = c.review_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)

@@ -2814,3 +2814,42 @@ class SnapReviewLint(SnapReview):
                 s = "unsupported scope '%s' for system-username '%s'" % (scope,
                                                                          name)
             self._add_result(t, n, s)
+
+    def check_valid_icon_sets(self):
+        '''Check valid icon sets'''
+        icons = glob.glob("%s/meta/gui/icons/**" % self._get_unpack_dir(),
+                          recursive=True)
+        bad_names = []
+        unsnap_names = []
+        count = 0
+        for fn in icons:
+            rel = os.path.relpath(fn, self._get_unpack_dir())
+            if fn != shlex.quote(fn):
+                bad_names.append(rel)
+                continue
+            elif not os.path.isfile(fn):
+                continue
+
+            icon = os.path.basename(fn)
+            count += 1
+            if not icon.startswith('snap.%s.' % self.snap_yaml['name']):
+                unsnap_names.append(rel)
+
+        t = 'info'
+        n = self._get_check_name('icon_theme_filenames')
+        s = 'OK'
+        if len(unsnap_names) > 0:
+            t = 'warn'
+            n = self._get_check_name('icon_theme_filenames')
+            s = "icon files should start with " + \
+                "'snap.%s.'" % self.snap_yaml['name'] + ": " + \
+                ", ".join(sorted(unsnap_names))
+        if count > 0:
+            self._add_result(t, n, s)
+
+        if len(bad_names) > 0:
+            t = 'error'
+            n = self._get_check_name('icon_theme_quoting')
+            s = "icon files should not use shell metacharacters: " + \
+                ", ".join(sorted(bad_names))
+            self._add_result(t, n, s)
