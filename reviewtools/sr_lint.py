@@ -329,6 +329,15 @@ class SnapReviewLint(SnapReview):
                 self.snap_yaml['icon']
         self._add_result(t, n, s)
 
+        if self.snap_yaml['icon'].startswith('.') or self.snap_yaml['icon'] \
+                != os.path.normpath(self.snap_yaml['icon']):
+            t = 'error'
+            n = self._get_check_name('icon_canonical_path')
+            s = "icon entry '%s' does not use canonical path" % \
+                self.snap_yaml['icon']
+            self._add_result(t, n, s)
+            # return
+
         t = 'info'
         n = self._get_check_name('icon_exists')
         s = 'OK'
@@ -1724,7 +1733,7 @@ class SnapReviewLint(SnapReview):
     # see snapd wrappers/desktop.go
     def _verify_icon_path(self, fn):
         '''Verify the icon file'''
-        if fn != os.path.normpath(fn):
+        if fn.startswith('.') or fn != os.path.normpath(fn):
             return False
 
         if '/' in fn:

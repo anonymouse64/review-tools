@@ -704,6 +704,18 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
+    def test_check_icon_canonical_path(self):
+        '''Test check_icon() - canonical path'''
+        self.set_test_snap_yaml("icon", "../foo/someicon")
+        self.set_test_snap_yaml("type", "gadget")
+        self.set_test_unpack_dir = "/nonexistent"
+        c = SnapReviewLint(self.test_name)
+        c.pkg_files.append(os.path.join(c._get_unpack_dir(), '../foo/someicon'))
+        c.check_icon()
+        r = c.review_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
     def test_check_icon_missing(self):
         '''Test check_icon() - missing icon'''
         self.set_test_snap_yaml("icon", "someicon")
@@ -5743,6 +5755,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
         invalid = ['/foo/../bar',
                    'foo/../bar',
+                   '../bar',
                    '${SNAP}/../foo.png',
                    '${SNAP}/foo',
                    '/usr/share/icons/foo.svg',
