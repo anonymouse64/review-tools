@@ -35,6 +35,8 @@ review-tools (0.48) UNRELEASED; urgency=medium
     - add slots check for hooks
     - add command-chain checks for hooks
     - specially handle snaps for symlinks which use 'base: nix-base'
+    - expand desktop file checks
+    - support icon sets
   * sr_security.py:
     - fix evaluation of SNAP_ENFORCE_RESQUASHFS so '0' turns it off
     - turn on resquash tests by default
@@ -60,7 +62,7 @@ review-tools (0.48) UNRELEASED; urgency=medium
   * sr_functional.py: add base snap mountpoint checks
   * add diffsquash tool
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Fri, 14 Jun 2019 15:30:00 -0400
+ -- Jamie Strandboge <jamie@ubuntu.com>  Mon, 19 Aug 2019 14:47:10 -0500
 
 click-reviewers-tools (0.47) RELEASED; urgency=medium
 
