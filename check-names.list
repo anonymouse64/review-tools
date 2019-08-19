@@ -124,6 +124,7 @@ lint-snap-v2:stop-timeout_range|
 lint-snap-v2:summary|
 lint-snap-v2:summary_present|
 lint-snap-v2:system-files_path|
+lint-snap-v2:system-usernames|
 lint-snap-v2:system-usernames_valid|
 lint-snap-v2:timer|
 lint-snap-v2:title|
