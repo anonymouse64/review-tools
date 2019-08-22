@@ -384,6 +384,7 @@ sec_iface_ref_overrides = {
     'personal-files': {
         'aws-sam-cli': ['config-aws'],
         'chromium': ['chromium-config'],
+        'cw-sh': ['dot-aws-config-credentials'],
         'doctl': ['doctl-config', 'kube-config'],
         'enonic': ['dot-enonic'],
         'fluxctl': ['kube-config'],
@@ -395,6 +396,7 @@ sec_iface_ref_overrides = {
         'k9s': ['kube-config'],
         'kubefwd': ['config-kube'],
         'kubicorn': ['kube-config'],
+        'liquibase': ['dot-m2-repository'],
         'popeye': ['kube-config'],
         'rain': ['config-aws'],
         'redis-desktop-manager': ['dot-rdm'],
