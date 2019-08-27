@@ -228,6 +228,7 @@ class SnapReview(Review):
                           'home': {'read/plugs': ""},
                           'i2c': {'path/slots': ""},
                           'iio': {'path/slots': ""},
+                          'kubernetes-support': {'flavor/plugs': ""},
                           'mpris': {'name/slots': ""},
                           'optical-drive': {'write/plugs': False},
                           'personal-files': {'read/plugs': [],
