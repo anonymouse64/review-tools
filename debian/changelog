@@ -50,6 +50,8 @@ review-tools (0.48) UNRELEASED; urgency=medium
   * add 2.37 interfaces
   * add 2.38 interfaces
   * add 2.39 interfaces
+  * add 2.40 interfaces
+  * add 2.41 interfaces
   * sr_declaration.py:
     - support verifying on-store and on-brand constraints
     - add plugs and slots checks for apps and slots
@@ -62,7 +64,7 @@ review-tools (0.48) UNRELEASED; urgency=medium
   * sr_functional.py: add base snap mountpoint checks
   * add diffsquash tool
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Mon, 19 Aug 2019 14:47:10 -0500
+ -- Jamie Strandboge <jamie@ubuntu.com>  Wed, 28 Aug 2019 14:57:48 -0500
 
 click-reviewers-tools (0.47) RELEASED; urgency=medium
 

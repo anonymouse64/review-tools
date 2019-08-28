@@ -16,6 +16,9 @@
   docker-support:
     allow-installation: false
     deny-auto-connection: true
+  gpio-control:
+    allow-installation: false
+    deny-auto-connection: true
   greengrass-support:
     allow-installation: false
     deny-auto-connection: true
@@ -29,6 +32,9 @@
     allow-installation: false
     deny-auto-connection: true
   multipass-support:
+    allow-installation: false
+    deny-auto-connection: true
+  packagekit-control:
     allow-installation: false
     deny-auto-connection: true
   personal-files:
@@ -59,6 +65,11 @@
         - core
     deny-auto-connection: true
   alsa:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
+  appstream-metadata:
     allow-installation:
       slot-snap-type:
         - core
@@ -282,6 +293,11 @@
       slot-snap-type:
         - core
         - gadget
+    deny-auto-connection: true
+  gpio-control:
+    allow-installation:
+      slot-snap-type:
+        - core
     deny-auto-connection: true
   gpio-memory-control:
     allow-installation:
@@ -574,6 +590,11 @@
     deny-auto-connection:
       plug-attributes:
         write: true
+  packagekit-control:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   password-manager-service:
     allow-installation:
       slot-snap-type:
