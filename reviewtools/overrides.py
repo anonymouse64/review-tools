@@ -382,11 +382,13 @@ sec_resquashfs_overrides = ['clion',  # jetbrains
 # passing snap declaration constraint.
 sec_iface_ref_overrides = {
     'personal-files': {
+        'amass': ['dot-amass'],
         'aws-sam-cli': ['config-aws'],
         'chromium': ['chromium-config'],
         'cw-sh': ['dot-aws-config-credentials'],
         'doctl': ['doctl-config', 'kube-config'],
         'enonic': ['dot-enonic'],
+        'exoscale-cli': ['dot-exoscale'],
         'fluxctl': ['kube-config'],
         'gallery-dl': ['config-gallery-dl'],
         'gitl': ['gitconfig'],
@@ -400,6 +402,7 @@ sec_iface_ref_overrides = {
         'popeye': ['kube-config'],
         'rain': ['config-aws'],
         'redis-desktop-manager': ['dot-rdm'],
+        'rofi-totp': ['dot-gauth'],
     },
     'system-files': {
         'gallery-dl': ['etc-gallery-dl'],
