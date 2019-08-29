@@ -464,6 +464,11 @@ lint_redflagged_base_dep_override = {
 
 # Some publisher_emails represent a shared account. For snaps with a shared
 # email, also send to other addresses.
+canonical_commercial_systems = ['uros.jovanovic@canonical.com',
+                                'francesco.banconi@canonical.com',
+                                'casey.marshall@canonical.com',
+                                'martin.hilton@canonical.com',
+                                ]
 canonical_desktop = ['ken.vandine@canonical.com',
                      'sebastien.bacher@canonical.com',
                      'will.cooke@canonical.com',
@@ -549,6 +554,7 @@ update_publisher_overrides = {
         'azure-kernel': canonical_kernel,
         'base-18': canonical_snapd,
         'bluez': canonical_enablement,
+        'candid': canonical_commercial_systems,
         'caracalla-kernel': canonical_hwe,
         'cascade-kernel': canonical_hwe,
         'chromium': ['olivier.tilloy@canonical.com'] + canonical_desktop,
