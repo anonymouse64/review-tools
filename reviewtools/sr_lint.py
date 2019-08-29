@@ -1733,7 +1733,7 @@ class SnapReviewLint(SnapReview):
     # see snapd wrappers/desktop.go
     def _verify_icon_path(self, fn):
         '''Verify the icon file'''
-        if fn.startswith('.') or fn != os.path.normpath(fn):
+        if fn is None or fn.startswith('.') or fn != os.path.normpath(fn):
             return False
 
         if '/' in fn:
@@ -1853,13 +1853,7 @@ class SnapReviewLint(SnapReview):
             s = "malformed desktop file: 'Type=' specified multiple times"
         self._add_result(t, n, s)
 
-        # Icon=
-        t = 'info'
-        n = self._get_check_name('desktop_file', app='icon',
-                                 extra=os.path.basename(fn))
-        s = 'OK'
-        count = 0
-        icon_fn = None
+        # Icon= may appear in Desktop entry or Actions
         for line in lines:
             line = line.rstrip()
             # snap-filtered
@@ -1867,17 +1861,19 @@ class SnapReviewLint(SnapReview):
                 continue
             count += 1
             icon_fn = line.split('=')[1]
+            t = 'info'
+            n = self._get_check_name('desktop_file_icon',
+                                     app=os.path.basename(fn),
+                                     extra=icon_fn)
+            s = 'OK'
 
-        if count > 1:
-            t = 'error'
-            s = "malformed desktop file: 'Icon=' specified multiple times"
-        elif icon_fn is not None and not self._verify_icon_path(icon_fn):
-            t = 'error'
-            s = "invalid icon path '%s'. Should either specify " % icon_fn + \
-                "the basename of the file (with or without file " + \
-                "extension), snap.<snap name>.<snap command>[.(png|svg)] " + \
-                "or ${SNAP}/path/to/icon.(png|svg)"
-        if count != 0:
+            if not self._verify_icon_path(icon_fn):
+                t = 'error'
+                s = "invalid icon path '%s'. Should either " % icon_fn + \
+                    "specify the basename of the file (with or without " + \
+                    "file extension), " + \
+                    "snap.<snap name>.<snap command>[.(png|svg)] or " + \
+                    "${SNAP}/path/to/icon.(png|svg)"
             self._add_result(t, n, s)
 
     def check_meta_gui_desktop(self):

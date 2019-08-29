@@ -60,6 +60,7 @@ lint-snap-v2:dbus_slot_required|
 lint-snap-v2:description|
 lint-snap-v2:description_present|
 lint-snap-v2:desktop_file|
+lint-snap-v2:desktop_file_icon|
 lint-snap-v2:environment_key_valid|http://pubs.opengroup.org/onlinepubs/000095399/basedefs/xbd_chap08.html
 lint-snap-v2:environment_valid|
 lint-snap-v2:environment_value_valid|

@@ -7099,7 +7099,7 @@ Icon=/etc/passwd
         name = 'lint-snap-v2:desktop_file:type:test.desktop'
         expected['error'][name] = {"text": "Could not find 'Type=Application' in desktop file"}
 
-        name = 'lint-snap-v2:desktop_file:icon:test.desktop'
+        name = 'lint-snap-v2:desktop_file_icon:test.desktop:/etc/passwd'
         expected['error'][name] = {"text": "invalid icon path '/etc/passwd'. Should either specify the basename of the file (with or without file extension), snap.<snap name>.<snap command>[.(png|svg)] or ${SNAP}/path/to/icon.(png|svg)"}
 
         name = 'lint-snap-v2:desktop_file:hidden:test.desktop'
@@ -7160,11 +7160,6 @@ Icon=/etc/passwd
 
         name = 'lint-snap-v2:desktop_file:type:test.desktop'
         expected['error'][name] = {"text": "malformed desktop file: 'Type=' specified multiple times"}
-
-        name = 'lint-snap-v2:desktop_file:icon:test.desktop'
-        expected['error'][name] = {"text": "malformed desktop file: 'Icon=' specified multiple times"}
-
-        self.check_results(r, expected=expected)
 
     def test_check_meta_gui_desktop_icon_workaround(self):
         '''Test check_meta_gui_desktop() - icon workaround'''
