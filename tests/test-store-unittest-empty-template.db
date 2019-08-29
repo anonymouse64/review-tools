@@ -1,0 +1,23 @@
+[
+  {
+    "publisher_email": "test.me@example.com",
+    "publisher_name": "Test Me",
+    "name": "test-snap",
+    "revisions": [
+      {
+        "uploader_email": "test.me@example.com",
+        "uploader_name": "Test Me",
+        "channels": [
+          "stable",
+          "edge"
+        ],
+        "manifest_yaml": "name: test-snap\nversion: 0.1\nsummary: Test summary\ndescription: Test description\nconfinement: strict\napps:\n  test-snap:\n    command: test-package-cmd\nparts:\n  test-part:\n    build-packages: []\n    installed-packages: []\n    installed-snaps: []\n    plugin: dump\n    prime: []\n    source: files/\n    stage: []\n    stage-packages: []\n    uname: 'Linux 4.4.0-148-generic #174-Ubuntu SMP Tue May 7 12:20:14 UTC 2019 x86_64\n      x86_64 x86_64 GNU/Linux'\ngrade: stable\narchitectures:\n- amd64\nbuild-packages: []\nbuild-snaps: []\n",
+        "version": "0.1",
+        "architectures": [
+          "amd64"
+        ],
+        "revision": 1
+      }
+    ]
+  }
+]

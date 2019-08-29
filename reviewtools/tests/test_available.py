@@ -405,3 +405,34 @@ Revision r12 (i386; channels: candidate, beta)
 
         for sn in ['3848-1', '3879-1']:
             self.assertTrue(sn in body)
+
+    def test_check_scan_store_lp1841848_allbinaries(self):
+        '''Test scan_store() - lp1841848 (allbinaries)'''
+        secnot_fn = "./tests/test-usn-unittest-lp1841848.db"
+        store_fn = "./tests/test-store-unittest-lp1841848.db"
+        (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
+        self.assertEquals(len(errors), 0)
+        self.assertEquals(len(sent), 1)
+        (to_addr, subj, body) = sent[0]
+        self.assertEquals(to_addr, None)
+        self.assertEquals(subj, None)
+        self.assertEquals(body, None)
+
+    def test_check_scan_store_lp1841848_allbinaries_bad_epoch(self):
+        '''Test scan_store() - lp1841848 (allbinaries with bad epoch)'''
+        secnot_fn = "./tests/test-usn-unittest-lp1841848-incorrect-epoch.db"
+        store_fn = "./tests/test-store-unittest-lp1841848.db"
+        (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
+        self.assertEquals(len(errors), 0)
+        self.assertEquals(len(sent), 1)
+        (to_addr, subj, body) = sent[0]
+
+        # This is where we want to be, but haven't updated the FIXME in
+        # usn.py yet
+        # self.assertEquals(to_addr, None)
+        # self.assertEquals(subj, None)
+        # self.assertEquals(body, None)
+
+        # but today, ensure current behavior doesn't change
+        eml = "test.me@example.com"
+        self.assertTrue(eml in to_addr)

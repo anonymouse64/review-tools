@@ -45,6 +45,39 @@ def read_usn_db(fn):
             if "sources" not in raw[usn]["releases"][rel]:
                 continue
 
+            # XXX: We don't use this below... is it needed for parsing ancient
+            # USNs we just want to ignore?
+            if "binaries" not in raw[usn]["releases"][rel]:
+                continue
+
+            #
+            # see if we can use "allbinaries" which is authoritative but only
+            # available in USNs after Dec 2018
+            #
+
+            # FIXME: note that prior to Sept 2019, "allbinaries" assumed the
+            # binaries had the same version as the source. To account for that,
+            # we should examine the Packages files for tracked_releases and
+            # come up with an override mechanism
+            if "allbinaries" in raw[usn]["releases"][rel]:
+                for bin in raw[usn]["releases"][rel]["allbinaries"]:
+                    version = debversion.DebVersion(raw[usn]["releases"][rel]["allbinaries"][bin]["version"])
+                    if bin not in usn_db[rel]:
+                        usn_db[rel][bin] = {}
+                    if usn not in usn_db[rel][bin]:
+                        usn_db[rel][bin][usn] = {}
+                        usn_db[rel][bin][usn]['version'] = version
+                        if 'cves' in raw[usn]:
+                            usn_db[rel][bin][usn]['cves'] = raw[usn]['cves']
+                            usn_db[rel][bin][usn]['cves'].sort()
+
+                # nothing more to do with this USN
+                continue
+
+            #
+            # "allbinaries" not available for this USN. Fallback to guessing
+            #
+
             # for checking epochs, later
             source_versions = []
             for src in raw[usn]["releases"][rel]["sources"]:
@@ -54,9 +87,6 @@ def read_usn_db(fn):
                 if sv not in source_versions:
                     source_versions.append(sv)
             source_versions.sort(reverse=True)
-
-            if "binaries" not in raw[usn]["releases"][rel]:
-                continue
 
             # Find the binaries from the arch URLs to work around lack of
             # source_map, etc

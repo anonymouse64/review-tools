@@ -1,0 +1,323 @@
+{
+  "4102-1": {
+    "description": "It was discovered that LibreOffice incorrectly handled LibreLogo scripts.\nIf a user were tricked into opening a specially crafted document, a remote\nattacker could cause LibreOffice to execute arbitrary code. (CVE-2019-9850,\nCVE-2019-9851)\n\nIt was discovered that LibreOffice incorrectly handled embedded scripts in\ndocument files. If a user were tricked into opening a specially crafted\ndocument, a remote attacker could possibly execute arbitrary code.\n(CVE-2019-9852)\n",
+    "releases": {
+      "xenial": {
+        "allbinaries": {
+          "uno-libs3": {
+            "version": "1:5.1.6~rc2-0ubuntu1~xenial9"
+          },
+          "libreoffice-style-tango": {
+            "version": "1:5.1.6~rc2-0ubuntu1~xenial9"
+          }
+        },
+        "binaries": {
+          "uno-libs3": {
+            "version": "1:5.1.6~rc2-0ubuntu1~xenial9"
+          }
+        },
+        "archs": {
+          "all": {
+            "urls": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libr/libreoffice/libreoffice-style-tango_5.1.6~rc2-0ubuntu1~xenial9_all.deb": {
+                "size": 1373328,
+                "md5": "fac69bbcef71fc5ec79db7994291f09c"
+              }
+            }
+          },
+          "amd64": {
+            "urls": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libr/libreoffice/uno-libs3_5.1.6~rc2-0ubuntu1~xenial9_amd64.deb": {
+                "size": 705610,
+                "md5": "6ae91f4e9b8c26beae274ed1c96ed934"
+              }
+            }
+          },
+          "ppc64el": {
+            "urls": {
+              "http://ports.ubuntu.com/pool/main/libr/libreoffice/uno-libs3_5.1.6~rc2-0ubuntu1~xenial9_ppc64el.deb": {
+                "size": 756630,
+                "md5": "ac1f17e070e4a0136aae01e1b6af4609"
+              }
+            }
+          },
+          "s390x": {
+            "urls": {
+              "http://ports.ubuntu.com/pool/main/libr/libreoffice/uno-libs3_5.1.6~rc2-0ubuntu1~xenial9_s390x.deb": {
+                "size": 639928,
+                "md5": "e7ccc12957f439f68a550d6eba7259fb"
+              }
+            }
+          },
+          "powerpc": {
+            "urls": {
+              "http://ports.ubuntu.com/pool/main/libr/libreoffice/uno-libs3_5.1.6~rc2-0ubuntu1~xenial9_powerpc.deb": {
+                "size": 639620,
+                "md5": "03320f8f32bf8c0f929220a5b04402c6"
+              }
+            }
+          },
+          "source": {
+            "urls": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libr/libreoffice/libreoffice_5.1.6~rc2.orig-src.tar.xz": {
+                "size": 167395528,
+                "md5": "c2c392218c650fc8871aed207a756157"
+              },
+              "http://security.ubuntu.com/ubuntu/pool/main/libr/libreoffice/libreoffice_5.1.6~rc2-0ubuntu1~xenial9.dsc": {
+                "size": 15028,
+                "md5": "bd9ce299824b250a22837145af15ecc9"
+              },
+              "http://security.ubuntu.com/ubuntu/pool/main/libr/libreoffice/libreoffice_5.1.6~rc2-0ubuntu1~xenial9.debian.tar.xz": {
+                "size": 2115296,
+                "md5": "c162f51c70e7aceab7b351a7228d6e70"
+              }
+            }
+          },
+          "i386": {
+            "urls": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libr/libreoffice/uno-libs3_5.1.6~rc2-0ubuntu1~xenial9_i386.deb": {
+                "size": 733722,
+                "md5": "df80b34ac1c53b2b8b332e80c87d77a8"
+              }
+            }
+          },
+          "armhf": {
+            "urls": {
+              "http://ports.ubuntu.com/pool/main/libr/libreoffice/uno-libs3_5.1.6~rc2-0ubuntu1~xenial9_armhf.deb": {
+                "size": 611822,
+                "md5": "e6e26462b58e3ec5244a0ae475cbbff3"
+              }
+            }
+          },
+          "arm64": {
+            "urls": {
+              "http://ports.ubuntu.com/pool/main/libr/libreoffice/uno-libs3_5.1.6~rc2-0ubuntu1~xenial9_arm64.deb": {
+                "size": 616776,
+                "md5": "f32b4294d6a2387b2a187c3935af51b3"
+              }
+            }
+          }
+        },
+        "sources": {
+          "libreoffice": {
+            "version": "1:5.1.6~rc2-0ubuntu1~xenial9",
+            "description": "Office productivity suite"
+          }
+        }
+      },
+      "bionic": {
+        "allbinaries": {
+          "uno-libs3": {
+            "version": "1:6.0.7-0ubuntu0.18.04.9"
+          },
+          "libreoffice-style-tango": {
+            "version": "1:6.0.7-0ubuntu0.18.04.9"
+          }
+        },
+        "binaries": {
+          "uno-libs3": {
+            "version": "1:6.0.7-0ubuntu0.18.04.9"
+          }
+        },
+        "archs": {
+          "all": {
+            "urls": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libr/libreoffice/libreoffice-style-tango_6.0.7-0ubuntu0.18.04.9_all.deb": {
+                "size": 1308456,
+                "md5": "5f7eb00dd7e32ecb33e7fa2874063884"
+              }
+            }
+          },
+          "amd64": {
+            "urls": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libr/libreoffice/uno-libs3_6.0.7-0ubuntu0.18.04.9_amd64.deb": {
+                "size": 707252,
+                "md5": "4dc68b62424d816c925fe43f2f10ad93"
+              }
+            }
+          },
+          "ppc64el": {
+            "urls": {
+              "http://ports.ubuntu.com/pool/main/libr/libreoffice/uno-libs3_6.0.7-0ubuntu0.18.04.9_ppc64el.deb": {
+                "size": 834628,
+                "md5": "0416de9315c5ac641e5267d7c46ba3ba"
+              }
+            }
+          },
+          "i386": {
+            "urls": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libr/libreoffice/uno-libs3_6.0.7-0ubuntu0.18.04.9_i386.deb": {
+                "size": 760800,
+                "md5": "c80a49efdbddb37efb3ad28cbc671bd3"
+              }
+            }
+          },
+          "source": {
+            "urls": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libr/libreoffice/libreoffice_6.0.7-0ubuntu0.18.04.9.debian.tar.xz": {
+                "size": 2178156,
+                "md5": "52e453001a26770527bdaed3d86017d0"
+              },
+              "http://security.ubuntu.com/ubuntu/pool/main/libr/libreoffice/libreoffice_6.0.7-0ubuntu0.18.04.9.dsc": {
+                "size": 18074,
+                "md5": "237e93bbe4b7519c507c2441ad10574b"
+              },
+              "http://security.ubuntu.com/ubuntu/pool/main/libr/libreoffice/libreoffice_6.0.7.orig-helpcontent2.tar.xz": {
+                "size": 2423012,
+                "md5": "f483d64217a570d889298e4b94027a5c"
+              }
+            }
+          },
+          "s390x": {
+            "urls": {
+              "http://ports.ubuntu.com/pool/main/libr/libreoffice/uno-libs3_6.0.7-0ubuntu0.18.04.9_s390x.deb": {
+                "size": 630296,
+                "md5": "3fcdca66d0443b14b4ec847277536573"
+              }
+            }
+          },
+          "armhf": {
+            "urls": {
+              "http://ports.ubuntu.com/pool/main/libr/libreoffice/uno-libs3_6.0.7-0ubuntu0.18.04.9_armhf.deb": {
+                "size": 602136,
+                "md5": "00283392542eb76d0446956a1cfefcb6"
+              }
+            }
+          },
+          "arm64": {
+            "urls": {
+              "http://ports.ubuntu.com/pool/main/libr/libreoffice/uno-libs3_6.0.7-0ubuntu0.18.04.9_arm64.deb": {
+                "size": 653128,
+                "md5": "92fac867de25cb60c529dd63f20308b0"
+              }
+            }
+          }
+        },
+        "sources": {
+          "libreoffice": {
+            "version": "1:6.0.7-0ubuntu0.18.04.9",
+            "description": "Office productivity suite"
+          }
+        }
+      },
+      "disco": {
+        "allbinaries": {
+          "uno-libs3": {
+            "version": "1:6.2.6-0ubuntu0.19.04.1"
+          },
+          "libreoffice-style-tango": {
+            "version": "1:6.2.6-0ubuntu0.19.04.1"
+          }
+        },
+        "binaries": {
+          "uno-libs3": {
+            "version": "1:6.2.6-0ubuntu0.19.04.1"
+          }
+        },
+        "archs": {
+          "all": {
+            "urls": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libr/libreoffice/libreoffice-style-tango_6.2.6-0ubuntu0.19.04.1_all.deb": {
+                "size": 1208056,
+                "md5": "e463c4e8865d9eec58c426aec88ff51b"
+              }
+            }
+          },
+          "amd64": {
+            "urls": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libr/libreoffice/uno-libs3_6.2.6-0ubuntu0.19.04.1_amd64.deb": {
+                "size": 708896,
+                "md5": "abfac4be1160632828b38741f41b3e4d"
+              }
+            }
+          },
+          "ppc64el": {
+            "urls": {
+              "http://ports.ubuntu.com/pool/main/libr/libreoffice/uno-libs3_6.2.6-0ubuntu0.19.04.1_ppc64el.deb": {
+                "size": 791356,
+                "md5": "a42a623e1bd76a0b032e9ce872eca15e"
+              }
+            }
+          },
+          "i386": {
+            "urls": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libr/libreoffice/uno-libs3_6.2.6-0ubuntu0.19.04.1_i386.deb": {
+                "size": 759260,
+                "md5": "7b47c7e10dd235a7c0e4f3d52bd0cef0"
+              }
+            }
+          },
+          "source": {
+            "urls": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libr/libreoffice/libreoffice_6.2.6-0ubuntu0.19.04.1.dsc": {
+                "size": 17700,
+                "md5": "581ce010b758dd4c01e643a629425c49"
+              },
+              "http://security.ubuntu.com/ubuntu/pool/main/libr/libreoffice/libreoffice_6.2.6.orig-translations.tar.xz": {
+                "size": 142463900,
+                "md5": "f9ecb04ad56d3e5326827c0c3a355adb"
+              },
+              "http://security.ubuntu.com/ubuntu/pool/main/libr/libreoffice/libreoffice_6.2.6.orig.tar.xz": {
+                "size": 192457144,
+                "md5": "93b200a4f69bb5acd0e7680f2ba840b3"
+              },
+              "http://security.ubuntu.com/ubuntu/pool/main/libr/libreoffice/libreoffice_6.2.6-0ubuntu0.19.04.1.debian.tar.xz": {
+                "size": 2112512,
+                "md5": "833b761eed2264114c2e83fc6d5b479e"
+              },
+              "http://security.ubuntu.com/ubuntu/pool/main/libr/libreoffice/libreoffice_6.2.6.orig-helpcontent2.tar.xz": {
+                "size": 12440716,
+                "md5": "261db45bee28bdbd882d4eb33f6527e0"
+              },
+              "http://security.ubuntu.com/ubuntu/pool/main/libr/libreoffice/libreoffice_6.2.6.orig-tarballs.tar.xz": {
+                "size": 280789976,
+                "md5": "8a6718cc94b7401c7f0ef854842b01f8"
+              }
+            }
+          },
+          "s390x": {
+            "urls": {
+              "http://ports.ubuntu.com/pool/main/libr/libreoffice/uno-libs3_6.2.6-0ubuntu0.19.04.1_s390x.deb": {
+                "size": 616520,
+                "md5": "f2037a727bb713b7c502a4e41f76a489"
+              }
+            }
+          },
+          "armhf": {
+            "urls": {
+              "http://ports.ubuntu.com/pool/main/libr/libreoffice/uno-libs3_6.2.6-0ubuntu0.19.04.1_armhf.deb": {
+                "size": 589592,
+                "md5": "36c472b5ed64bc5cf9102eb073a8e2d4"
+              }
+            }
+          },
+          "arm64": {
+            "urls": {
+              "http://ports.ubuntu.com/pool/main/libr/libreoffice/uno-libs3_6.2.6-0ubuntu0.19.04.1_arm64.deb": {
+                "size": 624972,
+                "md5": "f288b2b075996aea079a983ee4d4f3de"
+              }
+            }
+          }
+        },
+        "sources": {
+          "libreoffice": {
+            "version": "1:6.2.6-0ubuntu0.19.04.1",
+            "description": "Office productivity suite"
+          }
+        }
+      }
+    },
+    "title": "LibreOffice vulnerabilities",
+    "timestamp": 1566215429.382669,
+    "summary": "libreoffice vulnerabilities",
+    "action": "After a standard system update you need to restart LibreOffice to make all\nthe necessary changes.\n",
+    "isummary": "Several security issues were fixed in LibreOffice.\n",
+    "id": "4102-1",
+    "cves": [
+      "CVE-2019-9850",
+      "CVE-2019-9851",
+      "CVE-2019-9852"
+    ]
+  }
+}
