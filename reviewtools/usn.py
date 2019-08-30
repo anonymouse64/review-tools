@@ -98,6 +98,13 @@ def read_usn_db(fn):
             if "allbinaries" in raw[usn]["releases"][rel]:
                 for bin in raw[usn]["releases"][rel]["allbinaries"]:
                     rawv = raw[usn]["releases"][rel]["allbinaries"][bin]["version"]
+                    # FIXME: when UCT is updated to provide accurate
+                    # information on with allbinaries, we can make the
+                    # conditional on the date. Eg:
+                    # if raw[usn]["timestamp"] < ...:
+                    #     version = get_best_version(unmatched_vers, rel, bin, rawv)
+                    # else:
+                    #     version = debversion.DebVersion(rawv)
                     version = get_best_version(unmatched_vers, rel, bin, rawv)
                     # Skip binaries where we can't accurately guess the
                     # version to avoid false reports
