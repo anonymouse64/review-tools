@@ -1869,11 +1869,18 @@ class SnapReviewLint(SnapReview):
 
             if not self._verify_icon_path(icon_fn):
                 t = 'error'
-                s = "invalid icon path '%s'. Should either " % icon_fn + \
-                    "specify the basename of the file (with or without " + \
-                    "file extension), " + \
-                    "snap.<snap name>.<snap command>[.(png|svg)] or " + \
-                    "${SNAP}/path/to/icon.(png|svg)"
+                if icon_fn.startswith("$SNAP/"):
+                    s = "invalid icon path '%s'. Please adjust " % icon_fn + \
+                        "to use '${SNAP}' instead of '$SNAP'."
+                else:
+                    s = "invalid icon path '%s'. Should either " % icon_fn + \
+                        "specify the basename of the file (with or " + \
+                        "without file extension), " + \
+                        "snap.<snap name>.<snap command>[.(png|svg)] or " + \
+                        "${SNAP}/path/to/icon.(png|svg). If using " + \
+                        "snapcraft, consider using 'desktop: <file>' " + \
+                        "since the Icon paths in the desktop will be " + \
+                        "rewritten to use ${SNAP}/<file>."
             self._add_result(t, n, s)
 
     def check_meta_gui_desktop(self):

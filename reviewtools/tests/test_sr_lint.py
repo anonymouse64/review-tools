@@ -7100,7 +7100,7 @@ Icon=/etc/passwd
         expected['error'][name] = {"text": "Could not find 'Type=Application' in desktop file"}
 
         name = 'lint-snap-v2:desktop_file_icon:test.desktop:/etc/passwd'
-        expected['error'][name] = {"text": "invalid icon path '/etc/passwd'. Should either specify the basename of the file (with or without file extension), snap.<snap name>.<snap command>[.(png|svg)] or ${SNAP}/path/to/icon.(png|svg)"}
+        expected['error'][name] = {"text": "invalid icon path '/etc/passwd'. Should either specify the basename of the file (with or without file extension), snap.<snap name>.<snap command>[.(png|svg)] or ${SNAP}/path/to/icon.(png|svg). If using snapcraft, consider using 'desktop: <file>' since the Icon paths in the desktop will be rewritten to use ${SNAP}/<file>."}
 
         name = 'lint-snap-v2:desktop_file:hidden:test.desktop'
         expected['warn'][name] = {"text": "invalid value for 'Hidden' (should be 'true' or 'false')"}
@@ -7272,3 +7272,55 @@ Icon=/snap/testme/current/foo.png
         r = c.review_report
         expected_counts = {'info': 0, 'warn': 0, 'error': 0}
         self.check_results(r, expected_counts)
+
+    def test_check_meta_gui_desktop_bad_icon_expansion(self):
+        '''Test check_meta_gui_desktop() - bad icon expansion ($SNAP)'''
+        output_dir = self.mkdtemp()
+        path = os.path.join(output_dir, 'snap.yaml')
+        content = '''
+name: testme
+version: 0.1
+summary: some thing
+description: some desc
+apps:
+  testme:
+    command: bin/foo
+    plugs: [ desktop ]
+'''
+        with open(path, 'w') as f:
+            f.write(content)
+
+        desktop = os.path.join(output_dir, 'test.desktop')
+        content = '''
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Test
+GenericName=Test Generic
+Exec=testme
+Icon=$SNAP/foo.png
+'''
+        with open(desktop, 'w') as f:
+            f.write(content)
+
+        package = utils.make_snap2(output_dir=output_dir,
+                                   extra_files=[
+                                       '%s:meta/snap.yaml' % path,
+                                       '%s:meta/gui/test.desktop' % desktop,
+                                   ]
+                                   )
+        c = SnapReviewLint(package)
+        c.check_meta_gui_desktop()
+        r = c.review_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+
+        name = 'lint-snap-v2:desktop_file_icon:test.desktop:$SNAP/foo.png'
+        expected['error'][name] = {"text": "invalid icon path '$SNAP/foo.png'. Please adjust to use '${SNAP}' instead of '$SNAP'."}
+
+        self.check_results(r, expected=expected)
