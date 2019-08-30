@@ -14,21 +14,62 @@
 
 import os
 import re
+from pkg_resources import resource_filename
 
+import reviewtools.common as common
 import reviewtools.debversion as debversion
 
-from reviewtools.common import (
-    read_file_as_json_dict,
-)
-
 tracked_releases = ['xenial', 'bionic']
+epoch_pat = re.compile(r'^[0-9]+:')
 
 
 # For fast checks:
 # usn_db[release][binary][usn][version]
 def read_usn_db(fn):
-    raw = read_file_as_json_dict(fn)
-    epoch_pat = re.compile(r'^[0-9]+:')
+    def get_best_version(unmatched_vers, rel, bin, rawv):
+        version = debversion.DebVersion(rawv)
+
+        if rel in unmatched_vers and bin in unmatched_vers[rel]:
+            # If there is an epoch in the source_version, strip it and see if
+            # the stripped source_version matches the version in our overrides.
+            # If so, strip the epoch from the version for this package.
+            srcv = unmatched_vers[rel][bin]['source_version']
+            binv = unmatched_vers[rel][bin]['version']
+            if epoch_pat.search(srcv) and \
+                    binv == srcv.split(':', 1)[1]:
+                if ':' in rawv:
+                    version = debversion.DebVersion(rawv.split(':', 1)[1])
+            # Else if there is an epoch in the binary version from overrides,
+            # but not the source_version, add the binary's epoch to the
+            # source_version add see if they match. If so, add the epoch from
+            # the binary version in our overrides (since we should not be
+            # incrementing epochs in security updates) when the raw version
+            # doesn't have an epoch.
+            elif not epoch_pat.search(rawv) and \
+                    epoch_pat.search(binv) and \
+                    not epoch_pat.search(srcv) and \
+                    binv == "%s:%s" % (binv.split(':', 1)[0], srcv):
+                version = debversion.DebVersion("%s:%s" % (binv.split(':', 1)[0], rawv))
+            else:
+                # Don't pretend we know the version if we can't accurately
+                # guess
+                version = None
+
+        return version
+
+    unmatched_vers_fn = "./reviewtools/data/ubuntu-unmatched-bin-versions.json"
+    if not os.path.exists(unmatched_vers_fn):  # pragma: nocover
+        unmatched_vers_fn = resource_filename(
+            __name__, 'data/ubuntu-unmatched-bin-versions.json')
+        if not os.path.exists(unmatched_vers_fn):
+            unmatched_vers_fn = None
+
+    unmatched_vers = {}
+    # read in our unmatched binary versions if we have them
+    if unmatched_vers_fn is not None:
+        unmatched_vers = common.read_file_as_json_dict(unmatched_vers_fn)
+
+    raw = common.read_file_as_json_dict(fn)
 
     usn_db = {}
     for usn in raw:
@@ -54,14 +95,15 @@ def read_usn_db(fn):
             # see if we can use "allbinaries" which is authoritative but only
             # available in USNs after Dec 2018
             #
-
-            # FIXME: note that prior to Sept 2019, "allbinaries" assumed the
-            # binaries had the same version as the source. To account for that,
-            # we should examine the Packages files for tracked_releases and
-            # come up with an override mechanism
             if "allbinaries" in raw[usn]["releases"][rel]:
                 for bin in raw[usn]["releases"][rel]["allbinaries"]:
-                    version = debversion.DebVersion(raw[usn]["releases"][rel]["allbinaries"][bin]["version"])
+                    rawv = raw[usn]["releases"][rel]["allbinaries"][bin]["version"]
+                    version = get_best_version(unmatched_vers, rel, bin, rawv)
+                    # Skip binaries where we can't accurately guess the
+                    # version to avoid false reports
+                    if version is None:
+                        continue
+
                     if bin not in usn_db[rel]:
                         usn_db[rel][bin] = {}
                     if usn not in usn_db[rel][bin]:
@@ -116,7 +158,12 @@ def read_usn_db(fn):
                                     v.endswith(':%s' % usn_version):
                                 usn_version = v
                                 break
-                    version = debversion.DebVersion(usn_version)
+                    version = get_best_version(unmatched_vers, rel, bin,
+                                               usn_version)
+                    # Skip binaries where we can't accurately guess the
+                    # version to avoid false reports
+                    if version is None:
+                        continue
 
                     if bin not in usn_db[rel]:
                         usn_db[rel][bin] = {}

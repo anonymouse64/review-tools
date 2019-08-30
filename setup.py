@@ -27,6 +27,6 @@ setup(
     scripts=scripts,
     packages=find_packages(),
     test_suite='reviewtools.tests',
-    package_data={'reviewtools': ['data/*.yaml']},
+    package_data={'reviewtools': ['data/*.yaml', 'data/*.json']},
     include_package_data=True,
 )

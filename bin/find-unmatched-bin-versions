@@ -1,0 +1,35 @@
+#!/usr/bin/python3
+
+import json
+import os
+import sys
+
+lines = sys.stdin.readlines()
+
+if len(sys.argv) < 2:
+    print("Usage: cat Packages | %s <rel>" % os.path.basename(__file__))
+    sys.exit(1)
+
+rel = sys.argv[1]
+
+db = {}
+db[rel] = {}
+
+pkg = None
+for line in lines:
+    line = line.rstrip()
+    if line.startswith("Package: "):
+        pkg = line[9:]
+        db[rel][pkg] = {}
+    elif pkg is not None and line.startswith("Version: "):
+        db[rel][pkg]['version'] = line[9:]
+    elif pkg is not None and line.startswith("Source: ") and ' (' in line:
+        db[rel][pkg]['source'] = line[8:].split(' (')[0]
+        db[rel][pkg]['source_version'] = line.split('(')[1].split(')')[0]
+    elif line == '' and pkg in db[rel]:
+        if 'version' not in db[rel][pkg] or \
+                'source_version' not in db[rel][pkg] or \
+                db[rel][pkg]['version'] == db[rel][pkg]['source_version']:
+            del db[rel][pkg]
+
+print(json.dumps(db, sort_keys=True, indent=2))

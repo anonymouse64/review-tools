@@ -1,0 +1,17 @@
+Some USNs are known to have "allbinaries" with incorrect versions (see
+https://launchpad.net/bugs/1841848). As a result, snap-check-notices and
+snap-updates-available can't accurately report on these versions. In general
+there is no single convention that a binary version must use relative to the
+source version. We will create a map using the find-unmatched-bin-versions
+script. Eg:
+
+$ cat .../xenial/main/binary-amd64/Packages \
+  | find-unmatched-bin-versions xenial > ./xenial
+
+$ cat .../bionic/main/binary-amd64/Packages \
+  | find-unmatched-bin-versions bionic > ./bionic
+
+$ cat ./xenial ./bionic > ubuntu-unmatched-bin-versions.json
+
+Then fix up ubuntu-unmatched-bin-versions.json to be valid json. With this
+information, the tools can try a few different strategies to match the version.

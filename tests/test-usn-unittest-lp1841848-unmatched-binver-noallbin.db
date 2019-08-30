@@ -1,0 +1,54 @@
+{
+  "999999-1": {
+    "description": "blah blah\n",
+    "releases": {
+      "xenial": {
+        "binaries": {
+          "comerr-dev": {
+            "version": "2.2-1.42.13-1ubuntu1.1"
+          }
+        },
+        "archs": {
+          "amd64": {
+            "urls": {
+              "http://security.ubuntu.com/ubuntu/pool/main/e/e2fsprogs/comerr-dev_2.2-1.42.13-1ubuntu1.1_amd64.deb": {
+                "size": 705610,
+                "md5": "6ae91f4e9b8c26beae274ed1c96ed934"
+              }
+            }
+          },
+          "source": {
+            "urls": {
+              "http://security.ubuntu.com/ubuntu/pool/main/e/e2fsprogs/e2fsprogs_1.42.13.orig-src.tar.xz": {
+                "size": 167395528,
+                "md5": "c2c392218c650fc8871aed207a756157"
+              },
+              "http://security.ubuntu.com/ubuntu/pool/main/e/e2fsprogs/e2fsprogs_1.42.13-1ubuntu1.1.dsc": {
+                "size": 15028,
+                "md5": "bd9ce299824b250a22837145af15ecc9"
+              },
+              "http://security.ubuntu.com/ubuntu/pool/main/e/e2fsprogs/e2fsprogs_1.42.13-1ubuntu1.1.debian.tar.xz": {
+                "size": 2115296,
+                "md5": "c162f51c70e7aceab7b351a7228d6e70"
+              }
+            }
+          }
+        },
+        "sources": {
+          "e2fsprogs": {
+            "version": "1.42.13-1ubuntu1.1"
+          }
+        }
+      }
+    },
+    "title": "e2fsprogs blah",
+    "timestamp": 1566215429.382669,
+    "summary": "e2fsprogs vulnerabilities",
+    "action": "blah\n",
+    "isummary": "Several security issues were fixed in e2fsprogs.\n",
+    "id": "999999-1",
+    "cves": [
+      "CVE-2019-999999"
+    ]
+  }
+}

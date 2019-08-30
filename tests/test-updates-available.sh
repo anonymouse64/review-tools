@@ -128,6 +128,21 @@ echo "Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-
 PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-1.db' --store-db='./tests/test-store-unittest-bad-1.db' 2>&1 | tee -a "$tmp"
 echo "" | tee -a "$tmp"
 
+## LP: #1841848
+for i in test-check-notices_0.1_amd64.snap test-check-notices-needed_0.1_amd64.snap ; do
+    echo "Running: snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/$i'" | tee -a "$tmp"
+    PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap="./tests/$i" 2>&1 | tee -a "$tmp"
+    echo "" | tee -a "$tmp"
+    echo "Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/$i'" | tee -a "$tmp"
+    PYTHONPATH=./ ./bin/snap-updates-available --with-cves --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap="./tests/$i" 2>&1 | tee -a "$tmp"
+    echo "" | tee -a "$tmp"
+done
+for i in test-store-unittest-lp1841848.db test-store-unittest-lp1841848-needed.db ; do
+    echo "Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db' --store-db='./tests/$i'" | tee -a "$tmp"
+    PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db' --store-db="./tests/$i" 2>&1 | tee -a "$tmp"
+    echo "" | tee -a "$tmp"
+done
+
 # Test snap-check-notices
 ## app
 echo "Running: snap-check-notices --no-fetch ./tests/test-snapcraft-manifest_0_amd64.snap" | tee -a "$tmp"
@@ -152,6 +167,16 @@ for i in gke-kernel_4.15.0-1027.28~16.04.1_amd64.snap linux-generic-bbb_4.4.0-14
     echo "" | tee -a "$tmp"
     echo "Running: snap-check-notices --no-fetch --with-cves ./tests/$i" | tee -a "$tmp"
     PYTHONPATH=./ SNAP=./ SNAP_USER_COMMON=./ USNDB='./tests/test-usn-kernel.db' ./bin/snap-check-notices --no-fetch --with-cves "./tests/$i" 2>&1 | tee -a "$tmp"
+    echo "" | tee -a "$tmp"
+done
+
+## LP: #1841848
+for i in test-check-notices_0.1_amd64.snap test-check-notices-needed_0.1_amd64.snap ; do
+    echo "Running: snap-check-notices --no-fetch ./tests/$i" | tee -a "$tmp"
+    PYTHONPATH=./ SNAP=./ SNAP_USER_COMMON=./ USNDB='./tests/test-usn-unittest-lp1841848.db' ./bin/snap-check-notices --no-fetch "./tests/$i" 2>&1 | tee -a "$tmp"
+    echo "" | tee -a "$tmp"
+    echo "Running: snap-check-notices --no-fetch --with-cves ./tests/$i" | tee -a "$tmp"
+    PYTHONPATH=./ SNAP=./ SNAP_USER_COMMON=./ USNDB='./tests/test-usn-unittest-lp1841848.db' ./bin/snap-check-notices --no-fetch --with-cves "./tests/$i" 2>&1 | tee -a "$tmp"
     echo "" | tee -a "$tmp"
 done
 

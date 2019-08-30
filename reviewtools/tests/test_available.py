@@ -418,6 +418,19 @@ Revision r12 (i386; channels: candidate, beta)
         self.assertEquals(subj, None)
         self.assertEquals(body, None)
 
+    def test_check_scan_store_lp1841848_allbinaries_needed(self):
+        '''Test scan_store() - lp1841848 (allbinaries needed)'''
+        secnot_fn = "./tests/test-usn-unittest-lp1841848.db"
+        store_fn = "./tests/test-store-unittest-lp1841848-needed.db"
+        (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
+        self.assertEquals(len(errors), 0)
+        self.assertEquals(len(sent), 1)
+        (to_addr, subj, body) = sent[0]
+        eml = "test.me@example.com"
+        self.assertTrue(eml in to_addr)
+        self.assertTrue("libreoffice-style-tango: 4102-1" in body)
+        self.assertTrue("uno-libs3: 4102-1" in body)
+
     def test_check_scan_store_lp1841848_allbinaries_bad_epoch(self):
         '''Test scan_store() - lp1841848 (allbinaries with bad epoch)'''
         secnot_fn = "./tests/test-usn-unittest-lp1841848-incorrect-epoch.db"
@@ -427,12 +440,83 @@ Revision r12 (i386; channels: candidate, beta)
         self.assertEquals(len(sent), 1)
         (to_addr, subj, body) = sent[0]
 
-        # This is where we want to be, but haven't updated the FIXME in
-        # usn.py yet
-        # self.assertEquals(to_addr, None)
-        # self.assertEquals(subj, None)
-        # self.assertEquals(body, None)
+        self.assertEquals(to_addr, None)
+        self.assertEquals(subj, None)
+        self.assertEquals(body, None)
 
-        # but today, ensure current behavior doesn't change
+    def test_check_scan_store_lp1841848_allbinaries_bad_epoch_needed(self):
+        '''Test scan_store() - lp1841848 (allbinaries with bad epoch needed)'''
+        secnot_fn = "./tests/test-usn-unittest-lp1841848-incorrect-epoch.db"
+        store_fn = "./tests/test-store-unittest-lp1841848-needed.db"
+        (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
+        self.assertEquals(len(errors), 0)
+        self.assertEquals(len(sent), 1)
+        (to_addr, subj, body) = sent[0]
         eml = "test.me@example.com"
         self.assertTrue(eml in to_addr)
+        self.assertTrue("libreoffice-style-tango: 4102-1" in body)
+        self.assertTrue("uno-libs3: 4102-1" in body)
+
+    def test_check_scan_store_lp1841848_allbinaries_bad_epoch2(self):
+        '''Test scan_store() - lp1841848 (allbinaries with bad epoch2)'''
+        secnot_fn = "./tests/test-usn-unittest-lp1841848-incorrect-epoch2.db"
+        store_fn = "./tests/test-store-unittest-lp1841848.db"
+        (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
+        self.assertEquals(len(errors), 0)
+        self.assertEquals(len(sent), 1)
+        (to_addr, subj, body) = sent[0]
+
+        self.assertEquals(to_addr, None)
+        self.assertEquals(subj, None)
+        self.assertEquals(body, None)
+
+    def test_check_scan_store_lp1841848_unmatched_binver(self):
+        '''Test scan_store() - lp1841848 (unmatched binary version)'''
+        secnot_fn = "./tests/test-usn-unittest-lp1841848-unmatched-binver.db"
+        store_fn = "./tests/test-store-unittest-lp1841848.db"
+        (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
+        self.assertEquals(len(errors), 0)
+        self.assertEquals(len(sent), 1)
+        (to_addr, subj, body) = sent[0]
+
+        self.assertEquals(to_addr, None)
+        self.assertEquals(subj, None)
+        self.assertEquals(body, None)
+
+    def test_check_scan_store_lp1841848_no_allbinaries(self):
+        '''Test scan_store() - lp1841848 (no allbinaries)'''
+        secnot_fn = "./tests/test-usn-unittest-lp1841848-noallbin.db"
+        store_fn = "./tests/test-store-unittest-lp1841848.db"
+        (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
+        self.assertEquals(len(errors), 0)
+        self.assertEquals(len(sent), 1)
+        (to_addr, subj, body) = sent[0]
+        self.assertEquals(to_addr, None)
+        self.assertEquals(subj, None)
+        self.assertEquals(body, None)
+
+    def test_check_scan_store_lp1841848_no_allbinaries_needed(self):
+        '''Test scan_store() - lp1841848 (no allbinaries needed)'''
+        secnot_fn = "./tests/test-usn-unittest-lp1841848-noallbin.db"
+        store_fn = "./tests/test-store-unittest-lp1841848-needed.db"
+        (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
+        self.assertEquals(len(errors), 0)
+        self.assertEquals(len(sent), 1)
+        (to_addr, subj, body) = sent[0]
+        eml = "test.me@example.com"
+        self.assertTrue(eml in to_addr)
+        self.assertTrue("libreoffice-style-tango: 4102-1" in body)
+        self.assertTrue("uno-libs3: 4102-1" in body)
+
+    def test_check_scan_store_lp1841848_unmatched_binver2(self):
+        '''Test scan_store() - lp1841848 (unmatched binary version no all binaries)'''
+        secnot_fn = "./tests/test-usn-unittest-lp1841848-unmatched-binver-noallbin.db"
+        store_fn = "./tests/test-store-unittest-lp1841848.db"
+        (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
+        self.assertEquals(len(errors), 0)
+        self.assertEquals(len(sent), 1)
+        (to_addr, subj, body) = sent[0]
+
+        self.assertEquals(to_addr, None)
+        self.assertEquals(subj, None)
+        self.assertEquals(body, None)
