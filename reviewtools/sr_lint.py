@@ -1695,8 +1695,8 @@ class SnapReviewLint(SnapReview):
     def _uses_interface(self, iface_type, iface):
         '''Get interface name by type and interface/interface reference.
            Returns:
-           - The dereferenced interface name
-           - None if could not be found
+           - True if found the dereferenced interface name
+           - False if could not be found
         '''
         if iface_type in self.snap_yaml:
             for ref in self.snap_yaml[iface_type]:
@@ -2856,3 +2856,17 @@ class SnapReviewLint(SnapReview):
             s = "icon files should not use shell metacharacters: " + \
                 ", ".join(sorted(bad_names))
             self._add_result(t, n, s)
+
+    def check_audio_record_without_audio_playback(self):
+        '''Check audio-record used with audio-playback'''
+        if 'apps' not in self.snap_yaml or \
+                not self._uses_interface('plugs', 'audio-record'):
+            return
+
+        t = 'info'
+        n = self._get_check_name('audio-record_with_audio-playback')
+        s = 'OK'
+        if not self._uses_interface('plugs', 'audio-playback'):
+            t = 'warn'
+            s = "audio-playback must be specified with audio-record"
+        self._add_result(t, n, s)

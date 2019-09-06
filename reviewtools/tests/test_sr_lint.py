@@ -5777,6 +5777,78 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         for fn in valid:
             self.assertTrue(c._verify_icon_path(fn))
 
+    def test_check_audio_record_without_audio_playback_with(self):
+        '''Test audio_record_without_audio_playback - has audio-playback'''
+        plugs = {'audio-playback': {}, 'ref': {'interface': 'audio-record'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewLint(self.test_name)
+        c.check_audio_record_without_audio_playback()
+        r = c.review_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_audio_record_without_audio_playback_without(self):
+        '''Test audio_record_without_audio_playback - no audio-playback'''
+        plugs = {'ref': {'interface': 'audio-record'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewLint(self.test_name)
+        c.check_audio_record_without_audio_playback()
+        r = c.review_report
+        expected_counts = {'info': 0, 'warn': 1, 'error': 0}
+        self.check_results(r, expected_counts)
+        expected = {
+            'error': {},
+            'info': {},
+            'warn': {
+                'lint-snap-v2:audio-record_with_audio-playback': {
+                    'text': "audio-playback must be specified with audio-record"
+                }
+            }
+        }
+        self.check_results(r, expected=expected)
+
+    def test_check_audio_record_without_audio_playback_apps_with(self):
+        '''Test audio_record_without_audio_playback - apps has audio-playback'''
+        apps_plugs = {'bar': {'plugs': ['audio-playback', 'audio-record']}}
+        self.set_test_snap_yaml("apps", apps_plugs)
+        c = SnapReviewLint(self.test_name)
+        c.check_audio_record_without_audio_playback()
+        r = c.review_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_audio_record_without_audio_playback_apps_without(self):
+        '''Test audio_record_without_audio_playback - apps no audio-playback'''
+        apps_plugs = {'bar': {'plugs': ['audio-record']}}
+        self.set_test_snap_yaml("apps", apps_plugs)
+        c = SnapReviewLint(self.test_name)
+        c.check_audio_record_without_audio_playback()
+        r = c.review_report
+        expected_counts = {'info': 0, 'warn': 1, 'error': 0}
+        self.check_results(r, expected_counts)
+        expected = {
+            'error': {},
+            'info': {},
+            'warn': {
+                'lint-snap-v2:audio-record_with_audio-playback': {
+                    'text': "audio-playback must be specified with audio-record"
+                }
+            }
+        }
+        self.check_results(r, expected=expected)
+
+    def test_check_audio_record_without_audio_playback_mixed_with(self):
+        '''Test audio_record_without_audio_playback - mixed has audio-playback'''
+        plugs = {'ref': {'interface': 'audio-record'}}
+        apps_plugs = {'bar': {'plugs': ['audio-playback']}}
+        self.set_test_snap_yaml("plugs", plugs)
+        self.set_test_snap_yaml("apps", apps_plugs)
+        c = SnapReviewLint(self.test_name)
+        c.check_audio_record_without_audio_playback()
+        r = c.review_report
+        expected_counts = {'info': 1, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
 
 class TestSnapReviewLintNoMock(TestCase):
     """Tests without mocks where they are not needed."""
