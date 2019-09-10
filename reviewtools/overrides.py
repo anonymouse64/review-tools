@@ -111,6 +111,7 @@ redflagged_snap_types_overrides = {
              'core18',
              'core20',
              'test-snapd-base',
+             'test-snapd-core18',
              'fedora29',              # Community base snaps
              'godot-bare',
              'nix-base',
