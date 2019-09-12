@@ -598,6 +598,7 @@ update_publisher_overrides = {
         'dragonboard-kernel': canonical_kernel,
         'easy-openvpn': canonical_enablement,
         'eog': canonical_desktop,
+        'etcd': canonical_k8s,
         'gcp-kernel': canonical_kernel,
         'gedit': canonical_desktop,
         'git-ubuntu': canonical_server,
