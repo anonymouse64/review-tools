@@ -1732,9 +1732,16 @@ class SnapReviewLint(SnapReview):
 
     # see snapd wrappers/desktop.go
     def _verify_icon_path(self, fn):
-        '''Verify the icon file'''
+        '''Verify the icon file
+           Returns:
+             valid, path
+
+           Where 'valid' is boolean on if the path is good or not and 'path'
+           is a path to the file in the unpacked directory, or None if the
+           file isn't expected to be present.
+        '''
         if fn is None or fn.startswith('.') or fn != os.path.normpath(fn):
-            return False
+            return False, None
 
         if '/' in fn:
             # Explicit file paths must point into the snap with extension (if
@@ -1743,26 +1750,28 @@ class SnapReviewLint(SnapReview):
             # fine).
             if fn.startswith('${SNAP}/') and (fn.endswith('.png') or
                                               fn.endswith('.svg')):
-                return True
+                return True, os.path.join(self._get_unpack_dir(),
+                                          fn.split('/', 1)[1])
 
             # As a special consideration to not break existing snaps, allow
             # /snap/<snap name>/.... People should use ${SNAP}/ instead since
             # /snap is not portable (eg, Fedora puts this in /var/lib/snap
             # instead of /snap), but '${SNAP}' wasn't always available.
-            if fn.startswith('/snap/%s/' % self.snap_yaml['name']) and \
+            if fn.startswith('/snap/%s/current/' % self.snap_yaml['name']) and \
                     (fn.endswith('.png') or fn.endswith('.svg')):
-                return True
+                return True, os.path.join(self._get_unpack_dir(),
+                                          fn.split('/', 4)[4])
 
-            return False
+            return False, None
         elif fn.startswith('snap.'):
             # Icons specific to this snap can be used with or without extension
             if fn.startswith('snap.%s.' % self.snap_yaml['name']):
-                return True
-            return False
+                return True, 'meta/gui/icons'
+            return False, None
 
         # Allow use of system icons. Ideally this would be limited since these
         # could be used to spoof other applications.
-        return True
+        return True, None
 
     def _verify_desktop_file(self, fn):
         '''Verify the desktop file'''
@@ -1867,7 +1876,8 @@ class SnapReviewLint(SnapReview):
                                      extra=icon_fn)
             s = 'OK'
 
-            if not self._verify_icon_path(icon_fn):
+            (valid, real_fn) = self._verify_icon_path(icon_fn)
+            if not valid:
                 t = 'error'
                 if icon_fn.startswith("$SNAP/"):
                     s = "invalid icon path '%s'. Please adjust " % icon_fn + \
@@ -1881,6 +1891,16 @@ class SnapReviewLint(SnapReview):
                         "snapcraft, consider using 'desktop: <file>' " + \
                         "since the Icon paths in the desktop will be " + \
                         "rewritten to use ${SNAP}/<file>."
+            elif real_fn is not None and real_fn != 'meta/gui/icons':
+                # we have a path in the snap (we'll check this sizes of icons
+                # from meta/gui/icons in check_valid_icon_sets())
+                if not os.path.exists(real_fn):
+                    t = 'error'
+                    s = "nonexistent icon path"
+                elif not self._verify_file_size(real_fn, self.max_icon_size):
+                    t = 'error'
+                    s = "invalid icon size > %dM" % \
+                        (self.max_icon_size / 1024 / 1024)
             self._add_result(t, n, s)
 
     def check_meta_gui_desktop(self):
@@ -2824,6 +2844,7 @@ class SnapReviewLint(SnapReview):
                           recursive=True)
         bad_names = []
         unsnap_names = []
+        toobig_names = []
         count = 0
         for fn in icons:
             rel = os.path.relpath(fn, self._get_unpack_dir())
@@ -2837,6 +2858,8 @@ class SnapReviewLint(SnapReview):
             count += 1
             if not icon.startswith('snap.%s.' % self.snap_yaml['name']):
                 unsnap_names.append(rel)
+            elif not self._verify_file_size(fn, self.max_icon_size):
+                toobig_names.append(rel)
 
         t = 'info'
         n = self._get_check_name('icon_theme_filenames')
@@ -2855,6 +2878,14 @@ class SnapReviewLint(SnapReview):
             n = self._get_check_name('icon_theme_quoting')
             s = "icon files should not use shell metacharacters: " + \
                 ", ".join(sorted(bad_names))
+            self._add_result(t, n, s)
+
+        if len(toobig_names) > 0:
+            t = 'error'
+            n = self._get_check_name('icon_theme_size')
+            s = "invalid icon size > %dM for: %s" % \
+                (self.max_icon_size / 1024 / 1024,
+                 ", ".join(sorted(toobig_names)))
             self._add_result(t, n, s)
 
     def check_audio_record_without_audio_playback(self):

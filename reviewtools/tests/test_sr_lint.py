@@ -5762,20 +5762,29 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                    'snap.other.thing',
                    'snap.other.thing.png',
                    'snap.other.thing.svg',
+                   None,
+                   '$SNAP/foo.png',
                    ]
         for fn in invalid:
-            self.assertFalse(c._verify_icon_path(fn))
+            valid, real_fn = c._verify_icon_path(fn)
+            self.assertFalse(valid)
+            self.assertEqual(real_fn, None)
 
-        valid = ['foo',
-                 'foo.png',
-                 'foo.svg',
-                 '${SNAP}/foo.png',
-                 '${SNAP}/foo.svg',
-                 'snap.foo.foo.png',
-                 'snap.foo.bar.svg',
+        # (declared, fn_to_verify)
+        valid = [('foo', None),
+                 ('foo.png', None),
+                 ('foo.svg', None),
+                 ('${SNAP}/foo.png', '/fake/foo.png'),
+                 ('${SNAP}/foo.svg', '/fake/foo.svg'),
+                 ('/snap/foo/current/foo.png', '/fake/foo.png'),
+                 ('/snap/foo/current/foo.svg', '/fake/foo.svg'),
+                 ('snap.foo.foo.png', 'meta/gui/icons'),
+                 ('snap.foo.bar.svg', 'meta/gui/icons'),
                  ]
-        for fn in valid:
-            self.assertTrue(c._verify_icon_path(fn))
+        for (fn, exreal) in valid:
+            valid, real_fn = c._verify_icon_path(fn)
+            self.assertTrue(valid)
+            self.assertEqual(real_fn, exreal)
 
     def test_check_audio_record_without_audio_playback_with(self):
         '''Test audio_record_without_audio_playback - has audio-playback'''
@@ -7233,6 +7242,55 @@ Icon=/etc/passwd
         name = 'lint-snap-v2:desktop_file:type:test.desktop'
         expected['error'][name] = {"text": "malformed desktop file: 'Type=' specified multiple times"}
 
+    def test_check_meta_gui_desktop_icon_snap(self):
+        '''Test check_meta_gui_desktop() - icon ${SNAP}'''
+        output_dir = self.mkdtemp()
+        path = os.path.join(output_dir, 'snap.yaml')
+        content = '''
+name: testme
+version: 0.1
+summary: some thing
+description: some desc
+apps:
+  testme:
+    command: bin/foo
+    plugs: [ desktop ]
+'''
+        with open(path, 'w') as f:
+            f.write(content)
+
+        desktop = os.path.join(output_dir, 'test.desktop')
+        content = '''
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Test
+GenericName=Test Generic
+Exec=testme
+DBusActivatable=false
+NoDisplay=true
+Icon=${SNAP}/dir/foo.png
+'''
+        with open(desktop, 'w') as f:
+            f.write(content)
+
+        png = os.path.join(output_dir, 'foo.png')
+        with open(png, 'w') as f:
+            f.write('PNG')
+
+        package = utils.make_snap2(output_dir=output_dir,
+                                   extra_files=[
+                                       '%s:meta/snap.yaml' % path,
+                                       '%s:meta/gui/test.desktop' % desktop,
+                                       '%s:dir/foo.png' % png,
+                                   ]
+                                   )
+        c = SnapReviewLint(package)
+        c.check_meta_gui_desktop()
+        r = c.review_report
+        expected_counts = {'info': 6, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
     def test_check_meta_gui_desktop_icon_workaround(self):
         '''Test check_meta_gui_desktop() - icon workaround'''
         output_dir = self.mkdtemp()
@@ -7265,10 +7323,15 @@ Icon=/snap/testme/current/foo.png
         with open(desktop, 'w') as f:
             f.write(content)
 
+        png = os.path.join(output_dir, 'foo.png')
+        with open(png, 'w') as f:
+            f.write('PNG')
+
         package = utils.make_snap2(output_dir=output_dir,
                                    extra_files=[
                                        '%s:meta/snap.yaml' % path,
                                        '%s:meta/gui/test.desktop' % desktop,
+                                       '%s:foo.png' % png,
                                    ]
                                    )
         c = SnapReviewLint(package)
@@ -7313,37 +7376,170 @@ Icon=/snap/testme/current/foo.png
         expected['error'][name] = {"text": "icon files should not use shell metacharacters: meta/gui/icons/snap.test.foo;sh"}
         self.check_results(r, expected=expected)
 
-    def test_check_valid_icon_sets_notsnap_filename(self):
-        '''Test check_valid_icon_sets() - not snap-specific'''
+    def test_check_meta_gui_desktop_icon_snap(self):
+        '''Test check_meta_gui_desktop() - icon ${SNAP}'''
         output_dir = self.mkdtemp()
+        path = os.path.join(output_dir, 'snap.yaml')
+        content = '''
+name: testme
+version: 0.1
+summary: some thing
+description: some desc
+apps:
+  testme:
+    command: bin/foo
+    plugs: [ desktop ]
+'''
+        with open(path, 'w') as f:
+            f.write(content)
+
+        desktop = os.path.join(output_dir, 'test.desktop')
+        content = '''
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Test
+GenericName=Test Generic
+Exec=testme
+DBusActivatable=false
+NoDisplay=true
+Icon=${SNAP}/dir/foo.png
+'''
+        with open(desktop, 'w') as f:
+            f.write(content)
+
+        png = os.path.join(output_dir, 'foo.png')
+        with open(png, 'w') as f:
+            f.write('PNG')
+
         package = utils.make_snap2(output_dir=output_dir,
                                    extra_files=[
-                                       'meta/gui/icons/test.foo',
-                                       'meta/gui/icons/snap.other.foo',
-                                   ])
+                                       '%s:meta/snap.yaml' % path,
+                                       '%s:meta/gui/test.desktop' % desktop,
+                                       '%s:dir/foo.png' % png,
+                                   ]
+                                   )
         c = SnapReviewLint(package)
-        c.check_valid_icon_sets()
+        c.check_meta_gui_desktop()
         r = c.review_report
-        expected_counts = {'info': None, 'warn': 1, 'error': 0}
+        expected_counts = {'info': 6, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_meta_gui_desktop_bad_icon_nonexistent(self):
+        '''Test check_meta_gui_desktop() - bad icon - nonexistent'''
+        output_dir = self.mkdtemp()
+        path = os.path.join(output_dir, 'snap.yaml')
+        content = '''
+name: testme
+version: 0.1
+summary: some thing
+description: some desc
+apps:
+  testme:
+    command: bin/foo
+    plugs: [ desktop ]
+'''
+        with open(path, 'w') as f:
+            f.write(content)
+
+        desktop = os.path.join(output_dir, 'test.desktop')
+        content = '''
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Test
+GenericName=Test Generic
+Exec=testme
+DBusActivatable=false
+NoDisplay=true
+Icon=${SNAP}/nonexistent.png
+'''
+        with open(desktop, 'w') as f:
+            f.write(content)
+
+        png = os.path.join(output_dir, 'foo.png')
+        with open(png, 'w') as f:
+            f.write('PNG')
+
+        package = utils.make_snap2(output_dir=output_dir,
+                                   extra_files=[
+                                       '%s:meta/snap.yaml' % path,
+                                       '%s:meta/gui/test.desktop' % desktop,
+                                       '%s:foo.png' % png,
+                                   ]
+                                   )
+        c = SnapReviewLint(package)
+        c.check_meta_gui_desktop()
+        r = c.review_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
         expected = dict()
         expected['error'] = dict()
         expected['warn'] = dict()
         expected['info'] = dict()
-        name = 'lint-snap-v2:icon_theme_filenames'
-        expected['warn'][name] = {"text": "icon files should start with 'snap.test.': meta/gui/icons/snap.other.foo, meta/gui/icons/test.foo"}
+
+        name = 'lint-snap-v2:desktop_file_icon:test.desktop:${SNAP}/nonexistent.png'
+        expected['error'][name] = {"text": "nonexistent icon path"}
         self.check_results(r, expected=expected)
 
-    def test_check_valid_icon_sets_none(self):
-        '''Test check_valid_icon_sets() - none'''
+    def test_check_meta_gui_desktop_bad_icon_size(self):
+        '''Test check_meta_gui_desktop() - bad icon size'''
         output_dir = self.mkdtemp()
-        package = utils.make_snap2(output_dir=output_dir)
+        path = os.path.join(output_dir, 'snap.yaml')
+        content = '''
+name: testme
+version: 0.1
+summary: some thing
+description: some desc
+apps:
+  testme:
+    command: bin/foo
+    plugs: [ desktop ]
+'''
+        with open(path, 'w') as f:
+            f.write(content)
+
+        desktop = os.path.join(output_dir, 'test.desktop')
+        content = '''
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Test
+GenericName=Test Generic
+Exec=testme
+DBusActivatable=false
+NoDisplay=true
+Icon=${SNAP}/foo.png
+'''
+        with open(desktop, 'w') as f:
+            f.write(content)
+
+        png = os.path.join(output_dir, 'foo.png')
+        with open(png, 'w') as f:
+            f.write('%s' % ('A' * 9 * 1024 * 1024))
+
+        package = utils.make_snap2(output_dir=output_dir,
+                                   extra_files=[
+                                       '%s:meta/snap.yaml' % path,
+                                       '%s:meta/gui/test.desktop' % desktop,
+                                       '%s:foo.png' % png,
+                                   ]
+                                   )
         c = SnapReviewLint(package)
-        c.check_valid_icon_sets()
+        c.check_meta_gui_desktop()
         r = c.review_report
-        expected_counts = {'info': 0, 'warn': 0, 'error': 0}
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+
+        name = 'lint-snap-v2:desktop_file_icon:test.desktop:${SNAP}/foo.png'
+        expected['error'][name] = {"text": "invalid icon size > 8M"}
+        self.check_results(r, expected=expected)
 
     def test_check_meta_gui_desktop_bad_icon_expansion(self):
         '''Test check_meta_gui_desktop() - bad icon expansion ($SNAP)'''
@@ -7394,5 +7590,63 @@ Icon=$SNAP/foo.png
 
         name = 'lint-snap-v2:desktop_file_icon:test.desktop:$SNAP/foo.png'
         expected['error'][name] = {"text": "invalid icon path '$SNAP/foo.png'. Please adjust to use '${SNAP}' instead of '$SNAP'."}
+        self.check_results(r, expected=expected)
 
+    def test_check_valid_icon_sets_notsnap_filename(self):
+        '''Test check_valid_icon_sets() - not snap-specific'''
+        output_dir = self.mkdtemp()
+        package = utils.make_snap2(output_dir=output_dir,
+                                   extra_files=[
+                                       'meta/gui/icons/test.foo.png',
+                                       'meta/gui/icons/snap.other.foo.png',
+                                   ])
+        c = SnapReviewLint(package)
+        c.check_valid_icon_sets()
+        r = c.review_report
+        expected_counts = {'info': None, 'warn': 1, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'lint-snap-v2:icon_theme_filenames'
+        expected['warn'][name] = {"text": "icon files should start with 'snap.test.': meta/gui/icons/snap.other.foo.png, meta/gui/icons/test.foo.png"}
+        self.check_results(r, expected=expected)
+
+    def test_check_valid_icon_sets_none(self):
+        '''Test check_valid_icon_sets() - none'''
+        output_dir = self.mkdtemp()
+        package = utils.make_snap2(output_dir=output_dir)
+        c = SnapReviewLint(package)
+        c.check_valid_icon_sets()
+        r = c.review_report
+        expected_counts = {'info': 0, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_valid_icon_sets_bad_size(self):
+        '''Test check_valid_icon_sets() - bad size'''
+        output_dir = self.mkdtemp()
+
+        svg = os.path.join(output_dir, 'snap.test.foo.svg')
+        with open(svg, 'w') as f:
+            f.write('%s' % ('A' * 9 * 1024 * 1024))
+
+        package = utils.make_snap2(output_dir=output_dir,
+                                   extra_files=[
+                                       '%s:meta/gui/icons/snap.test.foo.svg' %
+                                       svg,
+                                   ])
+        c = SnapReviewLint(package)
+        c.check_valid_icon_sets()
+        r = c.review_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'lint-snap-v2:icon_theme_size'
+        expected['error'][name] = {"text": "invalid icon size > 8M for: meta/gui/icons/snap.test.foo.svg"}
         self.check_results(r, expected=expected)

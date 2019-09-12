@@ -310,6 +310,9 @@ class SnapReview(Review):
         # '/mnt',
     ]
 
+    # https://github.com/snapcore/snapd/pull/6767 specifies 8M
+    max_icon_size = 8 * 1024 * 1024
+
     def __init__(self, fn, review_type, overrides=None):
         Review.__init__(self, fn, review_type, overrides=overrides)
 
@@ -519,3 +522,10 @@ class SnapReview(Review):
                     return (valid, t, s)
 
         return (True, 'info', 'OK')
+
+    def _verify_file_size(self, fn, size):
+        '''Verify size of file is <= to specified size'''
+        # Callers should verify it it exists
+        if os.path.getsize(fn) <= size:
+            return True
+        return False
