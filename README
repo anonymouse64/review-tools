@@ -55,7 +55,7 @@ Or to run a specific test:
 $ python3 -m unittest reviewtools.tests.<filename>.<class>.<test>
 
 Eg:
-$ python3 -m unittest reviewtools.tests.test_sr_security.TestSnapReviewSecurity.test_all_checks_as_v2
+$ python3 -m unittest reviewtools.tests.test_sr_lint.TestSnapReviewLint.test_all_checks_as_v2
 
 Additional checks are:
 $ ./run-pep8
