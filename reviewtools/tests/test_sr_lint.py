@@ -7376,55 +7376,6 @@ Icon=/snap/testme/current/foo.png
         expected['error'][name] = {"text": "icon files should not use shell metacharacters: meta/gui/icons/snap.test.foo;sh"}
         self.check_results(r, expected=expected)
 
-    def test_check_meta_gui_desktop_icon_snap(self):
-        '''Test check_meta_gui_desktop() - icon ${SNAP}'''
-        output_dir = self.mkdtemp()
-        path = os.path.join(output_dir, 'snap.yaml')
-        content = '''
-name: testme
-version: 0.1
-summary: some thing
-description: some desc
-apps:
-  testme:
-    command: bin/foo
-    plugs: [ desktop ]
-'''
-        with open(path, 'w') as f:
-            f.write(content)
-
-        desktop = os.path.join(output_dir, 'test.desktop')
-        content = '''
-[Desktop Entry]
-Type=Application
-Version=1.0
-Name=Test
-GenericName=Test Generic
-Exec=testme
-DBusActivatable=false
-NoDisplay=true
-Icon=${SNAP}/dir/foo.png
-'''
-        with open(desktop, 'w') as f:
-            f.write(content)
-
-        png = os.path.join(output_dir, 'foo.png')
-        with open(png, 'w') as f:
-            f.write('PNG')
-
-        package = utils.make_snap2(output_dir=output_dir,
-                                   extra_files=[
-                                       '%s:meta/snap.yaml' % path,
-                                       '%s:meta/gui/test.desktop' % desktop,
-                                       '%s:dir/foo.png' % png,
-                                   ]
-                                   )
-        c = SnapReviewLint(package)
-        c.check_meta_gui_desktop()
-        r = c.review_report
-        expected_counts = {'info': 6, 'warn': 0, 'error': 0}
-        self.check_results(r, expected_counts)
-
     def test_check_meta_gui_desktop_bad_icon_nonexistent(self):
         '''Test check_meta_gui_desktop() - bad icon - nonexistent'''
         output_dir = self.mkdtemp()
