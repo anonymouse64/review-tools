@@ -1738,18 +1738,18 @@ class SnapReviewLint(SnapReview):
 
            Where 'valid' is boolean on if the path is good or not and 'path'
            is a path to the file in the unpacked directory, or None if the
-           file isn't expected to be present.
+           file isn't expected to be present when this check has run.
         '''
         if fn is None or fn.startswith('.') or fn != os.path.normpath(fn):
             return False, None
 
         if '/' in fn:
-            # Explicit file paths must point into the snap with extension (if
-            # this is relaxed, must consider snap-controlled paths that symlink
-            # outside of the snap (${SNAP}/ is in the read-only area, so it is
-            # fine).
-            if fn.startswith('${SNAP}/') and (fn.endswith('.png') or
-                                              fn.endswith('.svg')):
+            # Explicit file paths must point into the snap. We don't worry
+            # about extensions at this time since they are local to the snap
+            # and can't be used to subvert the system. If this is relaxed, must
+            # consider snap-controlled paths that symlink outside of the snap
+            # (${SNAP}/ is in the read-only area, so it is fine).
+            if fn.startswith('${SNAP}/'):
                 return True, os.path.join(self._get_unpack_dir(),
                                           fn.split('/', 1)[1])
 
@@ -1757,17 +1757,16 @@ class SnapReviewLint(SnapReview):
             # /snap/<snap name>/.... People should use ${SNAP}/ instead since
             # /snap is not portable (eg, Fedora puts this in /var/lib/snap
             # instead of /snap), but '${SNAP}' wasn't always available.
-            if fn.startswith('/snap/%s/current/' % self.snap_yaml['name']) and \
-                    (fn.endswith('.png') or fn.endswith('.svg')):
+            if fn.startswith('/snap/%s/current/' % self.snap_yaml['name']):
                 return True, os.path.join(self._get_unpack_dir(),
                                           fn.split('/', 4)[4])
 
             return False, None
         elif fn.startswith('snap.'):
-            # Icons specific to this snap can be used with or without extension
-            if fn.startswith('snap.%s.' % self.snap_yaml['name']):
-                return True, 'meta/gui/icons'
-            return False, None
+            # Icons that start with 'snap.' will typically come from icon sets
+            # Icons in icon sets are specific to the snap and can be used with
+            # or without extension. Valid extensions will be checked elsewhere.
+            return True, None
 
         # Allow use of system icons. Ideally this would be limited since these
         # could be used to spoof other applications.
@@ -1885,15 +1884,16 @@ class SnapReviewLint(SnapReview):
                 else:
                     s = "invalid icon path '%s'. Should either " % icon_fn + \
                         "specify the basename of the file (with or " + \
-                        "without file extension), " + \
-                        "snap.<snap name>.<snap command>[.(png|svg)] or " + \
-                        "${SNAP}/path/to/icon.(png|svg). If using " + \
+                        "without file extension), ${SNAP}/path/to/icon or" + \
+                        "snap.<snap name>.<snap command>[.(png|svg)] " + \
+                        "when using icon sets in meta/gui/icons. If using " + \
                         "snapcraft, consider using 'desktop: <file>' " + \
                         "since the Icon paths in the desktop will be " + \
                         "rewritten to use ${SNAP}/<file>."
-            elif real_fn is not None and real_fn != 'meta/gui/icons':
-                # we have a path in the snap (we'll check this sizes of icons
-                # from meta/gui/icons in check_valid_icon_sets())
+            elif real_fn is not None:
+                # we have a path in the snap (we'll perform additional checks
+                # for icon sets (ie, from meta/gui/icons) in
+                # check_valid_icon_sets()
                 if not os.path.exists(real_fn):
                     t = 'error'
                     s = "nonexistent icon path"
@@ -2845,6 +2845,7 @@ class SnapReviewLint(SnapReview):
         bad_names = []
         unsnap_names = []
         toobig_names = []
+        wrongext_names = []
         count = 0
         for fn in icons:
             rel = os.path.relpath(fn, self._get_unpack_dir())
@@ -2858,6 +2859,8 @@ class SnapReviewLint(SnapReview):
             count += 1
             if not icon.startswith('snap.%s.' % self.snap_yaml['name']):
                 unsnap_names.append(rel)
+            elif os.path.splitext(icon)[1].lower() not in ['.png', '.svg']:
+                wrongext_names.append(rel)
             elif not self._verify_file_size(fn, self.max_icon_size):
                 toobig_names.append(rel)
 
@@ -2878,6 +2881,13 @@ class SnapReviewLint(SnapReview):
             n = self._get_check_name('icon_theme_quoting')
             s = "icon files should not use shell metacharacters: " + \
                 ", ".join(sorted(bad_names))
+            self._add_result(t, n, s)
+
+        if len(wrongext_names) > 0:
+            t = 'error'
+            n = self._get_check_name('icon_theme_ext')
+            s = "invalid icon extension for icon set (should end with " + \
+                ".png or .svg): %s" % ", ".join(sorted(wrongext_names))
             self._add_result(t, n, s)
 
         if len(toobig_names) > 0:

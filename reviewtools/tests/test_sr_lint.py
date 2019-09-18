@@ -5755,15 +5755,20 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
         invalid = ['/foo/../bar',
                    'foo/../bar',
+                   './bar',
+                   'bar/.',
                    '../bar',
-                   '${SNAP}/../foo.png',
-                   '${SNAP}/foo',
-                   '/usr/share/icons/foo.svg',
-                   'snap.other.thing',
-                   'snap.other.thing.png',
-                   'snap.other.thing.svg',
                    None,
-                   '$SNAP/foo.png',
+                   '${SNAP}//foo.png',
+                   '${SNAP}/./foo.png',
+                   '${SNAP}/../foo.png',
+                   '${SNAP}/../../foo.png',
+                   '/usr/share/icons/foo.svg',
+                   '/usr/share/icons//foo.svg',
+                   '/usr/share/icons/./foo.svg',
+                   '/usr/share/icons/../foo.svg',
+                   '/usr/share/icons/../../foo.svg',
+                   '$SNAP/foo.png',  # should be ${SNAP}/...
                    ]
         for fn in invalid:
             valid, real_fn = c._verify_icon_path(fn)
@@ -5776,10 +5781,16 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                  ('foo.svg', None),
                  ('${SNAP}/foo.png', '/fake/foo.png'),
                  ('${SNAP}/foo.svg', '/fake/foo.svg'),
+                 ('${SNAP}/foo.ico', '/fake/foo.ico'),
+                 ('${SNAP}/foo', '/fake/foo'),
                  ('/snap/foo/current/foo.png', '/fake/foo.png'),
                  ('/snap/foo/current/foo.svg', '/fake/foo.svg'),
-                 ('snap.foo.foo.png', 'meta/gui/icons'),
-                 ('snap.foo.bar.svg', 'meta/gui/icons'),
+                 ('/snap/foo/current/foo.ico', '/fake/foo.ico'),
+                 ('/snap/foo/current/foo', '/fake/foo'),
+                 ('snap.foo.foo.png', None),
+                 ('snap.foo.bar.svg', None),
+                 ('snap.foo.bar.ico', None),
+                 ('snap.foo.bar', None),
                  ]
         for (fn, exreal) in valid:
             valid, real_fn = c._verify_icon_path(fn)
@@ -7181,7 +7192,7 @@ Icon=/etc/passwd
         expected['error'][name] = {"text": "Could not find 'Type=Application' in desktop file"}
 
         name = 'lint-snap-v2:desktop_file_icon:test.desktop:/etc/passwd'
-        expected['error'][name] = {"text": "invalid icon path '/etc/passwd'. Should either specify the basename of the file (with or without file extension), snap.<snap name>.<snap command>[.(png|svg)] or ${SNAP}/path/to/icon.(png|svg). If using snapcraft, consider using 'desktop: <file>' since the Icon paths in the desktop will be rewritten to use ${SNAP}/<file>."}
+        expected['error'][name] = {"text": "invalid icon path '/etc/passwd'. Should either specify the basename of the file (with or without file extension), ${SNAP}/path/to/icon orsnap.<snap name>.<snap command>[.(png|svg)] when using icon sets in meta/gui/icons. If using snapcraft, consider using 'desktop: <file>' since the Icon paths in the desktop will be rewritten to use ${SNAP}/<file>."}
 
         name = 'lint-snap-v2:desktop_file:hidden:test.desktop'
         expected['warn'][name] = {"text": "invalid value for 'Hidden' (should be 'true' or 'false')"}
@@ -7600,4 +7611,31 @@ Icon=$SNAP/foo.png
         expected['info'] = dict()
         name = 'lint-snap-v2:icon_theme_size'
         expected['error'][name] = {"text": "invalid icon size > 8M for: meta/gui/icons/snap.test.foo.svg"}
+        self.check_results(r, expected=expected)
+
+    def test_check_valid_icon_sets_bad_ext(self):
+        '''Test check_valid_icon_sets() - bad extension'''
+        output_dir = self.mkdtemp()
+
+        ico = os.path.join(output_dir, 'snap.test.foo.ico')
+        with open(ico, 'w') as f:
+            f.write('ICO')
+
+        package = utils.make_snap2(output_dir=output_dir,
+                                   extra_files=[
+                                       '%s:meta/gui/icons/snap.test.foo.ico' %
+                                       ico,
+                                   ])
+        c = SnapReviewLint(package)
+        c.check_valid_icon_sets()
+        r = c.review_report
+        expected_counts = {'info': None, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'lint-snap-v2:icon_theme_ext'
+        expected['error'][name] = {"text": "invalid icon extension for icon set (should end with .png or .svg): meta/gui/icons/snap.test.foo.ico"}
         self.check_results(r, expected=expected)
