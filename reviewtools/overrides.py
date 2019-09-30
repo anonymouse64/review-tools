@@ -429,6 +429,7 @@ sec_iface_ref_overrides = {
         'rain': ['config-aws'],
         'redis-desktop-manager': ['dot-rdm'],
         'rofi-totp': ['dot-gauth'],
+        'spread': ['dot-spread', 'dot-config-gcloud'],
     },
     'system-files': {
         'gallery-dl': ['etc-gallery-dl'],
