@@ -1,16 +1,5 @@
-Runnable snap v2 tests:
-- bin/snap-check-declaration: declaration tests
-- bin/snap-check-lint: lint tests
-- bin/snap-check-security: security tests
-- bin/snap-run-checks: all tests
+# Environment
 
-This gives an alternate view on bin/snap-run-checks:
-- bin/snap-review
-
-Running checks locally:
-$ PYTHONPATH=$PWD ./bin/snap-review /path/to/package
-
-Additional environment variables:
 SNAP_DEBUG=1               - show debug info
 SNAP_ENFORCE_RESQUASHFS=0  - don't enforce resquashfs tests
 SNAP_FAKEROOT_RESQUASHFS=1 - use fakeroot with resquashfs tests
@@ -23,6 +12,21 @@ RT_EMAIL_FROM=<addr>      - override configured From address
 RT_EMAIL_TO=<addr>        - override calculated To addresses
 RT_EMAIL_SERVER=<server>  - use <server> instead of localhost
 RT_EMAIL_NOPROMPT=1       - force sending of email without prompting
+
+
+# Tests
+
+Runnable snap v2 tests:
+- bin/snap-check-declaration: declaration tests
+- bin/snap-check-lint: lint tests
+- bin/snap-check-security: security tests
+- bin/snap-run-checks: all tests
+
+This gives an alternate view on bin/snap-run-checks:
+- bin/snap-review
+
+Running checks locally:
+$ PYTHONPATH=$PWD ./bin/snap-review /path/to/package
 
 Importable tests:
 - reviewtools/sr_lint.py: lint tests
@@ -89,3 +93,52 @@ hook to run the testsuite before committing. Eg, add something like this to
                                   run_tests_rt,
                                   'click-reviewers-tools tests')
 
+# Helpful commands
+
+Install the required snaps for the below commands:
+$ sudo snap install review-tools
+$ sudo snap disconnect review-tools:home   # optional, but good for security
+$ sudo snap install http
+$ sudo snap install jq
+$ sudo snap install what-snap
+
+To download a snap (and all of its assertions):
+$ snap download emoj
+Fetching snap "emoj"
+Fetching assertions for "emoj"
+Install the snap with:
+   snap ack emoj_53.assert
+   snap install emoj_53.snap
+
+To perform a review via snap:
+$ snap-review $HOME/snap/review-tools/common/path/to/snap
+(need not be in SNAP_USER_COMMON if 'home' is connected)
+
+To unpack the snap to 'squashfs-root' in the cwd (files are owned by invoking
+user unless using sudo, which isn't recommended):
+$ unsquashfs ./the.snap
+
+Find the snap name for a given snap-id:
+$ what-snap HjdctDwq9fm9TnLPSvUXgyXeY9zmRsB5
+HjdctDwq9fm9TnLPSvUXgyXeY9zmRsB5: emoj
+
+Find the snap-id for a given snap name:
+$ SNAPNAME=emoj ; http https://api.snapcraft.io/v2/snaps/info/$SNAPNAME Snap-Device-Series:16 | jq -r '."snap-id"'
+HjdctDwq9fm9TnLPSvUXgyXeY9zmRsB5
+
+Download the snap.yaml for a given snap (and architecture) from the store (uses latest revision):
+$ SNAPNAME=emoj ; http https://api.snapcraft.io/v2/snaps/info/$SNAPNAME Snap-Device-Series:16 architecture==amd64 fields==snap-yaml | jq -r '."channel-map"[0]."snap-yaml"'
+
+name: emoj
+version: v2.0.0
+...
+
+Download the snap declaration for a given snap from the store:
+$ snap known --remote snap-declaration series=16 snap-id=HjdctDwq9fm9TnLPSvUXgyXeY9zmRsB5
+type: snap-declaration
+authority-id: canonical
+series: 16
+snap-id: HjdctDwq9fm9TnLPSvUXgyXeY9zmRsB5
+publisher-id: ekRMaarzOfN1Vu3sDY0Bt1aGnM8Cd4kG
+snap-name: emoj
+...
