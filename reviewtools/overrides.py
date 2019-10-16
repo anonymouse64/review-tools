@@ -425,6 +425,7 @@ sec_iface_ref_overrides = {
         'kubernetes-worker': ['dot-kube'],
         'kubicorn': ['kube-config'],
         'liquibase': ['dot-m2-repository'],
+        'microk8s': ['dot-kube'],
         'popeye': ['kube-config'],
         'rain': ['config-aws'],
         'redis-desktop-manager': ['dot-rdm'],
