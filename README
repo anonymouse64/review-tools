@@ -93,6 +93,44 @@ hook to run the testsuite before committing. Eg, add something like this to
                                   run_tests_rt,
                                   'click-reviewers-tools tests')
 
+# Releases
+
+The review-tools historically used tags for released versions and modified
+debian/changelog to include what changed for that released version. The last
+released version and tag that followed this was 0.48.
+
+Today, the review-tools no longer releases versions and instead adds a git tag
+to signify something that is usable for others (eg, a stable snap, the snap
+store, etc). The debian/changelog file is still used and the version in it
+loosely corresponds to a given tag. Eg, if there are tags for 20190930 and
+20191018, then the changelog might look like:
+
+review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
+
+  * new thing changed since git tag from 20191018...
+  ...
+
+review-tools (0.48+20191018-1) RELEASED; urgency=medium
+
+  * thing changed since previous git tag
+  * other thing changed since previous git tag
+  ...
+
+review-tools (0.48+20190930-1) RELEASED; urgency=medium
+  ...
+
+When it is time to issue a new git tag, the UNRELEASED entry should be updated
+to have the date of the git tag and then changed to RELEASED. The general
+procedure for creating a new tag is:
+
+1. use 'dch -r' and update debian/changelog to use 0.48-YYYYMMDD-# with
+   RELEASED (substituting YYYYMMDD for today's date and '#' for '1'
+   (incrementing if multiple tags per day))
+2. git commit debian/changelog && git push
+3. Create a tag with: git tag $(date --utc "+%Y%m%d-%H%MUTC")
+4. Push the tag with: git push origin $(git tag | tail -1)
+
+
 # Helpful commands
 
 Install the required snaps for the below commands:
