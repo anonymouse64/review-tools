@@ -1,4 +1,4 @@
-review-tools (0.48) UNRELEASED; urgency=medium
+review-tools (0.48) RELEASED; urgency=medium
 
   * renamed as review-tools
     - adjust debian/links to link click-review to snap-review
@@ -64,7 +64,7 @@ review-tools (0.48) UNRELEASED; urgency=medium
   * sr_functional.py: add base snap mountpoint checks
   * add diffsquash tool
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Wed, 18 Sep 2019 22:00:04 +0200
+ -- Jamie Strandboge <jamie@ubuntu.com>  Fri, 18 Oct 2019 12:05:11 -0500
 
 click-reviewers-tools (0.47) RELEASED; urgency=medium
 
