@@ -1,3 +1,9 @@
+review-tools (0.48+2019MMDD-1) UNRELEASED; urgency=medium
+
+  * 
+
+ -- Jamie Strandboge <jamie@ubuntu.com>  Fri, 18 Oct 2019 12:06:48 -0500
+
 review-tools (0.48) RELEASED; urgency=medium
 
   * renamed as review-tools
