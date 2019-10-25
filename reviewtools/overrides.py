@@ -692,6 +692,7 @@ update_publisher_overrides = {
         'test-snapd-network-status-provider': canonical_snapd,
         'test-snapd-openvswitch-support': canonical_snapd,
         'test-snapd-password-manager-consumer': canonical_snapd,
+        'test-snapd-pc': canonical_snapd,
         'test-snapd-pc-kernel': canonical_snapd,
         'test-snapd-physical-memory-control': canonical_snapd,
         'test-snapd-python-webserver': canonical_snapd,
