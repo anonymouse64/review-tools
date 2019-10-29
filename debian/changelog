@@ -1,7 +1,9 @@
 review-tools (0.48+2019MMDD-1) UNRELEASED; urgency=medium
 
   [ Jamie Strandboge ]
-  * overrides.py: add test-snapd-pc to update_publisher_overrides
+  * overrides.py:
+    - add test-snapd-pc to update_publisher_overrides
+    - allow chromium to symlink to xdg-open (LP: #1850553)
   * debian/control: drop unneeded Build-Deps
 
   [ Alex Murray ]
