@@ -767,5 +767,6 @@ update_binaries_ignore = ['linux-headers-generic',
 # that some symlink may point to this target. It does not verify the name of
 # the symlink (only the target).
 common_external_symlink_override = {
+    'chromium': ['usr/bin/xdg-open'],
     'snapd': ['usr/lib/snapd/snap-device-helper'],
 }
