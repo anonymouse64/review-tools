@@ -1,4 +1,10 @@
 #!/bin/sh
 set -e
 
-./run-helper pylint3
+if command -v pylint3 > /dev/null ; then
+    ./run-helper pylint3
+elif command -v pylint > /dev/null ; then
+    ./run-helper pylint
+else
+    echo "Could not find pylint"
+fi

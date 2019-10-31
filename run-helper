@@ -7,13 +7,13 @@ case "$1" in
     pep8|pyflakes3)
         exe="$1"
         ;;
-    pylint3)
+    pylint3|pylint)
         exe="$1"
         # for now, only errors
         args="-E --disable=no-member"
         ;;
     *)
-        echo "run-helper pep8|pyflakes3|pylint3"
+        echo "run-helper pep8|pyflakes3|pylint3|pylint"
         exit 1
         ;;
 esac
