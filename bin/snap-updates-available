@@ -99,7 +99,10 @@ def main():
     if args.check_shared_publishers:
         report = available.scan_shared_publishers(args.store_db)
     elif args.snap:
-        report = available.scan_snap(args.usn_db, args.snap, args.with_cves)
+        try:
+            report = available.scan_snap(args.usn_db, args.snap, args.with_cves)
+        except ValueError as e:
+            error(e)
     elif args.store_db:
         (reports, errors) = available.scan_store(args.usn_db, args.store_db,
                                                  args.seen_db, args.pkg_name)
