@@ -68,6 +68,14 @@ class TestSnapReviewFunctionalNoMock(TestCase):
                       expected=None):
         common_check_results(self, report, expected_counts, expected)
 
+    def _execstack_has_lp1850861(self):
+        '''See if execstack breaks on LP: 1850861'''
+        fn = os.path.join(self.mkdtemp(), "ls")
+        shutil.copyfile('/bin/ls', fn)
+        (rc, out) = cmd(['execstack', '--set-execstack', fn])
+        if rc != 0:
+            return True
+
     def test_check_execstack(self):
         '''Test check_execstack() - execstack found execstack binary'''
         os.environ['SNAP_ARCH'] = utils.debian_architecture()
@@ -88,6 +96,9 @@ class TestSnapReviewFunctionalNoMock(TestCase):
         '''Test check_execstack() - execstack found execstack binary'''
         os.environ['SNAP_ARCH'] = utils.debian_architecture()
         if os.environ['SNAP_ARCH'] == "arm64":  # pragma: nocover
+            return
+        elif self._execstack_has_lp1850861():
+            print("SKIPPING: execstack failed (LP: #1850861)")
             return
 
         output_dir = self.mkdtemp()
@@ -116,6 +127,9 @@ class TestSnapReviewFunctionalNoMock(TestCase):
         '''Test check_execstack() - execstack found execstack binary - devmode'''
         os.environ['SNAP_ARCH'] = utils.debian_architecture()
         if os.environ['SNAP_ARCH'] == "arm64":  # pragma: nocover
+            return
+        elif self._execstack_has_lp1850861():
+            print("SKIPPING: execstack failed (LP: #1850861)")
             return
 
         output_dir = self.mkdtemp()
@@ -152,6 +166,9 @@ confinement: devmode
         os.environ['SNAP_ARCH'] = utils.debian_architecture()
         if os.environ['SNAP_ARCH'] == "arm64":  # pragma: nocover
             return
+        elif self._execstack_has_lp1850861():
+            print("SKIPPING: execstack failed (LP: #1850861)")
+            return
 
         output_dir = self.mkdtemp()
         fn = os.path.join(output_dir, "hasexecstack.bin")
@@ -182,6 +199,9 @@ confinement: devmode
         '''Test check_execstack() - os snap'''
         os.environ['SNAP_ARCH'] = utils.debian_architecture()
         if os.environ['SNAP_ARCH'] == "arm64":  # pragma: nocover
+            return
+        elif self._execstack_has_lp1850861():
+            print("SKIPPING: execstack failed (LP: #1850861)")
             return
 
         output_dir = self.mkdtemp()
@@ -225,6 +245,9 @@ type: os
         os.environ['SNAP_ARCH'] = utils.debian_architecture()
         if os.environ['SNAP_ARCH'] == "arm64":  # pragma: nocover
             return
+        elif self._execstack_has_lp1850861():
+            print("SKIPPING: execstack failed (LP: #1850861)")
+            return
 
         test_files = ['boot/memtest86+_multiboot.bin',
                       'lib/klibc-T5LXP1hTwH_ezt-1EUSxPbNR_es.so',
@@ -267,6 +290,9 @@ type: os
         '''Test check_execstack() - execstack found skipped execstack binary'''
         os.environ['SNAP_ARCH'] = utils.debian_architecture()
         if os.environ['SNAP_ARCH'] == "arm64":  # pragma: nocover
+            return
+        elif self._execstack_has_lp1850861():
+            print("SKIPPING: execstack failed (LP: #1850861)")
             return
 
         test_files = ['hasexecstack.bin',
