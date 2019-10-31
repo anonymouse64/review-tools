@@ -134,7 +134,8 @@ def get_pkg_revisions(item, secnot_db, errors):
         try:
             report = get_secnots_for_manifest(m, secnot_db)
         except ValueError as e:
-            _add_error(pkg_db['name'], errors, "%s" % e)
+            if 'not found in security notification database' not in str(e):
+                _add_error(pkg_db['name'], errors, "%s" % e)
             continue
 
         if r not in pkg_db['revisions']:
