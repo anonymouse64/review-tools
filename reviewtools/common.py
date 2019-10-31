@@ -889,12 +889,11 @@ def read_file_as_json_dict(fn):
     # XXX: consider reading in as stream
     debug("Loading: %s" % fn)
     raw = {}
-    fd = open_file_read(fn)
-    try:
-        raw = json.load(fd)
-    except Exception:
-        raise
-        error("Could not load %s. Is it properly formatted?" % fn)
+    with open_file_read(fn) as fd:
+        try:
+            raw = json.load(fd)
+        except Exception:
+            raise
 
     return raw
 
@@ -917,22 +916,22 @@ def get_snap_manifest(fn):
         recursive_rm(dir)
         error("%s not in %s" % (man, fn))
 
-    fd = open_file_read(man_fn)
-    try:
-        man_yaml = yaml.safe_load(fd)
-    except Exception:
-        recursive_rm(dir)
-        error("Could not load %s. Is it properly formatted?" % man)
+    with open_file_read(man_fn) as fd:
+        try:
+            man_yaml = yaml.safe_load(fd)
+        except Exception:
+            recursive_rm(dir)
+            error("Could not load %s. Is it properly formatted?" % man)
 
     os_dpkg_fn = os.path.join(dir, os_dpkg)
     os_dpkg_list = None
     if os.path.isfile(os_dpkg_fn):
-        fd = open_file_read(os_dpkg_fn)
-        try:
-            os_dpkg_list = fd.readlines()
-        except Exception:
-            recursive_rm(dir)
-            error("Could not load %s. Is it properly formatted?" % os_dpkg)
+        with open_file_read(os_dpkg_fn) as fd:
+            try:
+                os_dpkg_list = fd.readlines()
+            except Exception:
+                recursive_rm(dir)
+                error("Could not load %s. Is it properly formatted?" % os_dpkg)
 
     recursive_rm(dir)
 
@@ -975,3 +974,12 @@ def _add_error(name, errors, msg):
     if name not in errors:
         errors[name] = []
     errors[name].append(msg)
+
+
+def assign_type_to_dict_values(d, assignments):
+    '''For each toplevel key in d, if val is None, use empty value from
+       assignments
+    '''
+    for key in assignments:
+        if key in d and d[key] is None:
+            d[key] = assignments[key]
