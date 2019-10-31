@@ -420,6 +420,11 @@ References:
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel.db' --store-db='./tests/test-store-kernel.db'...
 
+= Test unkown release and missing usn release =
+Emptying seen.db
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-os-release-dne.db' --store-db='./tests/test-store-os-release-dne.db'...
+
+Emptying seen.db
 Running: snap-updates-available --usn-db='./tests/test-usn-budgie-2.db' --snap='./tests/test-snapcraft-manifest_0_amd64.snap'
 {
   "libssl1.0.0": [

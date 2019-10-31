@@ -107,11 +107,9 @@ class TestStore(TestCase):
         '''Test get_package_revisions() - bad secnot db'''
         self.secnot_db = "bad"
         errors = {}
-        store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
-        self.assertEquals(len(errors), 1)
-        self.assertEquals(errors['0ad'][0],
-                          "'xenial' not found in security notification "
-                          "database")
+        pkg_db = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
+        self.assertEquals(len(errors), 0)
+        self.assertEquals(len(pkg_db['revisions']), 0)
 
     def test_check_get_package_revisions_empty_uploader(self):
         '''Test get_package_revisions() - empty uploader'''
@@ -131,6 +129,53 @@ class TestStore(TestCase):
         self.assertTrue(isinstance(res['uploaders'], list))
         self.assertEquals(len(res['uploaders']), 1)
         self.assertEquals(res['uploaders'][0], "test@example.com")
+
+    def test_check_get_package_revisions_parts_is_none(self):
+        '''Test get_package_revisions() - parts is None'''
+        for i in range(len(self.store_db[0]['revisions'])):
+            m = yaml.load(self.store_db[0]['revisions'][i]['manifest_yaml'],
+                          Loader=yaml.SafeLoader)
+            m['parts'] = None
+            self.store_db[0]['revisions'][i]['manifest_yaml'] = yaml.dump(m)
+        errors = {}
+        pkg_db = store.get_pkg_revisions(self.store_db[0], self.secnot_db,
+                                         errors)
+        # empty parts has no security notices
+        self.assertEquals(len(errors), 0)
+        for rev in pkg_db['revisions']:
+            self.assertEquals(len(pkg_db['revisions'][rev]['secnot-report']), 0)
+
+    def test_check_get_package_revisions_image_info_is_none(self):
+        '''Test get_package_revisions() - image-info is None'''
+        for i in range(len(self.store_db[0]['revisions'])):
+            m = yaml.load(self.store_db[0]['revisions'][i]['manifest_yaml'],
+                          Loader=yaml.SafeLoader)
+            m['image-info'] = None
+            self.store_db[0]['revisions'][i]['manifest_yaml'] = yaml.dump(m)
+        errors = {}
+        pkg_db = store.get_pkg_revisions(self.store_db[0], self.secnot_db,
+                                         errors)
+        # empty image-info has no effect
+        self.assertEquals(len(errors), 0)
+        for rev in pkg_db['revisions']:
+            self.assertFalse(len(pkg_db['revisions'][rev]['secnot-report']) == 0)
+
+    def test_check_get_package_revisions_parts_stage_packages_is_none(self):
+        '''Test get_package_revisions() - parts/stage-packages is None'''
+        for i in range(len(self.store_db[0]['revisions'])):
+            m = yaml.load(self.store_db[0]['revisions'][i]['manifest_yaml'],
+                          Loader=yaml.SafeLoader)
+            for p in m['parts']:
+                if 'stage-packages' in m['parts'][p]:
+                    m['parts'][p]['stage-packages'] = None
+            self.store_db[0]['revisions'][i]['manifest_yaml'] = yaml.dump(m)
+        errors = {}
+        pkg_db = store.get_pkg_revisions(self.store_db[0], self.secnot_db,
+                                         errors)
+        # empty parts/stage-packages has no security notices
+        self.assertEquals(len(errors), 0)
+        for rev in pkg_db['revisions']:
+            self.assertEquals(len(pkg_db['revisions'][rev]['secnot-report']), 0)
 
     def test_check_get_package_revisions_pkg_override(self):
         '''Test get_package_revisions() - pkg override'''
@@ -174,15 +219,16 @@ class TestStore(TestCase):
         self.assertTrue(isinstance(res, dict))
         self.assertEquals(len(res), 0)
 
-    def test_check_verify_snap_manifest(self):
-        '''Test verify_snap_manifest()'''
-        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
-        store.verify_snap_manifest(m)
+    def test_check_normalize_and_verify_snap_manifest(self):
+        '''Test normalize_and_verify_snap_manifest()'''
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'],
+                      Loader=yaml.SafeLoader)
+        store.normalize_and_verify_snap_manifest(m)
 
-    def test_check_verify_snap_manifest_bad(self):
-        '''Test verify_snap_manifest()'''
+    def test_check_normalize_and_verify_snap_manifest_bad(self):
+        '''Test normalize_and_verify_snap_manifest()'''
         try:
-            store.verify_snap_manifest([])
+            store.normalize_and_verify_snap_manifest([])
         except ValueError:
             return
 
@@ -190,7 +236,8 @@ class TestStore(TestCase):
 
     def test_check_get_staged_packages_from_manifest(self):
         '''Test get_staged_packages_from_manifest()'''
-        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'],
+                      Loader=yaml.SafeLoader)
 
         res = store.get_staged_packages_from_manifest(m)
         self.assertTrue(isinstance(res, dict))
@@ -200,7 +247,8 @@ class TestStore(TestCase):
 
     def test_check_get_staged_packages_from_manifest_missing_parts(self):
         '''Test get_staged_packages_from_manifest() - missing parts'''
-        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'],
+                      Loader=yaml.SafeLoader)
         del m['parts']
 
         res = store.get_staged_packages_from_manifest(m)
@@ -208,7 +256,8 @@ class TestStore(TestCase):
 
     def test_check_get_staged_packages_from_manifest_bad_staged(self):
         '''Test get_staged_packages_from_manifest() - bad staged'''
-        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'],
+                      Loader=yaml.SafeLoader)
         m['parts']['0ad-launcher']['stage-packages'].append('foo')
 
         res = store.get_staged_packages_from_manifest(m)
@@ -220,7 +269,8 @@ class TestStore(TestCase):
 
     def test_check_get_staged_packages_from_manifest_empty_staged(self):
         '''Test get_staged_packages_from_manifest() - empty staged'''
-        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'],
+                      Loader=yaml.SafeLoader)
         m['parts']['0ad-launcher']['stage-packages'] = []
 
         res = store.get_staged_packages_from_manifest(m)
@@ -228,7 +278,8 @@ class TestStore(TestCase):
 
     def test_check_get_staged_packages_from_manifest_binary_ignored(self):
         '''Test get_staged_packages_from_manifest()'''
-        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'],
+                      Loader=yaml.SafeLoader)
         m['parts']['0ad-launcher']['stage-packages'].append(
             'linux-libc-dev=4.4.0-104.127')
 
@@ -242,7 +293,8 @@ class TestStore(TestCase):
 
     def test_check_get_secnots_for_manifest(self):
         '''Test get_secnots_for_manifest()'''
-        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'],
+                      Loader=yaml.SafeLoader)
 
         res = store.get_secnots_for_manifest(m, self.secnot_db)
         self.assertTrue(isinstance(res, dict))
@@ -257,7 +309,8 @@ class TestStore(TestCase):
 
     def test_check_get_secnots_for_manifest_empty_staged(self):
         '''Test get_secnots_for_manifest() - empty staged'''
-        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'],
+                      Loader=yaml.SafeLoader)
         m['parts']['0ad-launcher']['stage-packages'] = []
 
         res = store.get_secnots_for_manifest(m, self.secnot_db)
@@ -266,7 +319,8 @@ class TestStore(TestCase):
 
     def test_check_get_secnots_for_manifest_with_cves(self):
         '''Test get_secnots_for_manifest() - cves'''
-        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'],
+                      Loader=yaml.SafeLoader)
 
         res = store.get_secnots_for_manifest(m, self.secnot_db, with_cves=True)
         self.assertTrue(isinstance(res, dict))
@@ -286,7 +340,8 @@ class TestStore(TestCase):
 
     def test_check_get_secnots_for_manifest_has_newer(self):
         '''Test get_secnots_for_manifest() - has newer'''
-        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'],
+                      Loader=yaml.SafeLoader)
 
         # clear out all the stage-packages and then add one that has a
         # newer package than what is in the security notices
@@ -302,13 +357,15 @@ class TestStore(TestCase):
 
     def test_check_get_ubuntu_release_from_manifest(self):
         '''Test get_ubuntu_release_from_manifest()'''
-        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'],
+                      Loader=yaml.SafeLoader)
         res = store.get_ubuntu_release_from_manifest(m)
         self.assertEquals(res, "xenial")
 
     def test_check_get_ubuntu_release_from_manifest_missing_parts(self):
         '''Test get_ubuntu_release_from_manifest() - missing parts'''
-        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'],
+                      Loader=yaml.SafeLoader)
         del m['parts']
 
         try:
@@ -320,7 +377,8 @@ class TestStore(TestCase):
 
     def test_check_get_ubuntu_release_from_manifest_bad_staged(self):
         '''Test get_ubuntu_release_from_manifest() - bad staged'''
-        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'],
+                      Loader=yaml.SafeLoader)
         m['parts']['0ad-launcher']['installed-snaps'].append('foo')
 
         res = store.get_ubuntu_release_from_manifest(m)
@@ -328,7 +386,8 @@ class TestStore(TestCase):
 
     def test_check_get_ubuntu_release_from_manifest_base18(self):
         '''Test get_ubuntu_release_from_manifest() - base-18'''
-        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'],
+                      Loader=yaml.SafeLoader)
         m['parts']['0ad-launcher']['installed-snaps'].append('base-18=123')
 
         res = store.get_ubuntu_release_from_manifest(m)
@@ -336,7 +395,8 @@ class TestStore(TestCase):
 
     def test_check_get_ubuntu_release_from_manifest_base18_with_others(self):
         '''Test get_ubuntu_release_from_manifest() - base-18 with others'''
-        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'],
+                      Loader=yaml.SafeLoader)
         m['parts']['0ad-launcher']['installed-snaps'].append('abc=123')
         m['parts']['0ad-launcher']['installed-snaps'].append('base-18=123')
 
@@ -345,7 +405,8 @@ class TestStore(TestCase):
 
     def test_check_get_ubuntu_release_from_manifest_base18_with_core(self):
         '''Test get_ubuntu_release_from_manifest() - base-18 with others'''
-        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'],
+                      Loader=yaml.SafeLoader)
         m['parts']['0ad-launcher']['installed-snaps'].append('core=123')
         m['parts']['0ad-launcher']['installed-snaps'].append('base-18=123')
 
@@ -358,7 +419,8 @@ class TestStore(TestCase):
 
     def test_check_get_ubuntu_release_from_manifest_core18(self):
         '''Test get_ubuntu_release_from_manifest() - core18'''
-        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'],
+                      Loader=yaml.SafeLoader)
         m['parts']['0ad-launcher']['installed-snaps'].append('core18=123')
 
         res = store.get_ubuntu_release_from_manifest(m)
@@ -366,7 +428,8 @@ class TestStore(TestCase):
 
     def test_check_get_ubuntu_release_from_manifest_core16(self):
         '''Test get_ubuntu_release_from_manifest() - core16'''
-        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'],
+                      Loader=yaml.SafeLoader)
         m['parts']['0ad-launcher']['installed-snaps'].append('core16=123')
 
         res = store.get_ubuntu_release_from_manifest(m)
@@ -374,7 +437,8 @@ class TestStore(TestCase):
 
     def test_check_get_ubuntu_release_from_manifest_core(self):
         '''Test get_ubuntu_release_from_manifest() - core'''
-        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'],
+                      Loader=yaml.SafeLoader)
         m['parts']['0ad-launcher']['installed-snaps'].append('core=123')
 
         res = store.get_ubuntu_release_from_manifest(m)
@@ -382,7 +446,8 @@ class TestStore(TestCase):
 
     def test_check_get_ubuntu_release_from_manifest_os_release_xenial(self):
         '''Test get_ubuntu_release_from_manifest() - ubuntu/xenial'''
-        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'],
+                      Loader=yaml.SafeLoader)
         m['snapcraft-os-release-id'] = 'ubuntu'
         m['snapcraft-os-release-version-id'] = '16.04'
         res = store.get_ubuntu_release_from_manifest(m)
@@ -390,7 +455,8 @@ class TestStore(TestCase):
 
     def test_check_get_ubuntu_release_from_manifest_os_release_artful(self):
         '''Test get_ubuntu_release_from_manifest() - ubuntu/artful'''
-        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'],
+                      Loader=yaml.SafeLoader)
         m['snapcraft-os-release-id'] = 'ubuntu'
         m['snapcraft-os-release-version-id'] = '17.10'
         res = store.get_ubuntu_release_from_manifest(m)
@@ -398,7 +464,8 @@ class TestStore(TestCase):
 
     def test_check_get_ubuntu_release_from_manifest_os_release_bionic(self):
         '''Test get_ubuntu_release_from_manifest() - ubuntu/bionic'''
-        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'],
+                      Loader=yaml.SafeLoader)
         m['snapcraft-os-release-id'] = 'ubuntu'
         m['snapcraft-os-release-version-id'] = '18.04'
         res = store.get_ubuntu_release_from_manifest(m)
@@ -406,7 +473,8 @@ class TestStore(TestCase):
 
     def test_check_get_ubuntu_release_from_manifest_os_release_nonexist_os(self):
         '''Test get_ubuntu_release_from_manifest() - nonexistent'''
-        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'],
+                      Loader=yaml.SafeLoader)
         m['snapcraft-os-release-id'] = 'nonexistent'
         m['snapcraft-os-release-version-id'] = '18.04'
         res = store.get_ubuntu_release_from_manifest(m)
@@ -415,7 +483,8 @@ class TestStore(TestCase):
 
     def test_check_get_ubuntu_release_from_manifest_os_release_nonexist_ver(self):
         '''Test get_ubuntu_release_from_manifest() - ubuntu/nonexistent'''
-        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'])
+        m = yaml.load(self.store_db[0]['revisions'][0]['manifest_yaml'],
+                      Loader=yaml.SafeLoader)
         m['snapcraft-os-release-id'] = 'ubuntu'
         m['snapcraft-os-release-version-id'] = '1.02'
         res = store.get_ubuntu_release_from_manifest(m)

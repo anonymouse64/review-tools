@@ -104,6 +104,13 @@ reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-kernel.db test-store-kernel.db
 run "$tmp_seen" test-usn-kernel.db test-store-kernel.db
 
+# should show nothing with release that doesn't exist and release that isn't
+# in the usn db yet
+comment "= Test unkown release and missing usn release ="
+reset_seen "$tmp_seen"
+run "$tmp_seen" test-usn-os-release-dne.db test-store-os-release-dne.db
+reset_seen "$tmp_seen"
+
 # Test --snap
 echo "Running: snap-updates-available --usn-db='./tests/test-usn-budgie-2.db' --snap='./tests/test-snapcraft-manifest_0_amd64.snap'" | tee -a "$tmp"
 PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-budgie-2.db' --snap='./tests/test-snapcraft-manifest_0_amd64.snap' 2>&1 | tee -a "$tmp"

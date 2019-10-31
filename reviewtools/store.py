@@ -22,6 +22,7 @@ from reviewtools.common import (
     debug,
     warn,
     get_os_codename,
+    assign_type_to_dict_values,
     _add_error,  # make a class
 )
 import reviewtools.email as email
@@ -127,9 +128,14 @@ def get_pkg_revisions(item, secnot_db, errors):
                        "manifest_yaml missing for revision '%s'" % r)
             continue
 
-        m = yaml.load(rev['manifest_yaml'])
-        m = get_faked_stage_packages(m)
-        verify_snap_manifest(m)
+        try:
+            m = yaml.load(rev['manifest_yaml'], Loader=yaml.SafeLoader)
+            m = get_faked_stage_packages(m)
+            normalize_and_verify_snap_manifest(m)
+        except Exception as e:
+            _add_error(pkg_db['name'], errors, "error loading manifest: %s" %
+                       e)
+            continue
 
         try:
             report = get_secnots_for_manifest(m, secnot_db)
@@ -227,8 +233,22 @@ def get_staged_packages_from_manifest(m):
     return d
 
 
-def verify_snap_manifest(m):
-    '''Verify snap manifest is well-formed and has everything we expect'''
+def normalize_and_verify_snap_manifest(m):
+    '''Normalize manifest (ie, assign empty types if None for SafeLoader
+       defaults) and verify snap manifest is well-formed and has everything we
+       expect'''
+    # normalize toplevel keys
+    assign_type_to_dict_values(m, SnapReview.snap_manifest_required)
+    assign_type_to_dict_values(m, SnapReview.snap_manifest_optional)
+
+    if 'parts' in m and isinstance(m['parts'], dict):
+        for p in m['parts']:
+            # normalize parts keys
+            partm = m['parts'][p]
+            assign_type_to_dict_values(partm, SnapReview.snap_manifest_parts_required)
+            assign_type_to_dict_values(partm, SnapReview.snap_manifest_parts_optional)
+            m['parts'][p] = partm
+
     (valid, level, msg) = SnapReview.verify_snap_manifest(SnapReview, m)
     if not valid:
         raise ValueError(msg)
