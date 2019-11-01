@@ -439,6 +439,16 @@ slots:
                         'plug-attributes': {},
                     },
                 },
+                'conn-slots-per-plug': {  # only supported is allowed
+                    'allow-connection': {
+                        'slots-per-plug': '1',
+                    },
+                },
+                'conn-plugs-per-slot': {  # only supported is allowed
+                    'allow-connection': {
+                        'plugs-per-slot': '*',
+                    },
+                },
                 'conn-allow-alternates': {
                     'allow-connection': [
                         {'plug-snap-id': ['something32charslongGgGgGgGgGgGg'],
@@ -564,6 +574,16 @@ slots:
                          },
                     ],
                 },
+                'autoconn-slots-per-plug': {  # only supported is allowed
+                    'allow-auto-connection': {
+                        'slots-per-plug': '*',
+                    },
+                },
+                'autoconn-plugs-per-slot': {  # only supported is allowed
+                    'allow-connection': {
+                        'plugs-per-slot': '1',
+                    },
+                },
             },
             'plugs': {
                 'inst-on-classic-true': {
@@ -678,6 +698,16 @@ slots:
                         'slot-attributes': {},
                     },
                 },
+                'conn-slots-per-plug': {  # only supported is allowed
+                    'allow-connection': {
+                        'slots-per-plug': '1',
+                    },
+                },
+                'conn-plugs-per-slot': {  # only supported is allowed
+                    'allow-connection': {
+                        'plugs-per-slot': '*',
+                    },
+                },
                 'conn-allow-alternates': {
                     'allow-connection': [
                         {'slot-snap-id': ['something32charslongGgGgGgGgGgGg'],
@@ -771,6 +801,16 @@ slots:
                         'slot-attributes': {},
                     },
                 },
+                'autoconn-slots-per-plug': {  # only supported is allowed
+                    'allow-auto-connection': {
+                        'slots-per-plug': '*',
+                    },
+                },
+                'autoconn-plugs-per-slot': {  # only supported is allowed
+                    'allow-connection': {
+                        'plugs-per-slot': '1',
+                    },
+                },
                 'autoconn-allow-alternates': {
                     'allow-auto-connection': [
                         {'slot-snap-id': ['something32charslongGgGgGgGgGgGg'],
@@ -807,7 +847,9 @@ slots:
         }
         c._verify_declaration(decl=decl)
         r = c.review_report
-        expected_counts = {'info': 74, 'warn': 0, 'error': 0}
+        # warning are for "plugs-per-slot not supported yet" and
+        # "slots-per-plug currently only supports '*'"
+        expected_counts = {'info': 82, 'warn': 6, 'error': 0}
         self.check_results(r, expected_counts)
 
     def test__verify_declaration_invalid_empty(self):
@@ -1698,6 +1740,65 @@ slots:
         name = 'declaration-snap-v2:valid_slots:foo:allow-connection'
         expected['error'][name] = {"text": "declaration malformed (invalid format for snap id 'b@d')"}
         self.check_results(r, expected=expected)
+
+    def test__verify_declaration_valid_slots_per_plug(self):
+        '''Test _verify_declaration - invalid slots-per-plug'''
+        bad = ['1',
+               '10',
+               '999',
+               '*',
+               ]
+
+        for side in ['plugs', 'slots']:
+            for cstr in ['allow-connection', 'allow-auto-connection']:
+                for key in ['plugs-per-slot', 'slots-per-plug']:
+                    for item in bad:
+                        c = SnapReviewDeclaration(self.test_name)
+                        decl = {
+                            side: {
+                                'foo': {
+                                    cstr: {
+                                        key: item
+                                    }
+                                }
+                            }
+                        }
+                        c._verify_declaration(decl=decl)
+                        r = c.review_report
+                        # warning is to ignore 'plugs-per-slot not supported
+                        # yet' and "slots-per-plug currently only supports '*'"
+                        expected_counts = {'info': 1, 'warn': None, 'error': 0}
+                        self.check_results(r, expected_counts)
+
+    def test__verify_declaration_invalid_slots_per_plug(self):
+        '''Test _verify_declaration - invalid slots-per-plug'''
+        bad = ['-1',
+               '0',
+               'a',
+               '01',
+               '1a1',
+               {},
+               None
+               ]
+
+        for side in ['plugs', 'slots']:
+            for cstr in ['allow-connection', 'allow-auto-connection']:
+                for key in ['plugs-per-slot', 'slots-per-plug']:
+                    for item in bad:
+                        c = SnapReviewDeclaration(self.test_name)
+                        decl = {
+                            side: {
+                                'foo': {
+                                    cstr: {
+                                        key: item
+                                    }
+                                }
+                            }
+                        }
+                        c._verify_declaration(decl=decl)
+                        r = c.review_report
+                        expected_counts = {'info': 0, 'warn': 0, 'error': 1}
+                        self.check_results(r, expected_counts)
 
     def test_check_declaration_unknown_interface(self):
         '''Test check_declaration - unknown interface'''
@@ -6308,5 +6409,99 @@ slots:
         name = 'declaration-snap-v2:valid_slots:docker:allow-connection'
         expected['info'][name] = {"text": "OK"}
         name = 'declaration-snap-v2:slots:iface:docker'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_arity_ignored(self):
+        '''Test check_declaration - override - arity ignored
+
+           Ensure that arity doesn't affect other things that might cause a
+           manual review.
+        '''
+        plugs = {'iface-foo': {'interface': 'foo'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        self.set_test_snap_yaml("type", "app")
+        c = SnapReviewDeclaration(self.test_name)
+
+        base = {
+            'slots': {
+                'foo': {
+                    'allow-connection': {
+                        'plug-snap-type': ['gadget'],
+                        'slots-per-plug': '*',
+                        'plugs-per-slot': '*',
+                    }
+                }
+            },
+            'plugs': {}
+        }
+        self._set_base_declaration(c, base)
+
+        c.check_declaration()
+        r = c.review_report
+        # warning is to ignore 'plugs-per-slot not supported yet'
+        expected_counts = {'info': 0, 'warn': None, 'error': 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:plugs_connection:iface-foo:foo'
+        expected['error'][name] = {"text": "human review required due to 'allow-connection' constraint (snap-type)"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_arity_override(self):
+        '''Test check_declaration - override - slots-per-plug
+
+           When this is in the base decl:
+
+           slots:
+             foo:
+               allow-connection: false
+
+           and this is in the snap decl:
+
+           plugs:
+             foo:
+               allow-connection:
+               - slots-per-plug: *
+
+           then due to evalution rules, this should evaluate to
+           allow-connection: true. Test for that.
+        '''
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            'snap_decl_plugs': {
+                'foo': {
+                    'allow-connection': {
+                        'slots-per-plug': "*",
+                        'plugs-per-slot': "*",
+                    },
+                },
+            },
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+
+        base = {
+            'plugs': {
+                'foo': {
+                    'allow-installation': False
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+
+        c.check_declaration()
+        r = c.review_report
+        # warning is to ignore 'plugs-per-slot not supported yet'
+        expected_counts = {'info': 1, 'warn': None, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'declaration-snap-v2:valid_plugs:foo:allow-connection'
         expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)

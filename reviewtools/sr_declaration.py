@@ -117,6 +117,7 @@ class SnapReviewDeclaration(SnapReview):
                           "on-brand",
                           ]
             cstr_dicts = ["plug-attributes", "slot-attributes"]
+            cstr_strs = ["plugs-per-slot", "slots-per-plug"]
             for cstr_key in cstr:
                 badn = self._get_check_name('valid_%s' % key, app=iface,
                                             extra="%s_%s" % (constraint,
@@ -133,6 +134,10 @@ class SnapReviewDeclaration(SnapReview):
                     if not self.is_bool(cstr[cstr_key]):
                         malformed(badn, "'%s' not True or False" % cstr_key,
                                   base)
+                        found_errors = True
+                elif cstr_key in cstr_strs:
+                    if not isinstance(cstr[cstr_key], str):
+                        malformed(badn, "'%s' not a str" % cstr_key, base)
                         found_errors = True
                 elif cstr_key in cstr_lists:
                     if not isinstance(cstr[cstr_key], list):
@@ -246,6 +251,28 @@ class SnapReviewDeclaration(SnapReview):
                             malformed(n, "invalid snap type '%s'" % snap_type)
                             found_errors = True
                             break
+                elif not found_errors and \
+                        (cstr_key == "slots-per-plug" or
+                         cstr_key == "plugs-per-slot"):
+                    # see asserts/ifacedecls.go
+                    if not re.search(r'^(\*|[1-9][0-9]*)$', cstr[cstr_key]):
+                        malformed(n,
+                                  "invalid format for '%s': %s" %
+                                  (cstr[cstr_key], cstr[cstr_key]))
+                        found_errors = True
+                        break
+
+                    if cstr_key == "plugs-per-slot":
+                        # snapd ignores setting plugs-per-slot, so warn
+                        self._add_result('warn',
+                                         n,
+                                         "%s not supported yet" % cstr_key)
+                    elif cstr[cstr_key] != '*':
+                        # snapd ignores other values than '*', so warn
+                        self._add_result('warn',
+                                         n,
+                                         "%s currently only supports '*'" %
+                                         cstr_key)
 
             return not found_errors
             # end verify_constraint()
@@ -331,6 +358,13 @@ class SnapReviewDeclaration(SnapReview):
                             allowed.append("plug-publisher-id")
                             allowed.append("plug-snap-id")
                             allowed.append("plug-snap-type")
+
+                        # These may be slot or plug, but not installation
+                        # or deny-*. Ie, only allow-(auto-)connection
+                        # https://forum.snapcraft.io/t/plug-slot-declaration-rules-greedy-plugs/12438
+                        if constraint.startswith("allow"):
+                            allowed.append("slots-per-plug")
+                            allowed.append("plugs-per-slot")
 
                     # constraint may be bool or dict or lists of bools and
                     # dicts
@@ -709,6 +743,18 @@ class SnapReviewDeclaration(SnapReview):
         # NOTE: snapd uses checkDeviceScope() here but we instead apply the
         # scope rules in _get_rules() since we need to still flag when nothing
         # is scoped (ie, base decl is in effect)
+
+        # NOTE: Arities (ie, slots-per-plug and plugs-per-slot) only affect
+        # snapd's decision making wrt choosing how many slots/plugs to connect
+        # and thus have no bearing on whether we should flag for manual review
+        # or not (though, like any other constraint, their presence in the snap
+        # declaration means that only the snap declaration for that constraint
+        # is used due to evaluation rules). Ie, this in the snap declaration:
+        #
+        #   allow-connection:
+        #   - slots-per-plug: *
+        #
+        # correctly evaluates to: allow-connection: true
 
         # If multiple constraints are specified, they all must match
         if num_checked > 0 and len(tmp) == num_checked:
