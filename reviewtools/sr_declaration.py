@@ -213,8 +213,8 @@ class SnapReviewDeclaration(SnapReview):
                                 found_errors = True
 
                 if not found_errors and \
-                        cstr_key == "plug-publisher-id" or \
-                        cstr_key == "slot-publisher-id":
+                        (cstr_key == "plug-publisher-id" or
+                         cstr_key == "slot-publisher-id"):
                     for pubid in cstr[cstr_key]:
                         if not pub_pat.search(pubid):
                             malformed(n, "invalid format for publisher id '%s'"
@@ -235,8 +235,8 @@ class SnapReviewDeclaration(SnapReview):
                                 found_errors = True
                                 break
                 elif not found_errors and \
-                        cstr_key == "plug-snap-id" or \
-                        cstr_key == "slot-snap-id":
+                        (cstr_key == "plug-snap-id" or
+                         cstr_key == "slot-snap-id"):
                     for id in cstr[cstr_key]:
                         if not id_pat.search(id):
                             malformed(n,
@@ -244,8 +244,8 @@ class SnapReviewDeclaration(SnapReview):
                             found_errors = True
                             break
                 elif not found_errors and \
-                        cstr_key == "plug-snap-type" or \
-                        cstr_key == "slot-snap-type":
+                        (cstr_key == "plug-snap-type" or
+                         cstr_key == "slot-snap-type"):
                     for snap_type in cstr[cstr_key]:
                         if snap_type not in self.valid_snap_types:
                             malformed(n, "invalid snap type '%s'" % snap_type)
