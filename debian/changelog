@@ -12,6 +12,9 @@ review-tools (0.48+2019MMDD-1) UNRELEASED; urgency=medium
   * adjust run-helper/run-pylint to run with renamed pylint3 as pylint
   * test_sr_functional.py: workaround execstack LP: 1850861
   * common.py: close some files and add assign_type_to_dict_values()
+  * sr_declaration.py:
+    - update for slots-per-plug/plugs-per-slot
+    - fix conditional logic in verify_constraint()
 
   [ Alex Murray ]
   * reviewtools/common.py: Add eoan and focal to OS_RELEASE_MAP
