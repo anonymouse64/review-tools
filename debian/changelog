@@ -1,4 +1,4 @@
-review-tools (0.48+2019MMDD-1) UNRELEASED; urgency=medium
+review-tools (0.48+20191104-1) RELEASED; urgency=medium
 
   [ Jamie Strandboge ]
   * overrides.py:
@@ -19,7 +19,7 @@ review-tools (0.48+2019MMDD-1) UNRELEASED; urgency=medium
   [ Alex Murray ]
   * reviewtools/common.py: Add eoan and focal to OS_RELEASE_MAP
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Fri, 01 Nov 2019 07:06:22 -0500
+ -- Jamie Strandboge <jamie@ubuntu.com>  Mon, 04 Nov 2019 10:42:12 -0600
 
 review-tools (0.48+20191024-1) RELEASED; urgency=medium
 
