@@ -16,6 +16,7 @@ fi
 testtype="click-review"
 if [ "$1" = "system" ]; then
    testtype="snap-review"
+   # shellcheck disable=SC2230
    if ! which review-tools.snap-review >/dev/null 2>&1 ; then
        echo "Could not find snap-review. Is the review-tools snap installed?"
        exit 1
@@ -67,6 +68,28 @@ for i in ./tests/test-classic*.snap ; do
         fi
         echo
     done
+done | tee -a "$tmp"
+
+# test RT_EXTRAS_PATH
+testsnap="./tests/hello-world_25.snap"
+rtpath="./tests/review-tools-extras"
+for j in "" "--sdk" "--json" ; do
+    snap=$(basename "$testsnap")
+    echo "= RT_EXTRAS_PATH with $testsnap ="
+    if [ "$testtype" = "snap-review" ]; then
+        RT_EXTRAS_PATH="$rtpath" review-tools.snap-review $j "$testsnap" 2>&1 | sed -e 's#./tests/##g' -e 's/"text": "SKIPPED (could not import apt_pkg)"/"text": "OK"/' | tee "$tmpjson"
+    else
+        RT_EXTRAS_PATH="$rtpath" PYTHONPATH=./ ./bin/click-review $j "$testsnap" 2>&1 | sed -e 's#./tests/##g' | tee "$tmpjson"
+    fi
+
+    if [ "$j" = "--json" ]; then
+        jq '.' "$tmpjson" >/dev/null || {
+            echo "'jq . $tmpjson' failed"
+            cat "$tmpjson"
+            exit 1
+        }
+    fi
+    echo
 done | tee -a "$tmp"
 
 echo

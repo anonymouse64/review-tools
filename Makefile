@@ -38,6 +38,7 @@ check: test functest-updates functest syntax-check check-names
 
 clean:
 	rm -rf ./reviewtools/__pycache__ ./reviewtools/tests/__pycache__
+	rm -rf ./tests/review-tools-extras/__pycache__
 	rm -rf ./.coverage
 	rm -rf ./review-tools-*
 	rm -rf ./build ./review_tools.egg-info

@@ -13,6 +13,8 @@ RT_EMAIL_TO=<addr>        - override calculated To addresses
 RT_EMAIL_SERVER=<server>  - use <server> instead of localhost
 RT_EMAIL_NOPROMPT=1       - force sending of email without prompting
 
+For extra tests:
+RT_EXTRAS_PATH=/path/to/extras
 
 # Tests
 
