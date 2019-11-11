@@ -433,6 +433,7 @@ sec_iface_ref_overrides = {
         'redis-desktop-manager': ['dot-rdm'],
         'rofi-totp': ['dot-gauth'],
         'spread': ['dot-spread', 'dot-config-gcloud'],
+        'vht': ['dot-vault-token'],
     },
     'system-files': {
         'gallery-dl': ['etc-gallery-dl'],
