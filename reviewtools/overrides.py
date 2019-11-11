@@ -438,6 +438,7 @@ sec_iface_ref_overrides = {
     },
     'system-files': {
         'gallery-dl': ['etc-gallery-dl'],
+        'get-iplayer': ['etc-get-iplayer-options'],
         'glances': ['etc-glances-config'],
     },
 }
