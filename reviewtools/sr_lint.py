@@ -27,6 +27,7 @@ from reviewtools.overrides import (
     redflagged_snap_types_overrides,
     desktop_file_exception,
     lint_redflagged_base_dep_override,
+    classic_interfaces_exception,
 )
 import glob
 import os
@@ -1522,13 +1523,16 @@ class SnapReviewLint(SnapReview):
             link = None
             found = False
             if 'plugs' in self.snap_yaml or 'slots' in self.snap_yaml:
-                found = True
+                if self.snap_yaml['name'] not in classic_interfaces_exception:
+                    found = True
             elif 'apps' in self.snap_yaml:
                 for app in self.snap_yaml['apps']:
                     if 'plugs' in self.snap_yaml['apps'][app] or \
                             'slots' in self.snap_yaml['apps'][app]:
-                        found = True
-                        break
+                        if self.snap_yaml['name'] not in \
+                                classic_interfaces_exception:
+                            found = True
+                            break
             if found:
                 t = 'error'
                 s = "confinement '%s' not allowed with plugs/slots" % \

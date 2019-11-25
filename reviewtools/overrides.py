@@ -127,6 +127,23 @@ desktop_file_exception = ['emoj',
                           'pulsemixer',
                           ]
 
+# List of classic snaps that may specify slots/plugs (eg, for workaround
+# content interface methodology)
+classic_interfaces_exception = ['juju',
+                                'microk8s',
+                                ]
+
+# List additional attributes that a particular snap may specify with a
+# particular side of a particular interface (eg, for workaround content
+# interface methodology)
+interfaces_attribs_addons = {
+    'microk8s': {
+        'content': {
+            'name/slots': '',
+        }
+    }
+}
+
 #
 # sr_security.py overrides
 #

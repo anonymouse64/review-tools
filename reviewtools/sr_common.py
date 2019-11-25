@@ -27,6 +27,9 @@ from reviewtools.common import (
     open_file_read,
     read_snapd_base_declaration,
 )
+from reviewtools.overrides import (
+    interfaces_attribs_addons,
+)
 
 
 #
@@ -370,6 +373,18 @@ class SnapReview(Review):
                     self.interfaces[k] = self.interfaces_attribs[k]
                 else:
                     self.interfaces[k] = {}
+
+        # now add in any per-snap overrides iff they don't already exist
+        if 'name' in self.snap_yaml and \
+                isinstance(self.snap_yaml['name'], str) and \
+                self.snap_yaml['name'] in interfaces_attribs_addons:
+            pkgname = self.snap_yaml['name']
+            for k in interfaces_attribs_addons[pkgname]:
+                if k in self.interfaces:
+                    for v in interfaces_attribs_addons[pkgname][k]:
+                        if v not in self.interfaces[k]:
+                            self.interfaces[k][v] = \
+                                interfaces_attribs_addons[pkgname][k][v]
 
         # default to 'app'
         if 'type' not in self.snap_yaml:

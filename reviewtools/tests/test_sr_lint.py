@@ -2789,6 +2789,53 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
+    def test_check_plugs_unknown_attrib_overridden(self):
+        '''Test check_plugs() - unknown attrib (overridden)'''
+        plugs = {'test': {'interface': 'content',
+                          'target': 'foo',
+                          'ovrd': 'abc'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        # update the overrides for this snap
+        from reviewtools.overrides import interfaces_attribs_addons
+        interfaces_attribs_addons['foo'] = {
+            'content': {
+                'ovrd/plugs': '',
+            }
+        }
+        # run the test
+        c = SnapReviewLint(self.test_name)
+        c.check_plugs()
+        # then cleanup the overrides
+        del interfaces_attribs_addons['foo']
+
+        r = c.review_report
+        expected_counts = {'info': 5, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_plugs_unknown_attrib_not_overridden(self):
+        '''Test check_plugs() - unknown attrib (not overridden)'''
+        plugs = {'test': {'interface': 'content',
+                          'target': 'foo',
+                          'nonexistent': 'abc'}}
+        self.set_test_snap_yaml("plugs", plugs)
+        # update the overrides for this snap
+        from reviewtools.overrides import interfaces_attribs_addons
+        interfaces_attribs_addons['foo'] = {
+            'content': {
+                'ovrd/plugs': '',
+            }
+        }
+
+        # run the test
+        c = SnapReviewLint(self.test_name)
+        c.check_plugs()
+        # then cleanup the overrides
+        del interfaces_attribs_addons['foo']
+
+        r = c.review_report
+        expected_counts = {'info': 4, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
     def test_check_plugs_bad_attrib_content(self):
         '''Test check_plugs() - bad attrib - content'''
         plugs = {'test': {'interface': 'content',
@@ -3281,6 +3328,54 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {'info': None, 'warn': 0, 'error': 1}
         self.check_results(r, expected_counts)
 
+    def test_check_slots_unknown_attrib_overridden(self):
+        '''Test check_slots() - unknown attrib (overridden)'''
+        slots = {'test': {'interface': 'content',
+                          'content': 'foo',
+                          'read': ['$SNAP/foo'],
+                          'ovrd': 'abc'}}
+        self.set_test_snap_yaml("slots", slots)
+        # update the overrides for this snap
+        from reviewtools.overrides import interfaces_attribs_addons
+        interfaces_attribs_addons['foo'] = {
+            'content': {
+                'ovrd/slots': '',
+            }
+        }
+        # run the test
+        c = SnapReviewLint(self.test_name)
+        c.check_slots()
+        # then cleanup the overrides
+        del interfaces_attribs_addons['foo']
+
+        r = c.review_report
+        expected_counts = {'info': 6, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_slots_unknown_attrib_not_overridden(self):
+        '''Test check_slots() - unknown attrib (not overridden)'''
+        slots = {'test': {'interface': 'content',
+                          'content': 'foo',
+                          'read': ['$SNAP/foo'],
+                          'nonexistent': 'abc'}}
+        self.set_test_snap_yaml("slots", slots)
+        # update the overrides for this snap
+        from reviewtools.overrides import interfaces_attribs_addons
+        interfaces_attribs_addons['foo'] = {
+            'content': {
+                'ovrd': '',
+            }
+        }
+        # run the test
+        c = SnapReviewLint(self.test_name)
+        c.check_slots()
+        # then cleanup the overrides
+        del interfaces_attribs_addons['foo']
+
+        r = c.review_report
+        expected_counts = {'info': 5, 'warn': 0, 'error': 1}
+        self.check_results(r, expected_counts)
+
     def test_check_slots_bad_attrib_boolfile(self):
         '''Test check_slots() - bad attrib - bool-file'''
         slots = {'test': {'interface': 'bool-file',
@@ -3767,6 +3862,92 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected['info'] = dict()
         name = 'lint-snap-v2:confinement_classic_with_interfaces'
         expected['error'][name] = {"text": "confinement 'classic' not allowed with plugs/slots"}
+        self.check_results(r, expected=expected)
+
+    def test_check_confinement_classic_with_plugs_overridden(self):
+        '''Test check_confinement - classic (overridden)'''
+        self.set_test_snap_yaml("confinement", "classic")
+        overrides = {
+            'snap_allow_classic': True
+        }
+        self.set_test_snap_yaml("plugs", {})
+        # update the overrides for this snap
+        from reviewtools.overrides import classic_interfaces_exception
+        classic_interfaces_exception.append('foo')
+        # run the test
+        c = SnapReviewLint(self.test_name, overrides=overrides)
+        c.check_confinement()
+        # then cleanup the overrides
+        classic_interfaces_exception.remove('foo')
+
+        r = c.review_report
+        expected_counts = {'info': 3, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'lint-snap-v2:confinement_classic_with_interfaces'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_confinement_classic_with_slots_overridden(self):
+        '''Test check_confinement - classic (overridden)'''
+        self.set_test_snap_yaml("confinement", "classic")
+        overrides = {
+            'snap_allow_classic': True
+        }
+        self.set_test_snap_yaml("slots", {})
+        # update the overrides for this snap
+        from reviewtools.overrides import classic_interfaces_exception
+        classic_interfaces_exception.append('foo')
+        # run the test
+        c = SnapReviewLint(self.test_name, overrides=overrides)
+        c.check_confinement()
+        # then cleanup the overrides
+        classic_interfaces_exception.remove('foo')
+
+        r = c.review_report
+        expected_counts = {'info': 3, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'lint-snap-v2:confinement_classic_with_interfaces'
+        expected['info'][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_confinement_classic_with_app_plugs_overridden(self):
+        '''Test check_confinement - classic (overridden)'''
+        self.set_test_snap_yaml("confinement", "classic")
+        overrides = {
+            'snap_allow_classic': True
+        }
+
+        apps_plugs = {'bar': {'plugs': []}}
+        self.set_test_snap_yaml("apps", apps_plugs)
+        # update the overrides for this snap
+        from reviewtools.overrides import classic_interfaces_exception
+        classic_interfaces_exception.append('foo')
+        # run the test
+        c = SnapReviewLint(self.test_name, overrides=overrides)
+        c.check_confinement()
+        # then cleanup the overrides
+        classic_interfaces_exception.remove('foo')
+
+        r = c.review_report
+        expected_counts = {'info': 3, 'warn': 0, 'error': 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected['error'] = dict()
+        expected['warn'] = dict()
+        expected['info'] = dict()
+        name = 'lint-snap-v2:confinement_classic_with_interfaces'
+        expected['info'][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
     def test_check_confinement_os(self):
