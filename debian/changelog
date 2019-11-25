@@ -1,6 +1,14 @@
-review-tools (0.48+2019MMDD-1) UNRELEASED; urgency=medium
+review-tools (0.48+20191125-1) RELEASED; urgency=medium
 
-  * 
+  * support RT_EXTRAS_PATH
+  * run-tests: honor RT_EXTRAS_PATH
+  * reviewtools/tests/utils.py: add optional add_icon
+  * overrides.py updates for:
+    - vht
+    - universal-ctags
+    - get-iplayer
+  * overrides.py: add classic_interfaces_exception and
+    interfaces_attribs_addons
 
  -- Jamie Strandboge <jamie@ubuntu.com>  Mon, 04 Nov 2019 10:46:35 -0600
 
