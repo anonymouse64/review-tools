@@ -1,3 +1,10 @@
+review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
+
+  * update 2.42 interfaces
+  * add upcoming 2.43 interface
+
+ -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 26 Nov 2019 16:45:40 -0600
+
 review-tools (0.48+20191125-1) RELEASED; urgency=medium
 
   * support RT_EXTRAS_PATH

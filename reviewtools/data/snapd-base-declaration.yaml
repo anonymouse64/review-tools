@@ -276,6 +276,7 @@
     allow-installation:
       slot-snap-type:
         - app
+        - core
     deny-connection: true
     deny-auto-connection: true
   gpg-keys:
@@ -632,6 +633,7 @@
         - core
     deny-connection:
       on-classic: false
+    deny-auto-connection: true
   raw-usb:
     allow-installation:
       slot-snap-type:
@@ -688,6 +690,11 @@
       slot-snap-type:
         - app
     deny-connection: true
+    deny-auto-connection: true
+  system-backup:
+    allow-installation:
+      slot-snap-type:
+        - core
     deny-auto-connection: true
   system-files:
     allow-installation:
