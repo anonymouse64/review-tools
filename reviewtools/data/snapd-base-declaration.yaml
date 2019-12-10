@@ -442,6 +442,11 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  login-session-observe:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   lxd:
     allow-installation: false
     deny-connection: true
