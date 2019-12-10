@@ -1,3 +1,9 @@
+review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
+
+  * 
+
+ -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 10 Dec 2019 17:55:57 -0600
+
 review-tools (0.48+20191210-1) RELEASED; urgency=medium
 
   * update 2.42 interfaces
