@@ -457,6 +457,7 @@ sec_iface_ref_overrides = {
         'gallery-dl': ['etc-gallery-dl'],
         'get-iplayer': ['etc-get-iplayer-options'],
         'glances': ['etc-glances-config'],
+        'gnome-system-monitor': ['run-systemd-sessions'],
     },
 }
 
