@@ -639,6 +639,13 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  raw-volume:
+    allow-installation:
+      slot-snap-type:
+        - core
+        - gadget
+    deny-connection: true
+    deny-auto-connection: true
   removable-media:
     allow-installation:
       slot-snap-type:
