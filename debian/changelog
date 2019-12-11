@@ -1,8 +1,9 @@
-review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
+review-tools (0.48+20191211-1) RELEASED; urgency=medium
 
-  * 
+  * reviewtools/overrides.py: add more personal-files and system-files
+    overrides
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 10 Dec 2019 17:55:57 -0600
+ -- Jamie Strandboge <jamie@ubuntu.com>  Wed, 11 Dec 2019 08:55:36 -0600
 
 review-tools (0.48+20191210-1) RELEASED; urgency=medium
 
