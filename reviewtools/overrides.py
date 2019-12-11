@@ -437,7 +437,9 @@ sec_iface_ref_overrides = {
         'gitl': ['gitconfig'],
         'glances': ['home-glances-config'],
         'guvcview': ['config-guvcview2'],
+        'hw-probe': ['dot-local-share-xorg-logs'],
         'icdiff': ['gitconfig'],
+        'jaas': ['dot-local-share-juju'],
         'k9s': ['kube-config'],
         'kubefwd': ['config-kube'],
         'kubernetes-worker': ['dot-kube'],
@@ -454,6 +456,7 @@ sec_iface_ref_overrides = {
         'vht': ['dot-vault-token'],
     },
     'system-files': {
+        'cvescan': ['apt-dpkg-db'],
         'gallery-dl': ['etc-gallery-dl'],
         'get-iplayer': ['etc-get-iplayer-options'],
         'glances': ['etc-glances-config'],
