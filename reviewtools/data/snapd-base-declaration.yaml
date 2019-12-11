@@ -638,7 +638,6 @@
         - core
     deny-connection:
       on-classic: false
-    deny-auto-connection: true
   raw-usb:
     allow-installation:
       slot-snap-type:
