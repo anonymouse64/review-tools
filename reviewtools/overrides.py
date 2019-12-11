@@ -129,7 +129,8 @@ desktop_file_exception = ['emoj',
 
 # List of classic snaps that may specify slots/plugs (eg, for workaround
 # content interface methodology)
-classic_interfaces_exception = ['juju',
+classic_interfaces_exception = ['certbot',
+                                'juju',
                                 'microk8s',
                                 ]
 
