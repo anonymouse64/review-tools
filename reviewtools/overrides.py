@@ -535,7 +535,8 @@ canonical_enablement = ['snap-update-verification@lists.canonical.com',
                         'loic.minier@canonical.com',
                         ]
 
-canonical_foundations = ['daniel.watkins@canonical.com',
+canonical_foundations = ['dimitri.ledkov@canonical.com',
+                         'michael.hudson@canonical.com',
                          'patricia.gaughen@canonical.com',
                          'steve.langasek@canonical.com',
                          ]
