@@ -1,3 +1,9 @@
+review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
+
+  * overrides.py: add several snaps to shared publishers
+
+ -- Jamie Strandboge <jamie@ubuntu.com>  Thu, 12 Dec 2019 06:34:47 -0600
+
 review-tools (0.48+20191211-3) RELEASED; urgency=medium
 
   * snapd-base-declaration.yaml: revert pulseaudio change until 2.43 is stable
