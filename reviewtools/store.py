@@ -130,6 +130,8 @@ def get_pkg_revisions(item, secnot_db, errors):
 
         try:
             m = yaml.load(rev['manifest_yaml'], Loader=yaml.SafeLoader)
+            if m is None:
+                continue
             m = get_faked_stage_packages(m)
             normalize_and_verify_snap_manifest(m)
         except Exception as e:

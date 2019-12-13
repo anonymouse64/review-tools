@@ -1,0 +1,25 @@
+[
+  {
+    "name": "bare",
+    "publisher_email": "snaps@canonical.com",
+    "publisher_name": "Canonical",
+    "revisions": [
+      {
+        "revision": 5,
+        "uploader_email": "snaps@canonical.com",
+        "channels": [
+          "stable",
+          "candidate",
+          "beta",
+          "edge"
+        ],
+        "uploader_name": "Canonical",
+        "manifest_yaml": "",
+        "version": "1.0",
+        "architectures": [
+          "all"
+        ]
+      }
+    ]
+  }
+]

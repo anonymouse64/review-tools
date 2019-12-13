@@ -584,3 +584,14 @@ class TestStore(TestCase):
         self.assertTrue('stage-packages' in res['parts']['faked-by-review-tools'])
         self.assertTrue('linux-image-generic=4.4.0.140.999999' in
                         res['parts']['faked-by-review-tools']['stage-packages'])
+
+    def test_check_get_package_revisions_empty_manifest(self):
+        '''Test get_package_revisions() - empty manifest'''
+        self.store_db = read_file_as_json_dict(
+            "./tests/test-store-unittest-bare.db")
+        errors = {}
+        res = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
+        self.assertEquals(len(errors), 0)
+
+        self.assertTrue('revisions' in res)
+        self.assertEquals(len(res['revisions']), 0)

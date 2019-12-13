@@ -520,3 +520,11 @@ Revision r12 (i386; channels: candidate, beta)
         self.assertEquals(to_addr, None)
         self.assertEquals(subj, None)
         self.assertEquals(body, None)
+
+    def test_check_scan_store_empty_manifest(self):
+        '''Test scan_store() - empty manifest'''
+        secnot_fn = "./tests/test-usn-unittest-1.db"
+        store_fn = "./tests/test-store-unittest-bare.db"
+        (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
+        self.assertEquals(len(errors), 0)
+        self.assertEquals(len(sent), 0)

@@ -229,6 +229,11 @@ def scan_store(secnot_db_fn, store_db_fn, seen_db_fn, pkgname):
                 _add_error(item['name'], errors, "%s" % e)
             continue
 
+        # (At least) the 'bare' snap is in the db but doesn't have a manifest
+        # so there are no revisions to report on
+        if 'revisions' in pkg_db and len(pkg_db['revisions']) == 0:
+            continue
+
         try:
             (to_addr, subj, body) = _email_report_for_pkg(pkg_db, seen_db)
             sent.append((to_addr, subj, body))
