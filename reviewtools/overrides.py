@@ -435,6 +435,7 @@ sec_iface_ref_overrides = {
         'exoscale-cli': ['dot-exoscale'],
         'fluxctl': ['kube-config'],
         'gallery-dl': ['config-gallery-dl'],
+        'git-machete': ['gitconfig'],
         'gitl': ['gitconfig'],
         'glances': ['home-glances-config'],
         'guvcview': ['config-guvcview2'],
