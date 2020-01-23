@@ -36,13 +36,13 @@ from reviewtools.store import (
     get_staged_packages_from_manifest,
     get_faked_stage_packages,
 )
-from reviewtools.usn import (
-    read_usn_db,
-)
+from reviewtools.usn import read_usn_db
 
 
 email_templates = {}
-email_templates['default'] = '''A scan of this snap shows that it was built with packages from the Ubuntu
+email_templates[
+    "default"
+] = """A scan of this snap shows that it was built with packages from the Ubuntu
 archive that have since received security updates. The following lists new USNs
 for affected binary packages in each snap revision:
 %s
@@ -54,8 +54,10 @@ Thank you for your snap and for attending to this matter.
 
 References:
  * %s
-'''
-email_templates['kernel'] = '''A scan of this snap shows that it was built using sources based on a kernel
+"""
+email_templates[
+    "kernel"
+] = """A scan of this snap shows that it was built using sources based on a kernel
 from the Ubuntu archive that has since received security updates. The following
 lists new USNs for the Ubuntu kernel that the snap is based on in each snap
 revision:
@@ -68,37 +70,42 @@ Thank you for your snap and for attending to this matter.
 
 References:
  * %s
-'''
+"""
 
 
 def _secnot_report_for_pkg(pkg_db, seen_db):
-    '''Generate a report for this pkg, consulting seen_db'''
-    pkgname = pkg_db['name']
+    """Generate a report for this pkg, consulting seen_db"""
+    pkgname = pkg_db["name"]
 
     reference_urls = []
 
     report = ""
-    for r in sorted(pkg_db['revisions']):
-        if len(pkg_db['revisions'][r]['secnot-report']) == 0:
+    for r in sorted(pkg_db["revisions"]):
+        if len(pkg_db["revisions"][r]["secnot-report"]) == 0:
             continue
 
-        architectures = pkg_db['revisions'][r]['architectures']
+        architectures = pkg_db["revisions"][r]["architectures"]
         architectures.sort()
         architectures = ", ".join(architectures)
 
-        rev_header = "\nRevision r%s (%s; channel%s: %s)" % \
-            (r, architectures,
-             "s" if len(pkg_db['revisions'][r]['channels']) > 0 else "",
-             ", ".join(pkg_db['revisions'][r]['channels']))
+        rev_header = "\nRevision r%s (%s; channel%s: %s)" % (
+            r,
+            architectures,
+            "s" if len(pkg_db["revisions"][r]["channels"]) > 0 else "",
+            ", ".join(pkg_db["revisions"][r]["channels"]),
+        )
         shown_rev_header = False
 
-        for p in sorted(pkg_db['revisions'][r]['secnot-report']):
+        for p in sorted(pkg_db["revisions"][r]["secnot-report"]):
             secnots = []
-            for secnot in pkg_db['revisions'][r]['secnot-report'][p]:
+            for secnot in pkg_db["revisions"][r]["secnot-report"][p]:
                 # only report new secnots, unless we don't know about this
                 # revision
-                if pkgname in seen_db and r in seen_db[pkgname] and \
-                        secnot in seen_db[pkgname][r]:
+                if (
+                    pkgname in seen_db
+                    and r in seen_db[pkgname]
+                    and secnot in seen_db[pkgname][r]
+                ):
                     continue
                 secnots.append(secnot)
             secnots.sort()
@@ -122,30 +129,30 @@ def _secnot_report_for_pkg(pkg_db, seen_db):
         return ""
 
     reference_urls.sort()
-    template = 'default'
-    if 'snap_type' in pkg_db and pkg_db['snap_type'] == 'kernel':
-        template = 'kernel'
+    template = "default"
+    if "snap_type" in pkg_db and pkg_db["snap_type"] == "kernel":
+        template = "kernel"
     return email_templates[template] % (report, "\n * ".join(reference_urls))
 
 
 def _email_report_for_pkg(pkg_db, seen_db):
-    '''Send email report for this pkgname'''
-    pkgname = pkg_db['name']
+    """Send email report for this pkgname"""
+    pkgname = pkg_db["name"]
 
     body = _secnot_report_for_pkg(pkg_db, seen_db)
     if body == "":
         return (None, None, None)
 
     subj = "%s contains outdated Ubuntu packages" % pkgname
-    if 'snap_type' in pkg_db and pkg_db['snap_type'] == 'kernel':
+    if "snap_type" in pkg_db and pkg_db["snap_type"] == "kernel":
         subj = "%s built from outdated Ubuntu kernel" % pkgname
 
     # Send to the publisher and any affected uploaders
-    email_to_addr = pkg_db['publisher']
-    if len(pkg_db['uploaders']) > 0:
-        email_to_addr += ", %s" % ", ".join(pkg_db['uploaders'])
-    if len(pkg_db['additional']) > 0:
-        email_to_addr += ", %s" % ", ".join(pkg_db['additional'])
+    email_to_addr = pkg_db["publisher"]
+    if len(pkg_db["uploaders"]) > 0:
+        email_to_addr += ", %s" % ", ".join(pkg_db["uploaders"])
+    if len(pkg_db["additional"]) > 0:
+        email_to_addr += ", %s" % ", ".join(pkg_db["additional"])
     # temporary
     bcc = "jamie@canonical.com, alex.murray@canonical.com"
 
@@ -159,27 +166,27 @@ def read_seen_db(fn):
     if not os.path.exists(fn):
         # write out an empty seen_db
         with open_file_write(fn) as fd:
-            fd.write('{}\n')
+            fd.write("{}\n")
             fd.close()
 
     return read_file_as_json_dict(fn)
 
 
 def _update_seen(seen_fn, seen_db, pkg_db):
-    pkgname = pkg_db['name']
+    pkgname = pkg_db["name"]
     if pkgname not in seen_db:
         seen_db[pkgname] = {}
 
     # update to add new revisions
-    for r in pkg_db['revisions']:
-        if len(pkg_db['revisions'][r]['secnot-report']) == 0:
+    for r in pkg_db["revisions"]:
+        if len(pkg_db["revisions"][r]["secnot-report"]) == 0:
             continue
 
         if r not in seen_db[pkgname]:
             seen_db[pkgname][r] = []
 
-        for p in pkg_db['revisions'][r]['secnot-report']:
-            for secnot in pkg_db['revisions'][r]['secnot-report'][p]:
+        for p in pkg_db["revisions"][r]["secnot-report"]:
+            for secnot in pkg_db["revisions"][r]["secnot-report"][p]:
                 if secnot not in seen_db[pkgname][r]:
                     seen_db[pkgname][r].append(secnot)
         seen_db[pkgname][r].sort()
@@ -187,7 +194,7 @@ def _update_seen(seen_fn, seen_db, pkg_db):
     # remove old revisions
     remove = []
     for r in seen_db[pkgname]:
-        if r not in pkg_db['revisions']:
+        if r not in pkg_db["revisions"]:
             remove.append(r)
     if len(remove) > 0:
         for r in remove:
@@ -196,18 +203,18 @@ def _update_seen(seen_fn, seen_db, pkg_db):
     # TODO: update seen more efficiently (right now it is only 70k so not a
     # huge deal, but should probably move to sqlite)
     (fd, fn) = tempfile.mkstemp(prefix=MKDTEMP_PREFIX)
-    os.write(fd, bytes(json.dumps(seen_db, sort_keys=True, indent=2), 'UTF-8'))
+    os.write(fd, bytes(json.dumps(seen_db, sort_keys=True, indent=2), "UTF-8"))
     os.close(fd)
 
     shutil.move(fn, seen_fn)
 
 
 def scan_store(secnot_db_fn, store_db_fn, seen_db_fn, pkgname):
-    '''For each snap in store db, see if there are any binary packages with
+    """For each snap in store db, see if there are any binary packages with
        security notices, if see report them if not in the seen db. We perform
        these actions on each snap and do not form a queue to keep the
        implementation simple.
-    '''
+    """
     secnot_db = read_usn_db(secnot_db_fn)
     store_db = read_file_as_json_dict(store_db_fn)
 
@@ -219,30 +226,30 @@ def scan_store(secnot_db_fn, store_db_fn, seen_db_fn, pkgname):
     errors = {}
     sent = []
     for item in store_db:
-        if pkgname and 'name' in item and pkgname != item['name']:
+        if pkgname and "name" in item and pkgname != item["name"]:
             continue
 
         try:
             pkg_db = get_pkg_revisions(item, secnot_db, errors)
         except ValueError as e:
-            if 'name' in item:
-                _add_error(item['name'], errors, "%s" % e)
+            if "name" in item:
+                _add_error(item["name"], errors, "%s" % e)
             continue
 
         # (At least) the 'bare' snap is in the db but doesn't have a manifest
         # so there are no revisions to report on
-        if 'revisions' in pkg_db and len(pkg_db['revisions']) == 0:
+        if "revisions" in pkg_db and len(pkg_db["revisions"]) == 0:
             continue
 
         try:
             (to_addr, subj, body) = _email_report_for_pkg(pkg_db, seen_db)
             sent.append((to_addr, subj, body))
         except Exception as e:  # pragma: nocover
-            _add_error(pkg_db['name'], errors, "%s" % e)
+            _add_error(pkg_db["name"], errors, "%s" % e)
             continue
 
         if body is None:  # pragma: nocover
-            debug("Skipped email for '%s': up to date" % pkg_db['name'])
+            debug("Skipped email for '%s': up to date" % pkg_db["name"])
 
         if seen_db_fn:
             _update_seen(seen_db_fn, seen_db, pkg_db)
@@ -256,26 +263,26 @@ def scan_store(secnot_db_fn, store_db_fn, seen_db_fn, pkgname):
 
 
 def scan_snap(secnot_db_fn, snap_fn, with_cves=False):
-    '''Scan snap for packages with security notices'''
+    """Scan snap for packages with security notices"""
     out = ""
     (man, dpkg) = get_snap_manifest(snap_fn)
     man = get_faked_stage_packages(man)
 
     # Use dpkg.list with os/base snaps if we don't have any stage-packages.
     # This is limited to snap scans since dpkg.list doesn't exist in the store.
-    if 'type' in man and man['type'] in ['base', 'os', 'core'] and \
-            dpkg is not None:
+    if "type" in man and man["type"] in ["base", "os", "core"] and dpkg is not None:
         p = get_staged_packages_from_manifest(man)
-        fake_key = 'faked-by-review-tools-os'
-        if p is None and 'parts' in man and fake_key not in man['parts']:
-            man['parts'][fake_key] = {}
-            man['parts'][fake_key]['stage-packages'] = []
+        fake_key = "faked-by-review-tools-os"
+        if p is None and "parts" in man and fake_key not in man["parts"]:
+            man["parts"][fake_key] = {}
+            man["parts"][fake_key]["stage-packages"] = []
             for line in dpkg:
-                if not line.startswith('ii '):
+                if not line.startswith("ii "):
                     continue
                 tmp = line.split()
-                man['parts'][fake_key]['stage-packages'].append(
-                    "%s=%s" % (tmp[1], tmp[2]))
+                man["parts"][fake_key]["stage-packages"].append(
+                    "%s=%s" % (tmp[1], tmp[2])
+                )
 
     secnot_db = read_usn_db(secnot_db_fn)
 
@@ -288,9 +295,9 @@ def scan_snap(secnot_db_fn, snap_fn, with_cves=False):
 
 
 def scan_shared_publishers(store_fn):
-    '''Check store db for any snaps with a shared email that don't also have a
+    """Check store db for any snaps with a shared email that don't also have a
        mapping.
-    '''
+    """
     store_db = read_file_as_json_dict(store_fn)
     report = get_shared_snap_without_override(store_db)
 

@@ -1,4 +1,4 @@
-'''test_email.py: tests for the email module'''
+"""test_email.py: tests for the email module"""
 #
 # Copyright (C) 2018 Canonical Ltd.
 #
@@ -15,31 +15,30 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from unittest import TestCase
-from reviewtools.email import (
-    sanitize_addr,
-)
+from reviewtools.email import sanitize_addr
 
 
 class TestEmail(TestCase):
     """Tests for email functions."""
 
     def test_check_sanitize_addr_valid(self):
-        '''Test sanitize_addr() - valid'''
-        addresses = [('foo@bar.com', 'foo@bar.com'),
-                     ('Foo Bar <foo.bar@example.com>', 'foo.bar@example.com'),
-                     ('snaps@canonical.com',
-                      'snaps@canonical.com'),
-                     ]
+        """Test sanitize_addr() - valid"""
+        addresses = [
+            ("foo@bar.com", "foo@bar.com"),
+            ("Foo Bar <foo.bar@example.com>", "foo.bar@example.com"),
+            ("snaps@canonical.com", "snaps@canonical.com"),
+        ]
         for (addr, expected) in addresses:
             self.assertEquals(sanitize_addr(addr), expected)
 
     def test_check_sanitize_addr_invalid(self):
-        '''Test sanitize_addr() - invalid'''
-        addresses = [('', ''),
-                     ('foo.bar', ''),
-                     ('foo.bar@', ''),
-                     ('@foo.bar', ''),
-                     ('foo@@bar', ''),
-                     ]
+        """Test sanitize_addr() - invalid"""
+        addresses = [
+            ("", ""),
+            ("foo.bar", ""),
+            ("foo.bar@", ""),
+            ("@foo.bar", ""),
+            ("foo@@bar", ""),
+        ]
         for (addr, expected) in addresses:
             self.assertEquals(sanitize_addr(addr), expected)

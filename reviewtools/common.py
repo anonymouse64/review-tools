@@ -1,4 +1,4 @@
-'''common.py: common classes and functions'''
+"""common.py: common classes and functions"""
 #
 # Copyright (C) 2013-2017 Canonical Ltd.
 #
@@ -35,21 +35,25 @@ import time
 import types
 import yaml
 
-from reviewtools.overrides import (
-    common_external_symlink_override,
-)
+from reviewtools.overrides import common_external_symlink_override
 
 REPORT_OUTPUT = "json"
-RESULT_TYPES = ['info', 'warn', 'error']
+RESULT_TYPES = ["info", "warn", "error"]
 UNPACK_DIR = None
 RAW_UNPACK_DIR = None
 TMP_DIR = None
 MKDTEMP_PREFIX = "review-tools-"
 MKDTEMP_DIR = None
-VALID_SYSCALL = r'^[a-z0-9_]{2,64}$'
+VALID_SYSCALL = r"^[a-z0-9_]{2,64}$"
 # This needs to match up with snapcraft
-MKSQUASHFS_OPTS = ['-noappend', '-comp', 'xz', '-all-root', '-no-xattrs',
-                   '-no-fragments']
+MKSQUASHFS_OPTS = [
+    "-noappend",
+    "-comp",
+    "xz",
+    "-all-root",
+    "-no-xattrs",
+    "-no-fragments",
+]
 # There are quite a few kernel interfaces that can cause problems with
 # long profile names. These are outlined in
 # https://launchpad.net/bugs/1499544. The big issue is that the audit
@@ -81,40 +85,40 @@ PKG_FILES = None
 
 # os release map
 OS_RELEASE_MAP = {
-    'ubuntu': {
-        '4.10': 'warty',
-        '5.04': 'hoary',
-        '5.10': 'breezy',
-        '6.06': 'dapper',
-        '6.10': 'edgy',
-        '7.04': 'feisty',
-        '7.10': 'gutsy',
-        '8.04': 'hardy',
-        '8.10': 'intrepid',
-        '9.04': 'jaunty',
-        '9.10': 'karmic',
-        '10.04': 'lucid',
-        '10.10': 'maverick',
-        '11.04': 'natty',
-        '11.10': 'oneiric',
-        '12.04': 'precise',
-        '12.10': 'quantal',
-        '13.04': 'raring',
-        '13.10': 'saucy',
-        '14.04': 'trusty',
-        '14.10': 'utopic',
-        '15.04': 'vivid',
-        '15.10': 'wily',
-        '16.04': 'xenial',
-        '16.10': 'yakkety',
-        '17.04': 'zesty',
-        '17.10': 'artful',
-        '18.04': 'bionic',
-        '18.10': 'cosmic',
-        '19.04': 'disco',
-        '19.10': 'eoan',
-        '20.04': 'focal',
-    },
+    "ubuntu": {
+        "4.10": "warty",
+        "5.04": "hoary",
+        "5.10": "breezy",
+        "6.06": "dapper",
+        "6.10": "edgy",
+        "7.04": "feisty",
+        "7.10": "gutsy",
+        "8.04": "hardy",
+        "8.10": "intrepid",
+        "9.04": "jaunty",
+        "9.10": "karmic",
+        "10.04": "lucid",
+        "10.10": "maverick",
+        "11.04": "natty",
+        "11.10": "oneiric",
+        "12.04": "precise",
+        "12.10": "quantal",
+        "13.04": "raring",
+        "13.10": "saucy",
+        "14.04": "trusty",
+        "14.10": "utopic",
+        "15.04": "vivid",
+        "15.10": "wily",
+        "16.04": "xenial",
+        "16.10": "yakkety",
+        "17.04": "zesty",
+        "17.10": "artful",
+        "18.04": "bionic",
+        "18.10": "cosmic",
+        "19.04": "disco",
+        "19.10": "eoan",
+        "20.04": "focal",
+    }
 }
 
 
@@ -151,9 +155,11 @@ def cleanup_unpack():
                 recursive_rm(os.path.join(d))
             except Exception:
                 # Just log that something weird happened
-                syslog.openlog(ident="review-tools",
-                               logoption=syslog.LOG_PID,
-                               facility=syslog.LOG_USER | syslog.LOG_INFO)
+                syslog.openlog(
+                    ident="review-tools",
+                    logoption=syslog.LOG_PID,
+                    facility=syslog.LOG_USER | syslog.LOG_INFO,
+                )
                 syslog.syslog("Could not remove '%s'" % d)
                 syslog.closelog()
 
@@ -171,7 +177,8 @@ atexit.register(cleanup_unpack)
 # Utility classes
 #
 class ReviewException(Exception):
-    '''This class represents Review exceptions'''
+    """This class represents Review exceptions"""
+
     def __init__(self, value):
         self.value = value
 
@@ -180,16 +187,17 @@ class ReviewException(Exception):
 
 
 class Review(object):
-    '''Common review class'''
+    """Common review class"""
+
     magic_binary_file_descriptions = [
-        'application/x-executable; charset=binary',
-        'application/x-sharedlib; charset=binary',
-        'application/x-object; charset=binary',
+        "application/x-executable; charset=binary",
+        "application/x-sharedlib; charset=binary",
+        "application/x-object; charset=binary",
         # 18.04 and higher doesn't show the charset
-        'application/x-executable',
-        'application/x-sharedlib',
-        'application/x-object',
-        'application/x-pie-executable',
+        "application/x-executable",
+        "application/x-sharedlib",
+        "application/x-object",
+        "application/x-pie-executable",
     ]
 
     def __init__(self, fn, review_type, overrides=None):
@@ -207,9 +215,12 @@ class Review(object):
             self.stage_report[r] = dict()
 
         global MKDTEMP_DIR
-        if MKDTEMP_DIR is None and 'SNAP_USER_COMMON' in os.environ and \
-                os.path.exists(os.environ['SNAP_USER_COMMON']):
-            MKDTEMP_DIR = os.environ['SNAP_USER_COMMON']
+        if (
+            MKDTEMP_DIR is None
+            and "SNAP_USER_COMMON" in os.environ
+            and os.path.exists(os.environ["SNAP_USER_COMMON"])
+        ):
+            MKDTEMP_DIR = os.environ["SNAP_USER_COMMON"]
 
         global UNPACK_DIR
         if UNPACK_DIR is None:
@@ -246,11 +257,11 @@ class Review(object):
             REPORT_OUTPUT = t
 
     def _check_innerpath_executable(self, fn):
-        '''Check that the provided path exists and is executable'''
+        """Check that the provided path exists and is executable"""
         return os.access(fn, os.X_OK)
 
     def _extract_statinfo(self, fn):
-        '''Extract statinfo from file'''
+        """Extract statinfo from file"""
         try:
             st = os.stat(fn)
         except Exception:
@@ -258,8 +269,8 @@ class Review(object):
         return st
 
     def _extract_file(self, fn):
-        '''Extract file'''
-        if not fn.startswith('/'):
+        """Extract file"""
+        if not fn.startswith("/"):
             error("_extract_file() expects absolute path")
         rel = os.path.relpath(fn, self.unpack_dir)
 
@@ -271,31 +282,31 @@ class Review(object):
         return os.path.join(dirname, rest)
 
     def _get_sha512sum(self, fn):
-        '''Get sha512sum of file'''
-        (rc, out) = cmd(['sha512sum', fn])
+        """Get sha512sum of file"""
+        (rc, out) = cmd(["sha512sum", fn])
         if rc != 0:
             return None
         return out.split()[0]
 
     def _pkgfmt_type(self):
-        '''Return the package format type'''
+        """Return the package format type"""
         if "type" not in self.pkgfmt:
             return ""
         return self.pkgfmt["type"]
 
     def _pkgfmt_version(self):
-        '''Return the package format version'''
+        """Return the package format version"""
         if "version" not in self.pkgfmt:
             return ""
         return self.pkgfmt["version"]
 
     def _check_package_exists(self):
-        '''Check that the provided package exists'''
+        """Check that the provided package exists"""
         if not os.path.exists(self.pkg_filename):
             error("Could not find '%s'" % self.pkg_filename)
 
     def _list_all_files(self):
-        '''List all files included in this package.'''
+        """List all files included in this package."""
         global PKG_FILES
         if PKG_FILES is None:
             PKG_FILES = []
@@ -306,13 +317,13 @@ class Review(object):
         self.pkg_files = PKG_FILES
 
     def _check_if_message_catalog(self, fn):
-        '''Check if file is a message catalog (.mo file).'''
-        if fn.endswith('.mo'):
+        """Check if file is a message catalog (.mo file)."""
+        if fn.endswith(".mo"):
             return True
         return False
 
     def _list_all_compiled_binaries(self):
-        '''List all compiled binaries in this package.'''
+        """List all compiled binaries in this package."""
         global PKG_BIN_FILES
         if PKG_BIN_FILES is None:
             self.mime = magic.open(magic.MAGIC_MIME)
@@ -326,28 +337,32 @@ class Review(object):
                     debug("could not detemine mime type of '%s'" % i)
                     continue
 
-                if res in self.magic_binary_file_descriptions and \
-                   not self._check_if_message_catalog(i) and \
-                   i not in PKG_BIN_FILES:
+                if (
+                    res in self.magic_binary_file_descriptions
+                    and not self._check_if_message_catalog(i)
+                    and i not in PKG_BIN_FILES
+                ):
                     PKG_BIN_FILES.append(i)
 
         self.pkg_bin_files = PKG_BIN_FILES
 
-    def _get_check_name(self, name, app='', extra=''):
-        name = ':'.join([self.review_type, name])
+    def _get_check_name(self, name, app="", extra=""):
+        name = ":".join([self.review_type, name])
         if app:
-            name += ':' + app
+            name += ":" + app
         if extra:
-            name += ':' + extra
+            name += ":" + extra
         return name
 
     def _verify_pkgversion(self, v):
-        '''Verify package name'''
+        """Verify package name"""
         if not isinstance(v, (str, int, float)):
             return False
-        re_valid_version = re.compile(r'^((\d+):)?'              # epoch
-                                      '([A-Za-z0-9.+:~-]+?)'     # upstream
-                                      '(-([A-Za-z0-9+.~]+))?$')  # debian
+        re_valid_version = re.compile(
+            r"^((\d+):)?"  # epoch
+            "([A-Za-z0-9.+:~-]+?)"  # upstream
+            "(-([A-Za-z0-9+.~]+))?$"
+        )  # debian
         if re_valid_version.match(str(v)):
             return True
         return False
@@ -360,10 +375,17 @@ class Review(object):
     #   manual_review: force manual review
     #   override_result_type: prefix results with [<result_type>] and set
     #     result_type to override_result_type
-    def _add_result(self, result_type, review_name, result, link=None,
-                    manual_review=False, override_result_type=None,
-                    stage=False):
-        '''Add result to report'''
+    def _add_result(
+        self,
+        result_type,
+        review_name,
+        result,
+        link=None,
+        manual_review=False,
+        override_result_type=None,
+        stage=False,
+    ):
+        """Add result to report"""
         global RESULT_TYPES
         if stage:
             report = self.stage_report
@@ -376,8 +398,7 @@ class Review(object):
         prefix = ""
         if override_result_type is not None:
             if override_result_type not in RESULT_TYPES:
-                error("Invalid override result type '%s'" %
-                      override_result_type)
+                error("Invalid override result type '%s'" % override_result_type)
             prefix = "[%s] " % result_type.upper()
             result_type = override_result_type
 
@@ -386,21 +407,20 @@ class Review(object):
             # check-names.list file
             # format should be
             # CHECK|<review_type:check_name>|<link>
-            msg = 'CHECK|{}|{}'
-            name = ':'.join(review_name.split(':')[:2])
+            msg = "CHECK|{}|{}"
+            name = ":".join(review_name.split(":")[:2])
             link_text = link if link is not None else ""
             logging.debug(msg.format(name, link_text))
             report[result_type][review_name] = dict()
 
-        report[result_type][review_name].update({
-            'text': "%s%s" % (prefix, result),
-            'manual_review': manual_review,
-        })
+        report[result_type][review_name].update(
+            {"text": "%s%s" % (prefix, result), "manual_review": manual_review}
+        )
         if link is not None:
             report[result_type][review_name]["link"] = link
 
     def _apply_staged_results(self):
-        '''Merge the staged report into the main report'''
+        """Merge the staged report into the main report"""
         global RESULT_TYPES
         for result_type in self.stage_report:
             if result_type not in RESULT_TYPES:
@@ -410,34 +430,38 @@ class Review(object):
                 if review_name not in self.review_report[result_type]:
                     self.review_report[result_type][review_name] = dict()
                 for key in self.stage_report[result_type][review_name]:
-                    self.review_report[result_type][review_name][key] = \
-                        self.stage_report[result_type][review_name][key]
+                    self.review_report[result_type][review_name][
+                        key
+                    ] = self.stage_report[result_type][review_name][key]
             # reset the staged report
             self.stage_report[result_type] = dict()
 
     # Only called by ./bin/* individually, not 'snap-review'
     def do_report(self):
-        '''Print report'''
+        """Print report"""
         global REPORT_OUTPUT
 
         if REPORT_OUTPUT == "json":
             jsonmsg(self.review_report)
         else:
             import pprint
+
             pprint.pprint(self.review_report)
 
         rc = 0
-        if len(self.review_report['error']):
+        if len(self.review_report["error"]):
             rc = 2
-        elif len(self.review_report['warn']):
+        elif len(self.review_report["warn"]):
             rc = 1
         return rc
 
     def do_checks(self):
-        '''Run all methods that start with check_'''
-        methodList = [name for name, member in
-                      inspect.getmembers(self, inspect.ismethod)
-                      if isinstance(member, types.MethodType)]
+        """Run all methods that start with check_"""
+        methodList = [
+            name
+            for name, member in inspect.getmembers(self, inspect.ismethod)
+            if isinstance(member, types.MethodType)
+        ]
         for methodname in methodList:
             if not methodname.startswith("check_"):
                 continue
@@ -445,7 +469,7 @@ class Review(object):
             func()
 
     def set_review_type(self, name):
-        '''Set review name'''
+        """Set review name"""
         self.review_type = name
 
 
@@ -453,8 +477,9 @@ class Review(object):
 # Utility functions
 #
 
+
 def error(out, exit_code=1, do_exit=True):
-    '''Print error message and exit'''
+    """Print error message and exit"""
     global REPORT_OUTPUT
     global RESULT_TYPES
 
@@ -480,9 +505,9 @@ def error(out, exit_code=1, do_exit=True):
             report[family] = dict()
             for r in RESULT_TYPES:
                 report[family][r] = dict()
-            report[family]['error'][name] = dict()
-            report[family]['error'][name]['text'] = out
-            report[family]['error'][name]['manual_review'] = True
+            report[family]["error"][name] = dict()
+            report[family]["error"][name]["text"] = out
+            report[family]["error"][name]["manual_review"] = True
 
             jsonmsg(report)
         else:
@@ -495,7 +520,7 @@ def error(out, exit_code=1, do_exit=True):
 
 
 def warn(out):
-    '''Print warning message'''
+    """Print warning message"""
     try:
         print("WARN: %s" % (out), file=sys.stderr)
     except IOError:
@@ -503,7 +528,7 @@ def warn(out):
 
 
 def msg(out, output=sys.stdout):
-    '''Print message'''
+    """Print message"""
     try:
         print("%s" % (out), file=output)
     except IOError:
@@ -511,8 +536,8 @@ def msg(out, output=sys.stdout):
 
 
 def debug(out):
-    '''Print debug message'''
-    if 'SNAP_DEBUG' in os.environ:
+    """Print debug message"""
+    if "SNAP_DEBUG" in os.environ:
         try:
             print("DEBUG: %s" % (out), file=sys.stderr)
         except IOError:
@@ -520,24 +545,20 @@ def debug(out):
 
 
 def jsonmsg(out):
-    '''Format out as json'''
-    msg(json.dumps(out,
-                   sort_keys=True,
-                   indent=2,
-                   separators=(',', ': ')))
+    """Format out as json"""
+    msg(json.dumps(out, sort_keys=True, indent=2, separators=(",", ": ")))
 
 
 def cmd(command):
-    '''Try to execute the given command.'''
+    """Try to execute the given command."""
     debug(" ".join(command))
     try:
-        sp = subprocess.Popen(command, stdout=subprocess.PIPE,
-                              stderr=subprocess.STDOUT)
+        sp = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     except OSError as ex:
         return [127, str(ex)]
 
     if sys.version_info[0] >= 3:
-        out = sp.communicate()[0].decode('ascii', 'ignore')
+        out = sp.communicate()[0].decode("ascii", "ignore")
     else:
         out = sp.communicate()[0]
 
@@ -545,7 +566,7 @@ def cmd(command):
 
 
 def cmd_pipe(command1, command2):
-    '''Try to pipe command1 into command2.'''
+    """Try to pipe command1 into command2."""
     try:
         sp1 = subprocess.Popen(command1, stdout=subprocess.PIPE)
         sp2 = subprocess.Popen(command2, stdin=sp1.stdout)
@@ -553,7 +574,7 @@ def cmd_pipe(command1, command2):
         return [127, str(ex)]
 
     if sys.version_info[0] >= 3:
-        out = sp2.communicate()[0].decode('ascii', 'ignore')
+        out = sp2.communicate()[0].decode("ascii", "ignore")
     else:
         out = sp2.communicate()[0]
 
@@ -561,7 +582,7 @@ def cmd_pipe(command1, command2):
 
 
 def _unpack_cmd(cmd_args, d, dest):
-    '''Low level unpack helper'''
+    """Low level unpack helper"""
     curdir = os.getcwd()
     os.chdir(d)
 
@@ -587,14 +608,14 @@ def _unpack_cmd(cmd_args, d, dest):
 
 
 def _calculate_snap_unsquashfs_uncompressed_size(snap_pkg):
-    '''Calculate size of the uncompressed snap'''
-    (rc, out) = cmd(['unsquashfs', '-lls', snap_pkg])
+    """Calculate size of the uncompressed snap"""
+    (rc, out) = cmd(["unsquashfs", "-lls", snap_pkg])
     if rc != 0:
         error("unsquashfs -lls '%s' failed: %s" % (snap_pkg, out))
 
     size = 0
     for line in out.splitlines():
-        if not line.startswith('-'):  # skip non-regular files
+        if not line.startswith("-"):  # skip non-regular files
             continue
         try:
             size += int(line.split()[2])
@@ -605,35 +626,39 @@ def _calculate_snap_unsquashfs_uncompressed_size(snap_pkg):
 
 
 def _unpack_snap_squashfs(snap_pkg, dest, items=[]):
-    '''Unpack a squashfs based snap package to dest'''
+    """Unpack a squashfs based snap package to dest"""
     size = _calculate_snap_unsquashfs_uncompressed_size(snap_pkg)
 
     max = MAX_UNCOMPRESSED_SIZE * 1024 * 1024 * 1024
 
     st = os.statvfs(snap_pkg)
-    avail = st.f_bsize * st.f_bavail * .9  # 90% of available space
+    avail = st.f_bsize * st.f_bavail * 0.9  # 90% of available space
     if size > max:
-        error("uncompressed snap is too large (%dM > %dM)" %
-              (size / 1024 / 1024, max / 1024 / 1024))
-    elif size > avail * .9:
-        error("uncompressed snap is too large for available space (%dM > %dM)"
-              % (size / 1024 / 1024, avail / 1024 / 1024))
+        error(
+            "uncompressed snap is too large (%dM > %dM)"
+            % (size / 1024 / 1024, max / 1024 / 1024)
+        )
+    elif size > avail * 0.9:
+        error(
+            "uncompressed snap is too large for available space (%dM > %dM)"
+            % (size / 1024 / 1024, avail / 1024 / 1024)
+        )
 
     global MKDTEMP_PREFIX
     global MKDTEMP_DIR
     d = tempfile.mkdtemp(prefix=MKDTEMP_PREFIX, dir=MKDTEMP_DIR)
-    cmd = ['unsquashfs', '-f', '-d', d, os.path.abspath(snap_pkg)]
+    cmd = ["unsquashfs", "-f", "-d", d, os.path.abspath(snap_pkg)]
     if len(items) != 0:
         cmd += items
     return _unpack_cmd(cmd, d, dest)
 
 
 def unpack_pkg(fn, dest=None, items=[]):
-    '''Unpack package'''
+    """Unpack package"""
     if not os.path.isfile(fn):
         error("Could not find '%s'" % fn)
     pkg = fn
-    if not pkg.startswith('/'):
+    if not pkg.startswith("/"):
         pkg = os.path.abspath(pkg)
 
     if dest is not None and os.path.exists(dest):
@@ -643,8 +668,10 @@ def unpack_pkg(fn, dest=None, items=[]):
     size = os.stat(pkg)[stat.ST_SIZE]
     max = MAX_COMPRESSED_SIZE * 1024 * 1024 * 1024
     if size > max:
-        error("compressed file is too large (%dM > %dM)" %
-              (size / 1024 / 1024, max / 1024 / 1024))
+        error(
+            "compressed file is too large (%dM > %dM)"
+            % (size / 1024 / 1024, max / 1024 / 1024)
+        )
 
     # check if its a squashfs based snap
     if is_squashfs(pkg):
@@ -654,18 +681,18 @@ def unpack_pkg(fn, dest=None, items=[]):
 
 
 def is_squashfs(filename):
-    '''Return true if the given filename as a squashfs header'''
-    with open(filename, 'rb') as f:
+    """Return true if the given filename as a squashfs header"""
+    with open(filename, "rb") as f:
         header = f.read(10)
     return header.startswith(b"hsqs")
 
 
 def raw_unpack_pkg(fn, dest=None):
-    '''Unpack raw package'''
+    """Unpack raw package"""
     if not os.path.isfile(fn):
         error("Could not find '%s'" % fn)
     pkg = fn
-    if not pkg.startswith('/'):
+    if not pkg.startswith("/"):
         pkg = os.path.abspath(pkg)
     # nothing to do for squashfs images
     if is_squashfs(pkg):
@@ -680,7 +707,7 @@ def raw_unpack_pkg(fn, dest=None):
 
     curdir = os.getcwd()
     os.chdir(d)
-    (rc, out) = cmd(['ar', 'x', pkg])
+    (rc, out) = cmd(["ar", "x", pkg])
     os.chdir(curdir)
 
     if rc != 0:
@@ -697,7 +724,7 @@ def raw_unpack_pkg(fn, dest=None):
 
 
 def create_tempdir():
-    '''Create/reuse a temporary directory that is automatically cleaned up'''
+    """Create/reuse a temporary directory that is automatically cleaned up"""
     global TMP_DIR
     global MKDTEMP_PREFIX
     global MKDTEMP_DIR
@@ -707,9 +734,9 @@ def create_tempdir():
 
 
 def open_file_read(path):
-    '''Open specified file read-only'''
+    """Open specified file read-only"""
     try:
-        orig = codecs.open(path, 'r', "UTF-8")
+        orig = codecs.open(path, "r", "UTF-8")
     except Exception:
         raise
 
@@ -717,9 +744,9 @@ def open_file_read(path):
 
 
 def open_file_write(path):
-    '''Open specified file read-write'''
+    """Open specified file read-write"""
     try:
-        orig = codecs.open(path, 'w', "UTF-8")
+        orig = codecs.open(path, "w", "UTF-8")
     except Exception:
         raise
 
@@ -727,7 +754,7 @@ def open_file_write(path):
 
 
 def recursive_rm(dirPath, contents_only=False, top=True):
-    '''recursively remove directory'''
+    """recursively remove directory"""
     if top:
         os.chmod(dirPath, 0o0755)  # ensure the top dir is always removable
 
@@ -774,39 +801,40 @@ def run_check(cls):
 
 
 def find_external_symlinks(unpack_dir, pkg_files, pkgname, prefix_ok=None):
-    '''Check if symlinks in the package go out to the system.'''
-    common = r'(-[0-9.]+)?\.so(\.[0-9.]+)?'
-    libc6_libs = ['ld-*.so',
-                  'libanl',
-                  'libBrokenLocale',
-                  'libc',
-                  'libcidn',
-                  'libcrypt',
-                  'libdl',
-                  'libmemusage',
-                  'libm',
-                  'libmvec',
-                  'libnsl',
-                  'libnss_compat',
-                  'libnss_dns',
-                  'libnss_files',
-                  'libnss_hesiod',
-                  'libnss_nisplus',
-                  'libnss_nis',
-                  'libpcprofile',
-                  'libpthread',
-                  'libresolv',
-                  'librt',
-                  'libSegFault',
-                  'libthread_db',
-                  'libutil',
-                  ]
+    """Check if symlinks in the package go out to the system."""
+    common = r"(-[0-9.]+)?\.so(\.[0-9.]+)?"
+    libc6_libs = [
+        "ld-*.so",
+        "libanl",
+        "libBrokenLocale",
+        "libc",
+        "libcidn",
+        "libcrypt",
+        "libdl",
+        "libmemusage",
+        "libm",
+        "libmvec",
+        "libnsl",
+        "libnss_compat",
+        "libnss_dns",
+        "libnss_files",
+        "libnss_hesiod",
+        "libnss_nisplus",
+        "libnss_nis",
+        "libpcprofile",
+        "libpthread",
+        "libresolv",
+        "librt",
+        "libSegFault",
+        "libthread_db",
+        "libutil",
+    ]
     libc6_pats = []
     for lib in libc6_libs:
-        libc6_pats.append(re.compile(r'%s%s' % (lib, common)))
-    libc6_pats.append(re.compile(r'ld-*.so$'))
-    libc6_pats.append(re.compile(r'ld-linux-.*.so\.[0-9.]+$'))
-    libc6_pats.append(re.compile(r'ld64.so\.[0-9.]+$'))  # ppc64el
+        libc6_pats.append(re.compile(r"%s%s" % (lib, common)))
+    libc6_pats.append(re.compile(r"ld-*.so$"))
+    libc6_pats.append(re.compile(r"ld-linux-.*.so\.[0-9.]+$"))
+    libc6_pats.append(re.compile(r"ld64.so\.[0-9.]+$"))  # ppc64el
 
     def _in_patterns(pats, f):
         for pat in pats:
@@ -817,8 +845,11 @@ def find_external_symlinks(unpack_dir, pkg_files, pkgname, prefix_ok=None):
     def _is_external(link, pats, pkgname, prefix_ok=None):
         rp = os.path.realpath(link)
 
-        if rp.startswith('/') and len(rp) > 1 and \
-                pkgname in common_external_symlink_override:
+        if (
+            rp.startswith("/")
+            and len(rp) > 1
+            and pkgname in common_external_symlink_override
+        ):
             if rp.startswith(unpack_dir + "/"):
                 rel = os.path.relpath(rp, unpack_dir)
             else:
@@ -829,18 +860,20 @@ def find_external_symlinks(unpack_dir, pkg_files, pkgname, prefix_ok=None):
         if prefix_ok is not None and rp.startswith(prefix_ok):
             return False
 
-        if not rp.startswith(unpack_dir + "/") and \
-                not rp.startswith(os.path.join("/snap", pkgname) + "/") and \
-                not rp.startswith(
-                    os.path.join("/var/snap", pkgname) + "/") and \
-                not _in_patterns(pats, os.path.basename(link)):
+        if (
+            not rp.startswith(unpack_dir + "/")
+            and not rp.startswith(os.path.join("/snap", pkgname) + "/")
+            and not rp.startswith(os.path.join("/var/snap", pkgname) + "/")
+            and not _in_patterns(pats, os.path.basename(link))
+        ):
             return True
         return False
 
-    external_symlinks = list(filter(lambda link:
-                             _is_external(link, libc6_pats, pkgname,
-                                          prefix_ok),
-                             pkg_files))
+    external_symlinks = list(
+        filter(
+            lambda link: _is_external(link, libc6_pats, pkgname, prefix_ok), pkg_files
+        )
+    )
 
     return [os.path.relpath(i, unpack_dir) for i in external_symlinks]
 
@@ -861,31 +894,37 @@ def find_external_symlinks(unpack_dir, pkg_files, pkgname, prefix_ok=None):
 #   self.check_results(r, expected=expected)
 
 
-def check_results(testobj, report,
-                  expected_counts={'info': 1, 'warn': 0, 'error': 0},
-                  expected=None):
+def check_results(
+    testobj, report, expected_counts={"info": 1, "warn": 0, "error": 0}, expected=None
+):
     if expected is not None:
         for t in expected.keys():
             for r in expected[t]:
-                testobj.assertTrue(r in report[t],
-                                   "Could not find '%s' (%s) in:\n%s" %
-                                   (r, t, json.dumps(report, indent=2)))
+                testobj.assertTrue(
+                    r in report[t],
+                    "Could not find '%s' (%s) in:\n%s"
+                    % (r, t, json.dumps(report, indent=2)),
+                )
                 for k in expected[t][r]:
-                    testobj.assertTrue(k in report[t][r],
-                                       "Could not find '%s' (%s) in:\n%s" %
-                                       (k, r, json.dumps(report, indent=2)))
+                    testobj.assertTrue(
+                        k in report[t][r],
+                        "Could not find '%s' (%s) in:\n%s"
+                        % (k, r, json.dumps(report, indent=2)),
+                    )
                 testobj.assertEqual(expected[t][r][k], report[t][r][k])
     else:
         for k in expected_counts.keys():
             if expected_counts[k] is None:
                 continue
-            testobj.assertEqual(len(report[k]), expected_counts[k],
-                                "(%s not equal)\n%s" %
-                                (k, json.dumps(report, indent=2)))
+            testobj.assertEqual(
+                len(report[k]),
+                expected_counts[k],
+                "(%s not equal)\n%s" % (k, json.dumps(report, indent=2)),
+            )
 
 
 def read_file_as_json_dict(fn):
-    '''Read in filename as json dict'''
+    """Read in filename as json dict"""
     # XXX: consider reading in as stream
     debug("Loading: %s" % fn)
     raw = {}
@@ -899,9 +938,10 @@ def read_file_as_json_dict(fn):
 
 
 def get_snap_manifest(fn):
-    if 'SNAP_USER_COMMON' in os.environ and \
-            os.path.exists(os.environ['SNAP_USER_COMMON']):
-        MKDTEMP_DIR = os.environ['SNAP_USER_COMMON']
+    if "SNAP_USER_COMMON" in os.environ and os.path.exists(
+        os.environ["SNAP_USER_COMMON"]
+    ):
+        MKDTEMP_DIR = os.environ["SNAP_USER_COMMON"]
     else:
         MKDTEMP_DIR = tempfile.gettempdir()
 
@@ -943,20 +983,18 @@ def get_os_codename(os, ver):
         raise ValueError("Could not find '%s' in OS_RELEASE_MAP" % os)
 
     if ver not in OS_RELEASE_MAP[os]:
-        raise ValueError("Could not find '%s' in OS_RELEASE_MAP[%s]" % (ver,
-                                                                        os))
+        raise ValueError("Could not find '%s' in OS_RELEASE_MAP[%s]" % (ver, os))
 
     return OS_RELEASE_MAP[os][ver]
 
 
 def read_snapd_base_declaration():
-    '''Read snapd base declaration'''
+    """Read snapd base declaration"""
     # prefer local copy if it exists, otherwise, use one shipped in the
     # package
     bd_fn = "./reviewtools/data/snapd-base-declaration.yaml"
     if not os.path.exists(bd_fn):
-        bd_fn = resource_filename(__name__,
-                                  'data/snapd-base-declaration.yaml')
+        bd_fn = resource_filename(__name__, "data/snapd-base-declaration.yaml")
         if not os.path.exists(bd_fn):
             error("could not find '%s'" % bd_fn)
     fd = open_file_read(bd_fn)
@@ -977,9 +1015,9 @@ def _add_error(name, errors, msg):
 
 
 def assign_type_to_dict_values(d, assignments):
-    '''For each toplevel key in d, if val is None, use empty value from
+    """For each toplevel key in d, if val is None, use empty value from
        assignments
-    '''
+    """
     for key in assignments:
         if key in d and d[key] is None:
             d[key] = assignments[key]

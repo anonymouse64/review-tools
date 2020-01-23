@@ -45,38 +45,37 @@ import textwrap
 import reviewtools.available as available
 
 import reviewtools.common as common
-from reviewtools.common import (
-    error,
-)
+from reviewtools.common import error
 
 
 def main():
     common.REPORT_OUTPUT = "console"
     parser = argparse.ArgumentParser(
-        prog='snap-updates-available',
+        prog="snap-updates-available",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        description='Show report of available security updates',
-        epilog=textwrap.dedent('''\
+        description="Show report of available security updates",
+        epilog=textwrap.dedent(
+            """\
             Typical usage:
             $ %s --usn-db=/usn/db --store-db=/store/db --seen-db=/seen/db
-        ''' % os.path.basename(sys.argv[0])))
+        """
+            % os.path.basename(sys.argv[0])
+        ),
+    )
 
-    parser.add_argument('--snap', type=str,
-                        help='use manifest.yaml from snap')
-    parser.add_argument('--with-cves',
-                        help='Show referenced CVEs (with --snap)',
-                        action='store_true')
-    parser.add_argument('--check-shared-publishers',
-                        help='Report snaps missing publisher overrides',
-                        action='store_true')
-    parser.add_argument('--usn-db', type=str,
-                        help='USN database (json)')
-    parser.add_argument('--store-db', type=str,
-                        help='Raw store db (json)')
-    parser.add_argument('--seen-db', type=str,
-                        help='Previously seen db (json)')
-    parser.add_argument('--pkg-name', type=str,
-                        help='Limit report to package name')
+    parser.add_argument("--snap", type=str, help="use manifest.yaml from snap")
+    parser.add_argument(
+        "--with-cves", help="Show referenced CVEs (with --snap)", action="store_true"
+    )
+    parser.add_argument(
+        "--check-shared-publishers",
+        help="Report snaps missing publisher overrides",
+        action="store_true",
+    )
+    parser.add_argument("--usn-db", type=str, help="USN database (json)")
+    parser.add_argument("--store-db", type=str, help="Raw store db (json)")
+    parser.add_argument("--seen-db", type=str, help="Previously seen db (json)")
+    parser.add_argument("--pkg-name", type=str, help="Limit report to package name")
     args = parser.parse_args()
 
     # Arg validation
@@ -104,8 +103,9 @@ def main():
         except ValueError as e:
             error(e)
     elif args.store_db:
-        (reports, errors) = available.scan_store(args.usn_db, args.store_db,
-                                                 args.seen_db, args.pkg_name)
+        (reports, errors) = available.scan_store(
+            args.usn_db, args.store_db, args.seen_db, args.pkg_name
+        )
         if len(errors):
             error("Errors encountered when scanning store entries")
 
@@ -113,7 +113,7 @@ def main():
         print(report)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:

@@ -1,4 +1,4 @@
-'''email.py: classes for email module'''
+"""email.py: classes for email module"""
 # Copyright (C) 2018 Canonical Ltd.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -23,49 +23,47 @@ import sys
 email_from_addr = "Snap Store <noreply@canonical.com>"
 
 # Send via local SMTP server
-email_server = 'localhost'
+email_server = "localhost"
 
 
 def sanitize_addr(a):
-    '''Roughly sanitize the email field'''
+    """Roughly sanitize the email field"""
     (name, addr) = parseaddr(a)
 
     # "Foo bar <bad>"
-    if '@' not in addr:
-        return ''
+    if "@" not in addr:
+        return ""
 
     # "Foo bar <bad@>", "Foo bar <bad@@bad>", "Foo bar <@bad>"
-    if addr.count('@') == 1 and (addr.startswith('@') or
-                                 addr.endswith('@')):
-        return ''
+    if addr.count("@") == 1 and (addr.startswith("@") or addr.endswith("@")):
+        return ""
 
     return addr
 
 
 def send(email_to_addr, subj, body, bcc=None):
-    '''Send the email'''
+    """Send the email"""
     global email_server
     global email_from_addr
 
-    if 'RT_SEND_EMAIL' not in os.environ or \
-            os.environ['RT_SEND_EMAIL'] != "1":
+    if "RT_SEND_EMAIL" not in os.environ or os.environ["RT_SEND_EMAIL"] != "1":
         print("From: %s\nTo: %s" % (email_from_addr, email_to_addr))
         if bcc is not None:
             print("Bcc: %s" % bcc)
         print("Subject: %s\n" % (subj))
         print(body)
     else:
-        if 'RT_EMAIL_FROM' in os.environ:
-            email_from_addr = sanitize_addr(os.environ['RT_EMAIL_FROM'])
-            if email_from_addr == '':
+        if "RT_EMAIL_FROM" in os.environ:
+            email_from_addr = sanitize_addr(os.environ["RT_EMAIL_FROM"])
+            if email_from_addr == "":
                 print("Bad from address: '%s'" % email_from_addr)
                 return False
 
-        if 'RT_EMAIL_TO' in os.environ:
+        if "RT_EMAIL_TO" in os.environ:
             addresses = []
-            for i in os.environ['RT_EMAIL_TO'].split(', '):
+            for i in os.environ["RT_EMAIL_TO"].split(", "):
                 addr = sanitize_addr(i.strip())
-                if addr != '':
+                if addr != "":
                     addresses.append(addr)
                 else:
                     print("Bad to address: '%s'" % addr)
@@ -73,11 +71,11 @@ def send(email_to_addr, subj, body, bcc=None):
                 return False
             email_to_addr = ", ".join(addresses)
 
-        if 'RT_EMAIL_BCC' in os.environ:
+        if "RT_EMAIL_BCC" in os.environ:
             addresses = []
-            for i in os.environ['RT_EMAIL_BCC'].split(', '):
+            for i in os.environ["RT_EMAIL_BCC"].split(", "):
                 addr = sanitize_addr(i.strip())
-                if addr != '':
+                if addr != "":
                     addresses.append(addr)
                 else:
                     print("Bad to address: '%s'" % addr)
@@ -85,27 +83,32 @@ def send(email_to_addr, subj, body, bcc=None):
                 return False
             bcc = ", ".join(addresses)
 
-        if 'RT_EMAIL_SERVER' in os.environ:
-            email_server = os.environ['RT_EMAIL_SERVER']
+        if "RT_EMAIL_SERVER" in os.environ:
+            email_server = os.environ["RT_EMAIL_SERVER"]
 
-        if 'RT_EMAIL_NOPROMPT' not in os.environ or \
-                os.environ['RT_EMAIL_NOPROMPT'] != "1":
-            print("Send (subj='%s',to='%s',from='%s',bcc='%s',server='%s')? (y|N) " %
-                  (subj, email_to_addr, email_from_addr, bcc, email_server), end='')
+        if (
+            "RT_EMAIL_NOPROMPT" not in os.environ
+            or os.environ["RT_EMAIL_NOPROMPT"] != "1"
+        ):
+            print(
+                "Send (subj='%s',to='%s',from='%s',bcc='%s',server='%s')? (y|N) "
+                % (subj, email_to_addr, email_from_addr, bcc, email_server),
+                end="",
+            )
             sys.stdout.flush()
             ans = sys.stdin.readline().lower().strip()
-            if ans != 'y' and ans != 'yes':
+            if ans != "y" and ans != "yes":
                 print("aborting email delivery for 'Subject: %s'" % subj)
                 return False
 
         # This can throw many exceptions so the caller needs to catch them and
         # skip updating seen_db
         msg = MIMEText(body)
-        msg['Subject'] = subj
-        msg['From'] = email_from_addr
-        msg['To'] = email_to_addr
+        msg["Subject"] = subj
+        msg["From"] = email_from_addr
+        msg["To"] = email_to_addr
         if bcc is not None:
-            msg['Bcc'] = bcc
+            msg["Bcc"] = bcc
         s = smtplib.SMTP(email_server)
         s.send_message(msg)
         s.quit()

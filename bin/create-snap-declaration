@@ -14,16 +14,17 @@ base_decl_series, base_decl = read_snapd_base_declaration()
 
 def _verify_alias(alias):
     # from snapd validate.go
-    pat = re.compile(r'^[a-zA-Z0-9][-_.a-zA-Z0-9]*$')
+    pat = re.compile(r"^[a-zA-Z0-9][-_.a-zA-Z0-9]*$")
     if not pat.search(alias):
-        raise Exception("'%s' is malformed (must match " % alias +
-                        "'^[a-zA-Z0-9][-_.a-zA-Z0-9]*$')")
-    if 'auto-aliases' in decl and alias in decl['auto-aliases']:
+        raise Exception(
+            "'%s' is malformed (must match " % alias + "'^[a-zA-Z0-9][-_.a-zA-Z0-9]*$')"
+        )
+    if "auto-aliases" in decl and alias in decl["auto-aliases"]:
         raise Exception("'%s' should only be declared once" % alias)
 
 
 def add_alias(e):
-    tmp = e.split(':')
+    tmp = e.split(":")
     if len(tmp) != 2:
         raise Exception("'%s' should be '<alias>:<command>'" % e)
     alias = tmp[0]
@@ -31,29 +32,28 @@ def add_alias(e):
     command = tmp[1]
     _verify_alias(command)
 
-    if 'auto-aliases' not in decl:
-        decl['auto-aliases'] = []
+    if "auto-aliases" not in decl:
+        decl["auto-aliases"] = []
 
-    decl['auto-aliases'].append({"name": alias, "target": command})
+    decl["auto-aliases"].append({"name": alias, "target": command})
 
 
 def _verify_snap_id(id):
     # from snapd ifacedecls.go
-    pat = re.compile(r'^[a-z0-9A-Z]{32}$')
+    pat = re.compile(r"^[a-z0-9A-Z]{32}$")
     if not pat.search(id):
-        raise Exception("'%s' is malformed (must match '^[a-z0-9A-Z]{32}$')"
-                        % id)
-    if 'refresh-control' in decl and id in decl['refresh-control']:
+        raise Exception("'%s' is malformed (must match '^[a-z0-9A-Z]{32}$')" % id)
+    if "refresh-control" in decl and id in decl["refresh-control"]:
         raise Exception("'%s' should only be declared once" % id)
 
 
 def add_refresh_control(id):
     _verify_snap_id(id)
 
-    if 'refresh-control' not in decl:
-        decl['refresh-control'] = []
+    if "refresh-control" not in decl:
+        decl["refresh-control"] = []
 
-    decl['refresh-control'].append(id)
+    decl["refresh-control"].append(id)
 
 
 def _verify_interface(iface):
@@ -95,32 +95,35 @@ def add_interface_dbus(side, name):
     if side not in decl:
         decl[side] = {}
 
-    iface = 'dbus'
+    iface = "dbus"
     if iface not in decl[side]:
         decl[side][iface] = {}
 
-    if side == 'slots':
-        key = 'deny-auto-connection'
+    if side == "slots":
+        key = "deny-auto-connection"
         if key not in decl[side][iface]:
             decl[side][iface][key] = bool2str(True)
 
-        key = 'allow-connection'
+        key = "allow-connection"
         if key not in decl[side][iface]:
             decl[side][iface][key] = []
-        decl[side][iface][key].append({'slot-attributes': {'name': name}})
-    elif side == 'plugs':
-        key = 'allow-auto-connection'
+        decl[side][iface][key].append({"slot-attributes": {"name": name}})
+    elif side == "plugs":
+        key = "allow-auto-connection"
         if key not in decl[side][iface]:
             decl[side][iface][key] = []
 
         for c in decl[side][iface][key]:
-            ckey = 'slot-attributes'
-            if ckey in c and 'name' in c[ckey] and name == c[ckey]['name']:
+            ckey = "slot-attributes"
+            if ckey in c and "name" in c[ckey] and name == c[ckey]["name"]:
                 raise Exception("'%s' already specified for '%s'" % (ckey, name))
 
-        decl[side][iface][key].append({
-            'slot-attributes': {'name': name},
-            'plug-attributes': {'name': '$SLOT(name)'}})
+        decl[side][iface][key].append(
+            {
+                "slot-attributes": {"name": name},
+                "plug-attributes": {"name": "$SLOT(name)"},
+            }
+        )
 
 
 def add_missing():
@@ -143,30 +146,34 @@ def add_missing():
                 print("INFO: skipping base alternation constraints")
                 continue
 
-            for cstr in ['installation', 'connection', 'auto-connection']:
+            for cstr in ["installation", "connection", "auto-connection"]:
                 in_base = False
                 cstr_b = ""
-                for perm in ['allow', 'deny']:
-                    cstr_b = '%s-%s' % (perm, cstr)
+                for perm in ["allow", "deny"]:
+                    cstr_b = "%s-%s" % (perm, cstr)
                     if cstr_b in base_decl[side][iface]:
                         in_base = True
                         break
 
                 cstr_s = "allow-%s" % cstr
                 if in_base and cstr_s not in decl[side][iface]:
-                    print("WARN: adding missing '%s' for '%s' from base decl"
-                          % (cstr, iface))
-                    decl[side][iface][cstr_b] = \
-                        bool2str(base_decl[side][iface][cstr_b])
+                    print(
+                        "WARN: adding missing '%s' for '%s' from base decl"
+                        % (cstr, iface)
+                    )
+                    decl[side][iface][cstr_b] = bool2str(base_decl[side][iface][cstr_b])
                     if isinstance(decl[side][iface][cstr_b], dict):
                         for key in decl[side][iface][cstr_b]:
-                            if key.endswith('-snap-type'):
-                                decl[side][iface][cstr_b][key] = ["<ADJUST_TO_SNAP_TYPE_OF_SNAP, eg 'app'>"]
+                            if key.endswith("-snap-type"):
+                                decl[side][iface][cstr_b][key] = [
+                                    "<ADJUST_TO_SNAP_TYPE_OF_SNAP, eg 'app'>"
+                                ]
 
 
 def print_decl():
     def _print_key(key):
         print(json.dumps(decl[key], sort_keys=True, indent=2))
+
     if "slots" in decl:
         print("Paste into 'slots':")
         _print_key("slots")
@@ -179,7 +186,7 @@ def print_decl():
         # compatibility
         print("Paste into 'Auto aliases' (compat):")
         aliases = []
-        for item in decl['auto-aliases']:
+        for item in decl["auto-aliases"]:
             aliases.append(item["name"])
         aliases.sort()
         print(json.dumps(aliases, sort_keys=True, indent=2))
@@ -206,81 +213,106 @@ def print_review_text():
                 if key in decl[side][iface][const]:
                     for attr in decl[side][iface][const][key]:
                         # dbus
-                        if side == 'slots' and \
-                                iface == 'dbus' and \
-                                const == 'allow-connection' and \
-                                key == 'slot-attributes' and \
-                                attr == 'name':
+                        if (
+                            side == "slots"
+                            and iface == "dbus"
+                            and const == "allow-connection"
+                            and key == "slot-attributes"
+                            and attr == "name"
+                        ):
                             _print_header()
-                            print("Granting use of the well-known DBus name '%s' to this snap.\n" % decl[side][iface][const][key][attr])
+                            print(
+                                "Granting use of the well-known DBus name '%s' to this snap.\n"
+                                % decl[side][iface][const][key][attr]
+                            )
 
 
 def main():
     parser = argparse.ArgumentParser(
-        prog='create-snap-declaration',
+        prog="create-snap-declaration",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        description='Output data suitable for adding to snap declaration')
-    parser.add_argument('--slot-installation', type=str,
-                        help='list of interfaces to allow installation')
-    parser.add_argument('--slot-connection', type=str,
-                        help='list of interfaces to allow connection')
-    parser.add_argument('--slot-dbus-connection', type=str,
-                        help='list of well-known DBus names to allow')
-    parser.add_argument('--plug-dbus-auto-connection', type=str,
-                        help='list of well-known DBus names to allow')
-    parser.add_argument('--slot-auto-connection', type=str,
-                        help='list of interfaces to allow auto-connection')
-    parser.add_argument('--plug-installation', type=str,
-                        help='list of interfaces to allow installation')
-    parser.add_argument('--plug-connection', type=str,
-                        help='list of interfaces to allow connection')
-    parser.add_argument('--plug-auto-connection', type=str,
-                        help='list of interfaces to allow auto-connection')
-    parser.add_argument('--auto-aliases', type=str,
-                        help='list of auto-aliases '
-                             '(<alias name>:<target command>)')
-    parser.add_argument('--refresh-control', type=str,
-                        help='list of snap IDs to be gated by this snap')
+        description="Output data suitable for adding to snap declaration",
+    )
+    parser.add_argument(
+        "--slot-installation", type=str, help="list of interfaces to allow installation"
+    )
+    parser.add_argument(
+        "--slot-connection", type=str, help="list of interfaces to allow connection"
+    )
+    parser.add_argument(
+        "--slot-dbus-connection",
+        type=str,
+        help="list of well-known DBus names to allow",
+    )
+    parser.add_argument(
+        "--plug-dbus-auto-connection",
+        type=str,
+        help="list of well-known DBus names to allow",
+    )
+    parser.add_argument(
+        "--slot-auto-connection",
+        type=str,
+        help="list of interfaces to allow auto-connection",
+    )
+    parser.add_argument(
+        "--plug-installation", type=str, help="list of interfaces to allow installation"
+    )
+    parser.add_argument(
+        "--plug-connection", type=str, help="list of interfaces to allow connection"
+    )
+    parser.add_argument(
+        "--plug-auto-connection",
+        type=str,
+        help="list of interfaces to allow auto-connection",
+    )
+    parser.add_argument(
+        "--auto-aliases",
+        type=str,
+        help="list of auto-aliases " "(<alias name>:<target command>)",
+    )
+    parser.add_argument(
+        "--refresh-control", type=str, help="list of snap IDs to be gated by this snap"
+    )
     args = parser.parse_args()
 
     if args.slot_installation:
-        for i in args.slot_installation.split(','):
+        for i in args.slot_installation.split(","):
             add_interface("slots", i, "allow-installation", True)
 
     if args.slot_connection:
-        for i in args.slot_connection.split(','):
+        for i in args.slot_connection.split(","):
             add_interface("slots", i, "allow-connection", True)
 
     if args.slot_auto_connection:
-        for i in args.slot_auto_connection.split(','):
+        for i in args.slot_auto_connection.split(","):
             add_interface("slots", i, "allow-auto-connection", True)
 
     if args.plug_installation:
-        for i in args.plug_installation.split(','):
+        for i in args.plug_installation.split(","):
             add_interface("plugs", i, "allow-installation", True)
 
     if args.plug_connection:
-        for i in args.plug_connection.split(','):
+        for i in args.plug_connection.split(","):
             add_interface("plugs", i, "allow-connection", True)
 
     if args.plug_auto_connection:
-        for i in args.plug_auto_connection.split(','):
+        for i in args.plug_auto_connection.split(","):
             add_interface("plugs", i, "allow-auto-connection", True)
 
     if args.auto_aliases:
-        for i in args.auto_aliases.split(','):
+        for i in args.auto_aliases.split(","):
             add_alias(i)
 
     if args.refresh_control:
-        for i in args.refresh_control.split(','):
+        for i in args.refresh_control.split(","):
             add_refresh_control(i)
 
     if args.slot_dbus_connection:
-        for i in args.slot_dbus_connection.split(','):
+        for i in args.slot_dbus_connection.split(","):
             add_interface_dbus("slots", i)
 
     if args.plug_dbus_auto_connection:
-        for i in args.plug_dbus_auto_connection.split(','):
+        for i in args.plug_dbus_auto_connection.split(","):
             add_interface_dbus("plugs", i)
 
     add_missing()
@@ -290,7 +322,7 @@ def main():
     print_review_text()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:

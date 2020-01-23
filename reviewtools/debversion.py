@@ -1,4 +1,4 @@
-'''debversion.py: classes for debversion module'''
+"""debversion.py: classes for debversion module"""
 # Copyright (C) 2018 Canonical Ltd.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,12 +18,14 @@ import struct
 
 
 # reimplemented from lib/dpkg/version.c
-class DebVersion():
-    valid_pat = re.compile(r'^((\d+):)?'              # epoch
-                           '([A-Za-z0-9.+:~-]+?)'     # upstream
-                           '(-([A-Za-z0-9+.~]+))?$')  # debian
-    epoch_pat = re.compile(r'^\d+:')
-    revision_pat = re.compile(r'^[a-zA-Z0-9+.~]+$')
+class DebVersion:
+    valid_pat = re.compile(
+        r"^((\d+):)?"  # epoch
+        "([A-Za-z0-9.+:~-]+?)"  # upstream
+        "(-([A-Za-z0-9+.~]+))?$"
+    )  # debian
+    epoch_pat = re.compile(r"^\d+:")
+    revision_pat = re.compile(r"^[a-zA-Z0-9+.~]+$")
 
     def __init__(self, version):
         if not self.valid_pat.search(str(version)):
@@ -35,16 +37,16 @@ class DebVersion():
         tmp = version
         # if version starts with '<int>:' then int is an epoch
         if self.epoch_pat.search(tmp):
-            self.epoch = int(tmp.split(':')[0])
-            tmp = tmp.split(':', 1)[1]
+            self.epoch = int(tmp.split(":")[0])
+            tmp = tmp.split(":", 1)[1]
 
         # if version has a '-', then (the last) may be the revision
         self.revision = "0"
-        if tmp.count('-') > 0:
-            poss_revision = tmp.split('-')[-1]
+        if tmp.count("-") > 0:
+            poss_revision = tmp.split("-")[-1]
             if self.revision_pat.search(poss_revision):
                 self.revision = poss_revision
-                self.version = tmp.rsplit('-', 1)[0]
+                self.version = tmp.rsplit("-", 1)[0]
             else:
                 self.version = tmp
         else:
@@ -61,27 +63,26 @@ class DebVersion():
         return self.full_version
 
     def validate(self):
-        '''Check a couple extra things not caught by valid_pat'''
+        """Check a couple extra things not caught by valid_pat"""
         # https://www.debian.org/doc/debian-policy/#s-f-version
-        if not self.epoch_pat.search(self.full_version) and \
-                self.version.count(':') > 0:
-            raise ValueError("%s is invalid: epoch in not a number" %
-                             self.full_version)
+        if not self.epoch_pat.search(self.full_version) and self.version.count(":") > 0:
+            raise ValueError("%s is invalid: epoch in not a number" % self.full_version)
 
         # see if epoch is larget than MAX_INT
-        if self.epoch > 2 ** (struct.Struct('i').size * 8 - 1) - 1:
-            raise ValueError("%s is invalid: epoch is too large" %
-                             self.full_version)
+        if self.epoch > 2 ** (struct.Struct("i").size * 8 - 1) - 1:
+            raise ValueError("%s is invalid: epoch is too large" % self.full_version)
 
         if self.version == "":
             # 1:-2
-            raise ValueError("%s is invalid: upstream version is empty" %
-                             self.full_version)
+            raise ValueError(
+                "%s is invalid: upstream version is empty" % self.full_version
+            )
 
-        if self.revision == "0" and self.version.count('-') > 1:
+        if self.revision == "0" and self.version.count("-") > 1:
             # 1-2-
-            raise ValueError("%s is invalid: revision version is empty" %
-                             self.full_version)
+            raise ValueError(
+                "%s is invalid: revision version is empty" % self.full_version
+            )
 
 
 def _order(c):
@@ -89,7 +90,7 @@ def _order(c):
         return 0
     elif c.isalpha():
         return ord(c)
-    elif c == '~':
+    elif c == "~":
         return -1
     elif c != "":
         return ord(c) + 256
@@ -107,8 +108,9 @@ def _verrevcomp(a, b):
     bidx = 0
     while aidx < len(a) or bidx < len(b):
         first_diff = 0
-        while (aidx < len(a) and not a[aidx].isdigit()) or \
-                (bidx < len(b) and not b[bidx].isdigit()):
+        while (aidx < len(a) and not a[aidx].isdigit()) or (
+            bidx < len(b) and not b[bidx].isdigit()
+        ):
             ac = 0
             if aidx < len(a):
                 ac = int(_order(a[aidx]))
@@ -126,8 +128,9 @@ def _verrevcomp(a, b):
             aidx += 1
         while bidx < len(b) and b[bidx] == "0":
             bidx += 1
-        while aidx < len(a) and a[aidx].isdigit() and \
-                bidx < len(b) and b[bidx].isdigit():
+        while (
+            aidx < len(a) and a[aidx].isdigit() and bidx < len(b) and b[bidx].isdigit()
+        ):
             if first_diff == 0:
                 first_diff = int(a[aidx]) - int(b[bidx])
             aidx += 1

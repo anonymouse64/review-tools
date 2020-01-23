@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-'''snap-check-declaration: perform snap declaration checks'''
+"""snap-check-declaration: perform snap declaration checks"""
 #
 # Copyright (C) 2013-2016 Canonical Ltd.
 #

@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-'''snap-check-lint: perform snap lint checks'''
+"""snap-check-lint: perform snap lint checks"""
 #
 # Copyright (C) 2013-2016 Canonical Ltd.
 #

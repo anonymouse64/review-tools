@@ -1,4 +1,4 @@
-'''sr_tests.py: common setup and tests for test modules'''
+"""sr_tests.py: common setup and tests for test modules"""
 #
 # Copyright (C) 2013-2016 Canonical Ltd.
 #
@@ -20,9 +20,7 @@ import yaml
 
 from unittest.mock import patch
 from unittest import TestCase
-from reviewtools.common import (
-    check_results as common_check_results
-)
+from reviewtools.common import check_results as common_check_results
 
 # These should be set in the test cases
 TEST_SNAP_YAML = ""
@@ -37,37 +35,37 @@ TEST_UNSQUASHFS_LLS = ""
 # Mock override functions
 #
 def _mock_func(self):
-    '''Fake test function'''
+    """Fake test function"""
     return
 
 
 def _extract_snap_yaml(self):
-    '''Pretend we read the snap.yaml file'''
+    """Pretend we read the snap.yaml file"""
     return io.StringIO(TEST_SNAP_YAML)
 
 
 def _extract_snap_manifest_yaml(self):
-    '''Pretend we read the snap/manifest.yaml file'''
+    """Pretend we read the snap/manifest.yaml file"""
     return io.StringIO(TEST_SNAP_MANIFEST_YAML)
 
 
 def _path_join(self, d, fn):
-    '''Pretend we have a tempdir'''
+    """Pretend we have a tempdir"""
     return os.path.join("/fake", fn)
 
 
 def _pkgfmt_type(self):
-    '''Pretend we found the pkgfmt type'''
+    """Pretend we found the pkgfmt type"""
     return TEST_PKGFMT_TYPE
 
 
 def __get_unpack_dir(self):
-    '''Pretend we found the unpack dir'''
+    """Pretend we found the unpack dir"""
     return TEST_UNPACK_DIR
 
 
 def _unsquashfs_lls(self, fn):
-    '''Pretend we ran unsquashfs -lls fn'''
+    """Pretend we ran unsquashfs -lls fn"""
     return (0, TEST_UNSQUASHFS_LLS)
 
 
@@ -76,47 +74,53 @@ def create_patches():
     # Mock patching. Don't use decorators but instead patch in setUp() of the
     # child.
     patches = []
-    patches.append(patch('reviewtools.common.Review._check_package_exists',
-                   _mock_func))
-    patches.append(patch(
-        'reviewtools.sr_common.SnapReview._extract_snap_yaml',
-        _extract_snap_yaml))
-    patches.append(patch(
-        'reviewtools.sr_common.SnapReview._extract_snap_manifest_yaml',
-        _extract_snap_manifest_yaml))
-    patches.append(patch(
-        'reviewtools.sr_common.SnapReview._path_join',
-        _path_join))
-    patches.append(patch('reviewtools.common.unpack_pkg', _mock_func))
-    patches.append(patch('reviewtools.common.raw_unpack_pkg', _mock_func))
-    patches.append(patch('reviewtools.sr_common.SnapReview._list_all_files',
-                   _mock_func))
-    patches.append(patch(
-        'reviewtools.sr_common.SnapReview._list_all_compiled_binaries',
-        _mock_func))
+    patches.append(patch("reviewtools.common.Review._check_package_exists", _mock_func))
+    patches.append(
+        patch("reviewtools.sr_common.SnapReview._extract_snap_yaml", _extract_snap_yaml)
+    )
+    patches.append(
+        patch(
+            "reviewtools.sr_common.SnapReview._extract_snap_manifest_yaml",
+            _extract_snap_manifest_yaml,
+        )
+    )
+    patches.append(patch("reviewtools.sr_common.SnapReview._path_join", _path_join))
+    patches.append(patch("reviewtools.common.unpack_pkg", _mock_func))
+    patches.append(patch("reviewtools.common.raw_unpack_pkg", _mock_func))
+    patches.append(
+        patch("reviewtools.sr_common.SnapReview._list_all_files", _mock_func)
+    )
+    patches.append(
+        patch(
+            "reviewtools.sr_common.SnapReview._list_all_compiled_binaries", _mock_func
+        )
+    )
 
-    patches.append(patch('reviewtools.common.Review._list_all_files',
-                   _mock_func))
-    patches.append(patch(
-        'reviewtools.common.Review._list_all_compiled_binaries',
-        _mock_func))
+    patches.append(patch("reviewtools.common.Review._list_all_files", _mock_func))
+    patches.append(
+        patch("reviewtools.common.Review._list_all_compiled_binaries", _mock_func)
+    )
 
     # sr_common
-    patches.append(patch('reviewtools.sr_common.SnapReview._get_unpack_dir',
-                   __get_unpack_dir))
-    patches.append(patch("reviewtools.sr_common.SnapReview._pkgfmt_type",
-                   _pkgfmt_type))
+    patches.append(
+        patch("reviewtools.sr_common.SnapReview._get_unpack_dir", __get_unpack_dir)
+    )
+    patches.append(patch("reviewtools.sr_common.SnapReview._pkgfmt_type", _pkgfmt_type))
 
     # sr_security
-    patches.append(patch(
-        "reviewtools.sr_security.SnapReviewSecurity._unsquashfs_lls",
-        _unsquashfs_lls))
+    patches.append(
+        patch(
+            "reviewtools.sr_security.SnapReviewSecurity._unsquashfs_lls",
+            _unsquashfs_lls,
+        )
+    )
 
     return patches
 
 
 class TestSnapReview(TestCase):
     """Tests for the snap review tool."""
+
     def __init__(self, *args):
         TestCase.__init__(self, *args)
         self._reset_test_data()
@@ -141,35 +145,37 @@ class TestSnapReview(TestCase):
 
     def _update_test_snap_yaml(self):
         global TEST_SNAP_YAML
-        TEST_SNAP_YAML = yaml.dump(self.test_snap_yaml,
-                                   default_flow_style=False,
-                                   indent=4)
+        TEST_SNAP_YAML = yaml.dump(
+            self.test_snap_yaml, default_flow_style=False, indent=4
+        )
 
     def _update_test_snap_manifest_yaml(self):
         global TEST_SNAP_MANIFEST_YAML
-        TEST_SNAP_MANIFEST_YAML = yaml.dump(self.test_snap_manifest_yaml,
-                                            default_flow_style=False,
-                                            indent=4)
+        TEST_SNAP_MANIFEST_YAML = yaml.dump(
+            self.test_snap_manifest_yaml, default_flow_style=False, indent=4
+        )
 
     def _update_test_name(self):
         self.test_name = "%s.origin_%s_%s.snap" % (
             self.test_snap_yaml["name"],
             self.test_snap_yaml["version"],
-            self.test_snap_yaml["architectures"][0])
+            self.test_snap_yaml["architectures"][0],
+        )
 
-    def check_results(self, report,
-                      expected_counts={'info': 1, 'warn': 0, 'error': 0},
-                      expected=None):
+    def check_results(
+        self, report, expected_counts={"info": 1, "warn": 0, "error": 0}, expected=None
+    ):
         common_check_results(self, report, expected_counts, expected)
 
-    def check_manual_review(self, report, check_name,
-                            result_type='error', manual_review=True):
+    def check_manual_review(
+        self, report, check_name, result_type="error", manual_review=True
+    ):
         result = report[result_type][check_name]
-        self.assertEqual(result['manual_review'], manual_review)
+        self.assertEqual(result["manual_review"], manual_review)
 
     def set_test_snap_yaml(self, key, value):
-        '''Set key in meta/snap.yaml to value. If value is None, remove
-           key'''
+        """Set key in meta/snap.yaml to value. If value is None, remove
+           key"""
         if value is None:
             if key in self.test_snap_yaml:
                 self.test_snap_yaml.pop(key, None)
@@ -178,8 +184,8 @@ class TestSnapReview(TestCase):
         self._update_test_snap_yaml()
 
     def set_test_snap_manifest_yaml(self, key, value):
-        '''Set key in snap/manifest.yaml to value. If value is None, remove
-           key'''
+        """Set key in snap/manifest.yaml to value. If value is None, remove
+           key"""
         if value is None:
             if key in self.test_snap_manifest_yaml:
                 self.test_snap_manifest_yaml.pop(key, None)
@@ -202,14 +208,14 @@ class TestSnapReview(TestCase):
         TEST_UNSQUASHFS_LLS = s
 
     def setUp(self):
-        '''Make sure our patches are applied everywhere'''
+        """Make sure our patches are applied everywhere"""
         patches = create_patches()
         for p in patches:
             p.start()
             self.addCleanup(p.stop)
 
     def tearDown(self):
-        '''Make sure we reset everything to known good values'''
+        """Make sure we reset everything to known good values"""
         global TEST_SNAP_YAML
         TEST_SNAP_YAML = ""
         global TEST_SNAP_MANIFEST_YAML

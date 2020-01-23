@@ -1,4 +1,4 @@
-'''sr_declaration.py: snap declaration'''
+"""sr_declaration.py: snap declaration"""
 #
 # Copyright (C) 2014-2019 Canonical Ltd.
 #
@@ -24,38 +24,39 @@ import re
 
 
 class SnapDeclarationException(SnapReviewException):
-    '''This class represents SnapDeclaration exceptions'''
+    """This class represents SnapDeclaration exceptions"""
 
 
 class SnapReviewDeclaration(SnapReview):
-    '''This class represents snap declaration reviews'''
+    """This class represents snap declaration reviews"""
+
     def __init__(self, fn, overrides=None):
-        SnapReview.__init__(self, fn, "declaration-snap-v2",
-                            overrides=overrides)
+        SnapReview.__init__(self, fn, "declaration-snap-v2", overrides=overrides)
 
         self._verify_declaration(self.base_declaration, base=True)
 
         self.on_store = None
-        if overrides is not None and 'snap_on_store' in overrides:
-            if not isinstance(overrides['snap_on_store'], str):
+        if overrides is not None and "snap_on_store" in overrides:
+            if not isinstance(overrides["snap_on_store"], str):
                 raise ValueError("'--on-store' should be a str")
-            self.on_store = overrides['snap_on_store']
+            self.on_store = overrides["snap_on_store"]
 
         self.on_brand = None
-        if overrides is not None and 'snap_on_brand' in overrides:
-            if not isinstance(overrides['snap_on_brand'], str):
+        if overrides is not None and "snap_on_brand" in overrides:
+            if not isinstance(overrides["snap_on_brand"], str):
                 raise ValueError("'--on-brand' should be a str")
-            self.on_brand = overrides['snap_on_brand']
+            self.on_brand = overrides["snap_on_brand"]
 
         self.snap_declaration = None
-        if overrides is not None and ('snap_decl_plugs' in overrides or
-                                      'snap_decl_slots' in overrides):
+        if overrides is not None and (
+            "snap_decl_plugs" in overrides or "snap_decl_slots" in overrides
+        ):
             self.snap_declaration = {}
-            self.snap_declaration = {'plugs': {}, 'slots': {}}
-            if 'snap_decl_plugs' in overrides:
-                self.snap_declaration['plugs'] = overrides['snap_decl_plugs']
-            if 'snap_decl_slots' in overrides:
-                self.snap_declaration['slots'] = overrides['snap_decl_slots']
+            self.snap_declaration = {"plugs": {}, "slots": {}}
+            if "snap_decl_plugs" in overrides:
+                self.snap_declaration["plugs"] = overrides["snap_decl_plugs"]
+            if "snap_decl_slots" in overrides:
+                self.snap_declaration["slots"] = overrides["snap_decl_slots"]
 
             self._verify_declaration(self.snap_declaration, base=False)
 
@@ -72,7 +73,8 @@ class SnapReviewDeclaration(SnapReview):
         return s
 
     def _verify_declaration(self, decl, base=False):
-        '''Verify declaration'''
+        """Verify declaration"""
+
         def malformed(name, s, base=False):
             pre = ""
             if base:
@@ -80,60 +82,60 @@ class SnapReviewDeclaration(SnapReview):
             err = "%sdeclaration malformed (%s)" % (pre, s)
             if base:
                 raise SnapDeclarationException(err)
-            self._add_result('error', name, err)
+            self._add_result("error", name, err)
 
-        def verify_constraint(cstr, decl, key, iface, index, allowed,
-                              has_alternates):
+        def verify_constraint(cstr, decl, key, iface, index, allowed, has_alternates):
             found_errors = False
             if self.is_bool(cstr):
                 if not base:
-                    self._add_result('info', n, s)
+                    self._add_result("info", n, s)
                 return False
             elif not isinstance(cstr, dict):
-                malformed(n, "%s not True, False or dict" %
-                          constraint, base)
+                malformed(n, "%s not True, False or dict" % constraint, base)
                 return False
 
             for cstr_key in cstr:
                 if cstr_key not in allowed:
-                    name = self._get_check_name('valid_%s' % key, app=iface,
-                                                extra="%s_%s" % (constraint,
-                                                                 cstr_key))
-                    malformed(name, "unknown constraint key '%s'" % cstr_key,
-                              base)
+                    name = self._get_check_name(
+                        "valid_%s" % key,
+                        app=iface,
+                        extra="%s_%s" % (constraint, cstr_key),
+                    )
+                    malformed(name, "unknown constraint key '%s'" % cstr_key, base)
                     found_errors = True
 
             if found_errors:
                 return False
 
             cstr_bools = ["on-classic"]
-            cstr_lists = ["plug-snap-type",
-                          "slot-snap-type",
-                          "plug-publisher-id"
-                          "slot-publisher-id",
-                          "plug-snap-id",
-                          "slot-snap-id",
-                          "on-store",
-                          "on-brand",
-                          ]
+            cstr_lists = [
+                "plug-snap-type",
+                "slot-snap-type",
+                "plug-publisher-id" "slot-publisher-id",
+                "plug-snap-id",
+                "slot-snap-id",
+                "on-store",
+                "on-brand",
+            ]
             cstr_dicts = ["plug-attributes", "slot-attributes"]
             cstr_strs = ["plugs-per-slot", "slots-per-plug"]
             for cstr_key in cstr:
-                badn = self._get_check_name('valid_%s' % key, app=iface,
-                                            extra="%s_%s" % (constraint,
-                                                             cstr_key))
+                badn = self._get_check_name(
+                    "valid_%s" % key, app=iface, extra="%s_%s" % (constraint, cstr_key)
+                )
                 if cstr_key in cstr_bools:
                     # snap declarations from the store express bools as
                     # strings
                     if isinstance(cstr[cstr_key], str):
-                        cstr[cstr_key] = \
-                            self.str2bool(cstr[cstr_key])
+                        cstr[cstr_key] = self.str2bool(cstr[cstr_key])
                         if has_alternates:
-                            decl[key][iface][constraint][index][cstr_key] = \
-                                self.str2bool(decl[key][iface][constraint][index][cstr_key])
+                            decl[key][iface][constraint][index][
+                                cstr_key
+                            ] = self.str2bool(
+                                decl[key][iface][constraint][index][cstr_key]
+                            )
                     if not self.is_bool(cstr[cstr_key]):
-                        malformed(badn, "'%s' not True or False" % cstr_key,
-                                  base)
+                        malformed(badn, "'%s' not True or False" % cstr_key, base)
                         found_errors = True
                 elif cstr_key in cstr_strs:
                     if not isinstance(cstr[cstr_key], str):
@@ -146,8 +148,11 @@ class SnapReviewDeclaration(SnapReview):
                     else:
                         for entry in cstr[cstr_key]:
                             if not isinstance(entry, str):
-                                malformed(badn, "'%s' in '%s' not a string" %
-                                          (entry, cstr_key), base)
+                                malformed(
+                                    badn,
+                                    "'%s' in '%s' not a string" % (entry, cstr_key),
+                                    base,
+                                )
                                 found_errors = True
                 elif cstr_key in cstr_dicts:
                     if not isinstance(cstr[cstr_key], dict):
@@ -155,20 +160,19 @@ class SnapReviewDeclaration(SnapReview):
                         found_errors = True
                     else:
                         for attrib in cstr[cstr_key]:
-                            bn = self._get_check_name('valid_%s' % key,
-                                                      app=iface,
-                                                      extra="%s_%s" %
-                                                      (constraint, cstr_key))
+                            bn = self._get_check_name(
+                                "valid_%s" % key,
+                                app=iface,
+                                extra="%s_%s" % (constraint, cstr_key),
+                            )
                             if iface not in self.interfaces_attribs:
-                                malformed(bn, "unknown attribute '%s'" %
-                                          attrib,
-                                          base)
+                                malformed(bn, "unknown attribute '%s'" % attrib, base)
                                 found_errors = True
                                 continue
 
                             found_iface_attr = False
                             for tmp in self.interfaces_attribs[iface]:
-                                known, side = tmp.split('/')
+                                known, side = tmp.split("/")
                                 if attrib != known:
                                     continue
                                 spec_side = side[:-1]
@@ -179,11 +183,17 @@ class SnapReviewDeclaration(SnapReview):
                                 # snap declarations from the store express
                                 # bools as strings
                                 if isinstance(cstr[cstr_key][attrib], str):
-                                    cstr[cstr_key][attrib] = \
-                                        self.str2bool(cstr[cstr_key][attrib])
+                                    cstr[cstr_key][attrib] = self.str2bool(
+                                        cstr[cstr_key][attrib]
+                                    )
                                     if has_alternates:
-                                        decl[key][iface][constraint][index][cstr_key][attrib] = \
-                                            self.str2bool(decl[key][iface][constraint][index][cstr_key][attrib])
+                                        decl[key][iface][constraint][index][cstr_key][
+                                            attrib
+                                        ] = self.str2bool(
+                                            decl[key][iface][constraint][index][
+                                                cstr_key
+                                            ][attrib]
+                                        )
 
                                 attr_type = cstr[cstr_key][attrib]
 
@@ -194,109 +204,118 @@ class SnapReviewDeclaration(SnapReview):
                                 # a string (since in the decl one can specify a
                                 # string as a match/regex for something in the
                                 # list)
-                                if not isinstance(attr_type,
-                                                  type(self.interfaces_attribs[iface][tmp])) \
-                                    and not (isinstance(self.interfaces_attribs[iface][tmp], list) and
-                                             isinstance(attr_type, str)):
-                                    malformed(bn,
-                                              "wrong type '%s' for attribute '%s'"
-                                              % (attr_type, attrib),
-                                              base)
+                                if not isinstance(
+                                    attr_type, type(self.interfaces_attribs[iface][tmp])
+                                ) and not (
+                                    isinstance(
+                                        self.interfaces_attribs[iface][tmp], list
+                                    )
+                                    and isinstance(attr_type, str)
+                                ):
+                                    malformed(
+                                        bn,
+                                        "wrong type '%s' for attribute '%s'"
+                                        % (attr_type, attrib),
+                                        base,
+                                    )
                                     found_errors = True
                                     break
 
                             if not found_iface_attr:
-                                malformed(bn,
-                                          "attribute '%s' wrong for '%ss'" %
-                                          (attrib, cstr_key[:4]),
-                                          base)
+                                malformed(
+                                    bn,
+                                    "attribute '%s' wrong for '%ss'"
+                                    % (attrib, cstr_key[:4]),
+                                    base,
+                                )
                                 found_errors = True
 
-                if not found_errors and \
-                        (cstr_key == "plug-publisher-id" or
-                         cstr_key == "slot-publisher-id"):
+                if not found_errors and (
+                    cstr_key == "plug-publisher-id" or cstr_key == "slot-publisher-id"
+                ):
                     for pubid in cstr[cstr_key]:
                         if not pub_pat.search(pubid):
-                            malformed(n, "invalid format for publisher id '%s'"
-                                      % pubid)
+                            malformed(n, "invalid format for publisher id '%s'" % pubid)
                             found_errors = True
                             break
-                        if pubid.startswith('$'):
-                            if cstr_key == "plug-publisher-id" and \
-                                    pubid != "$SLOT_PUBLISHER_ID":
-                                malformed(n,
-                                          "invalid publisher id '%s'" % pubid)
+                        if pubid.startswith("$"):
+                            if (
+                                cstr_key == "plug-publisher-id"
+                                and pubid != "$SLOT_PUBLISHER_ID"
+                            ):
+                                malformed(n, "invalid publisher id '%s'" % pubid)
                                 found_errors = True
                                 break
-                            elif cstr_key == "slot-publisher-id" and \
-                                    pubid != "$PLUG_PUBLISHER_ID":
-                                malformed(n,
-                                          "invalid publisher id '%s'" % pubid)
+                            elif (
+                                cstr_key == "slot-publisher-id"
+                                and pubid != "$PLUG_PUBLISHER_ID"
+                            ):
+                                malformed(n, "invalid publisher id '%s'" % pubid)
                                 found_errors = True
                                 break
-                elif not found_errors and \
-                        (cstr_key == "plug-snap-id" or
-                         cstr_key == "slot-snap-id"):
+                elif not found_errors and (
+                    cstr_key == "plug-snap-id" or cstr_key == "slot-snap-id"
+                ):
                     for id in cstr[cstr_key]:
                         if not id_pat.search(id):
-                            malformed(n,
-                                      "invalid format for snap id '%s'" % id)
+                            malformed(n, "invalid format for snap id '%s'" % id)
                             found_errors = True
                             break
-                elif not found_errors and \
-                        (cstr_key == "plug-snap-type" or
-                         cstr_key == "slot-snap-type"):
+                elif not found_errors and (
+                    cstr_key == "plug-snap-type" or cstr_key == "slot-snap-type"
+                ):
                     for snap_type in cstr[cstr_key]:
                         if snap_type not in self.valid_snap_types:
                             malformed(n, "invalid snap type '%s'" % snap_type)
                             found_errors = True
                             break
-                elif not found_errors and \
-                        (cstr_key == "slots-per-plug" or
-                         cstr_key == "plugs-per-slot"):
+                elif not found_errors and (
+                    cstr_key == "slots-per-plug" or cstr_key == "plugs-per-slot"
+                ):
                     # see asserts/ifacedecls.go
-                    if not re.search(r'^(\*|[1-9][0-9]*)$', cstr[cstr_key]):
-                        malformed(n,
-                                  "invalid format for '%s': %s" %
-                                  (cstr[cstr_key], cstr[cstr_key]))
+                    if not re.search(r"^(\*|[1-9][0-9]*)$", cstr[cstr_key]):
+                        malformed(
+                            n,
+                            "invalid format for '%s': %s"
+                            % (cstr[cstr_key], cstr[cstr_key]),
+                        )
                         found_errors = True
                         break
 
                     if cstr_key == "plugs-per-slot":
                         # snapd ignores setting plugs-per-slot, so warn
-                        self._add_result('warn',
-                                         n,
-                                         "%s not supported yet" % cstr_key)
-                    elif cstr[cstr_key] != '*':
+                        self._add_result("warn", n, "%s not supported yet" % cstr_key)
+                    elif cstr[cstr_key] != "*":
                         # snapd ignores other values than '*', so warn
-                        self._add_result('warn',
-                                         n,
-                                         "%s currently only supports '*'" %
-                                         cstr_key)
+                        self._add_result(
+                            "warn", n, "%s currently only supports '*'" % cstr_key
+                        )
 
             return not found_errors
             # end verify_constraint()
 
         # from snapd.git/assers/ifacedecls.go
-        id_pat = re.compile(r'^[a-z0-9A-Z]{32}$')
-        pub_pat = re.compile(r'^(?:[a-z0-9A-Z]{32}|[-a-z0-9]{2,28}|\$[A-Z][A-Z0-9_]*)$')
+        id_pat = re.compile(r"^[a-z0-9A-Z]{32}$")
+        pub_pat = re.compile(r"^(?:[a-z0-9A-Z]{32}|[-a-z0-9]{2,28}|\$[A-Z][A-Z0-9_]*)$")
 
         if not isinstance(decl, dict):
-            malformed(self._get_check_name('valid_dict'), "not a dict", base)
+            malformed(self._get_check_name("valid_dict"), "not a dict", base)
             return
         elif len(decl) == 0:
-            malformed(self._get_check_name('valid_dict'), "empty", base)
+            malformed(self._get_check_name("valid_dict"), "empty", base)
             return
 
         for key in decl:
             if key not in ["plugs", "slots"]:
-                malformed(self._get_check_name('valid_key'),
-                          "unknown key '%s'" % key, base)
+                malformed(
+                    self._get_check_name("valid_key"), "unknown key '%s'" % key, base
+                )
                 return
 
             if not isinstance(decl[key], dict):
-                malformed(self._get_check_name('valid_dict', app=key),
-                          "not a dict", base)
+                malformed(
+                    self._get_check_name("valid_dict", app=key), "not a dict", base
+                )
                 return
 
             for iface in decl[key]:
@@ -305,37 +324,41 @@ class SnapReviewDeclaration(SnapReview):
                     decl[key][iface] = self.str2bool(decl[key][iface])
                 # iface may be bool or dict
                 if self.is_bool(decl[key][iface]):
-                    n = self._get_check_name('valid_%s_bool' % key, app=iface)
-                    self._add_result('info', n, 'OK')
+                    n = self._get_check_name("valid_%s_bool" % key, app=iface)
+                    self._add_result("info", n, "OK")
                     continue
                 elif not isinstance(decl[key][iface], dict):
-                    malformed(self._get_check_name('valid_%s_dict' % key,
-                                                   app=iface),
-                              "interface not True, False or dict", base)
+                    malformed(
+                        self._get_check_name("valid_%s_dict" % key, app=iface),
+                        "interface not True, False or dict",
+                        base,
+                    )
                     continue
 
                 for constraint in decl[key][iface]:
                     # snap declarations from the store express bools as strings
                     if isinstance(decl[key][iface][constraint], str):
-                        decl[key][iface][constraint] = \
-                            self.str2bool(decl[key][iface][constraint])
+                        decl[key][iface][constraint] = self.str2bool(
+                            decl[key][iface][constraint]
+                        )
 
-                    t = 'info'
-                    n = self._get_check_name('valid_%s' % key, app=iface,
-                                             extra=constraint)
+                    t = "info"
+                    n = self._get_check_name(
+                        "valid_%s" % key, app=iface, extra=constraint
+                    )
                     s = "OK"
                     cstr = decl[key][iface][constraint]
 
-                    allowed_ctrs = ["allow-installation",
-                                    "deny-installation",
-                                    "allow-connection",
-                                    "allow-auto-connection",
-                                    "deny-connection",
-                                    "deny-auto-connection"
-                                    ]
+                    allowed_ctrs = [
+                        "allow-installation",
+                        "deny-installation",
+                        "allow-connection",
+                        "allow-auto-connection",
+                        "deny-connection",
+                        "deny-auto-connection",
+                    ]
                     if constraint not in allowed_ctrs:
-                        malformed(n, "unknown constraint '%s'" % constraint,
-                                  base)
+                        malformed(n, "unknown constraint '%s'" % constraint, base)
                         continue
 
                     allowed = []
@@ -348,8 +371,13 @@ class SnapReviewDeclaration(SnapReview):
                             allowed.append("slot-snap-type")
                             allowed.append("slot-attributes")
                     else:
-                        allowed = ["plug-attributes", "slot-attributes",
-                                   "on-classic", "on-store", "on-brand"]
+                        allowed = [
+                            "plug-attributes",
+                            "slot-attributes",
+                            "on-classic",
+                            "on-store",
+                            "on-brand",
+                        ]
                         if key == "plugs":
                             allowed.append("slot-publisher-id")
                             allowed.append("slot-snap-id")
@@ -377,9 +405,9 @@ class SnapReviewDeclaration(SnapReview):
                     found_errors = False
                     index = 0
                     for alt in alternates:
-                        if not verify_constraint(alt, decl, key, iface, index,
-                                                 allowed,
-                                                 (len(alternates) > 1)):
+                        if not verify_constraint(
+                            alt, decl, key, iface, index, allowed, (len(alternates) > 1)
+                        ):
                             found_errors = True
                         index += 1
 
@@ -387,31 +415,34 @@ class SnapReviewDeclaration(SnapReview):
                         self._add_result(t, n, s)
 
     def _get_decl(self, side, iface, snapDecl):
-        '''Obtain the declaration for the interface. When snapDecl is False,
+        """Obtain the declaration for the interface. When snapDecl is False,
            get the base declaration, falling back to slots as needed.
            Returns (found decl, [snap|base]/[<side>|fallback])
-        '''
+        """
         if snapDecl:
             if iface in self.snap_declaration[side]:
-                return (copy.deepcopy(self.snap_declaration[side][iface]),
-                        "snap/%s" % side)
+                return (
+                    copy.deepcopy(self.snap_declaration[side][iface]),
+                    "snap/%s" % side,
+                )
             else:
                 return (None, None)
 
         if iface in self.base_declaration[side]:
-            return (copy.deepcopy(self.base_declaration[side][iface]),
-                    "base/%s" % side)
-        elif iface in self.base_declaration['slots']:
+            return (copy.deepcopy(self.base_declaration[side][iface]), "base/%s" % side)
+        elif iface in self.base_declaration["slots"]:
             # Fallback to slots in the base declaration if nothing is in plugs
-            return (copy.deepcopy(self.base_declaration['slots'][iface]),
-                    "base/fallback")
+            return (
+                copy.deepcopy(self.base_declaration["slots"][iface]),
+                "base/fallback",
+            )
 
         return (None, None)
 
     def _is_scoped(self, rules):
-        '''Return whether or not the specified rules are scoped to the snap as
+        """Return whether or not the specified rules are scoped to the snap as
            dictated by the --on-store and --on-brand overrides
-        '''
+        """
         # NOTE: currently if --on-store/--on-brand is specified to the
         # review-tools but the constraint here is not scoped (doesn't
         # contain on-store/on-brand: []) then we treat it as if
@@ -425,8 +456,10 @@ class SnapReviewDeclaration(SnapReview):
             # no defined scoping, so scoped to us
             scoped = True
         elif "on-store" in rules and "on-brand" in rules:
-            if self.on_store in rules["on-store"] and \
-                    self.on_brand in rules["on-brand"]:
+            if (
+                self.on_store in rules["on-store"]
+                and self.on_brand in rules["on-brand"]
+            ):
                 # both store and brand match
                 scoped = True
         elif "on-store" in rules and self.on_store in rules["on-store"]:
@@ -439,20 +472,19 @@ class SnapReviewDeclaration(SnapReview):
         return scoped
 
     def _get_rules(self, decl, cstr_type):
-        '''Obtain the rules, if any, from the specified decl for this
+        """Obtain the rules, if any, from the specified decl for this
            constraint type (eg, 'connection' or 'installation'.
-        '''
+        """
         scoped = True
         rules = {}
 
         if decl is None:
             return rules, False
-        elif 'allow-%s' % cstr_type not in decl and \
-                'deny-%s' % cstr_type not in decl:
+        elif "allow-%s" % cstr_type not in decl and "deny-%s" % cstr_type not in decl:
             return rules, False
 
-        for i in ['allow', 'deny']:
-            cstr = '%s-%s' % (i, cstr_type)
+        for i in ["allow", "deny"]:
+            cstr = "%s-%s" % (i, cstr_type)
             if cstr in decl:
                 if isinstance(decl[cstr], list):
                     tmp = []
@@ -472,7 +504,7 @@ class SnapReviewDeclaration(SnapReview):
         return (rules, scoped)
 
     def _check_attributes(self, side, iface, rules, cstr, whence):
-        '''Check if there are any matching attributes for this side, interface,
+        """Check if there are any matching attributes for this side, interface,
            rules and constraint. If attributes are specified in the constraint,
            they all must match. If the attribute in the constraint is a list,
            just one must match (it is considered a list of alternatives). As a
@@ -480,7 +512,8 @@ class SnapReviewDeclaration(SnapReview):
            slot-attributes in plugging snaps when checking against the fallback
            base declaration slot since the slotting snap will have been flagged
            and require a snap declaration for snaps to connect to it
-        '''
+        """
+
         def _check_attrib(val, against, side, rules_attrib):
             if type(val) not in [str, list, dict, bool]:
                 raise SnapDeclarationException("unknown type '%s'" % val)
@@ -514,21 +547,23 @@ class SnapReviewDeclaration(SnapReview):
             # something different than the type in snap.yaml
             if isinstance(against, list):
                 raise SnapDeclarationException(
-                    "attribute lists in the declaration not supported")
+                    "attribute lists in the declaration not supported"
+                )
 
             matched = False
             if isinstance(val, str) and isinstance(against, str):
-                if against.startswith('$'):
-                    if against == '$MISSING':
+                if against.startswith("$"):
+                    if against == "$MISSING":
                         matched = False  # value must not be set
-                    elif re.search(r'^\$PLUG\(%s\)$' % rules_attrib, against):
+                    elif re.search(r"^\$PLUG\(%s\)$" % rules_attrib, against):
                         matched = True
-                    elif re.search(r'^\$SLOT\(%s\)$' % rules_attrib, against):
+                    elif re.search(r"^\$SLOT\(%s\)$" % rules_attrib, against):
                         matched = True
                     else:
                         raise SnapDeclarationException(
-                            "unknown special attrib '%s'" % against)
-                elif re.search(r'^(%s)$' % against, val):
+                            "unknown special attrib '%s'" % against
+                        )
+                elif re.search(r"^(%s)$" % against, val):
                     matched = True
             elif isinstance(val, list):
                 # if the attribute in the snap (val) is a list and the
@@ -538,7 +573,7 @@ class SnapReviewDeclaration(SnapReview):
                     if _check_attrib(i, against, side, rules_attrib):
                         matched = True
             else:  # bools and dicts (TODO: nested matches for dicts)
-                matched = (against == val)
+                matched = against == val
 
             return matched
 
@@ -547,21 +582,24 @@ class SnapReviewDeclaration(SnapReview):
         attributes_matched = {}
 
         for rules_key in rules:
-            if rules_key not in ['slot-attributes', 'plug-attributes']:
+            if rules_key not in ["slot-attributes", "plug-attributes"]:
                 continue
             elif len(rules[rules_key]) == 0:  # if empty, then just ignore
                 continue
-            elif side == 'plugs' and 'connection' in cstr \
-                    and rules_key == 'slot-attributes' \
-                    and whence == 'base/fallback':
+            elif (
+                side == "plugs"
+                and "connection" in cstr
+                and rules_key == "slot-attributes"
+                and whence == "base/fallback"
+            ):
                 # don't check slot-attributes with plugs in connection
                 # constrains when falling back since the slot's snap
                 # declaration will cover this
                 continue
 
             attributes_matched[rules_key] = {}
-            attributes_matched[rules_key]['len'] = len(rules[rules_key])
-            attributes_matched[rules_key]['matched'] = 0
+            attributes_matched[rules_key]["len"] = len(rules[rules_key])
+            attributes_matched[rules_key]["matched"] = 0
             for rules_attrib in rules[rules_key]:
                 if rules_attrib in iface:
                     checked = True
@@ -573,11 +611,11 @@ class SnapReviewDeclaration(SnapReview):
                         # one must match (list of OR constraints)
                         for i in against:
                             if _check_attrib(val, i, side, rules_attrib):
-                                attributes_matched[rules_key]['matched'] += 1
+                                attributes_matched[rules_key]["matched"] += 1
                                 break
                     else:
                         if _check_attrib(val, against, side, rules_attrib):
-                            attributes_matched[rules_key]['matched'] += 1
+                            attributes_matched[rules_key]["matched"] += 1
                 else:
                     # when the attribute is missing from the interface don't
                     # mark as checked (missing attributes are checked
@@ -586,49 +624,66 @@ class SnapReviewDeclaration(SnapReview):
                     pass
 
         # all the attributes specified in the decl must match the interface
-        if 'slot-attributes' in attributes_matched and \
-                'plug-attributes' in attributes_matched:
-            if attributes_matched['slot-attributes']['len'] == \
-                    attributes_matched['slot-attributes']['matched'] and \
-                    attributes_matched['plug-attributes']['len'] == \
-                    attributes_matched['plug-attributes']['matched']:
+        if (
+            "slot-attributes" in attributes_matched
+            and "plug-attributes" in attributes_matched
+        ):
+            if (
+                attributes_matched["slot-attributes"]["len"]
+                == attributes_matched["slot-attributes"]["matched"]
+                and attributes_matched["plug-attributes"]["len"]
+                == attributes_matched["plug-attributes"]["matched"]
+            ):
                 matched = True
-        elif 'slot-attributes' in attributes_matched:
-            if attributes_matched['slot-attributes']['len'] == \
-                    attributes_matched['slot-attributes']['matched']:
+        elif "slot-attributes" in attributes_matched:
+            if (
+                attributes_matched["slot-attributes"]["len"]
+                == attributes_matched["slot-attributes"]["matched"]
+            ):
                 matched = True
-        elif 'plug-attributes' in attributes_matched:
-            if attributes_matched['plug-attributes']['len'] == \
-                    attributes_matched['plug-attributes']['matched']:
+        elif "plug-attributes" in attributes_matched:
+            if (
+                attributes_matched["plug-attributes"]["len"]
+                == attributes_matched["plug-attributes"]["matched"]
+            ):
                 matched = True
 
-        if checked and ((matched and cstr.startswith('deny')) or
-                        (not matched and cstr.startswith('allow'))):
-            s = "human review required due to '%s' constraint (interface attributes)" % cstr
-            if "plug-attributes" in rules and \
-                    'allow-sandbox' in rules['plug-attributes'] and \
-                    rules['plug-attributes']['allow-sandbox']:
+        if checked and (
+            (matched and cstr.startswith("deny"))
+            or (not matched and cstr.startswith("allow"))
+        ):
+            s = (
+                "human review required due to '%s' constraint (interface attributes)"
+                % cstr
+            )
+            if (
+                "plug-attributes" in rules
+                and "allow-sandbox" in rules["plug-attributes"]
+                and rules["plug-attributes"]["allow-sandbox"]
+            ):
                 # old Oxide is OXIDE_NO_SANDBOX=1
-                s += ". If using a chromium webview, you can disable the " + \
-                     "internal sandbox (eg, use --no-sandbox) and remove " + \
-                     "the 'allow-sandbox' attribute instead. For " + \
-                     "QtWebEngine webviews, export " + \
-                     "QTWEBENGINE_DISABLE_SANDBOX=1 to disable its " + \
-                     "internal sandbox."
+                s += (
+                    ". If using a chromium webview, you can disable the "
+                    + "internal sandbox (eg, use --no-sandbox) and remove "
+                    + "the 'allow-sandbox' attribute instead. For "
+                    + "QtWebEngine webviews, export "
+                    + "QTWEBENGINE_DISABLE_SANDBOX=1 to disable its "
+                    + "internal sandbox."
+                )
             return (checked, s)
 
         return (checked, None)
 
     # func checkSnapType() in helpers.go
     def _check_snap_type(self, side, iface, rules, cstr):
-        '''Check if there are any matching snap types for this side, interface,
+        """Check if there are any matching snap types for this side, interface,
            rules and constraint.
-        '''
-        snap_type = 'app'
-        if 'type' in self.snap_yaml:
-            snap_type = self.snap_yaml['type']
-            if snap_type == 'os':
-                snap_type = 'core'
+        """
+        snap_type = "app"
+        if "type" in self.snap_yaml:
+            snap_type = self.snap_yaml["type"]
+            if snap_type == "os":
+                snap_type = "core"
 
         matched = False
         checked = False
@@ -640,15 +695,20 @@ class SnapReviewDeclaration(SnapReview):
             if snap_type in rules[rules_key]:
                 matched = True
 
-        if checked and ((matched and cstr.startswith('deny')) or
-                        (not matched and cstr.startswith('allow'))):
-            return (checked, "human review required due to '%s' constraint (snap-type)" % cstr)
+        if checked and (
+            (matched and cstr.startswith("deny"))
+            or (not matched and cstr.startswith("allow"))
+        ):
+            return (
+                checked,
+                "human review required due to '%s' constraint (snap-type)" % cstr,
+            )
 
         return (checked, None)
 
     # func checkOnClassic() in helpers.go
     def _check_on_classic(self, side, iface, rules, cstr):
-        '''Check if there is a matching on-classic for this side, interface,
+        """Check if there is a matching on-classic for this side, interface,
            rules and constraint.
 
            Flag when:
@@ -661,39 +721,43 @@ class SnapReviewDeclaration(SnapReview):
            - we ignore plugs with on classic for connections since core snaps
              won't plugs and app snaps will obtain their connection ability
              from the providing (slotting) snap
-        '''
-        snap_type = 'app'
-        if 'type' in self.snap_yaml:
-            snap_type = self.snap_yaml['type']
-            if snap_type == 'os':
-                snap_type = 'core'
+        """
+        snap_type = "app"
+        if "type" in self.snap_yaml:
+            snap_type = self.snap_yaml["type"]
+            if snap_type == "os":
+                snap_type = "core"
 
         matched = False
         checked = False
 
         # only worry about on-classic with app snaps
-        if snap_type != 'app':
+        if snap_type != "app":
             return (checked, None)
 
         if "on-classic" in rules:
             checked = True
 
-            if 'installation' in cstr:
+            if "installation" in cstr:
                 matched = True
             else:
-                if side == 'slots' and  \
-                        ((cstr.startswith('allow') and rules['on-classic']) or
-                         (cstr.startswith('deny') and not rules['on-classic'])):
+                if side == "slots" and (
+                    (cstr.startswith("allow") and rules["on-classic"])
+                    or (cstr.startswith("deny") and not rules["on-classic"])
+                ):
                     matched = True
 
         if matched:
-            return (checked, "human review required due to '%s' constraint (on-classic)" % cstr)
+            return (
+                checked,
+                "human review required due to '%s' constraint (on-classic)" % cstr,
+            )
 
         return (checked, None)
 
     # based on, func check*Constraints1() in helpers.go
     def _check_constraints1(self, side, iface, rules, cstr, whence):
-        '''Check one constraint
+        """Check one constraint
 
            To avoid superflous manual reviews, we want to limit when we want to
            check to:
@@ -704,16 +768,16 @@ class SnapReviewDeclaration(SnapReview):
              matter, the slotting snap will have been flagged and require a
              snap declaration for snaps to connect to it) no need to check the
              others if we have a toplevel constraint
-        '''
+        """
         if isinstance(rules, bool):
             # don't flag connection constraints in the base/fallback in
             # plugging snaps
-            if side == 'plugs' and 'connection' in cstr and \
-                    whence == "base/fallback":
+            if side == "plugs" and "connection" in cstr and whence == "base/fallback":
                 return None
 
-            if ((rules and cstr.startswith('deny')) or
-                    (not rules and cstr.startswith('allow'))):
+            if (rules and cstr.startswith("deny")) or (
+                not rules and cstr.startswith("allow")
+            ):
                 return "human review required due to '%s' constraint (bool)" % cstr
 
             return None
@@ -721,8 +785,7 @@ class SnapReviewDeclaration(SnapReview):
         tmp = []
         num_checked = 0
 
-        (checked, res) = self._check_attributes(side, iface, rules, cstr,
-                                                whence)
+        (checked, res) = self._check_attributes(side, iface, rules, cstr, whence)
         if checked:
             num_checked += 1
         if res is not None:
@@ -765,14 +828,14 @@ class SnapReviewDeclaration(SnapReview):
 
     # func check*Constraints() in helpers.go
     def _check_constraints(self, side, iface, rules, cstr, whence):
-        '''Check alternate constraints'''
+        """Check alternate constraints"""
         if cstr not in rules:
             return None
 
         firstError = None
 
         # OR of alternative constraints
-        if cstr.startswith('allow'):
+        if cstr.startswith("allow"):
             # With allow, the first success is a match and we allow it
             for i in rules[cstr]:
                 res = self._check_constraints1(side, iface, i, cstr, whence)
@@ -793,14 +856,14 @@ class SnapReviewDeclaration(SnapReview):
             return None
 
     def _check_rule(self, side, iface, rules, cstr_type, whence):
-        '''Check any constraints for this set of rules'''
-        res = self._check_constraints(side, iface, rules,
-                                      'deny-%s' % cstr_type, whence)
+        """Check any constraints for this set of rules"""
+        res = self._check_constraints(side, iface, rules, "deny-%s" % cstr_type, whence)
         if res is not None:
             return res
 
-        res = self._check_constraints(side, iface, rules,
-                                      'allow-%s' % cstr_type, whence)
+        res = self._check_constraints(
+            side, iface, rules, "allow-%s" % cstr_type, whence
+        )
         if res is not None:
             return res
 
@@ -808,29 +871,28 @@ class SnapReviewDeclaration(SnapReview):
 
     # func (ic *Candidate) checkPlug()/checkSlot() from policy.go
     def _check_side(self, side, iface, cstr_type):
-        '''Check the set of rules for this side (plugs/slots) for this
+        """Check the set of rules for this side (plugs/slots) for this
            constraint
-        '''
+        """
         # if the snap declaration has something to say for this constraint,
         # only it is consulted (there is no merging with base declaration)
         snapHasSay = False
-        if self.snap_declaration and \
-                iface['interface'] in self.snap_declaration[side]:
-            for i in ['allow', 'deny']:
+        if self.snap_declaration and iface["interface"] in self.snap_declaration[side]:
+            for i in ["allow", "deny"]:
                 cstr = "%s-%s" % (i, cstr_type)
-                if cstr in self.snap_declaration[side][iface['interface']]:
+                if cstr in self.snap_declaration[side][iface["interface"]]:
                     snapHasSay = True
                     break
 
         if snapHasSay:
-            (decl, whence) = self._get_decl(side, iface['interface'], True)
+            (decl, whence) = self._get_decl(side, iface["interface"], True)
             (rules, scoped) = self._get_rules(decl, cstr_type)
             # if we have no scoped rules, then it is as if the snap decl wasn't
             # specified for this constraint
             if scoped and rules is not None:
                 return self._check_rule(side, iface, rules, cstr_type, whence)
 
-        (decl, whence) = self._get_decl(side, iface['interface'], False)
+        (decl, whence) = self._get_decl(side, iface["interface"], False)
         (rules, scoped) = self._get_rules(decl, cstr_type)
         if rules is not None:
             return self._check_rule(side, iface, rules, cstr_type, whence)
@@ -841,19 +903,19 @@ class SnapReviewDeclaration(SnapReview):
 
     # func (ic *InstallCandidate) Check() in policy.go
     def _installation_check(self, side, iname, attribs):
-        '''Check for any installation constraints'''
+        """Check for any installation constraints"""
         iface = {}
         if attribs is not None:
             iface = copy.deepcopy(attribs)
-        iface['interface'] = iname
+        iface["interface"] = iname
 
-        if side == 'slots':
-            res = self._check_side('slots', iface, "installation")
+        if side == "slots":
+            res = self._check_side("slots", iface, "installation")
             if res is not None:
                 return res
 
-        if side == 'plugs':
-            res = self._check_side('plugs', iface, "installation")
+        if side == "plugs":
+            res = self._check_side("plugs", iface, "installation")
             if res is not None:
                 return res
 
@@ -861,48 +923,52 @@ class SnapReviewDeclaration(SnapReview):
 
     # func (ic *ConnectionCandidate) check() in policy.go
     def _connection_check(self, side, iname, attribs):
-        '''Check for any connecttion constraints'''
+        """Check for any connecttion constraints"""
         iface = {}
         if attribs is not None:
             iface = copy.deepcopy(attribs)
-        iface['interface'] = iname
+        iface["interface"] = iname
 
-        if side == 'slots':
-            res = self._check_side('slots', iface, "connection")
+        if side == "slots":
+            res = self._check_side("slots", iface, "connection")
             if res is not None:
                 return res
 
-        if side == 'plugs':
-            res = self._check_side('plugs', iface, "connection")
+        if side == "plugs":
+            res = self._check_side("plugs", iface, "connection")
             if res is not None:
                 return res
 
         return None
 
     def _verify_iface(self, name, iface, interface, attribs=None):
-        '''Verify the interface for any matching constraints'''
-        if name.endswith('slot'):
-            side = 'slots'
-            oside = 'plugs'
-        elif name.endswith('plug'):
-            side = 'plugs'
-            oside = 'slots'
+        """Verify the interface for any matching constraints"""
+        if name.endswith("slot"):
+            side = "slots"
+            oside = "plugs"
+        elif name.endswith("plug"):
+            side = "plugs"
+            oside = "slots"
 
         # If it is an interface reference used by an app, skip since it will be
         # checked in top-level interface checks.
-        if (name.startswith('app_') or name.startswith('hook_')) and \
-                side in self.snap_yaml and \
-                interface in self.snap_yaml[side]:
+        if (
+            (name.startswith("app_") or name.startswith("hook_"))
+            and side in self.snap_yaml
+            and interface in self.snap_yaml[side]
+        ):
             return
 
-        t = 'info'
-        n = self._get_check_name('%s_known' % name, app=iface, extra=interface)
-        s = 'OK'
-        if side in self.base_declaration and \
-                interface not in self.base_declaration[side] and \
-                oside in self.base_declaration and \
-                interface not in self.base_declaration[oside]:
-            t = 'error'
+        t = "info"
+        n = self._get_check_name("%s_known" % name, app=iface, extra=interface)
+        s = "OK"
+        if (
+            side in self.base_declaration
+            and interface not in self.base_declaration[side]
+            and oside in self.base_declaration
+            and interface not in self.base_declaration[oside]
+        ):
+            t = "error"
             s = "interface '%s' not found in base declaration" % interface
             self._add_result(t, n, s)
             return
@@ -911,31 +977,31 @@ class SnapReviewDeclaration(SnapReview):
         # auto-connection
         err1 = self._installation_check(side, interface, attribs)
         if err1 is not None:
-            t = 'error'
-            n = self._get_check_name('%s_installation' % side, app=iface,
-                                     extra=interface)
+            t = "error"
+            n = self._get_check_name(
+                "%s_installation" % side, app=iface, extra=interface
+            )
             s = err1
             self._add_result(t, n, s, manual_review=True)
 
         err2 = self._connection_check(side, interface, attribs)
         if err2 is not None:
-            t = 'error'
-            n = self._get_check_name('%s_connection' % side, app=iface,
-                                     extra=interface)
+            t = "error"
+            n = self._get_check_name("%s_connection" % side, app=iface, extra=interface)
             s = err2
             self._add_result(t, n, s, manual_review=True)
 
         if err1 is None and err2 is None:
-            t = 'info'
-            n = self._get_check_name('%s' % side, app=iface, extra=interface)
-            s = 'OK'
+            t = "info"
+            n = self._get_check_name("%s" % side, app=iface, extra=interface)
+            s = "OK"
             self._add_result(t, n, s)
 
     def check_declaration(self):
-        '''Check base/snap declaration requires manual review for top-level
+        """Check base/snap declaration requires manual review for top-level
            plugs/slots
-        '''
-        for side in ['plugs', 'slots']:
+        """
+        for side in ["plugs", "slots"]:
             if side not in self.snap_yaml:
                 continue
 
@@ -952,25 +1018,25 @@ class SnapReviewDeclaration(SnapReview):
                     # <plugs|slots>:
                     #   <alias>: <interface>
                     interface = spec
-                elif 'interface' in spec:
+                elif "interface" in spec:
                     # Full specification.
                     # <plugs|slots>:
                     #   <alias>:
                     #     interface: <interface>
-                    interface = spec['interface']
+                    interface = spec["interface"]
                     if len(spec) > 1:
                         attribs = spec
-                        del attribs['interface']
+                        del attribs["interface"]
 
                 self._verify_iface(side[:-1], iface, interface, attribs)
 
     def _verify_declaration_apps_hooks(self, key):
-        '''Verify declaration for apps and hooks'''
+        """Verify declaration for apps and hooks"""
         if key not in self.snap_yaml:
             return
 
         for app in self.snap_yaml[key]:
-            for side in ['plugs', 'slots']:
+            for side in ["plugs", "slots"]:
                 if side not in self.snap_yaml[key][app]:
                     continue
 
@@ -983,17 +1049,16 @@ class SnapReviewDeclaration(SnapReview):
                     if not isinstance(ref, str):
                         continue  # checked elsewhere
 
-                    self._verify_iface('%s_%s' % (key[:-1], side[:-1]),
-                                       app, ref)
+                    self._verify_iface("%s_%s" % (key[:-1], side[:-1]), app, ref)
 
     def check_declaration_apps(self):
-        '''Check base/snap declaration requires manual review for apps
+        """Check base/snap declaration requires manual review for apps
            plugs/slots
-        '''
-        self._verify_declaration_apps_hooks('apps')
+        """
+        self._verify_declaration_apps_hooks("apps")
 
     def check_declaration_hooks(self):
-        '''Check base/snap declaration requires manual review for hooks
+        """Check base/snap declaration requires manual review for hooks
            plugs/slots
-        '''
-        self._verify_declaration_apps_hooks('hooks')
+        """
+        self._verify_declaration_apps_hooks("hooks")

@@ -1,4 +1,4 @@
-'''sr_skeleton.py: snap skeleton'''
+"""sr_skeleton.py: snap skeleton"""
 #
 # Copyright (C) 2014-2015 Canonical Ltd.
 #
@@ -19,34 +19,35 @@ from reviewtools.sr_common import SnapReview
 
 
 class SnapReviewSkeleton(SnapReview):
-    '''This class represents snap lint reviews'''
+    """This class represents snap lint reviews"""
+
     def __init__(self, fn, overrides=None):
         SnapReview.__init__(self, fn, "skeleton-snap-v2", overrides=overrides)
 
     def check_foo(self):
-        '''Check foo'''
-        t = 'info'
-        n = self._get_check_name('foo')
+        """Check foo"""
+        t = "info"
+        n = self._get_check_name("foo")
         s = "OK"
         if False:
-            t = 'error'
+            t = "error"
             s = "some message"
         self._add_result(t, n, s)
 
     def check_bar(self):
-        '''Check bar'''
-        t = 'info'
-        n = self._get_check_name('bar')
+        """Check bar"""
+        t = "info"
+        n = self._get_check_name("bar")
         s = "OK"
         if True:
-            t = 'error'
+            t = "error"
             s = "some message"
         self._add_result(t, n, s)
 
     def check_baz(self):
-        '''Check baz'''
-        n = self._get_check_name('baz')
-        self._add_result('warn', n, 'TODO', link="http://example.com")
+        """Check baz"""
+        n = self._get_check_name("baz")
+        self._add_result("warn", n, "TODO", link="http://example.com")
 
         # Spawn a shell to pause the script (run 'exit' to continue)
         # import subprocess

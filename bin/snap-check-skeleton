@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-'''snap-check-skeleton: perform snap skeleton checks'''
+"""snap-check-skeleton: perform snap skeleton checks"""
 #
 # Copyright (C) 2013-2015 Canonical Ltd.
 #

@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-'''snap-check-security: perform snap security checks'''
+"""snap-check-security: perform snap security checks"""
 #
 # Copyright (C) 2013-2016 Canonical Ltd.
 #

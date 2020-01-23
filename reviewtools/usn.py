@@ -19,8 +19,8 @@ from pkg_resources import resource_filename
 import reviewtools.common as common
 import reviewtools.debversion as debversion
 
-tracked_releases = ['xenial', 'bionic']
-epoch_pat = re.compile(r'^[0-9]+:')
+tracked_releases = ["xenial", "bionic"]
+epoch_pat = re.compile(r"^[0-9]+:")
 
 
 # For fast checks:
@@ -33,23 +33,24 @@ def read_usn_db(fn):
             # If there is an epoch in the source_version, strip it and see if
             # the stripped source_version matches the version in our overrides.
             # If so, strip the epoch from the version for this package.
-            srcv = unmatched_vers[rel][bin]['source_version']
-            binv = unmatched_vers[rel][bin]['version']
-            if epoch_pat.search(srcv) and \
-                    binv == srcv.split(':', 1)[1]:
-                if ':' in rawv:
-                    version = debversion.DebVersion(rawv.split(':', 1)[1])
+            srcv = unmatched_vers[rel][bin]["source_version"]
+            binv = unmatched_vers[rel][bin]["version"]
+            if epoch_pat.search(srcv) and binv == srcv.split(":", 1)[1]:
+                if ":" in rawv:
+                    version = debversion.DebVersion(rawv.split(":", 1)[1])
             # Else if there is an epoch in the binary version from overrides,
             # but not the source_version, add the binary's epoch to the
             # source_version add see if they match. If so, add the epoch from
             # the binary version in our overrides (since we should not be
             # incrementing epochs in security updates) when the raw version
             # doesn't have an epoch.
-            elif not epoch_pat.search(rawv) and \
-                    epoch_pat.search(binv) and \
-                    not epoch_pat.search(srcv) and \
-                    binv == "%s:%s" % (binv.split(':', 1)[0], srcv):
-                version = debversion.DebVersion("%s:%s" % (binv.split(':', 1)[0], rawv))
+            elif (
+                not epoch_pat.search(rawv)
+                and epoch_pat.search(binv)
+                and not epoch_pat.search(srcv)
+                and binv == "%s:%s" % (binv.split(":", 1)[0], srcv)
+            ):
+                version = debversion.DebVersion("%s:%s" % (binv.split(":", 1)[0], rawv))
             else:
                 # Don't pretend we know the version if we can't accurately
                 # guess
@@ -60,7 +61,8 @@ def read_usn_db(fn):
     unmatched_vers_fn = "./reviewtools/data/ubuntu-unmatched-bin-versions.json"
     if not os.path.exists(unmatched_vers_fn):  # pragma: nocover
         unmatched_vers_fn = resource_filename(
-            __name__, 'data/ubuntu-unmatched-bin-versions.json')
+            __name__, "data/ubuntu-unmatched-bin-versions.json"
+        )
         if not os.path.exists(unmatched_vers_fn):
             unmatched_vers_fn = None
 
@@ -115,10 +117,10 @@ def read_usn_db(fn):
                         usn_db[rel][bin] = {}
                     if usn not in usn_db[rel][bin]:
                         usn_db[rel][bin][usn] = {}
-                        usn_db[rel][bin][usn]['version'] = version
-                        if 'cves' in raw[usn]:
-                            usn_db[rel][bin][usn]['cves'] = raw[usn]['cves']
-                            usn_db[rel][bin][usn]['cves'].sort()
+                        usn_db[rel][bin][usn]["version"] = version
+                        if "cves" in raw[usn]:
+                            usn_db[rel][bin][usn]["cves"] = raw[usn]["cves"]
+                            usn_db[rel][bin][usn]["cves"].sort()
 
                 # nothing more to do with this USN
                 continue
@@ -146,7 +148,7 @@ def read_usn_db(fn):
                     continue
                 for u in raw[usn]["releases"][rel]["archs"][arch]["urls"]:
                     # foo_1.2_amd64.deb
-                    tmp = os.path.basename(u).split('_')
+                    tmp = os.path.basename(u).split("_")
                     if len(tmp) < 3:
                         continue
                     bin = tmp[0]
@@ -161,12 +163,10 @@ def read_usn_db(fn):
                     # practice this is not a problem.
                     if usn_version not in source_versions:
                         for v in source_versions:
-                            if epoch_pat.search(v) and \
-                                    v.endswith(':%s' % usn_version):
+                            if epoch_pat.search(v) and v.endswith(":%s" % usn_version):
                                 usn_version = v
                                 break
-                    version = get_best_version(unmatched_vers, rel, bin,
-                                               usn_version)
+                    version = get_best_version(unmatched_vers, rel, bin, usn_version)
                     # Skip binaries where we can't accurately guess the
                     # version to avoid false reports
                     if version is None:
@@ -176,9 +176,9 @@ def read_usn_db(fn):
                         usn_db[rel][bin] = {}
                     if usn not in usn_db[rel][bin]:
                         usn_db[rel][bin][usn] = {}
-                        usn_db[rel][bin][usn]['version'] = version
-                        if 'cves' in raw[usn]:
-                            usn_db[rel][bin][usn]['cves'] = raw[usn]['cves']
-                            usn_db[rel][bin][usn]['cves'].sort()
+                        usn_db[rel][bin][usn]["version"] = version
+                        if "cves" in raw[usn]:
+                            usn_db[rel][bin][usn]["cves"] = raw[usn]["cves"]
+                            usn_db[rel][bin][usn]["cves"].sort()
 
     return usn_db
