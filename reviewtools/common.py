@@ -647,6 +647,10 @@ def _unpack_snap_squashfs(snap_pkg, dest, items=[]):
     global MKDTEMP_PREFIX
     global MKDTEMP_DIR
     d = tempfile.mkdtemp(prefix=MKDTEMP_PREFIX, dir=MKDTEMP_DIR)
+    # FIXME: squashfs-tools 4.4 is more strict about errors. When using
+    # squashfs-tools 4.4, pass -ignore-errors so it behaves as before like so:
+    #   cmd = ["unsquashfs", "-f", "-d", d, os.path.abspath(snap_pkg),
+    #          "-ignore-errors"]
     cmd = ["unsquashfs", "-f", "-d", d, os.path.abspath(snap_pkg)]
     if len(items) != 0:
         cmd += items
