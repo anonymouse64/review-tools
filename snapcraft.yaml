@@ -86,3 +86,5 @@ parts:
     - -usr/share/python3/py3versions.py
     - -var/lib/ieee-data/mam.txt
     - -var/lib/ieee-data/oui36.txt
+    - -usr/lib/python3/dist-packages/netaddr/eui/iab.txt
+    - -usr/lib/python3/dist-packages/netaddr/eui/oui.txt
