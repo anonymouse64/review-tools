@@ -5,6 +5,7 @@ review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
     - update for canonical_foundations
     - update for git-machete
   * reviewtools/{available,store}.py: handle empty manifest
+  * use flake8 instead of pep8/pyflakes
 
  -- Jamie Strandboge <jamie@ubuntu.com>  Thu, 12 Dec 2019 06:34:47 -0600
 

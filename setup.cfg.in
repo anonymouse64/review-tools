@@ -1,4 +1,0 @@
-# E501 line too long
-# W504 line break after binary operator
-[pep8]
-ignore = E501,W504

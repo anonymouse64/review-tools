@@ -23,8 +23,7 @@ coverage-report:
 	python3 -m coverage report --show-missing --omit="*skeleton*,*/dist-packages/*"
 
 syntax-check: clean
-	./run-pyflakes
-	./run-pep8
+	./run-flake8
 	./run-pylint
 
 check-names:

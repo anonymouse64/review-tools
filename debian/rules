@@ -42,6 +42,5 @@ override_dh_auto_test:
 	set -ex; for python in $(PY3); do \
 		$$python setup.py test; \
 	done
-	./run-pep8
-	./run-pyflakes
+	./run-flake8
 endif

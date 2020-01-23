@@ -4,7 +4,7 @@ set -e
 exe=
 args=
 case "$1" in
-    pep8|pyflakes3)
+    flake8)
         exe="$1"
         ;;
     pylint3|pylint)
@@ -13,7 +13,7 @@ case "$1" in
         args="-E --disable=no-member"
         ;;
     *)
-        echo "run-helper pep8|pyflakes3|pylint3|pylint"
+        echo "run-helper flake8|pylint3|pylint"
         exit 1
         ;;
 esac

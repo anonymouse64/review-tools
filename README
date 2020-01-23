@@ -64,8 +64,7 @@ Eg:
 $ python3 -m unittest reviewtools.tests.test_sr_lint.TestSnapReviewLint.test_all_checks_as_v2
 
 Additional checks are:
-$ ./run-pep8
-$ ./run-pyflakes
+$ ./run-flake8
 $ ./tests/test.sh
 $ ./tests/test.sh system  # requies 'review-tools' snap to be installed
 

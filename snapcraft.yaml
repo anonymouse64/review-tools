@@ -55,8 +55,7 @@ parts:
     - fakeroot
     - file
     - libmagic1
-    - pep8
-    - pyflakes3
+    - flake8
     - pylint3
     - python3-coverage
     - python3-magic
