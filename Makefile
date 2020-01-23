@@ -26,6 +26,9 @@ syntax-check: clean
 	./run-flake8
 	./run-pylint
 
+style-check: clean
+	./run-black
+
 check-names:
 	# make sure check-names.list is up to date
 	cp -f check-names.list check-names.list.orig
@@ -33,7 +36,7 @@ check-names:
 	diff -Naur check-names.list.orig check-names.list || exit 1
 	rm -f check-names.list.orig
 
-check: test functest-updates functest syntax-check check-names
+check: test functest-updates functest syntax-check style-check check-names
 
 clean:
 	rm -rf ./reviewtools/__pycache__ ./reviewtools/tests/__pycache__

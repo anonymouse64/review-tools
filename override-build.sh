@@ -19,6 +19,8 @@ if [ -z "$RT_IGNORE_TESTS" ]; then
     make coverage
     make coverage-report
     make syntax-check
+    # eventually
+    #make style-check
 fi
 
 # eventually

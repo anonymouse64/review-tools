@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+
+if command -v black > /dev/null ; then
+   ./run-helper black
+else
+    echo "Could not find black"
+fi
