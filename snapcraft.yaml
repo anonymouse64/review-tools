@@ -65,7 +65,6 @@ parts:
     stage-packages:
     - binutils
     - dpkg
-    - execstack
     - fakeroot
     - file
     - libdb5.3
@@ -88,3 +87,33 @@ parts:
     - -var/lib/ieee-data/oui36.txt
     - -usr/lib/python3/dist-packages/netaddr/eui/iab.txt
     - -usr/lib/python3/dist-packages/netaddr/eui/oui.txt
+
+  # https://launchpad.net/bugs/1850861
+  execstack:
+    plugin: autotools
+    source: .
+    override-pull: |
+      # pull the source from xenial if we haven't already
+      if ! test -f ./debian/changelog ; then
+        echo "deb-src http://archive.ubuntu.com/ubuntu/ xenial universe" > /etc/apt/sources.list.d/prelink.list
+        echo "deb-src http://archive.ubuntu.com/ubuntu/ xenial-security universe" >> /etc/apt/sources.list.d/prelink.list
+        apt-get update
+        echo "apt-get source prelink and put in $(pwd)"
+        tmpdir=$(mktemp -d prelink.XXXXXX --tmpdir=./)
+        cd "$tmpdir"
+        apt-get source prelink
+        mv ./prelink-*/* ../
+        cd ..
+        rm -rf "$tmpdir"
+      fi
+    build-packages:
+    - build-essential
+    - libelf-dev
+    - libpopt-dev
+    - libselinux1-dev
+    stage-packages:
+    - libelf1
+    stage:
+    - -man
+    - -sbin/prelink
+    - -usr/share/doc
