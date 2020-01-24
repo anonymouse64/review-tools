@@ -11,13 +11,13 @@ base: core18
 environment:
   LANG: C.UTF-8
   LC_ALL: C.UTF-8
+  MAGIC: $SNAP/usr/share/misc/magic
 
 apps:
   snap-review:
     command: snap-review
     plugs: [ home, mount-observe ]
     environment:
-      MAGIC: $SNAP/usr/share/misc/magic
       FAKEROOTDONTTRYCHOWN: "1"
   snap-declaration:
     command: create-snap-declaration
