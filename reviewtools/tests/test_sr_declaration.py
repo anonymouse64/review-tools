@@ -5904,3 +5904,63 @@ slots:
         name = "declaration-snap-v2:valid_plugs:foo:allow-connection"
         expected["info"][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
+
+    def test_check_declaration_slots_bug1850861_mpris(self):
+        """Test check_declaration - slots mpris with implied interface
+           reference
+        """
+        slots = {"mpris": {"name": "foo"}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.review_report
+        expected_counts = {"info": 0, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:slots_connection:mpris:mpris"
+        expected["error"][name] = {
+            "text": "human review required due to 'deny-connection' constraint (interface attributes)"
+        }
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_plugs_bug1850861_browser_support(self):
+        """Test check_declaration - plugs browser-support with implied
+           interface reference
+        """
+        plugs = {"browser-support": {"allow-sandbox": True}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewDeclaration(self.test_name)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.review_report
+        expected_counts = {"info": 0, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:plugs_connection:browser-support:browser-support"
+        expected["error"][name] = {
+            "text": "human review required due to 'deny-connection' constraint (interface attributes). If using a chromium webview, you can disable the internal sandbox (eg, use --no-sandbox) and remove the 'allow-sandbox' attribute instead. For QtWebEngine webviews, export QTWEBENGINE_DISABLE_SANDBOX=1 to disable its internal sandbox."
+        }
+        self.check_results(r, expected=expected)
+
+    def test_zz_check_declaration_slots_invalid_top_list(self):
+        """Test check_declaration - top slots is list"""
+        slots = {"mpris": []}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.review_report
+        expected_counts = {"info": 0, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)

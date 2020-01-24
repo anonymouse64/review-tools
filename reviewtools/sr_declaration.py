@@ -1018,15 +1018,27 @@ class SnapReviewDeclaration(SnapReview):
                     # <plugs|slots>:
                     #   <alias>: <interface>
                     interface = spec
-                elif "interface" in spec:
+                elif isinstance(spec, dict):
                     # Full specification.
                     # <plugs|slots>:
                     #   <alias>:
                     #     interface: <interface>
-                    interface = spec["interface"]
-                    if len(spec) > 1:
+                    #     attrib: ...
+                    #
+                    # or
+                    # <plugs|slots>:
+                    #   <interface>:
+                    #     attrib: ...
+                    if "interface" in spec:
+                        interface = spec["interface"]
+                        if len(spec) > 1:
+                            attribs = spec
+                            del attribs["interface"]
+                    elif len(spec) > 0:
                         attribs = spec
-                        del attribs["interface"]
+                else:  # this is checked elsewhere, so just avoid a traceback
+                    # coverage doesn't detect without this o_O
+                    continue  # pragma: nocover
 
                 self._verify_iface(side[:-1], iface, interface, attribs)
 
