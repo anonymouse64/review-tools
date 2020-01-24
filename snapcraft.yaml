@@ -111,6 +111,8 @@ parts:
     - libelf-dev
     - libpopt-dev
     - libselinux1-dev
+    configflags:
+    - --prefix=/usr
     stage-packages:
     - libelf1
     stage:
