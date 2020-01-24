@@ -54,6 +54,12 @@ MKSQUASHFS_OPTS = [
     "-no-xattrs",
     "-no-fragments",
 ]
+# squashfs-tools 4.4 and higher is more strict about errors but
+# -ignore-errors is supposed to be able to be used to retain the previous
+# behavior. Unfortunately, the return code for creating device files is
+# still non-zero, so we will check the error strings and only error out
+# if there are no ignored errors.
+UNSQUASHFS_IGNORED_ERRORS = ["because you're not superuser"]
 # There are quite a few kernel interfaces that can cause problems with
 # long profile names. These are outlined in
 # https://launchpad.net/bugs/1499544. The big issue is that the audit
@@ -581,12 +587,61 @@ def cmd_pipe(command1, command2):
     return [sp2.returncode, out]
 
 
+def cmdIgnoreErrorStrings(command, ignoreErrorStrings):
+    """Try to run command but only error if no ignored error strings"""
+    # Make sure we get untranslated strings
+    origLANG = None
+    origLC_ALL = None
+    if "LANG" in os.environ:
+        origLANG = os.environ["LANG"]
+    if "LC_ALL" in os.environ:
+        origLC_ALL = os.environ["LC_ALL"]
+    os.environ["LANG"] = "C.UTF-8"
+    os.environ["LC_ALL"] = "C.UTF-8"
+
+    # run the command
+    (rc, out) = cmd(command)
+
+    # reset/unset
+    if origLANG is None:
+        del os.environ["LANG"]
+    else:
+        os.environ["LANG"] = origLANG
+    if origLC_ALL is None:
+        del os.environ["LC_ALL"]
+    else:
+        os.environ["LC_ALL"] = origLC_ALL
+
+    if rc != 0:
+        redacted = ""
+        for line in out.splitlines():
+            # XXX: we lose empty lines in error output
+            if line == "":
+                continue
+
+            ignored = False
+            for s in ignoreErrorStrings:
+                if s in line:
+                    ignored = True
+                    break
+            if ignored:
+                continue
+            redacted += "%s\n" % line
+
+        if redacted == "":
+            rc = 0
+        out = redacted
+
+    return [rc, out]
+
+
 def _unpack_cmd(cmd_args, d, dest):
     """Low level unpack helper"""
     curdir = os.getcwd()
     os.chdir(d)
 
-    (rc, out) = cmd(cmd_args)
+    (rc, out) = cmdIgnoreErrorStrings(cmd_args, UNSQUASHFS_IGNORED_ERRORS)
+
     os.chdir(curdir)
 
     if rc != 0:
@@ -625,6 +680,13 @@ def _calculate_snap_unsquashfs_uncompressed_size(snap_pkg):
     return size
 
 
+def unsquashfs_supports_ignore_errors():
+    """Detect if unsquashfs supports the -ignore-errors option"""
+    (rc, out) = cmd(["unsquashfs", "-help"])
+    # unsquashfs -help returns non-zero, so just search for the option
+    return "-ig[nore-errors]" in out
+
+
 def _unpack_snap_squashfs(snap_pkg, dest, items=[]):
     """Unpack a squashfs based snap package to dest"""
     size = _calculate_snap_unsquashfs_uncompressed_size(snap_pkg)
@@ -647,11 +709,15 @@ def _unpack_snap_squashfs(snap_pkg, dest, items=[]):
     global MKDTEMP_PREFIX
     global MKDTEMP_DIR
     d = tempfile.mkdtemp(prefix=MKDTEMP_PREFIX, dir=MKDTEMP_DIR)
-    # FIXME: squashfs-tools 4.4 is more strict about errors. When using
-    # squashfs-tools 4.4, pass -ignore-errors so it behaves as before like so:
-    #   cmd = ["unsquashfs", "-f", "-d", d, os.path.abspath(snap_pkg),
-    #          "-ignore-errors"]
-    cmd = ["unsquashfs", "-f", "-d", d, os.path.abspath(snap_pkg)]
+    cmd = ["unsquashfs", "-no-progress", "-f", "-d", d]
+
+    # If unsquashfs supports it, pass "-ignore-errors -quiet"
+    if unsquashfs_supports_ignore_errors():
+        cmd.append("-ignore-errors")
+        cmd.append("-quiet")
+
+    cmd.append(os.path.abspath(snap_pkg))
+
     if len(items) != 0:
         cmd += items
     return _unpack_cmd(cmd, d, dest)

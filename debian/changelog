@@ -8,6 +8,8 @@ review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
   * use flake8 instead of pep8/pyflakes
   * add black style-check and black format our python files
   * use base: core18
+  * sr_security.py/common.py: handle squashfs-tools 4.4 unsquashfs updated
+    error handling
 
  -- Jamie Strandboge <jamie@ubuntu.com>  Thu, 12 Dec 2019 06:34:47 -0600
 

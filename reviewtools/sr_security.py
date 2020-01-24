@@ -19,12 +19,15 @@ from __future__ import print_function
 from reviewtools.sr_common import SnapReview
 from reviewtools.common import (
     cmd,
+    cmdIgnoreErrorStrings,
     create_tempdir,
     open_file_write,
     ReviewException,
     AA_PROFILE_NAME_MAXLEN,
     AA_PROFILE_NAME_ADVLEN,
     MKSQUASHFS_OPTS,
+    UNSQUASHFS_IGNORED_ERRORS,
+    unsquashfs_supports_ignore_errors,
 )
 from reviewtools.overrides import (
     sec_browser_support_overrides,
@@ -282,10 +285,16 @@ class SnapReviewSecurity(SnapReview):
                         mksquash_opts.append(i)
 
             cmdline = (
-                fakeroot_cmd + fakeroot_args + ["unsquashfs", "-d", tmp_unpack, fn]
+                fakeroot_cmd
+                + fakeroot_args
+                + ["unsquashfs", "-no-progress", "-d", tmp_unpack]
             )
+            if unsquashfs_supports_ignore_errors():
+                cmdline.append("-ignore-errors")
+                cmdline.append("-quiet")
+            cmdline.append(fn)
 
-            (rc, out) = cmd(cmdline)
+            (rc, out) = cmdIgnoreErrorStrings(cmdline, UNSQUASHFS_IGNORED_ERRORS)
             if rc != 0:
                 raise ReviewException(
                     "could not unsquash '%s': %s" % (os.path.basename(fn), out)
