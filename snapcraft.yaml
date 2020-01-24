@@ -49,8 +49,7 @@ parts:
       cd $SNAPCRAFT_PART_BUILD
       ./override-build.sh
     build-packages:
-    - binutils
-    - dpkg
+    - build-essential
     - execstack
     - fakeroot
     - file
@@ -63,8 +62,6 @@ parts:
     - python3-yaml
     - squashfs-tools
     stage-packages:
-    - binutils
-    - dpkg
     - fakeroot
     - file
     - libdb5.3
@@ -75,13 +72,16 @@ parts:
     - python3-yaml
     - squashfs-tools
     - python3-swiftclient
-    - build-essential
     stage:
+    - -lib/systemd
     - -usr/bin/2to3-3.5
+    - -usr/bin/dbus*
     - -usr/bin/py3clean
     - -usr/bin/py3compile
     - -usr/bin/pydoc3.5
     - -usr/share/dh-python
+    - -usr/share/doc
+    - -usr/share/man
     - -usr/share/python3/py3versions.py
     - -var/lib/ieee-data/mam.txt
     - -var/lib/ieee-data/oui36.txt
