@@ -78,6 +78,28 @@ class TestSnapReviewFunctionalNoMock(TestCase):
         if rc != 0:
             return True
 
+    def test_check_execstack_inject_link(self):
+        """Workaround the fact that newer releases don't have a functional
+           execstack (LP: #1850861). This isn't an actual check but rather
+           an injection so collect-check-names-from-tests returns consistent
+           results when the testsuite is run on systems with and without a
+           functional execstack.
+        """
+        if not self._execstack_has_lp1850861():
+            return
+        package = utils.make_snap2(output_dir=self.mkdtemp())
+        c = SnapReviewFunctional(package)
+        c._add_result(
+            "info",
+            "functional-snap-v2:execstack",
+            "OK (faked via test_check_execstack_inject_link())",
+            manual_review=False,
+            link="https://forum.snapcraft.io/t/snap-and-executable-stacks/1812",
+        )
+        report = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+
     def test_check_execstack(self):
         """Test check_execstack() - execstack found execstack binary"""
         os.environ["SNAP_ARCH"] = utils.debian_architecture()
