@@ -47,18 +47,20 @@ ln -sf fakeroot-sysv fakeroot
 echo "Patching fakeroot-sysv for snappy paths"
 SNAPTMP=$(mktemp -d)
 cd "$SNAPTMP"
+#shellcheck disable=SC2016
 sed -e 's#^FAKEROOT_PREFIX=#FAKEROOT_PREFIX=$SNAP#' \
     -e 's#^FAKEROOT_BINDIR=#FAKEROOT_BINDIR=$SNAP#' \
     -e 's#^PATHS=#PATHS=$SNAP#' \
     "$SNAPDIR"/usr/bin/fakeroot-sysv > ./fakeroot-sysv
 mv -f ./fakeroot-sysv "$SNAPDIR"/usr/bin/fakeroot-sysv
 chmod 755 "$SNAPDIR"/usr/bin/fakeroot-sysv
-cd -
+cd "$SNAPDIR"
 
 echo "Symlinking libmagic.so"
 libmagic=$(find "$SNAPDIR"/usr/lib -name libmagic.so.1.0.0)
-cd $(dirname "$libmagic")
+libdir=$(dirname "$libmagic")
+cd "$libdir"
 ln -sf libmagic.so.1.0.0 libmagic.so
-cd -
+cd "$SNAPDIR"
 
 rmdir "$SNAPTMP"
