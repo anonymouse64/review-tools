@@ -103,6 +103,7 @@ parts:
         cd "$tmpdir"
         apt-get source prelink
         mv ./prelink-*/* ../
+        autoreconf -sfi
         cd ..
         rm -rf "$tmpdir"
       fi
@@ -112,7 +113,9 @@ parts:
     - libpopt-dev
     - libselinux1-dev
     configflags:
-    - --prefix=/usr
+    - --disable-shared
+    - --disable-libtool-lock
+    - --disable-dependency-tracking
     stage-packages:
     - libelf1
     stage:
