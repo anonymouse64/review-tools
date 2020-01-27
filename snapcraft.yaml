@@ -103,8 +103,8 @@ parts:
         cd "$tmpdir"
         apt-get source prelink
         mv ./prelink-*/* ../
-        autoreconf -sfi
         cd ..
+        autoreconf -fi
         rm -rf "$tmpdir"
       fi
     build-packages:
