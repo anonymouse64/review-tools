@@ -61,6 +61,7 @@ parts:
     - python3-simplejson
     - python3-yaml
     - squashfs-tools
+    # binutils is needed for python cytypes (ld and objdump)
     stage-packages:
     - binutils
     - fakeroot
