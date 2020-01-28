@@ -62,6 +62,7 @@ parts:
     - python3-yaml
     - squashfs-tools
     stage-packages:
+    - binutils
     - fakeroot
     - file
     - libdb5.3
@@ -80,7 +81,9 @@ parts:
     - -usr/bin/py3compile
     - -usr/bin/pydoc3.5
     - -usr/share/dh-python
+    - -usr/share/bug
     - -usr/share/doc
+    - -usr/share/lintian
     - -usr/share/man
     - -usr/share/python3/py3versions.py
     - -var/lib/ieee-data/mam.txt

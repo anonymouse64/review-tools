@@ -56,7 +56,7 @@ mv -f ./fakeroot-sysv "$SNAPDIR"/usr/bin/fakeroot-sysv
 chmod 755 "$SNAPDIR"/usr/bin/fakeroot-sysv
 cd "$SNAPDIR"
 
-echo "Symlinking libmagic.so"
+echo "Symlinking libmagic.so (LP: #1861026)"
 libmagic=$(find "$SNAPDIR"/usr/lib -name libmagic.so.1.0.0)
 libdir=$(dirname "$libmagic")
 cd "$libdir"
