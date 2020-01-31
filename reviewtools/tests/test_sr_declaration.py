@@ -2577,7 +2577,7 @@ slots:
         expected["info"][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
-    def test_zz_check_declaration_plugs_allow_connection_list_match_one(self):
+    def test_check_declaration_plugs_allow_connection_list_match_one(self):
         """Test check_declaration - plugs/allow-connection/list one matches"""
         plugs = {"iface-foo": {"interface": "foo", "attrib1": "val1"}}
         self.set_test_snap_yaml("plugs", plugs)
@@ -5953,7 +5953,7 @@ slots:
         }
         self.check_results(r, expected=expected)
 
-    def test_zz_check_declaration_slots_invalid_top_list(self):
+    def test_check_declaration_slots_invalid_top_list(self):
         """Test check_declaration - top slots is list"""
         slots = {"mpris": []}
         self.set_test_snap_yaml("slots", slots)
