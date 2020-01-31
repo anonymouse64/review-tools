@@ -16,6 +16,9 @@ functest-system:
 functest-updates:
 	./tests/test-updates-available.sh
 
+functest-dump-tool:
+	./tests/test-dump-tool.sh
+
 coverage:
 	python3 -m coverage run ./run-tests
 
@@ -36,7 +39,7 @@ check-names:
 	diff -Naur check-names.list.orig check-names.list || exit 1
 	rm -f check-names.list.orig
 
-check: test functest-updates functest syntax-check style-check check-names
+check: test functest-updates functest-dump-tool functest syntax-check style-check check-names
 
 clean:
 	rm -rf ./reviewtools/__pycache__ ./reviewtools/tests/__pycache__

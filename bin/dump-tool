@@ -1,0 +1,229 @@
+#!/usr/bin/python3
+#
+# Tool for working with store dumps. The format of the input is:
+# snap_id|revision|<yaml start>
+# <yaml continued>
+# snap_id|revision|
+# snap_id|revision|<yaml start>
+# <yaml continued>
+#
+# Eg:
+# 4Zx8o1ub19ibqNwTQbBHzUgT9zM0TLGs|1|apps:
+#   snap-review:
+# ...<yaml continued>...
+# name: review-tools
+#
+# 4Zx8o1ub19ibqNwTQbBHzUgT9zM0TLGs|2|
+# 4Zx8o1ub19ibqNwTQbBHzUgT9zM0TLGs|3|apps:
+#   snap-review:
+# ...<yaml continued>...
+# name: review-tools
+#
+# (end of Eg)
+#
+# Per store team (roadmr): they run a query to get snap id, revision and
+# snap.yaml from the revisions table. See "the snap store admin manual"
+# for details.
+#
+# For now, for searches, can copy this somewhere, modify it. Eg:
+# $ cp /path/to/review-tools/bin/dump-tool ./search-tool
+# (modify ./search-tool)
+# $ PYTHONPATH=/path/to/review-tools ./search-tool ...
+#
+# Eventually (exact syntax TBD):
+# * implement --query with some simple queries (perhaps via 'exec' or 'eval'.
+#   Eg
+#   - "yaml['confinement] == 'classic'"
+#   - "'snapd-control' in yaml['plugs'] or yaml['plugs'][*]['interface'] ==
+#     'snapd-control' or 'snapd-control' in apps[*]['plugs']" (or a shortcut of,
+#     --query-plugs)
+#   - "('interface' not in yaml['plugs'][*] and len(yaml['plugs'][*]) > 0) or
+#     ('interface' not in yaml['slots'][*] and len+yaml['slots[*] > 0)"
+#   - "yaml['plugs'][*]['interface'] in ['snapd-control', 'kernel-module-control']
+#     and yaml['plugs"][*] != yaml['plugs'][*]['interface']"
+#   - 'yaml['plugs'][*]' expands to "isinstance(yaml['plugs'], dict): for i in
+#     yaml['plugs']: ...", etc
+# * implement --query-plugin=<file> which implements alternate pattern (perhaps
+#   usable with --query?)
+# * implement --query-output=json to output a json in the --db-file format with
+#   just the matching query
+
+import argparse
+import json
+import os
+import re
+import sys
+import textwrap
+import yaml
+
+import reviewtools.common as common
+from reviewtools.common import error, warn, msg, debug
+
+# TODO:
+# - --file read in one at a time and flush to disk (either --output or
+#   --output-dir)
+# - --db-file eventually use ijson or similar for stream json
+
+
+def _read_store_dump(input, warn_if_empty=False, progress=False, merge=None):
+    """Read input file into a dictionary:
+       dump[<id>][<revision>]["yaml"] = <yaml>
+       dump[<id>]["name"] = <'name' from yaml>
+    """
+
+    def _add_entry(db, id, rev, y):
+        debug("adding: id=%s,rev=%s,yaml=\n%s" % (id, rev, y))
+        try:
+            snap_yaml = yaml.load(y, Loader=yaml.SafeLoader)
+        except Exception as e:
+            warn("Skipping %s|%s: %s" % (cId, cRev, e))
+            return
+
+        # skipping existing entries
+        if db is not None and id in db and rev in db[id]:
+            return
+
+        if id not in db:
+            db[id] = {}
+        db[id][rev] = {}
+        db[id][rev]["yaml"] = snap_yaml
+        db[id][rev]["name"] = snap_yaml["name"]
+
+    db = {}
+    if merge is not None:
+        db = merge
+    pat = re.compile(r"^[a-zA-Z0-9]{32}\|[0-9]+\|")
+    count = 0
+    with open(input, "r") as fh:
+        lines = fh.readlines()
+
+        cId = None
+        cRev = None
+        cYaml = None
+        if progress:
+            print("Parsing snap yamls: ", end=".")
+        for line in lines:
+            if pat.search(line):
+                if cId is not None and cYaml != "\n":
+                    _add_entry(db, cId, cRev, cYaml)
+                    if progress:
+                        count += 1
+                        print(".", end="", flush=True)
+                        if count % 1000 == 0:
+                            print("%s" % (count), end="", flush=True)
+
+                (cId, cRev, cYaml) = line.split("|")
+                if cYaml == "\n":  # id|rev|
+                    if warn_if_empty and not progress:
+                        warn("Skipping %s|%s: empty" % (cId, cRev))
+                    cId = None
+            elif cId is not None:
+                cYaml += "%s" % (line)
+
+        if cId is not None:
+            _add_entry(db, cId, cRev, cYaml)
+            if progress:
+                count += 1
+                print(".", end="")
+
+    if progress:
+        print("\nDone: %d revisions read" % (count))
+
+    return db
+
+
+def _write_json_db(db, fn, stdout=False):
+    """Write db to json dict"""
+    if stdout:
+        print(json.dumps(db, sort_keys=True, indent=2))
+        return
+
+    if os.path.exists(fn):
+        error("%s exists. Aborting" % (fn))
+    with open(fn, "w") as fh:
+        json.dump(db, fh, sort_keys=True, indent=2)
+        fh.write("\n")
+
+
+def main():
+    common.REPORT_OUTPUT = "console"
+    parser = argparse.ArgumentParser(
+        prog="dump-tool",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description="Tool for working with store dumps",
+        epilog=textwrap.dedent(
+            """\
+            Typical usage:
+
+              # initial read
+              $ %s --file=store.dump --output=db.json
+
+              # merge new.dump into db.json and save as merged.json
+              $ %s --file=new.dump --db-file=db.json --output=merged.json
+        """
+            % (os.path.basename(sys.argv[0]), os.path.basename(sys.argv[0]))
+        ),
+    )
+
+    parser.add_argument("--file", type=str, help="store dump input file")
+    parser.add_argument("--db-file", type=str, help="read database file")
+    parser.add_argument(
+        "--force-merge",
+        help="force merge of --file into --db-file",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--output", type=str, help="output db to file ('stdout' for stdout)"
+    )
+    parser.add_argument("--progress", help="show progress", action="store_true")
+    parser.add_argument(
+        "--warn-if-empty", help="warn if a revision is empty", action="store_true"
+    )
+    args = parser.parse_args()
+
+    # Arg validation
+    if not (args.file) and not (args.db_file):
+        error("Must specify either --file or --db-file")
+    elif (args.file) and (args.db_file):
+        if not os.path.exists(args.file) or not os.path.exists(args.db_file):
+            error("Both --file and --db-file must exist when used together")
+        if not args.force_merge:
+            ans = input("Merge '%s' into '%s' (y|N)? " % (args.file, args.db_file))
+            if ans.strip().lower() not in ["y", "yes"]:
+                msg("Aborting")
+                sys.exit(0)
+
+    if args.db_file:  # read the existing db
+        try:
+            db = common.read_file_as_json_dict(args.db_file)
+        except json.decoder.JSONDecodeError as e:
+            error("Could not read '%s': %s" % (args.db_file, e))
+
+    if args.file and args.db_file:
+        db = _read_store_dump(
+            args.file,
+            warn_if_empty=args.warn_if_empty,
+            progress=args.progress,
+            merge=db,
+        )
+    elif args.file:
+        db = _read_store_dump(
+            args.file, warn_if_empty=args.warn_if_empty, progress=args.progress
+        )
+
+    elif args.db_file:
+        db = common.read_file_as_json_dict(args.db_file)
+
+    if args.output:
+        stdout = False
+        if args.output == "stdout":
+            stdout = True
+        _write_json_db(db, args.output, stdout=stdout)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("Aborted.")
+        sys.exit(1)

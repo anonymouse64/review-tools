@@ -1,0 +1,37 @@
+= Test --file =
+Running: dump-tool --file ./tests/test-store-dump.1
+
+Running: dump-tool --file ./tests/test-store-dump.2
+
+= Test --file (bad) =
+Running: dump-tool --file ./bad --output=stdout
+{}
+
+= Test --file --progress =
+Running: dump-tool --progress --file ./tests/test-store-dump.1
+Parsing snap yamls: ...........
+Done: 10 revisions read
+
+= Test --file --warn-if-empty =
+Running: dump-tool --warn-if-empty --file ./tests/test-store-dump.1
+WARN: Skipping 4ZWSHtNHDBdBsoGCTVgKkk8F9MtvjZS1|1: empty
+WARN: Skipping 4ZWSHtNHDBdBsoGCTVgKkk8F9MtvjZS1|2: empty
+WARN: Skipping 4ZWSHtNHDBdBsoGCTVgKkk8F9MtvjZS1|3: empty
+WARN: Skipping 99T7MUlRhtI3U0QFgl5mXXESAiSwt776|1: empty
+WARN: Skipping UqFziVZDHLSyO3TqSWgNBoAdHbLI4dAH|1: empty
+WARN: Skipping UqFziVZDHLSyO3TqSWgNBoAdHbLI4dAH|2: empty
+WARN: Skipping UqFziVZDHLSyO3TqSWgNBoAdHbLI4dAH|3: empty
+WARN: Skipping UqFziVZDHLSyO3TqSWgNBoAdHbLI4dAH|4: empty
+
+= Test --db-file =
+Running: dump-tool --db-file ./tests/test-store-dump.1.json
+
+Running: dump-tool --db-file ./tests/test-store-dump.2.json
+
+= Test --db-file (bad) =
+Running: dump-tool --db-file ./bad --output=stdout
+ERROR: Could not read './bad': Expecting value: line 1 column 1 (char 0)
+
+= Test --file --db-file (merge) =
+Running: dump-tool --force-merge --db-file ./tests/test-store-dump.1.json --file ./tests/test-store-dump.2
+

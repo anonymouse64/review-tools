@@ -1,0 +1,219 @@
+{
+  "4Zx8o1ub19ibqNwTQbBHzUgT9zM0TLGs": {
+    "1": {
+      "name": "review-tools",
+      "yaml": {
+        "apps": {
+          "snap-review": {
+            "aliases": [
+              "snap-review"
+            ],
+            "command": "command-snap-review.wrapper",
+            "plugs": [
+              "home",
+              "network"
+            ]
+          }
+        },
+        "architectures": [
+          "amd64"
+        ],
+        "confinement": "strict",
+        "description": "This snap provides the review tools as used by the Ubuntu store. They can\nbe used to verify your snap before upload.\n",
+        "grade": "devel",
+        "name": "review-tools",
+        "summary": "Review tools for snappy",
+        "version": "0.46~1"
+      }
+    },
+    "2": {
+      "name": "review-tools",
+      "yaml": {
+        "apps": {
+          "snap-review": {
+            "aliases": [
+              "snap-review"
+            ],
+            "command": "command-snap-review.wrapper",
+            "plugs": [
+              "home",
+              "network"
+            ]
+          }
+        },
+        "architectures": [
+          "i386"
+        ],
+        "confinement": "strict",
+        "description": "This snap provides the review tools as used by the Ubuntu store. They can\nbe used to verify your snap before upload.\n",
+        "grade": "devel",
+        "name": "review-tools",
+        "summary": "Review tools for snappy",
+        "version": "0.46~1"
+      }
+    },
+    "3": {
+      "name": "review-tools",
+      "yaml": {
+        "apps": {
+          "snap-review": {
+            "aliases": [
+              "snap-review"
+            ],
+            "command": "command-snap-review.wrapper",
+            "plugs": [
+              "home",
+              "network"
+            ]
+          }
+        },
+        "architectures": [
+          "ppc64el"
+        ],
+        "confinement": "strict",
+        "description": "This snap provides the review tools as used by the Ubuntu store. They can\nbe used to verify your snap before upload.\n",
+        "grade": "devel",
+        "name": "review-tools",
+        "summary": "Review tools for snappy",
+        "version": "0.46~1"
+      }
+    }
+  },
+  "99T7MUlRhtI3U0QFgl5mXXESAiSwt776": {
+    "2": {
+      "name": "core",
+      "yaml": {
+        "architectures": [
+          "armhf"
+        ],
+        "confinement": "strict",
+        "description": "The core runtime environment for snapd",
+        "grade": "stable",
+        "name": "core",
+        "summary": "snapd runtime environment",
+        "type": "os",
+        "version": "16.04.1"
+      }
+    },
+    "3": {
+      "name": "core",
+      "yaml": {
+        "architectures": [
+          "amd64"
+        ],
+        "confinement": "strict",
+        "description": "The core runtime environment for snapd",
+        "name": "core",
+        "summary": "snapd runtime environment",
+        "type": "os",
+        "version": "16.04.1"
+      }
+    }
+  },
+  "DLqre5XGLbDqg9jPtiAhRRjDuPVa5X1q": {
+    "1": {
+      "name": "core20",
+      "yaml": {
+        "architectures": [
+          "amd64"
+        ],
+        "confinement": "strict",
+        "description": "The base snap based on the Ubuntu 20.04 release.\n",
+        "grade": "devel",
+        "name": "core20",
+        "summary": "Runtime environment based on Ubuntu 20.04",
+        "type": "base",
+        "version": 20
+      }
+    },
+    "2": {
+      "name": "core20",
+      "yaml": {
+        "architectures": [
+          "amd64"
+        ],
+        "confinement": "strict",
+        "description": "The base snap based on the Ubuntu 20.04 release.\n",
+        "grade": "devel",
+        "name": "core20",
+        "summary": "Runtime environment based on Ubuntu 20.04",
+        "type": "base",
+        "version": 20
+      }
+    }
+  },
+  "UqFziVZDHLSyO3TqSWgNBoAdHbLI4dAH": {
+    "33": {
+      "name": "pc",
+      "yaml": {
+        "architectures": [
+          "amd64"
+        ],
+        "confinement": "strict",
+        "description": "This gadget enables generic pc devices to work with Ubuntu Core\n",
+        "grade": "stable",
+        "name": "pc",
+        "summary": "PC gadget for generic devices",
+        "type": "gadget",
+        "version": "16.04-0.10"
+      }
+    },
+    "5": {
+      "name": "pc",
+      "yaml": {
+        "description": "This package contains a simple OEM snappy package for system configuration\n",
+        "name": "pc",
+        "summary": "AMD64 generic package",
+        "type": "gadget",
+        "version": "16.04-0.5"
+      }
+    }
+  },
+  "pYVQrBcKmBa0mZ4CCN7ExT6jH8rY1hza": {
+    "377": {
+      "name": "pc-kernel",
+      "yaml": {
+        "architectures": [
+          "amd64"
+        ],
+        "confinement": "strict",
+        "description": "The generic Ubuntu kernel package as a snap",
+        "grade": "stable",
+        "name": "pc-kernel",
+        "summary": "generic linux kernel",
+        "type": "kernel",
+        "version": "4.4.0-173.203"
+      }
+    },
+    "378": {
+      "name": "pc-kernel",
+      "yaml": {
+        "architectures": [
+          "i386"
+        ],
+        "confinement": "strict",
+        "description": "The generic Ubuntu kernel package as a snap",
+        "grade": "stable",
+        "name": "pc-kernel",
+        "summary": "generic linux kernel",
+        "type": "kernel",
+        "version": "4.4.0-173.203"
+      }
+    },
+    "379": {
+      "name": "pc-kernel",
+      "yaml": {
+        "architectures": [
+          "armhf"
+        ],
+        "confinement": "strict",
+        "description": "The generic Ubuntu kernel package as a snap",
+        "grade": "stable",
+        "name": "pc-kernel",
+        "summary": "generic linux kernel",
+        "type": "kernel",
+        "version": "5.4.0-11.14"
+      }
+    }
+  }
+}
