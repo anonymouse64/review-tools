@@ -20,6 +20,7 @@ import os
 import re
 import shutil
 import tempfile
+import yaml
 
 from reviewtools.common import cleanup_unpack
 from reviewtools.common import check_results as common_check_results
@@ -1250,6 +1251,80 @@ drwx------ root/root                48 2016-03-11 12:26 squashfs-root/meta
             "text": "interface reference 'disallowed2' not allowed. Please use one of: known-ref"
         }
         self.check_results(report, expected=expected)
+
+    def _setup_base_declaration(self, c):
+        # setup minimized base declaration
+        decl = yaml.safe_load(
+            """
+plugs:
+slots:
+  iface:
+    allow-installation:
+      slot-snap-type:
+      - core
+  other:
+    allow-installation:
+      slot-snap-type:
+      - core
+"""
+        )
+        c.base_declaration = decl
+
+    def test_check_interface_reference_matches_base_decl(self):
+        """Test check_interface_reference_matches_base_decl()"""
+        for obj in ["null", {"interface": "iface"}]:
+            plugs = {"iface": obj}
+            self.set_test_snap_yaml("plugs", plugs)
+            self.set_test_snap_yaml("name", "test-app")
+
+            c = SnapReviewSecurity(self.test_name)
+            self._setup_base_declaration(c)
+            c.check_interface_reference_matches_base_decl()
+            report = c.review_report
+            expected_counts = {"info": 0, "warn": 0, "error": 0}
+            self.check_results(report, expected_counts)
+
+    def test_check_interface_reference_matches_base_decl_found(self):
+        """Test check_interface_reference_matches_base_decl() - found match"""
+        plugs = {"other": {"interface": "iface"}}
+        self.set_test_snap_yaml("plugs", plugs)
+        self.set_test_snap_yaml("name", "test-app")
+
+        c = SnapReviewSecurity(self.test_name)
+        self._setup_base_declaration(c)
+        c.check_interface_reference_matches_base_decl()
+        report = c.review_report
+        expected_counts = {"info": 0, "warn": 1, "error": 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "security-snap-v2:interface-reference-matches-base-decl:other"
+        expected["warn"][name] = {
+            "text": "interface reference 'other' found in base declaration"
+        }
+        self.check_results(report, expected=expected)
+
+    def test_check_interface_reference_matches_base_decl_override(self):
+        """Test check_interface_reference_matches_base_decl() - found match"""
+        plugs = {"other": {"interface": "iface"}}
+        self.set_test_snap_yaml("plugs", plugs)
+        self.set_test_snap_yaml("name", "test-app")
+        # update the overrides with our snap
+        from reviewtools.overrides import sec_iface_ref_matches_base_decl_overrides
+
+        sec_iface_ref_matches_base_decl_overrides["test-app"] = [("iface", "other")]
+        c = SnapReviewSecurity(self.test_name)
+        self._setup_base_declaration(c)
+        c.check_interface_reference_matches_base_decl()
+        # then clean up
+        del sec_iface_ref_matches_base_decl_overrides["test-app"]
+
+        report = c.review_report
+        expected_counts = {"info": 0, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
 
 
 class TestSnapReviewSecurityNoMock(TestCase):

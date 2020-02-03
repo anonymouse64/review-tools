@@ -32,6 +32,7 @@ from reviewtools.common import (
 from reviewtools.overrides import (
     sec_browser_support_overrides,
     sec_iface_ref_overrides,
+    sec_iface_ref_matches_base_decl_overrides,
     sec_mode_overrides,
     sec_resquashfs_overrides,
 )
@@ -659,3 +660,39 @@ class SnapReviewSecurity(SnapReview):
     def check_system_files_iface_reference(self):
         """Check system-files interface references"""
         self._allowed_iface_reference("plugs", "system-files")
+
+    def check_interface_reference_matches_base_decl(self):
+        """Check if an interface reference matches a different interface
+           in the base declaration.
+        """
+        pkgname = self.snap_yaml["name"]
+        for side in ["plugs", "slots"]:
+            if side not in self.snap_yaml:
+                continue
+
+            for ref in self.snap_yaml[side]:
+                if (
+                    not isinstance(self.snap_yaml[side][ref], dict)
+                    or "interface" not in self.snap_yaml[side][ref]
+                    or self.snap_yaml[side][ref]["interface"] == ref
+                ):
+                    continue
+
+                if ref in self.base_declaration["slots"]:
+                    ok = False
+                    if pkgname in sec_iface_ref_matches_base_decl_overrides:
+                        for (aIface, aRef) in sec_iface_ref_matches_base_decl_overrides[
+                            pkgname
+                        ]:
+                            if (
+                                self.snap_yaml[side][ref]["interface"] == aIface
+                                and ref == aRef
+                            ):
+                                ok = True
+                    if not ok:
+                        t = "warn"
+                        n = self._get_check_name(
+                            "interface-reference-matches-base-decl", app=ref
+                        )
+                        s = "interface reference '%s' found in base declaration" % (ref)
+                        self._add_result(t, n, s)

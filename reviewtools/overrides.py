@@ -453,6 +453,12 @@ sec_iface_ref_overrides = {
     },
 }
 
+sec_iface_ref_matches_base_decl_overrides = {
+    "caracalla": [("content", "alsa")],
+    "caracalla-iot-nxt": [("content", "alsa")],
+    "joule": [("content", "alsa")],
+}
+
 # Snaps that have legitimate need for executable stack but otherwise work fine
 # in strict mode
 func_execstack_overrides = [
