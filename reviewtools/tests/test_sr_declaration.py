@@ -327,6 +327,12 @@ slots:
                 "inst-slot-attributes-empty": {
                     "allow-installation": {"slot-attributes": {}}
                 },
+                "inst-slot-names-empty": {
+                    "allow-installation": {"slot-names": []}
+                },
+                "inst-slot-names-iface": {
+                    "allow-installation": {"slot-names": ["$INTERFACE"]}
+                },
                 "inst-allow-alternates": {
                     "allow-installation": [
                         {"slot-snap-type": ["app"]},
@@ -378,6 +384,12 @@ slots:
                 },
                 "conn-plug-attributes-empty": {
                     "deny-connection": {"plug-attributes": {}}
+                },
+                "conn-slot-names-empty": {
+                    "allow-connection": {"slot-names": []}
+                },
+                "conn-slot-names-iface": {
+                    "allow-connection": {"slot-names": ["$INTERFACE"]}
                 },
                 "conn-slots-per-plug": {  # only supported is allowed
                     "allow-connection": {"slots-per-plug": "1"}
@@ -469,6 +481,12 @@ slots:
                 "autoconn-plug-attributes-empty": {
                     "deny-auto-connection": {"plug-attributes": {}}
                 },
+                "autoconn-slot-names-empty": {
+                    "allow-auto-connection": {"slot-names": []}
+                },
+                "autoconn-slot-names-iface": {
+                    "allow-auto-connection": {"slot-names": ["$INTERFACE"]}
+                },
                 "autoconn-allow-alternates": {
                     "allow-auto-connection": [
                         {
@@ -532,6 +550,12 @@ slots:
                 "inst-plug-attributes-empty": {
                     "allow-installation": {"plug-attributes": {}}
                 },
+                "inst-plug-names-empty": {
+                    "allow-installation": {"plug-names": []}
+                },
+                "inst-plug-names-iface": {
+                    "allow-installation": {"plug-names": ["$INTERFACE"]}
+                },
                 "inst-allow-alternates": {
                     "allow-installation": [
                         {"plug-snap-type": ["app"]},
@@ -583,6 +607,12 @@ slots:
                 },
                 "conn-slot-attributes-empty": {
                     "deny-connection": {"slot-attributes": {}}
+                },
+                "conn-plug-names-empty": {
+                    "allow-connection": {"plug-names": []}
+                },
+                "conn-plug-names-iface": {
+                    "allow-connection": {"plug-names": ["$INTERFACE"]}
                 },
                 "conn-slots-per-plug": {  # only supported is allowed
                     "allow-connection": {"slots-per-plug": "1"}
@@ -674,6 +704,12 @@ slots:
                 "autoconn-slot-attributes-empty": {
                     "deny-auto-connection": {"slot-attributes": {}}
                 },
+                "autoconn-plug-names-empty": {
+                    "allow-auto-connection": {"plug-names": []}
+                },
+                "autoconn-plug-names-iface": {
+                    "allow-auto-connection": {"plug-names": ["$INTERFACE"]}
+                },
                 "autoconn-slots-per-plug": {  # only supported is allowed
                     "allow-auto-connection": {"slots-per-plug": "*"}
                 },
@@ -726,7 +762,7 @@ slots:
         r = c.review_report
         # warning are for "plugs-per-slot not supported yet" and
         # "slots-per-plug currently only supports '*'"
-        expected_counts = {"info": 82, "warn": 6, "error": 0}
+        expected_counts = {"info": 94, "warn": 6, "error": 0}
         self.check_results(r, expected_counts)
 
     def test__verify_declaration_invalid_empty(self):
@@ -1252,6 +1288,92 @@ slots:
             "text": "declaration malformed ('{}' in 'on-brand' not a string)"
         }
         self.check_results(r, expected=expected)
+
+    def test__verify_declaration_invalid_slots_iface_constraint_slot_names_value(self):
+        """Test _verify_declaration - invalid interface constraint slot-names"""
+        c = SnapReviewDeclaration(self.test_name)
+        decl = {"slots": {"foo": {"allow-connection": {"slot-names": {}}}}}
+        c._verify_declaration(decl=decl)
+        r = c.review_report
+        expected_counts = {"info": 0, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:valid_slots:foo:allow-connection_slot-names"
+        expected["error"][name] = {
+            "text": "declaration malformed ('slot-names' not a list)"
+        }
+        self.check_results(r, expected=expected)
+
+    def test__verify_declaration_invalid_slots_iface_constraint_slot_names_value_auto(self):
+        """Test _verify_declaration - invalid interface constraint slot-names
+           (auto-connection)"""
+        c = SnapReviewDeclaration(self.test_name)
+        decl = {"slots": {"foo": {"allow-auto-connection": {"slot-names": {}}}}}
+        c._verify_declaration(decl=decl)
+        r = c.review_report
+        expected_counts = {"info": 0, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:valid_slots:foo:allow-auto-connection_slot-names"
+        expected["error"][name] = {
+            "text": "declaration malformed ('slot-names' not a list)"
+        }
+        self.check_results(r, expected=expected)
+
+    def test__verify_declaration_invalid_plugs_iface_constraint_plug_names_value(self):
+        """Test _verify_declaration - invalid interface constraint plug-names"""
+        c = SnapReviewDeclaration(self.test_name)
+        decl = {"plugs": {"foo": {"allow-installation": {"plug-names": ""}}}}
+        c._verify_declaration(decl=decl)
+        r = c.review_report
+        expected_counts = {"info": 0, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:valid_plugs:foo:allow-installation_plug-names"
+        expected["error"][name] = {
+            "text": "declaration malformed ('plug-names' not a list)"
+        }
+        self.check_results(r, expected=expected)
+
+    def test__verify_declaration_valid_plugs_iface_constraint_plug_names_value(self):
+        """Test _verify_declaration - valid interface constraint plug-names"""
+        c = SnapReviewDeclaration(self.test_name)
+        decl = {"plugs": {"foo": {"allow-installation": {"plug-names": ["a", "b"]}}}}
+        c._verify_declaration(decl=decl)
+        r = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
+
+    def test__verify_declaration_valid_plugs_iface_constraint_plug_names_value_auto(self):
+        """Test _verify_declaration - valid interface constraint plug-names
+           (auto-connection)"""
+        c = SnapReviewDeclaration(self.test_name)
+        decl = {"plugs": {"foo": {"allow-auto-connection": {"plug-names": ["a", "b"]}}}}
+        c._verify_declaration(decl=decl)
+        r = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
+
+    def test__verify_declaration_valid_slots_iface_constraint_slot_names_value(self):
+        """Test _verify_declaration - valid interface constraint slot-names"""
+        c = SnapReviewDeclaration(self.test_name)
+        decl = {"slots": {"foo": {"allow-connection": {"slot-names": ["a", "b"]}}}}
+        c._verify_declaration(decl=decl)
+        r = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
 
     def test__verify_declaration_valid_slots_plug_attribs_browser_support(self):
         """Test _verify_declaration - valid interface constraint attrib

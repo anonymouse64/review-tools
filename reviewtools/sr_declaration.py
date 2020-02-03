@@ -116,6 +116,8 @@ class SnapReviewDeclaration(SnapReview):
                 "slot-snap-id",
                 "on-store",
                 "on-brand",
+                "plug-names",  # https://forum.snapcraft.io/t/plug-slot-rules-plug-names-slot-names-constraints/12439
+                "slot-names",
             ]
             cstr_dicts = ["plug-attributes", "slot-attributes"]
             cstr_strs = ["plugs-per-slot", "slots-per-plug"]
@@ -367,9 +369,11 @@ class SnapReviewDeclaration(SnapReview):
                         if key == "plugs":
                             allowed.append("plug-snap-type")
                             allowed.append("plug-attributes")
+                            allowed.append("plug-names")
                         elif key == "slots":
                             allowed.append("slot-snap-type")
                             allowed.append("slot-attributes")
+                            allowed.append("slot-names")
                     else:
                         allowed = [
                             "plug-attributes",
@@ -382,10 +386,12 @@ class SnapReviewDeclaration(SnapReview):
                             allowed.append("slot-publisher-id")
                             allowed.append("slot-snap-id")
                             allowed.append("slot-snap-type")
+                            allowed.append("plug-names")
                         elif key == "slots":
                             allowed.append("plug-publisher-id")
                             allowed.append("plug-snap-id")
                             allowed.append("plug-snap-type")
+                            allowed.append("slot-names")
 
                         # These may be slot or plug, but not installation
                         # or deny-*. Ie, only allow-(auto-)connection
