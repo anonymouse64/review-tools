@@ -1,4 +1,4 @@
-review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
+review-tools (0.48+20200203-1) RELEASED; urgency=medium
 
   * overrides.py:
     - add several snaps to shared publishers
@@ -7,11 +7,15 @@ review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
   * reviewtools/{available,store}.py: handle empty manifest
   * use flake8 instead of pep8/pyflakes
   * add black style-check and black format our python files
-  * use base: core18
+  * use base: core18 with various snap packaging updates to make things work
+    again with 'base: core18'
   * sr_security.py/common.py: handle squashfs-tools 4.4 unsquashfs updated
     error handling
+  * sr_declaration.py: check interface attributes when 'interface' omitted
+    (LP: #1860821)
+  * add bin/dump-tool
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Thu, 12 Dec 2019 06:34:47 -0600
+ -- Jamie Strandboge <jamie@ubuntu.com>  Mon, 03 Feb 2020 13:14:40 -0600
 
 review-tools (0.48+20191211-3) RELEASED; urgency=medium
 
