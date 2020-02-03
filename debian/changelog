@@ -1,3 +1,9 @@
+review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
+
+  * sr_security.py: add checks to warn if iref matches another interface
+
+ -- Jamie Strandboge <jamie@ubuntu.com>  Mon, 03 Feb 2020 15:06:21 -0600
+
 review-tools (0.48+20200203-1) RELEASED; urgency=medium
 
   * overrides.py:
