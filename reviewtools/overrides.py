@@ -410,6 +410,11 @@ sec_resquashfs_overrides = [
 # reference is in the list of allowed references. We don't want to encode the
 # snap declaration here too, which means a snap can use any of these with the
 # passing snap declaration constraint.
+#
+# XXX: eventually, this will go away. snapd 2.44 adds plug-names/slot-names
+# that should be used instead for personal-files, system-files, etc. We don't
+# want to do this just yet though. See:
+# https://wiki.canonical.com/AppStore/Reviews#Snap_declaration_assertion_versions
 sec_iface_ref_overrides = {
     "personal-files": {
         "amass": ["dot-amass"],
