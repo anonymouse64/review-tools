@@ -148,6 +148,24 @@ class TestStore(TestCase):
         self.assertEqual(len(res["uploaders"]), 1)
         self.assertEqual(res["uploaders"][0], "test@example.com")
 
+    def test_check_get_package_revisions_empty_collaborator(self):
+        """Test get_package_revisions() - empty collaborator"""
+        self.store_db[0]["collaborators"] = [""]
+        errors = {}
+        store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors["0ad"][0], "collaborator email '' invalid")
+
+    def test_check_get_package_revisions_has_collaborator(self):
+        """Test get_package_revisions() - has has collaborator"""
+        self.store_db[0]["collaborators"] = ["test@example.com"]
+        errors = {}
+        res = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
+        self.assertEqual(len(errors), 0)
+        self.assertTrue(isinstance(res["collaborators"], list))
+        self.assertEqual(len(res["collaborators"]), 1)
+        self.assertEqual(res["collaborators"][0], "test@example.com")
+
     def test_check_get_package_revisions_parts_is_none(self):
         """Test get_package_revisions() - parts is None"""
         for i in range(len(self.store_db[0]["revisions"])):
@@ -226,7 +244,10 @@ class TestStore(TestCase):
         errors = {}
         store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
         self.assertEqual(len(errors), 1)
-        self.assertEqual(errors["0ad"][0], "Could not determine Ubuntu release ('parts' not in manifest)")
+        self.assertEqual(
+            errors["0ad"][0],
+            "Could not determine Ubuntu release ('parts' not in manifest)",
+        )
 
     def test_check_get_shared_snap_without_override_missing(self):
         """Test get_shared_snap_without_override() - missing"""

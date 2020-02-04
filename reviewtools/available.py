@@ -147,9 +147,12 @@ def _email_report_for_pkg(pkg_db, seen_db):
     if "snap_type" in pkg_db and pkg_db["snap_type"] == "kernel":
         subj = "%s built from outdated Ubuntu kernel" % pkgname
 
-    # Send to the publisher and any affected uploaders
+    # Send to the publisher and any collaborators. If no collaborators,
+    # fallback to any uploaders for the revision
     email_to_addr = pkg_db["publisher"]
-    if len(pkg_db["uploaders"]) > 0:
+    if len(pkg_db["collaborators"]) > 0:
+        email_to_addr += ", %s" % ", ".join(pkg_db["collaborators"])
+    elif len(pkg_db["uploaders"]) > 0:
         email_to_addr += ", %s" % ", ".join(pkg_db["uploaders"])
     if len(pkg_db["additional"]) > 0:
         email_to_addr += ", %s" % ", ".join(pkg_db["additional"])

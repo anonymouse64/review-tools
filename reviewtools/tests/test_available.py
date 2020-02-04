@@ -210,6 +210,15 @@ Revision r12 (i386; channels: candidate, beta)
         self.assertEqual(subj, None)
         self.assertEqual(body, None)
 
+    def test_check__email_report_for_pkg_with_collaborators(self):
+        """Test _email_report_for_pkg() - with collaborators"""
+        self.pkg_db["collaborators"] = ["testme@example.com"]
+        self.pkg_db["uploaders"] = ["testme2@example.com"]
+        (to_addr, subj, body) = available._email_report_for_pkg(self.pkg_db, {})
+        self.assertTrue("testme@example.com" in to_addr)
+        # collaborators supercede uploaders
+        self.assertFalse("testme2@example.com" in to_addr)
+
     def test_check__email_report_for_pkg_with_uploaders(self):
         """Test _email_report_for_pkg() - with uploaders"""
         self.pkg_db["uploaders"] = ["testme@example.com"]

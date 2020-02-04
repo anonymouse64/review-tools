@@ -114,6 +114,20 @@ def get_pkg_revisions(item, secnot_db, errors):
         )
         return pkg_db
 
+    pkg_db["collaborators"] = []
+    if "collaborators" in item:
+        for c in item["collaborators"]:
+            cEmail = email.sanitize_addr(c)
+            if cEmail == "":
+                # Don't treat this as fatal for this snap
+                _add_error(
+                    pkg_db["name"], errors, "collaborator email '%s' invalid" % cEmail
+                )
+            elif (
+                cEmail != pkg_db["publisher"] and cEmail not in pkg_db["collaborators"]
+            ):
+                pkg_db["collaborators"].append(cEmail)
+
     for rev in item["revisions"]:
         if "revision" not in rev:
             _add_error(pkg_db["name"], errors, "no revisions found")
@@ -178,6 +192,7 @@ def get_pkg_revisions(item, secnot_db, errors):
             for eml in update_publisher_overrides[pkg_db["publisher"]][pkg_db["name"]]:
                 if (
                     eml != pkg_db["publisher"]
+                    and eml not in pkg_db["collaborators"]
                     and eml not in pkg_db["uploaders"]
                     and eml not in pkg_db["additional"]
                 ):
