@@ -2,6 +2,7 @@ review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
 
   * sr_security.py: add checks to warn if iref matches another interface
   * sr_declaration.py: add plug-names/slot-names checks
+  * sr_{available,store}.py: support collaborators (LP: #1859034)
 
  -- Jamie Strandboge <jamie@ubuntu.com>  Mon, 03 Feb 2020 15:06:21 -0600
 
