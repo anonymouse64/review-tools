@@ -34,7 +34,7 @@ class TestAvailable(TestCase):
         self.store_db = read_file_as_json_dict("./tests/test-store-unittest-1.db")
         errors = {}
         self.pkg_db = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
-        self.assertEquals(len(errors), 0)
+        self.assertEqual(len(errors), 0)
 
         os.environ["RT_SEND_EMAIL"] = "0"
 
@@ -77,7 +77,7 @@ Revision r14 (i386; channels: edge)
         for rev in self.pkg_db["revisions"]:
             self.pkg_db["revisions"][rev]["secnot-report"] = {}
         res = available._secnot_report_for_pkg(self.pkg_db, {})
-        self.assertEquals(res, "")
+        self.assertEqual(res, "")
 
     def test_check__secnot_report_for_pkg_only_new_secnot(self):
         """Test _secnot_report_for_pkg() - only new secnot"""
@@ -111,7 +111,7 @@ Revision r14 (i386; channels: edge)
         self.store_db = read_file_as_json_dict("./tests/test-store-budgie.db")
         errors = {}
         self.pkg_db = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
-        self.assertEquals(len(errors), 0)
+        self.assertEqual(len(errors), 0)
 
         seen_db = {
             "ubuntu-budgie-welcome": {
@@ -206,9 +206,9 @@ Revision r12 (i386; channels: candidate, beta)
         for rev in self.pkg_db["revisions"]:
             self.pkg_db["revisions"][rev]["secnot-report"] = {}
         (to_addr, subj, body) = available._email_report_for_pkg(self.pkg_db, {})
-        self.assertEquals(to_addr, None)
-        self.assertEquals(subj, None)
-        self.assertEquals(body, None)
+        self.assertEqual(to_addr, None)
+        self.assertEqual(subj, None)
+        self.assertEqual(body, None)
 
     def test_check__email_report_for_pkg_with_uploaders(self):
         """Test _email_report_for_pkg() - with uploaders"""
@@ -227,20 +227,20 @@ Revision r12 (i386; channels: candidate, beta)
         self.tmpdir = tempfile.mkdtemp()
         tmp = os.path.join(self.tmpdir, "seen.db")
         res = available.read_seen_db(tmp)
-        self.assertEquals(len(res), 0)
+        self.assertEqual(len(res), 0)
 
     def test_check__update_seen(self):
         """Test _update_seen()"""
         self.tmpdir = tempfile.mkdtemp()
         tmp = os.path.join(self.tmpdir, "seen.db")
         res = available.read_seen_db(tmp)
-        self.assertEquals(len(res), 0)
+        self.assertEqual(len(res), 0)
         seen_db = res
 
         available._update_seen(tmp, seen_db, self.pkg_db)
 
         res = available.read_seen_db(tmp)
-        self.assertEquals(len(res), 1)
+        self.assertEqual(len(res), 1)
         self.assertTrue("0ad" in res)
 
         expected_db = {
@@ -251,14 +251,14 @@ Revision r12 (i386; channels: candidate, beta)
                 "14": ["3501-1", "3602-1", "3606-1"],
             }
         }
-        self.assertEquals(len(expected_db), len(res))
+        self.assertEqual(len(expected_db), len(res))
 
         for pkg in expected_db:
             self.assertTrue(pkg in res)
-            self.assertEquals(len(expected_db[pkg]), len(res[pkg]))
+            self.assertEqual(len(expected_db[pkg]), len(res[pkg]))
             for rev in expected_db[pkg]:
                 self.assertTrue(rev in res[pkg])
-                self.assertEquals(len(expected_db[pkg][rev]), len(res[pkg][rev]))
+                self.assertEqual(len(expected_db[pkg][rev]), len(res[pkg][rev]))
                 for secnot in expected_db[pkg][rev]:
                     self.assertTrue(secnot in res[pkg][rev])
 
@@ -267,7 +267,7 @@ Revision r12 (i386; channels: candidate, beta)
         self.tmpdir = tempfile.mkdtemp()
         tmp = os.path.join(self.tmpdir, "seen.db")
         res = available.read_seen_db(tmp)
-        self.assertEquals(len(res), 0)
+        self.assertEqual(len(res), 0)
         seen_db = res
 
         for rev in self.pkg_db["revisions"]:
@@ -275,16 +275,16 @@ Revision r12 (i386; channels: candidate, beta)
         available._update_seen(tmp, seen_db, self.pkg_db)
 
         res = available.read_seen_db(tmp)
-        self.assertEquals(len(res), 1)
+        self.assertEqual(len(res), 1)
         self.assertTrue("0ad" in res)
-        self.assertEquals(len(res["0ad"]), 0)
+        self.assertEqual(len(res["0ad"]), 0)
 
     def test_check__update_seen_remove_old_revision(self):
         """Test _update_seen() - remove old revision"""
         self.tmpdir = tempfile.mkdtemp()
         tmp = os.path.join(self.tmpdir, "seen.db")
         res = available.read_seen_db(tmp)
-        self.assertEquals(len(res), 0)
+        self.assertEqual(len(res), 0)
 
         seen_db = {
             "0ad": {"9": ["3401-1"], "10": ["3401-1"], "8": ["3401-1"], "7": ["3401-1"]}
@@ -292,9 +292,9 @@ Revision r12 (i386; channels: candidate, beta)
         available._update_seen(tmp, seen_db, self.pkg_db)
 
         res = available.read_seen_db(tmp)
-        self.assertEquals(len(res), 1)
+        self.assertEqual(len(res), 1)
         self.assertTrue("0ad" in res)
-        self.assertEquals(len(res["0ad"]), 4)
+        self.assertEqual(len(res["0ad"]), 4)
 
         for r in ["7", "8", "9", "10"]:
             self.assertFalse(r in seen_db["0ad"])
@@ -367,8 +367,8 @@ Revision r12 (i386; channels: candidate, beta)
         secnot_fn = "./tests/test-usn-unittest-1.db"
         store_fn = "./tests/test-store-unittest-1.db"
         (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
-        self.assertEquals(len(errors), 0)
-        self.assertEquals(len(sent), 1)
+        self.assertEqual(len(errors), 0)
+        self.assertEqual(len(sent), 1)
         (to_addr, subj, body) = sent[0]
         for eml in ["olivier.tilloy@canonical.com"]:
             self.assertTrue(eml in to_addr)
@@ -388,8 +388,8 @@ Revision r12 (i386; channels: candidate, beta)
         self.tmpdir = tempfile.mkdtemp()
         seen_fn = os.path.join(self.tmpdir, "seen.db")
         (sent, errors) = available.scan_store(secnot_fn, store_fn, seen_fn, None)
-        self.assertEquals(len(errors), 0)
-        self.assertEquals(len(sent), 1)
+        self.assertEqual(len(errors), 0)
+        self.assertEqual(len(sent), 1)
         (to_addr, subj, body) = sent[0]
         for eml in ["olivier.tilloy@canonical.com"]:
             self.assertTrue(eml in to_addr)
@@ -406,24 +406,24 @@ Revision r12 (i386; channels: candidate, beta)
         secnot_fn = "./tests/test-usn-unittest-1.db"
         store_fn = "./tests/test-store-unittest-1.db"
         (sent, errors) = available.scan_store(secnot_fn, store_fn, None, "not-there")
-        self.assertEquals(len(errors), 0)
-        self.assertEquals(len(sent), 0)
+        self.assertEqual(len(errors), 0)
+        self.assertEqual(len(sent), 0)
 
     def test_check_scan_store_with_pkgname_bad_publisher(self):
         """Test scan_store() - with pkgname and bad publisher"""
         secnot_fn = "./tests/test-usn-unittest-1.db"
         store_fn = "./tests/test-store-unittest-bad-1.db"
         (sent, errors) = available.scan_store(secnot_fn, store_fn, None, "1ad")
-        self.assertEquals(len(errors), 1)
-        self.assertEquals(len(sent), 0)
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(len(sent), 0)
 
     def test_check_scan_store_kernel(self):
         """Test scan_store() - kernel"""
         secnot_fn = "./tests/test-usn-kernel.db"
         store_fn = "./tests/test-store-kernel.db"
         (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
-        self.assertEquals(len(errors), 0)
-        self.assertEquals(len(sent), 1)
+        self.assertEqual(len(errors), 0)
+        self.assertEqual(len(sent), 1)
         (to_addr, subj, body) = sent[0]
         for eml in ["foo@example.com"]:
             self.assertTrue(eml in to_addr)
@@ -440,20 +440,20 @@ Revision r12 (i386; channels: candidate, beta)
         secnot_fn = "./tests/test-usn-unittest-lp1841848.db"
         store_fn = "./tests/test-store-unittest-lp1841848.db"
         (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
-        self.assertEquals(len(errors), 0)
-        self.assertEquals(len(sent), 1)
+        self.assertEqual(len(errors), 0)
+        self.assertEqual(len(sent), 1)
         (to_addr, subj, body) = sent[0]
-        self.assertEquals(to_addr, None)
-        self.assertEquals(subj, None)
-        self.assertEquals(body, None)
+        self.assertEqual(to_addr, None)
+        self.assertEqual(subj, None)
+        self.assertEqual(body, None)
 
     def test_check_scan_store_lp1841848_allbinaries_needed(self):
         """Test scan_store() - lp1841848 (allbinaries needed)"""
         secnot_fn = "./tests/test-usn-unittest-lp1841848.db"
         store_fn = "./tests/test-store-unittest-lp1841848-needed.db"
         (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
-        self.assertEquals(len(errors), 0)
-        self.assertEquals(len(sent), 1)
+        self.assertEqual(len(errors), 0)
+        self.assertEqual(len(sent), 1)
         (to_addr, subj, body) = sent[0]
         eml = "test.me@example.com"
         self.assertTrue(eml in to_addr)
@@ -465,21 +465,21 @@ Revision r12 (i386; channels: candidate, beta)
         secnot_fn = "./tests/test-usn-unittest-lp1841848-incorrect-epoch.db"
         store_fn = "./tests/test-store-unittest-lp1841848.db"
         (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
-        self.assertEquals(len(errors), 0)
-        self.assertEquals(len(sent), 1)
+        self.assertEqual(len(errors), 0)
+        self.assertEqual(len(sent), 1)
         (to_addr, subj, body) = sent[0]
 
-        self.assertEquals(to_addr, None)
-        self.assertEquals(subj, None)
-        self.assertEquals(body, None)
+        self.assertEqual(to_addr, None)
+        self.assertEqual(subj, None)
+        self.assertEqual(body, None)
 
     def test_check_scan_store_lp1841848_allbinaries_bad_epoch_needed(self):
         """Test scan_store() - lp1841848 (allbinaries with bad epoch needed)"""
         secnot_fn = "./tests/test-usn-unittest-lp1841848-incorrect-epoch.db"
         store_fn = "./tests/test-store-unittest-lp1841848-needed.db"
         (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
-        self.assertEquals(len(errors), 0)
-        self.assertEquals(len(sent), 1)
+        self.assertEqual(len(errors), 0)
+        self.assertEqual(len(sent), 1)
         (to_addr, subj, body) = sent[0]
         eml = "test.me@example.com"
         self.assertTrue(eml in to_addr)
@@ -491,46 +491,46 @@ Revision r12 (i386; channels: candidate, beta)
         secnot_fn = "./tests/test-usn-unittest-lp1841848-incorrect-epoch2.db"
         store_fn = "./tests/test-store-unittest-lp1841848.db"
         (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
-        self.assertEquals(len(errors), 0)
-        self.assertEquals(len(sent), 1)
+        self.assertEqual(len(errors), 0)
+        self.assertEqual(len(sent), 1)
         (to_addr, subj, body) = sent[0]
 
-        self.assertEquals(to_addr, None)
-        self.assertEquals(subj, None)
-        self.assertEquals(body, None)
+        self.assertEqual(to_addr, None)
+        self.assertEqual(subj, None)
+        self.assertEqual(body, None)
 
     def test_check_scan_store_lp1841848_unmatched_binver(self):
         """Test scan_store() - lp1841848 (unmatched binary version)"""
         secnot_fn = "./tests/test-usn-unittest-lp1841848-unmatched-binver.db"
         store_fn = "./tests/test-store-unittest-lp1841848.db"
         (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
-        self.assertEquals(len(errors), 0)
-        self.assertEquals(len(sent), 1)
+        self.assertEqual(len(errors), 0)
+        self.assertEqual(len(sent), 1)
         (to_addr, subj, body) = sent[0]
 
-        self.assertEquals(to_addr, None)
-        self.assertEquals(subj, None)
-        self.assertEquals(body, None)
+        self.assertEqual(to_addr, None)
+        self.assertEqual(subj, None)
+        self.assertEqual(body, None)
 
     def test_check_scan_store_lp1841848_no_allbinaries(self):
         """Test scan_store() - lp1841848 (no allbinaries)"""
         secnot_fn = "./tests/test-usn-unittest-lp1841848-noallbin.db"
         store_fn = "./tests/test-store-unittest-lp1841848.db"
         (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
-        self.assertEquals(len(errors), 0)
-        self.assertEquals(len(sent), 1)
+        self.assertEqual(len(errors), 0)
+        self.assertEqual(len(sent), 1)
         (to_addr, subj, body) = sent[0]
-        self.assertEquals(to_addr, None)
-        self.assertEquals(subj, None)
-        self.assertEquals(body, None)
+        self.assertEqual(to_addr, None)
+        self.assertEqual(subj, None)
+        self.assertEqual(body, None)
 
     def test_check_scan_store_lp1841848_no_allbinaries_needed(self):
         """Test scan_store() - lp1841848 (no allbinaries needed)"""
         secnot_fn = "./tests/test-usn-unittest-lp1841848-noallbin.db"
         store_fn = "./tests/test-store-unittest-lp1841848-needed.db"
         (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
-        self.assertEquals(len(errors), 0)
-        self.assertEquals(len(sent), 1)
+        self.assertEqual(len(errors), 0)
+        self.assertEqual(len(sent), 1)
         (to_addr, subj, body) = sent[0]
         eml = "test.me@example.com"
         self.assertTrue(eml in to_addr)
@@ -542,18 +542,18 @@ Revision r12 (i386; channels: candidate, beta)
         secnot_fn = "./tests/test-usn-unittest-lp1841848-unmatched-binver-noallbin.db"
         store_fn = "./tests/test-store-unittest-lp1841848.db"
         (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
-        self.assertEquals(len(errors), 0)
-        self.assertEquals(len(sent), 1)
+        self.assertEqual(len(errors), 0)
+        self.assertEqual(len(sent), 1)
         (to_addr, subj, body) = sent[0]
 
-        self.assertEquals(to_addr, None)
-        self.assertEquals(subj, None)
-        self.assertEquals(body, None)
+        self.assertEqual(to_addr, None)
+        self.assertEqual(subj, None)
+        self.assertEqual(body, None)
 
     def test_check_scan_store_empty_manifest(self):
         """Test scan_store() - empty manifest"""
         secnot_fn = "./tests/test-usn-unittest-1.db"
         store_fn = "./tests/test-store-unittest-bare.db"
         (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
-        self.assertEquals(len(errors), 0)
-        self.assertEquals(len(sent), 0)
+        self.assertEqual(len(errors), 0)
+        self.assertEqual(len(sent), 0)

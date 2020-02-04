@@ -46,22 +46,22 @@ class TestStore(TestCase):
         """Test get_package_revisions() - valid"""
         errors = {}
         res = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
-        self.assertEquals(len(errors), 0)
+        self.assertEqual(len(errors), 0)
 
         # verify the structure is what we expect
         self.assertTrue("name" in res)
-        self.assertEquals(res["name"], "0ad")
+        self.assertEqual(res["name"], "0ad")
 
         self.assertTrue("publisher" in res)
-        self.assertEquals(res["publisher"], "olivier.tilloy@canonical.com")
+        self.assertEqual(res["publisher"], "olivier.tilloy@canonical.com")
 
         self.assertTrue("uploaders" in res)
         self.assertTrue(isinstance(res["uploaders"], list))
-        self.assertEquals(len(res["uploaders"]), 0)
+        self.assertEqual(len(res["uploaders"]), 0)
 
         self.assertTrue("additional" in res)
         self.assertTrue(isinstance(res["additional"], list))
-        self.assertEquals(len(res["additional"]), 0)
+        self.assertEqual(len(res["additional"]), 0)
 
         self.assertTrue("revisions" in res)
         self.assertTrue("12" in res["revisions"])
@@ -84,7 +84,7 @@ class TestStore(TestCase):
         self.store_db[0]["revisions"][0]["manifest_yaml"] = m
         errors = {}
         res = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
-        self.assertEquals(len(errors), 0)
+        self.assertEqual(len(errors), 0)
         self.assertTrue(
             "3501-1" in res["revisions"]["12"]["secnot-report"]["libxcursor1"]
         )
@@ -94,31 +94,31 @@ class TestStore(TestCase):
         self.store_db[0]["publisher_email"] = ""
         errors = {}
         store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
-        self.assertEquals(len(errors), 1)
-        self.assertEquals(errors["0ad"][0], "publisher_email '' invalid")
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors["0ad"][0], "publisher_email '' invalid")
 
     def test_check_get_package_revisions_missing_revision(self):
         """Test get_package_revisions() - missing revision"""
         del self.store_db[0]["revisions"][0]["revision"]
         errors = {}
         store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
-        self.assertEquals(len(errors), 1)
-        self.assertEquals(errors["0ad"][0], "no revisions found")
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors["0ad"][0], "no revisions found")
 
     def test_check_get_package_revisions_missing_manifest(self):
         """Test get_package_revisions() - missing manifest"""
         del self.store_db[0]["revisions"][0]["manifest_yaml"]
         errors = {}
         store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
-        self.assertEquals(len(errors), 1)
-        self.assertEquals(errors["0ad"][0], "manifest_yaml missing for revision '12'")
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors["0ad"][0], "manifest_yaml missing for revision '12'")
 
     def test_check_get_package_revisions_bad_manifest(self):
         """Test get_package_revisions() - bad manifest"""
         self.store_db[0]["revisions"][0]["manifest_yaml"] = "{"
         errors = {}
         store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
-        self.assertEquals(len(errors), 1)
+        self.assertEqual(len(errors), 1)
         self.assertTrue(errors["0ad"][0].startswith("error loading manifest:"))
 
     def test_check_get_package_revisions_bad_secnot(self):
@@ -126,27 +126,27 @@ class TestStore(TestCase):
         self.secnot_db = "bad"
         errors = {}
         pkg_db = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
-        self.assertEquals(len(errors), 0)
-        self.assertEquals(len(pkg_db["revisions"]), 0)
+        self.assertEqual(len(errors), 0)
+        self.assertEqual(len(pkg_db["revisions"]), 0)
 
     def test_check_get_package_revisions_empty_uploader(self):
         """Test get_package_revisions() - empty uploader"""
         self.store_db[0]["revisions"][0]["uploader_email"] = ""
         errors = {}
         store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
-        self.assertEquals(len(errors), 1)
-        self.assertEquals(errors["0ad"][0], "uploader_email '' invalid")
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors["0ad"][0], "uploader_email '' invalid")
 
     def test_check_get_package_revisions_has_uploader(self):
         """Test get_package_revisions() - has uploader"""
         self.store_db[0]["revisions"][0]["uploader_email"] = "test@example.com"
         errors = {}
         res = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
-        self.assertEquals(len(errors), 0)
+        self.assertEqual(len(errors), 0)
         self.assertTrue("uploaders" in res)
         self.assertTrue(isinstance(res["uploaders"], list))
-        self.assertEquals(len(res["uploaders"]), 1)
-        self.assertEquals(res["uploaders"][0], "test@example.com")
+        self.assertEqual(len(res["uploaders"]), 1)
+        self.assertEqual(res["uploaders"][0], "test@example.com")
 
     def test_check_get_package_revisions_parts_is_none(self):
         """Test get_package_revisions() - parts is None"""
@@ -160,9 +160,9 @@ class TestStore(TestCase):
         errors = {}
         pkg_db = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
         # empty parts has no security notices
-        self.assertEquals(len(errors), 0)
+        self.assertEqual(len(errors), 0)
         for rev in pkg_db["revisions"]:
-            self.assertEquals(len(pkg_db["revisions"][rev]["secnot-report"]), 0)
+            self.assertEqual(len(pkg_db["revisions"][rev]["secnot-report"]), 0)
 
     def test_check_get_package_revisions_image_info_is_none(self):
         """Test get_package_revisions() - image-info is None"""
@@ -176,7 +176,7 @@ class TestStore(TestCase):
         errors = {}
         pkg_db = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
         # empty image-info has no effect
-        self.assertEquals(len(errors), 0)
+        self.assertEqual(len(errors), 0)
         for rev in pkg_db["revisions"]:
             self.assertFalse(len(pkg_db["revisions"][rev]["secnot-report"]) == 0)
 
@@ -194,9 +194,9 @@ class TestStore(TestCase):
         errors = {}
         pkg_db = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
         # empty parts/stage-packages has no security notices
-        self.assertEquals(len(errors), 0)
+        self.assertEqual(len(errors), 0)
         for rev in pkg_db["revisions"]:
-            self.assertEquals(len(pkg_db["revisions"][rev]["secnot-report"]), 0)
+            self.assertEqual(len(pkg_db["revisions"][rev]["secnot-report"]), 0)
 
     def test_check_get_package_revisions_pkg_override(self):
         """Test get_package_revisions() - pkg override"""
@@ -208,11 +208,11 @@ class TestStore(TestCase):
         self.store_db[0]["publisher_email"] = "rt-tests@example.com"
         errors = {}
         res = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
-        self.assertEquals(len(errors), 0)
+        self.assertEqual(len(errors), 0)
         self.assertTrue("additional" in res)
         self.assertTrue(isinstance(res["additional"], list))
-        self.assertEquals(len(res["additional"]), 1)
-        self.assertEquals(res["additional"][0], "over@example.com")
+        self.assertEqual(len(res["additional"]), 1)
+        self.assertEqual(res["additional"][0], "over@example.com")
 
     def test_check_get_package_revisions_bad_release(self):
         """Test get_package_revisions() - pkg override"""
@@ -225,8 +225,8 @@ class TestStore(TestCase):
             self.store_db[0]["revisions"][i]["manifest_yaml"] = yaml.dump(m)
         errors = {}
         store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
-        self.assertEquals(len(errors), 1)
-        self.assertEquals(errors["0ad"][0], "Could not determine Ubuntu release ('parts' not in manifest)")
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors["0ad"][0], "Could not determine Ubuntu release ('parts' not in manifest)")
 
     def test_check_get_shared_snap_without_override_missing(self):
         """Test get_shared_snap_without_override() - missing"""
@@ -237,23 +237,23 @@ class TestStore(TestCase):
         self.store_db[0]["publisher_email"] = "rt-tests@example.com"
         res = store.get_shared_snap_without_override(self.store_db)
         self.assertTrue(isinstance(res, dict))
-        self.assertEquals(len(res), 1)
+        self.assertEqual(len(res), 1)
         self.assertTrue("rt-tests@example.com" in res)
-        self.assertEquals(len(res["rt-tests@example.com"]), 1)
-        self.assertEquals(res["rt-tests@example.com"][0], "0ad")
+        self.assertEqual(len(res["rt-tests@example.com"]), 1)
+        self.assertEqual(res["rt-tests@example.com"][0], "0ad")
 
     def test_check_get_shared_snap_without_override_missing_publisher(self):
         """Test get_shared_snap_without_override() - missing publisher"""
         del self.store_db[0]["publisher_email"]
         res = store.get_shared_snap_without_override(self.store_db)
         self.assertTrue(isinstance(res, dict))
-        self.assertEquals(len(res), 0)
+        self.assertEqual(len(res), 0)
 
     def test_check_get_shared_snap_without_override_not_present(self):
         """Test get_shared_snap_without_override() - not present"""
         res = store.get_shared_snap_without_override(self.store_db)
         self.assertTrue(isinstance(res, dict))
-        self.assertEquals(len(res), 0)
+        self.assertEqual(len(res), 0)
 
     def test_check_normalize_and_verify_snap_manifest(self):
         """Test normalize_and_verify_snap_manifest()"""
@@ -291,7 +291,7 @@ class TestStore(TestCase):
         del m["parts"]
 
         res = store.get_staged_packages_from_manifest(m)
-        self.assertEquals(res, None)
+        self.assertEqual(res, None)
 
     def test_check_get_staged_packages_from_manifest_bad_staged(self):
         """Test get_staged_packages_from_manifest() - bad staged"""
@@ -315,7 +315,7 @@ class TestStore(TestCase):
         m["parts"]["0ad-launcher"]["stage-packages"] = []
 
         res = store.get_staged_packages_from_manifest(m)
-        self.assertEquals(res, None)
+        self.assertEqual(res, None)
 
     def test_check_get_staged_packages_from_manifest_binary_ignored(self):
         """Test get_staged_packages_from_manifest()"""
@@ -342,12 +342,12 @@ class TestStore(TestCase):
 
         res = store.get_secnots_for_manifest(m, self.secnot_db)
         self.assertTrue(isinstance(res, dict))
-        self.assertEquals(len(res), 2)
+        self.assertEqual(len(res), 2)
         self.assertTrue("libxcursor1" in res)
-        self.assertEquals(len(res["libxcursor1"]), 1)
-        self.assertEquals(res["libxcursor1"][0], "3501-1")
+        self.assertEqual(len(res["libxcursor1"]), 1)
+        self.assertEqual(res["libxcursor1"][0], "3501-1")
         self.assertTrue("libtiff5" in res)
-        self.assertEquals(len(res["libtiff5"]), 2)
+        self.assertEqual(len(res["libtiff5"]), 2)
         self.assertTrue("3602-1" in res["libtiff5"])
         self.assertTrue("3606-1" in res["libtiff5"])
 
@@ -360,7 +360,7 @@ class TestStore(TestCase):
 
         res = store.get_secnots_for_manifest(m, self.secnot_db)
         self.assertTrue(isinstance(res, dict))
-        self.assertEquals(len(res), 0)
+        self.assertEqual(len(res), 0)
 
     def test_check_get_secnots_for_manifest_with_cves(self):
         """Test get_secnots_for_manifest() - cves"""
@@ -370,19 +370,19 @@ class TestStore(TestCase):
 
         res = store.get_secnots_for_manifest(m, self.secnot_db, with_cves=True)
         self.assertTrue(isinstance(res, dict))
-        self.assertEquals(len(res), 2)
+        self.assertEqual(len(res), 2)
         self.assertTrue("libxcursor1" in res)
-        self.assertEquals(len(res["libxcursor1"]), 1)
+        self.assertEqual(len(res["libxcursor1"]), 1)
         self.assertTrue("3501-1" in res["libxcursor1"])
         self.assertTrue(isinstance(res["libxcursor1"]["3501-1"], list))
-        self.assertEquals(len(res["libxcursor1"]["3501-1"]), 1)
+        self.assertEqual(len(res["libxcursor1"]["3501-1"]), 1)
         self.assertTrue("CVE-2017-16612" in res["libxcursor1"]["3501-1"])
         self.assertTrue("libtiff5" in res)
-        self.assertEquals(len(res["libtiff5"]), 2)
+        self.assertEqual(len(res["libtiff5"]), 2)
         self.assertTrue(isinstance(res["libtiff5"]["3602-1"], list))
-        self.assertEquals(len(res["libtiff5"]["3602-1"]), 27)
+        self.assertEqual(len(res["libtiff5"]["3602-1"]), 27)
         self.assertTrue(isinstance(res["libtiff5"]["3606-1"], list))
-        self.assertEquals(len(res["libtiff5"]["3606-1"]), 12)
+        self.assertEqual(len(res["libtiff5"]["3606-1"]), 12)
 
     def test_check_get_secnots_for_manifest_has_newer(self):
         """Test get_secnots_for_manifest() - has newer"""
@@ -399,7 +399,7 @@ class TestStore(TestCase):
 
         res = store.get_secnots_for_manifest(m, self.secnot_db)
         self.assertTrue(isinstance(res, dict))
-        self.assertEquals(len(res), 0)
+        self.assertEqual(len(res), 0)
 
     def test_check_get_ubuntu_release_from_manifest(self):
         """Test get_ubuntu_release_from_manifest()"""
@@ -407,7 +407,7 @@ class TestStore(TestCase):
             self.store_db[0]["revisions"][0]["manifest_yaml"], Loader=yaml.SafeLoader
         )
         res = store.get_ubuntu_release_from_manifest(m)
-        self.assertEquals(res, "xenial")
+        self.assertEqual(res, "xenial")
 
     def test_check_get_ubuntu_release_from_manifest_missing_parts(self):
         """Test get_ubuntu_release_from_manifest() - missing parts"""
@@ -431,7 +431,7 @@ class TestStore(TestCase):
         m["parts"]["0ad-launcher"]["installed-snaps"].append("foo")
 
         res = store.get_ubuntu_release_from_manifest(m)
-        self.assertEquals(res, "xenial")
+        self.assertEqual(res, "xenial")
 
     def test_check_get_ubuntu_release_from_manifest_base18(self):
         """Test get_ubuntu_release_from_manifest() - base-18"""
@@ -441,7 +441,7 @@ class TestStore(TestCase):
         m["parts"]["0ad-launcher"]["installed-snaps"].append("base-18=123")
 
         res = store.get_ubuntu_release_from_manifest(m)
-        self.assertEquals(res, "bionic")
+        self.assertEqual(res, "bionic")
 
     def test_check_get_ubuntu_release_from_manifest_base18_with_others(self):
         """Test get_ubuntu_release_from_manifest() - base-18 with others"""
@@ -452,7 +452,7 @@ class TestStore(TestCase):
         m["parts"]["0ad-launcher"]["installed-snaps"].append("base-18=123")
 
         res = store.get_ubuntu_release_from_manifest(m)
-        self.assertEquals(res, "bionic")
+        self.assertEqual(res, "bionic")
 
     def test_check_get_ubuntu_release_from_manifest_base18_with_core(self):
         """Test get_ubuntu_release_from_manifest() - base-18 with others"""
@@ -477,7 +477,7 @@ class TestStore(TestCase):
         m["parts"]["0ad-launcher"]["installed-snaps"].append("core18=123")
 
         res = store.get_ubuntu_release_from_manifest(m)
-        self.assertEquals(res, "bionic")
+        self.assertEqual(res, "bionic")
 
     def test_check_get_ubuntu_release_from_manifest_core16(self):
         """Test get_ubuntu_release_from_manifest() - core16"""
@@ -487,7 +487,7 @@ class TestStore(TestCase):
         m["parts"]["0ad-launcher"]["installed-snaps"].append("core16=123")
 
         res = store.get_ubuntu_release_from_manifest(m)
-        self.assertEquals(res, "xenial")
+        self.assertEqual(res, "xenial")
 
     def test_check_get_ubuntu_release_from_manifest_core(self):
         """Test get_ubuntu_release_from_manifest() - core"""
@@ -497,7 +497,7 @@ class TestStore(TestCase):
         m["parts"]["0ad-launcher"]["installed-snaps"].append("core=123")
 
         res = store.get_ubuntu_release_from_manifest(m)
-        self.assertEquals(res, "xenial")
+        self.assertEqual(res, "xenial")
 
     def test_check_get_ubuntu_release_from_manifest_os_release_xenial(self):
         """Test get_ubuntu_release_from_manifest() - ubuntu/xenial"""
@@ -507,7 +507,7 @@ class TestStore(TestCase):
         m["snapcraft-os-release-id"] = "ubuntu"
         m["snapcraft-os-release-version-id"] = "16.04"
         res = store.get_ubuntu_release_from_manifest(m)
-        self.assertEquals(res, "xenial")
+        self.assertEqual(res, "xenial")
 
     def test_check_get_ubuntu_release_from_manifest_os_release_artful(self):
         """Test get_ubuntu_release_from_manifest() - ubuntu/artful"""
@@ -517,7 +517,7 @@ class TestStore(TestCase):
         m["snapcraft-os-release-id"] = "ubuntu"
         m["snapcraft-os-release-version-id"] = "17.10"
         res = store.get_ubuntu_release_from_manifest(m)
-        self.assertEquals(res, "artful")
+        self.assertEqual(res, "artful")
 
     def test_check_get_ubuntu_release_from_manifest_os_release_bionic(self):
         """Test get_ubuntu_release_from_manifest() - ubuntu/bionic"""
@@ -527,7 +527,7 @@ class TestStore(TestCase):
         m["snapcraft-os-release-id"] = "ubuntu"
         m["snapcraft-os-release-version-id"] = "18.04"
         res = store.get_ubuntu_release_from_manifest(m)
-        self.assertEquals(res, "bionic")
+        self.assertEqual(res, "bionic")
 
     def test_check_get_ubuntu_release_from_manifest_os_release_nonexist_os(self):
         """Test get_ubuntu_release_from_manifest() - nonexistent"""
@@ -538,7 +538,7 @@ class TestStore(TestCase):
         m["snapcraft-os-release-version-id"] = "18.04"
         res = store.get_ubuntu_release_from_manifest(m)
         # fallback to old behavior
-        self.assertEquals(res, "xenial")
+        self.assertEqual(res, "xenial")
 
     def test_check_get_ubuntu_release_from_manifest_os_release_nonexist_ver(self):
         """Test get_ubuntu_release_from_manifest() - ubuntu/nonexistent"""
@@ -549,7 +549,7 @@ class TestStore(TestCase):
         m["snapcraft-os-release-version-id"] = "1.02"
         res = store.get_ubuntu_release_from_manifest(m)
         # fallback to old behavior
-        self.assertEquals(res, "xenial")
+        self.assertEqual(res, "xenial")
 
     def test_convert_canonical_kernel_version(self):
         """Test convert_canonical_kernel_version()"""
@@ -567,7 +567,7 @@ class TestStore(TestCase):
         ]
         for (v, expected, only_abi) in tests:
             res = store.convert_canonical_kernel_version(v, only_abi)
-            self.assertEquals(res, expected)
+            self.assertEqual(res, expected)
 
     def test_convert_canonical_app_version(self):
         """Test convert_canonical_app_version()"""
@@ -583,7 +583,7 @@ class TestStore(TestCase):
         ]
         for (v, expected) in tests:
             res = store.convert_canonical_app_version(v)
-            self.assertEquals(res, expected)
+            self.assertEqual(res, expected)
 
     def test_get_faked_stage_packages_version(self):
         """Test get_faked_stage_packages - version"""
@@ -661,7 +661,7 @@ class TestStore(TestCase):
         self.store_db = read_file_as_json_dict("./tests/test-store-unittest-bare.db")
         errors = {}
         res = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
-        self.assertEquals(len(errors), 0)
+        self.assertEqual(len(errors), 0)
 
         self.assertTrue("revisions" in res)
-        self.assertEquals(len(res["revisions"]), 0)
+        self.assertEqual(len(res["revisions"]), 0)

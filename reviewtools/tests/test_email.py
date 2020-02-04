@@ -29,7 +29,7 @@ class TestEmail(TestCase):
             ("snaps@canonical.com", "snaps@canonical.com"),
         ]
         for (addr, expected) in addresses:
-            self.assertEquals(sanitize_addr(addr), expected)
+            self.assertEqual(sanitize_addr(addr), expected)
 
     def test_check_sanitize_addr_invalid(self):
         """Test sanitize_addr() - invalid"""
@@ -41,4 +41,4 @@ class TestEmail(TestCase):
             ("foo@@bar", ""),
         ]
         for (addr, expected) in addresses:
-            self.assertEquals(sanitize_addr(addr), expected)
+            self.assertEqual(sanitize_addr(addr), expected)

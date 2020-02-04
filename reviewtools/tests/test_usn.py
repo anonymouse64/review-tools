@@ -391,22 +391,22 @@ class TestUSN(TestCase):
 
         print(res)
         self.maxDiff = None
-        self.assertEquals(len(expected_db), len(res))
+        self.assertEqual(len(expected_db), len(res))
         for rel in expected_db:
             self.assertTrue(rel in res)
-            self.assertEquals(len(expected_db[rel]), len(res[rel]))
+            self.assertEqual(len(expected_db[rel]), len(res[rel]))
             for pkg in expected_db[rel]:
                 self.assertTrue(pkg in res[rel])
-                self.assertEquals(len(expected_db[rel][pkg]), len(res[rel][pkg]))
+                self.assertEqual(len(expected_db[rel][pkg]), len(res[rel][pkg]))
                 for sn in expected_db[rel][pkg]:
                     self.assertTrue(sn in res[rel][pkg])
                     pprint.pprint(expected_db[rel][pkg][sn])
                     pprint.pprint(res[rel][pkg][sn])
-                    self.assertEquals(
+                    self.assertEqual(
                         expected_db[rel][pkg][sn]["version"],
                         str(res[rel][pkg][sn]["version"]),
                     )
-                    self.assertEquals(
+                    self.assertEqual(
                         expected_db[rel][pkg][sn]["cves"], res[rel][pkg][sn]["cves"]
                     )
 
@@ -429,7 +429,7 @@ class TestUSN(TestCase):
         # with json load
         self.patch_json_load(raw)
         res = usn.read_usn_db("./tests/test-usn-unittest-1.db")
-        self.assertEquals(len(res), 0)
+        self.assertEqual(len(res), 0)
 
     def test_check_read_usn_db_no_xenial(self):
         """Test read_usn_db() - no xenial"""
@@ -450,7 +450,7 @@ class TestUSN(TestCase):
         # with json load
         self.patch_json_load(raw)
         res = usn.read_usn_db("./tests/test-usn-unittest-1.db")
-        self.assertEquals(len(res), 0)
+        self.assertEqual(len(res), 0)
 
     def test_check_read_usn_db_no_sources(self):
         """Test read_usn_db() - no sources"""
@@ -471,8 +471,8 @@ class TestUSN(TestCase):
         # with json load
         self.patch_json_load(raw)
         res = usn.read_usn_db("./tests/test-usn-unittest-1.db")
-        self.assertEquals(len(res), 1)
-        self.assertEquals(len(res["xenial"]), 0)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(len(res["xenial"]), 0)
 
     def test_check_read_usn_db_no_versions(self):
         """Test read_usn_db() - no versions"""
@@ -494,8 +494,8 @@ class TestUSN(TestCase):
         # with json load
         self.patch_json_load(raw)
         res = usn.read_usn_db("./tests/test-usn-unittest-1.db")
-        self.assertEquals(len(res), 1)
-        self.assertEquals(len(res["xenial"]), 6)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(len(res["xenial"]), 6)
 
     def test_check_read_usn_db_no_binaries(self):
         """Test read_usn_db() - no binaries"""
@@ -516,8 +516,8 @@ class TestUSN(TestCase):
         # with json load
         self.patch_json_load(raw)
         res = usn.read_usn_db("./tests/test-usn-unittest-1.db")
-        self.assertEquals(len(res), 1)
-        self.assertEquals(len(res["xenial"]), 0)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(len(res["xenial"]), 0)
 
     def test_check_read_usn_db_no_archs(self):
         """Test read_usn_db() - no archs"""
@@ -538,8 +538,8 @@ class TestUSN(TestCase):
         # with json load
         self.patch_json_load(raw)
         res = usn.read_usn_db("./tests/test-usn-unittest-1.db")
-        self.assertEquals(len(res), 1)
-        self.assertEquals(len(res["xenial"]), 0)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(len(res["xenial"]), 0)
 
     def test_check_read_usn_db_no_urls(self):
         """Test read_usn_db() - no urls"""
@@ -561,8 +561,8 @@ class TestUSN(TestCase):
         # with json load
         self.patch_json_load(raw)
         res = usn.read_usn_db("./tests/test-usn-unittest-1.db")
-        self.assertEquals(len(res), 1)
-        self.assertEquals(len(res["xenial"]), 0)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(len(res["xenial"]), 0)
 
     def test_check_read_usn_db_with_unmatched(self):
         """Test read_usn_db() - unmatched"""
@@ -601,23 +601,23 @@ class TestUSN(TestCase):
 
         print(res)
         self.maxDiff = None
-        self.assertEquals(len(expected_db), len(res))
+        self.assertEqual(len(expected_db), len(res))
 
         for rel in expected_db:
             self.assertTrue(rel in res)
-            self.assertEquals(len(expected_db[rel]), len(res[rel]))
+            self.assertEqual(len(expected_db[rel]), len(res[rel]))
             for pkg in expected_db[rel]:
                 self.assertTrue(pkg in res[rel])
-                self.assertEquals(len(expected_db[rel][pkg]), len(res[rel][pkg]))
+                self.assertEqual(len(expected_db[rel][pkg]), len(res[rel][pkg]))
                 for sn in expected_db[rel][pkg]:
                     self.assertTrue(sn in res[rel][pkg])
                     pprint.pprint(expected_db[rel][pkg][sn])
                     pprint.pprint(res[rel][pkg][sn])
-                    self.assertEquals(
+                    self.assertEqual(
                         expected_db[rel][pkg][sn]["version"],
                         str(res[rel][pkg][sn]["version"]),
                     )
-                    self.assertEquals(
+                    self.assertEqual(
                         expected_db[rel][pkg][sn]["cves"], res[rel][pkg][sn]["cves"]
                     )
 
@@ -658,23 +658,23 @@ class TestUSN(TestCase):
 
         print(res)
         self.maxDiff = None
-        self.assertEquals(len(expected_db), len(res))
+        self.assertEqual(len(expected_db), len(res))
 
         for rel in expected_db:
             self.assertTrue(rel in res)
-            self.assertEquals(len(expected_db[rel]), len(res[rel]))
+            self.assertEqual(len(expected_db[rel]), len(res[rel]))
             for pkg in expected_db[rel]:
                 self.assertTrue(pkg in res[rel])
-                self.assertEquals(len(expected_db[rel][pkg]), len(res[rel][pkg]))
+                self.assertEqual(len(expected_db[rel][pkg]), len(res[rel][pkg]))
                 for sn in expected_db[rel][pkg]:
                     self.assertTrue(sn in res[rel][pkg])
                     pprint.pprint(expected_db[rel][pkg][sn])
                     pprint.pprint(res[rel][pkg][sn])
-                    self.assertEquals(
+                    self.assertEqual(
                         expected_db[rel][pkg][sn]["version"],
                         str(res[rel][pkg][sn]["version"]),
                     )
-                    self.assertEquals(
+                    self.assertEqual(
                         expected_db[rel][pkg][sn]["cves"], res[rel][pkg][sn]["cves"]
                     )
 
@@ -711,23 +711,23 @@ class TestUSN(TestCase):
 
         print(res)
         self.maxDiff = None
-        self.assertEquals(len(expected_db), len(res))
+        self.assertEqual(len(expected_db), len(res))
 
         for rel in expected_db:
             self.assertTrue(rel in res)
-            self.assertEquals(len(expected_db[rel]), len(res[rel]))
+            self.assertEqual(len(expected_db[rel]), len(res[rel]))
             for pkg in expected_db[rel]:
                 self.assertTrue(pkg in res[rel])
-                self.assertEquals(len(expected_db[rel][pkg]), len(res[rel][pkg]))
+                self.assertEqual(len(expected_db[rel][pkg]), len(res[rel][pkg]))
                 for sn in expected_db[rel][pkg]:
                     self.assertTrue(sn in res[rel][pkg])
                     pprint.pprint(expected_db[rel][pkg][sn])
                     pprint.pprint(res[rel][pkg][sn])
-                    self.assertEquals(
+                    self.assertEqual(
                         expected_db[rel][pkg][sn]["version"],
                         str(res[rel][pkg][sn]["version"]),
                     )
-                    self.assertEquals(
+                    self.assertEqual(
                         expected_db[rel][pkg][sn]["cves"], res[rel][pkg][sn]["cves"]
                     )
 
@@ -740,8 +740,8 @@ class TestUSN(TestCase):
         expected_db = {"xenial": {}}
         print(res)
         self.maxDiff = None
-        self.assertEquals(len(expected_db), len(res))
-        self.assertEquals(len(expected_db["xenial"]), len(res["xenial"]))
+        self.assertEqual(len(expected_db), len(res))
+        self.assertEqual(len(expected_db["xenial"]), len(res["xenial"]))
 
     def test_check_read_usn_db_with_unmatched_bad_epoch4(self):
         """Test read_usn_db() - unmatched bin epoch missing (can't guess)"""
@@ -750,5 +750,5 @@ class TestUSN(TestCase):
         expected_db = {"xenial": {}}
         print(res)
         self.maxDiff = None
-        self.assertEquals(len(expected_db), len(res))
-        self.assertEquals(len(expected_db["xenial"]), len(res["xenial"]))
+        self.assertEqual(len(expected_db), len(res))
+        self.assertEqual(len(expected_db["xenial"]), len(res["xenial"]))

@@ -92,7 +92,7 @@ class TestDebVersion(TestCase):
             elif rc > 0:
                 rc = 1
 
-            self.assertEquals(rc, expected)
+            self.assertEqual(rc, expected)
 
     def test_check_version_invalid(self):
         """Test DebVersion(<version>) - invalid"""
@@ -176,12 +176,12 @@ class TestDebVersion(TestCase):
     def test_check___repr__(self):
         """Test __repr()__"""
         v = DebVersion("1.0")
-        self.assertEquals("%s" % v.__repr__(), "1.0")
+        self.assertEqual("%s" % v.__repr__(), "1.0")
 
     def test_check___str__(self):
         """Test __str()__"""
         v = DebVersion("1.0")
-        self.assertEquals(str(v), "1.0")
+        self.assertEqual(str(v), "1.0")
 
     def test_check__order(self):
         """Test __str()__"""
@@ -194,4 +194,4 @@ class TestDebVersion(TestCase):
         ]
         for ver, expected in expected_db:
             res = _order(ver)
-            self.assertEquals(res, expected)
+            self.assertEqual(res, expected)
