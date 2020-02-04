@@ -6155,7 +6155,7 @@ slots:
                     {"plug-names": ["foo", "foo"]},
                     {"plug-names": ["foo", "iref"]},
                     {"plug-names": ["foo", "bar"]},
-                ]
+                ],
             ),
             (
                 "allow-connection",
@@ -6195,7 +6195,7 @@ slots:
                     {"plug-names": ["foo", "foo"]},
                     {"plug-names": ["foo", "iref"]},
                     {"plug-names": ["foo", "bar"]},
-                ]
+                ],
             ),
         ]:
 
@@ -6261,7 +6261,7 @@ slots:
                     {"plug-names": ["foo", "foo"]},
                     {"plug-names": ["foo", "$INTERFACE"]},
                     {"plug-names": ["foo", "bar"]},
-                ]
+                ],
             ),
             (
                 "allow-connection",
@@ -6301,7 +6301,7 @@ slots:
                     {"plug-names": ["foo", "foo"]},
                     {"plug-names": ["foo", "$INTERFACE"]},
                     {"plug-names": ["foo", "bar"]},
-                ]
+                ],
             ),
         ]:
 
@@ -6345,7 +6345,7 @@ slots:
                     {"plug-names": ["foo", "foo"]},
                     {"plug-names": ["foo", "$BAD"]},
                     {"plug-names": ["foo", "bar"]},
-                ]
+                ],
             ),
             (
                 "allow-connection",
@@ -6361,7 +6361,7 @@ slots:
                     {"plug-names": ["foo", "foo"]},
                     {"plug-names": ["foo", "$BAD"]},
                     {"plug-names": ["foo", "bar"]},
-                ]
+                ],
             ),
             (
                 "allow-auto-connection",
@@ -6377,7 +6377,7 @@ slots:
                     {"plug-names": ["foo", "foo"]},
                     {"plug-names": ["foo", "$BAD"]},
                     {"plug-names": ["foo", "bar"]},
-                ]
+                ],
             ),
         ]:
 
