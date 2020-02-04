@@ -78,6 +78,17 @@ class TestStore(TestCase):
             "3501-1" in res["revisions"]["12"]["secnot-report"]["libxcursor1"]
         )
 
+    def test_check_get_package_revisions_valid_with_snap_type(self):
+        """Test get_package_revisions() - valid (snap type)"""
+        m = self.store_db[0]["revisions"][0]["manifest_yaml"] + "\ntype: app"
+        self.store_db[0]["revisions"][0]["manifest_yaml"] = m
+        errors = {}
+        res = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
+        self.assertEquals(len(errors), 0)
+        self.assertTrue(
+            "3501-1" in res["revisions"]["12"]["secnot-report"]["libxcursor1"]
+        )
+
     def test_check_get_package_revisions_missing_publisher(self):
         """Test get_package_revisions() - missing publisher"""
         self.store_db[0]["publisher_email"] = ""
@@ -101,6 +112,14 @@ class TestStore(TestCase):
         store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
         self.assertEquals(len(errors), 1)
         self.assertEquals(errors["0ad"][0], "manifest_yaml missing for revision '12'")
+
+    def test_check_get_package_revisions_bad_manifest(self):
+        """Test get_package_revisions() - bad manifest"""
+        self.store_db[0]["revisions"][0]["manifest_yaml"] = "{"
+        errors = {}
+        store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
+        self.assertEquals(len(errors), 1)
+        self.assertTrue(errors["0ad"][0].startswith("error loading manifest:"))
 
     def test_check_get_package_revisions_bad_secnot(self):
         """Test get_package_revisions() - bad secnot db"""
@@ -194,6 +213,20 @@ class TestStore(TestCase):
         self.assertTrue(isinstance(res["additional"], list))
         self.assertEquals(len(res["additional"]), 1)
         self.assertEquals(res["additional"][0], "over@example.com")
+
+    def test_check_get_package_revisions_bad_release(self):
+        """Test get_package_revisions() - pkg override"""
+        for i in range(len(self.store_db[0]["revisions"])):
+            m = yaml.load(
+                self.store_db[0]["revisions"][i]["manifest_yaml"],
+                Loader=yaml.SafeLoader,
+            )
+            del m["parts"]
+            self.store_db[0]["revisions"][i]["manifest_yaml"] = yaml.dump(m)
+        errors = {}
+        store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
+        self.assertEquals(len(errors), 1)
+        self.assertEquals(errors["0ad"][0], "Could not determine Ubuntu release ('parts' not in manifest)")
 
     def test_check_get_shared_snap_without_override_missing(self):
         """Test get_shared_snap_without_override() - missing"""
