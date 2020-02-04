@@ -1012,7 +1012,7 @@ class SnapReviewDeclaration(SnapReview):
                 interface = iface
                 attribs = None
 
-                spec = self.snap_yaml[side][iface]
+                spec = copy.deepcopy(self.snap_yaml[side][iface])
                 if isinstance(spec, str):
                     # Abbreviated syntax (no attributes)
                     # <plugs|slots>:
