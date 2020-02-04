@@ -148,6 +148,7 @@ lint-snap-v2:watchdog-timeout|
 lint-snap-v2:watchdog-timeout_range|
 security-snap-v2:daemon_with_browser-support|
 security-snap-v2:interface-reference|
+security-snap-v2:interface-reference-matches-base-decl|
 security-snap-v2:profile_name_length|
 security-snap-v2:squashfs_files|
 security-snap-v2:squashfs_files_malformed_line|
