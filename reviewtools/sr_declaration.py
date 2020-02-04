@@ -509,6 +509,45 @@ class SnapReviewDeclaration(SnapReview):
 
         return (rules, scoped)
 
+    # func checkNameConstraints() in interfaces/policy/helpers.go and
+    # func compileNameConstraints() in asserts/ifacedecls.go
+    def _check_names(self, side, iref, iface, rules, cstr):
+        """Check if there are any matching names for this side, interface,
+           rules and constraint. A matching name consists of:
+           - the interface reference (iref) matches a list entry regex
+           - the interface reference (iref) matches the interface name
+             when the list entry is $INTERFACE
+        """
+        matched = False
+        checked = False
+        for rules_key in rules:
+            if not rules_key == "%s-names" % side[:-1]:
+                continue
+            checked = True
+
+            for matcher in rules[rules_key]:
+                if matcher.startswith("$"):
+                    if matcher == "$INTERFACE":
+                        if "interface" in iface and iref == iface["interface"]:
+                            matched = True
+                    else:
+                        raise SnapDeclarationException(
+                            "unknown special name '%s'" % matcher
+                        )
+                elif re.search(r"^(%s)$" % matcher, iref):
+                    matched = True
+
+        if checked and (
+            (matched and cstr.startswith("deny"))
+            or (not matched and cstr.startswith("allow"))
+        ):
+            return (
+                checked,
+                "human review required due to '%s' constraint (%s)" % (cstr, rules_key),
+            )
+
+        return (checked, None)
+
     def _check_attributes(self, side, iface, rules, cstr, whence):
         """Check if there are any matching attributes for this side, interface,
            rules and constraint. If attributes are specified in the constraint,
@@ -680,7 +719,7 @@ class SnapReviewDeclaration(SnapReview):
 
         return (checked, None)
 
-    # func checkSnapType() in helpers.go
+    # func checkSnapType() in interfaces/policy/helpers.go
     def _check_snap_type(self, side, iface, rules, cstr):
         """Check if there are any matching snap types for this side, interface,
            rules and constraint.
@@ -712,7 +751,7 @@ class SnapReviewDeclaration(SnapReview):
 
         return (checked, None)
 
-    # func checkOnClassic() in helpers.go
+    # func checkOnClassic() in interfaces/policy/helpers.go
     def _check_on_classic(self, side, iface, rules, cstr):
         """Check if there is a matching on-classic for this side, interface,
            rules and constraint.
@@ -761,8 +800,8 @@ class SnapReviewDeclaration(SnapReview):
 
         return (checked, None)
 
-    # based on, func check*Constraints1() in helpers.go
-    def _check_constraints1(self, side, iface, rules, cstr, whence):
+    # based on, func check*Constraints1() in interfaces/policy/helpers.go
+    def _check_constraints1(self, side, iref, iface, rules, cstr, whence):
         """Check one constraint
 
            To avoid superflous manual reviews, we want to limit when we want to
@@ -790,6 +829,12 @@ class SnapReviewDeclaration(SnapReview):
 
         tmp = []
         num_checked = 0
+
+        (checked, res) = self._check_names(side, iref, iface, rules, cstr)
+        if checked:
+            num_checked += 1
+        if res is not None:
+            tmp.append(res)
 
         (checked, res) = self._check_attributes(side, iface, rules, cstr, whence)
         if checked:
@@ -832,8 +877,8 @@ class SnapReviewDeclaration(SnapReview):
 
         return None
 
-    # func check*Constraints() in helpers.go
-    def _check_constraints(self, side, iface, rules, cstr, whence):
+    # func check*Constraints() in interfaces/policy/helpers.go
+    def _check_constraints(self, side, iref, iface, rules, cstr, whence):
         """Check alternate constraints"""
         if cstr not in rules:
             return None
@@ -844,7 +889,7 @@ class SnapReviewDeclaration(SnapReview):
         if cstr.startswith("allow"):
             # With allow, the first success is a match and we allow it
             for i in rules[cstr]:
-                res = self._check_constraints1(side, iface, i, cstr, whence)
+                res = self._check_constraints1(side, iref, iface, i, cstr, whence)
                 if res is None:
                     return res
 
@@ -855,28 +900,30 @@ class SnapReviewDeclaration(SnapReview):
         else:
             # With deny, the first failure is a match and we deny it
             for i in rules[cstr]:
-                res = self._check_constraints1(side, iface, i, cstr, whence)
+                res = self._check_constraints1(side, iref, iface, i, cstr, whence)
                 if res is not None:
                     return res
 
             return None
 
-    def _check_rule(self, side, iface, rules, cstr_type, whence):
+    def _check_rule(self, side, iref, iface, rules, cstr_type, whence):
         """Check any constraints for this set of rules"""
-        res = self._check_constraints(side, iface, rules, "deny-%s" % cstr_type, whence)
+        res = self._check_constraints(
+            side, iref, iface, rules, "deny-%s" % cstr_type, whence
+        )
         if res is not None:
             return res
 
         res = self._check_constraints(
-            side, iface, rules, "allow-%s" % cstr_type, whence
+            side, iref, iface, rules, "allow-%s" % cstr_type, whence
         )
         if res is not None:
             return res
 
         return None
 
-    # func (ic *Candidate) checkPlug()/checkSlot() from policy.go
-    def _check_side(self, side, iface, cstr_type):
+    # func (ic *Candidate) checkPlug()/checkSlot() from interfaces/policy/policy.go
+    def _check_side(self, side, iref, iface, cstr_type):
         """Check the set of rules for this side (plugs/slots) for this
            constraint
         """
@@ -896,19 +943,19 @@ class SnapReviewDeclaration(SnapReview):
             # if we have no scoped rules, then it is as if the snap decl wasn't
             # specified for this constraint
             if scoped and rules is not None:
-                return self._check_rule(side, iface, rules, cstr_type, whence)
+                return self._check_rule(side, iref, iface, rules, cstr_type, whence)
 
         (decl, whence) = self._get_decl(side, iface["interface"], False)
         (rules, scoped) = self._get_rules(decl, cstr_type)
         if rules is not None:
-            return self._check_rule(side, iface, rules, cstr_type, whence)
+            return self._check_rule(side, iref, iface, rules, cstr_type, whence)
 
         # unreachable: the base declaration will have something for all
         # existing interfaces, and nonexistence tests are done elsewhere
         return None  # pragma: nocover
 
-    # func (ic *InstallCandidate) Check() in policy.go
-    def _installation_check(self, side, iname, attribs):
+    # func (ic *InstallCandidate) Check() in interfaces/policy/policy.go
+    def _installation_check(self, side, iref, iname, attribs):
         """Check for any installation constraints"""
         iface = {}
         if attribs is not None:
@@ -916,19 +963,19 @@ class SnapReviewDeclaration(SnapReview):
         iface["interface"] = iname
 
         if side == "slots":
-            res = self._check_side("slots", iface, "installation")
+            res = self._check_side("slots", iref, iface, "installation")
             if res is not None:
                 return res
 
         if side == "plugs":
-            res = self._check_side("plugs", iface, "installation")
+            res = self._check_side("plugs", iref, iface, "installation")
             if res is not None:
                 return res
 
         return None
 
     # func (ic *ConnectionCandidate) check() in policy.go
-    def _connection_check(self, side, iname, attribs):
+    def _connection_check(self, side, iref, iname, attribs):
         """Check for any connecttion constraints"""
         iface = {}
         if attribs is not None:
@@ -936,12 +983,12 @@ class SnapReviewDeclaration(SnapReview):
         iface["interface"] = iname
 
         if side == "slots":
-            res = self._check_side("slots", iface, "connection")
+            res = self._check_side("slots", iref, iface, "connection")
             if res is not None:
                 return res
 
         if side == "plugs":
-            res = self._check_side("plugs", iface, "connection")
+            res = self._check_side("plugs", iref, iface, "connection")
             if res is not None:
                 return res
 
@@ -981,7 +1028,7 @@ class SnapReviewDeclaration(SnapReview):
 
         # only need to check installation and connection since snapd handles
         # auto-connection
-        err1 = self._installation_check(side, interface, attribs)
+        err1 = self._installation_check(side, iface, interface, attribs)
         if err1 is not None:
             t = "error"
             n = self._get_check_name(
@@ -990,7 +1037,7 @@ class SnapReviewDeclaration(SnapReview):
             s = err1
             self._add_result(t, n, s, manual_review=True)
 
-        err2 = self._connection_check(side, interface, attribs)
+        err2 = self._connection_check(side, iface, interface, attribs)
         if err2 is not None:
             t = "error"
             n = self._get_check_name("%s_connection" % side, app=iface, extra=interface)

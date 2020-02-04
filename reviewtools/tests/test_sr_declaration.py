@@ -327,9 +327,7 @@ slots:
                 "inst-slot-attributes-empty": {
                     "allow-installation": {"slot-attributes": {}}
                 },
-                "inst-slot-names-empty": {
-                    "allow-installation": {"slot-names": []}
-                },
+                "inst-slot-names-empty": {"allow-installation": {"slot-names": []}},
                 "inst-slot-names-iface": {
                     "allow-installation": {"slot-names": ["$INTERFACE"]}
                 },
@@ -385,9 +383,7 @@ slots:
                 "conn-plug-attributes-empty": {
                     "deny-connection": {"plug-attributes": {}}
                 },
-                "conn-slot-names-empty": {
-                    "allow-connection": {"slot-names": []}
-                },
+                "conn-slot-names-empty": {"allow-connection": {"slot-names": []}},
                 "conn-slot-names-iface": {
                     "allow-connection": {"slot-names": ["$INTERFACE"]}
                 },
@@ -550,9 +546,7 @@ slots:
                 "inst-plug-attributes-empty": {
                     "allow-installation": {"plug-attributes": {}}
                 },
-                "inst-plug-names-empty": {
-                    "allow-installation": {"plug-names": []}
-                },
+                "inst-plug-names-empty": {"allow-installation": {"plug-names": []}},
                 "inst-plug-names-iface": {
                     "allow-installation": {"plug-names": ["$INTERFACE"]}
                 },
@@ -608,9 +602,7 @@ slots:
                 "conn-slot-attributes-empty": {
                     "deny-connection": {"slot-attributes": {}}
                 },
-                "conn-plug-names-empty": {
-                    "allow-connection": {"plug-names": []}
-                },
+                "conn-plug-names-empty": {"allow-connection": {"plug-names": []}},
                 "conn-plug-names-iface": {
                     "allow-connection": {"plug-names": ["$INTERFACE"]}
                 },
@@ -1308,7 +1300,9 @@ slots:
         }
         self.check_results(r, expected=expected)
 
-    def test__verify_declaration_invalid_slots_iface_constraint_slot_names_value_auto(self):
+    def test__verify_declaration_invalid_slots_iface_constraint_slot_names_value_auto(
+        self
+    ):
         """Test _verify_declaration - invalid interface constraint slot-names
            (auto-connection)"""
         c = SnapReviewDeclaration(self.test_name)
@@ -1356,7 +1350,9 @@ slots:
         expected_counts = {"info": 1, "warn": 0, "error": 0}
         self.check_results(r, expected_counts)
 
-    def test__verify_declaration_valid_plugs_iface_constraint_plug_names_value_auto(self):
+    def test__verify_declaration_valid_plugs_iface_constraint_plug_names_value_auto(
+        self
+    ):
         """Test _verify_declaration - valid interface constraint plug-names
            (auto-connection)"""
         c = SnapReviewDeclaration(self.test_name)
@@ -6086,3 +6082,312 @@ slots:
         r = c.review_report
         expected_counts = {"info": 0, "warn": 0, "error": 0}
         self.check_results(r, expected_counts)
+
+    def test_check_declaration_plug_names_no_override(self):
+        """Test check_declaration - plug-names without override"""
+        # we don't enforce auto-connection so just the validity checks are fine
+        for cstr, iname, plugs in [
+            ("allow-installation", "iface", {"iface": {"interface": "iface"}}),
+            ("allow-installation", "iface", {"iface": {}}),
+            ("allow-installation", "iref", {"iref": {"interface": "iface"}}),
+            ("allow-connection", "iface", {"iface": {"interface": "iface"}}),
+            ("allow-connection", "iface", {"iface": {}}),
+            ("allow-connection", "iref", {"iref": {"interface": "iface"}}),
+        ]:
+            self.set_test_snap_yaml("plugs", plugs)
+            c = SnapReviewDeclaration(self.test_name)
+            base = {"plugs": {"iface": {cstr: False}}}
+            self._set_base_declaration(c, base)
+            c.check_declaration()
+            r = c.review_report
+            expected_counts = {"info": 0, "warn": 0, "error": 1}
+            self.check_results(r, expected_counts)
+
+            expected = dict()
+            expected["error"] = dict()
+            expected["warn"] = dict()
+            expected["info"] = dict()
+            name = "declaration-snap-v2:plugs_%s:%s:iface" % (cstr.split("-")[1], iname)
+            expected["error"][name] = {
+                "text": "human review required due to '%s' constraint (bool)" % cstr
+            }
+            self.check_results(r, expected=expected)
+
+    def test_check_declaration_plug_names_override(self):
+        """Test check_declaration - plug-names with override"""
+        # we don't enforce auto-connection so just the validity checks are fine
+        for cstr, iname, plugs, overrides in [
+            (
+                "allow-installation",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                {"plug-names": ["iref"]},
+            ),
+            (
+                "allow-installation",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                {"plug-names": ["(foo|iref)"]},
+            ),
+            (
+                "allow-installation",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                {"plug-names": ["(foo|iref|bar)"]},
+            ),
+            (
+                "allow-installation",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                {"plug-names": ["foo", "iref"]},
+            ),
+            (
+                "allow-installation",
+                "iface",
+                {"iface": {"interface": "iface"}},
+                {"plug-names": ["foo", "$INTERFACE"]},
+            ),
+            (
+                "allow-installation",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                [
+                    {"plug-names": ["foo", "foo"]},
+                    {"plug-names": ["foo", "iref"]},
+                    {"plug-names": ["foo", "bar"]},
+                ]
+            ),
+            (
+                "allow-connection",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                {"plug-names": ["iref"]},
+            ),
+            (
+                "allow-connection",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                {"plug-names": ["(foo|iref)"]},
+            ),
+            (
+                "allow-connection",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                {"plug-names": ["(foo|iref|bar)"]},
+            ),
+            (
+                "allow-connection",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                {"plug-names": ["foo", "iref"]},
+            ),
+            (
+                "allow-connection",
+                "iface",
+                {"iface": {"interface": "iface"}},
+                {"plug-names": ["foo", "$INTERFACE"]},
+            ),
+            (
+                "allow-connection",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                [
+                    {"plug-names": ["foo", "foo"]},
+                    {"plug-names": ["foo", "iref"]},
+                    {"plug-names": ["foo", "bar"]},
+                ]
+            ),
+        ]:
+
+            self.set_test_snap_yaml("plugs", plugs)
+            overrides = {"snap_decl_plugs": {"iface": {"%s" % (cstr): overrides}}}
+            c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+            base = {"plugs": {"iface": {cstr: False}}}
+            self._set_base_declaration(c, base)
+            c.check_declaration()
+            r = c.review_report
+            expected_counts = {"info": 2, "warn": 0, "error": 0}
+            self.check_results(r, expected_counts)
+
+            expected = dict()
+            expected["error"] = dict()
+            expected["warn"] = dict()
+            expected["info"] = dict()
+            name = "declaration-snap-v2:valid_plugs:iface:%s" % cstr
+            expected["info"][name] = {"text": "OK"}
+            name = "declaration-snap-v2:plugs:%s:iface" % iname
+            expected["info"][name] = {"text": "OK"}
+            self.check_results(r, expected=expected)
+
+    def test_check_declaration_plug_names_override_mismatch(self):
+        """Test check_declaration - plug-names with override mismatch"""
+        # we don't enforce auto-connection so just the validity checks are fine
+        for cstr, iname, plugs, overrides in [
+            (
+                "allow-installation",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                {"plug-names": ["other"]},
+            ),
+            (
+                "allow-installation",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                {"plug-names": ["(foo|other)"]},
+            ),
+            (
+                "allow-installation",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                {"plug-names": ["(foo|other|bar)"]},
+            ),
+            (
+                "allow-installation",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                {"plug-names": ["foo", "other"]},
+            ),
+            (
+                "allow-installation",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                {"plug-names": ["foo", "$INTERFACE"]},
+            ),
+            (
+                "allow-installation",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                [
+                    {"plug-names": ["foo", "foo"]},
+                    {"plug-names": ["foo", "$INTERFACE"]},
+                    {"plug-names": ["foo", "bar"]},
+                ]
+            ),
+            (
+                "allow-connection",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                {"plug-names": ["other"]},
+            ),
+            (
+                "allow-connection",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                {"plug-names": ["(foo|other)"]},
+            ),
+            (
+                "allow-connection",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                {"plug-names": ["(foo|other|bar)"]},
+            ),
+            (
+                "allow-connection",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                {"plug-names": ["foo", "other"]},
+            ),
+            (
+                "allow-connection",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                {"plug-names": ["foo", "$INTERFACE"]},
+            ),
+            (
+                "allow-connection",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                [
+                    {"plug-names": ["foo", "foo"]},
+                    {"plug-names": ["foo", "$INTERFACE"]},
+                    {"plug-names": ["foo", "bar"]},
+                ]
+            ),
+        ]:
+
+            self.set_test_snap_yaml("plugs", plugs)
+            overrides = {"snap_decl_plugs": {"iface": {"%s" % (cstr): overrides}}}
+            c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+            base = {"plugs": {"iface": {cstr: False}}}
+            self._set_base_declaration(c, base)
+            c.check_declaration()
+            r = c.review_report
+            expected_counts = {"info": 1, "warn": 0, "error": 1}
+            self.check_results(r, expected_counts)
+
+            expected = dict()
+            expected["error"] = dict()
+            expected["warn"] = dict()
+            expected["info"] = dict()
+            name = "declaration-snap-v2:valid_plugs:iface:%s" % cstr
+            expected["info"][name] = {"text": "OK"}
+            name = "declaration-snap-v2:plugs_%s:%s:iface" % (cstr.split("-")[1], iname)
+            expected["error"][name] = {
+                "text": "human review required due to '%s' constraint (plug-names)"
+                % cstr
+            }
+            self.check_results(r, expected=expected)
+
+    def test_check_declaration_plug_names_override_bad_special(self):
+        """Test check_declaration - plug-names with bad special override"""
+        for cstr, iname, plugs, overrides in [
+            (
+                "allow-installation",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                {"plug-names": ["foo", "$BAD"]},
+            ),
+            (
+                "allow-installation",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                [
+                    {"plug-names": ["foo", "foo"]},
+                    {"plug-names": ["foo", "$BAD"]},
+                    {"plug-names": ["foo", "bar"]},
+                ]
+            ),
+            (
+                "allow-connection",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                {"plug-names": ["foo", "$BAD"]},
+            ),
+            (
+                "allow-connection",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                [
+                    {"plug-names": ["foo", "foo"]},
+                    {"plug-names": ["foo", "$BAD"]},
+                    {"plug-names": ["foo", "bar"]},
+                ]
+            ),
+            (
+                "allow-auto-connection",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                {"plug-names": ["foo", "$BAD"]},
+            ),
+            (
+                "allow-auto-connection",
+                "iref",
+                {"iref": {"interface": "iface"}},
+                [
+                    {"plug-names": ["foo", "foo"]},
+                    {"plug-names": ["foo", "$BAD"]},
+                    {"plug-names": ["foo", "bar"]},
+                ]
+            ),
+        ]:
+
+            self.set_test_snap_yaml("plugs", plugs)
+            overrides = {"snap_decl_plugs": {"iface": {"%s" % (cstr): overrides}}}
+            c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+            base = {"plugs": {"iface": {cstr: False}}}
+            self._set_base_declaration(c, base)
+            try:
+                c.check_declaration()
+            except SnapDeclarationException:
+                return
+            raise Exception("base declaration should be invalid")  # pragma: nocover
