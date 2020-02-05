@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 from reviewtools import modules
+from reviewtools.common import error
 import argparse
 import json
 import os
@@ -31,13 +32,14 @@ class Results(object):
     warnings = {}
     info = {}
     rc = 0
+    sdk_output = ""
 
     def __init__(self, args):
         self.args = args
         self.pkg_fn = self.args.filename
         self.modules = modules.get_modules()
 
-    def _sumarise_results(self):
+    def _summarise_results(self):
         for module in self.results:
             for key in self.results[module]["error"]:
                 self.errors[key] = self.results[module]["error"][key]
@@ -47,8 +49,8 @@ class Results(object):
                 for key in self.results[module]["info"]:
                     self.info[key] = self.results[module]["info"][key]
 
-    def _complete_report(self):
-        self._sumarise_results()
+    def complete_report(self):
+        self._summarise_results()
 
         if self.args.json:
             print(
@@ -56,6 +58,8 @@ class Results(object):
                     self.results, sort_keys=True, indent=2, separators=(",", ": ")
                 )
             )
+        elif self.args.sdk:
+            print(self.sdk_output)
         else:
             print_findings(self.errors, "Errors")
             print_findings(self.warnings, "Warnings")
@@ -75,7 +79,7 @@ class Results(object):
         elif self.warnings:
             self.rc = 3
 
-    def _report_module(self, section):
+    def _report_module_sdk(self, section):
         """
         This is currently only used in the --sdk option.
         It will print the output for each section when it's
@@ -83,8 +87,12 @@ class Results(object):
         until all checks have been run.
         """
         output = self.results[section]
-        print("= %s =" % section)
-        print(json.dumps(output, sort_keys=True, indent=2, separators=(",", ": ")))
+        if self.sdk_output != "":
+            self.sdk_output += "\n"
+        self.sdk_output += "= %s =" % section
+        self.sdk_output += "\n%s" % json.dumps(
+            output, sort_keys=True, indent=2, separators=(",", ": ")
+        )
         if output["error"] or output["warn"]:
             self.rc = 1
 
@@ -120,7 +128,7 @@ class Results(object):
             for module in self.modules:
                 section = self._run_module_checks(module, overrides, report_type)
                 if section:
-                    self._report_module(section)
+                    self._report_module_sdk(section)
         else:
             # put runtime errors in json if --json is specified, otherwise
             # output to console
@@ -129,7 +137,6 @@ class Results(object):
                 report_type = "json"
             for module in self.modules:
                 self._run_module_checks(module, overrides, report_type)
-            self._complete_report()
 
 
 def main():
@@ -177,9 +184,14 @@ def main():
     parser.add_argument("--on-brand", default=None, help="brand id for the snap")
     args = parser.parse_args()
 
+    error_output_type = "console"
+    if args.json or args.sdk:
+        error_output_type = "json"
+
     if not os.path.exists(args.filename):
-        print("file '%s' does not exist." % args.filename)
-        sys.exit(1)
+        error(
+            "file '%s' does not exist." % args.filename, output_type=error_output_type
+        )
 
     results = Results(args)
     if not results.modules:
@@ -214,6 +226,8 @@ def main():
         overrides["snap_on_brand"] = args.on_brand
 
     results.run_all_checks(overrides)
+    results.complete_report()
+
     sys.exit(results.rc)
 
 

@@ -484,10 +484,13 @@ class Review(object):
 #
 
 
-def error(out, exit_code=1, do_exit=True):
+def error(out, exit_code=1, do_exit=True, output_type=None):
     """Print error message and exit"""
     global REPORT_OUTPUT
     global RESULT_TYPES
+
+    if output_type is not None:
+        Review.set_report_type(None, output_type)
 
     try:
         if REPORT_OUTPUT == "json":
