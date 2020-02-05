@@ -150,15 +150,26 @@ class TestStore(TestCase):
 
     def test_check_get_package_revisions_empty_collaborator(self):
         """Test get_package_revisions() - empty collaborator"""
-        self.store_db[0]["collaborators"] = [""]
+        self.store_db[0]["collaborators"] = [{"email": ""}]
         errors = {}
         store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors["0ad"][0], "collaborator email '' invalid")
 
+    def test_check_get_package_revisions_malformed_collaborator(self):
+        """Test get_package_revisions() - malformed collaborator"""
+        self.store_db[0]["collaborators"] = ["test@example.com"]
+        errors = {}
+        res = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
+        self.assertEqual(len(errors), 0)
+        self.assertTrue(isinstance(res["collaborators"], list))
+        self.assertEqual(len(res["collaborators"]), 0)
+
     def test_check_get_package_revisions_has_collaborator(self):
         """Test get_package_revisions() - has has collaborator"""
-        self.store_db[0]["collaborators"] = ["test@example.com"]
+        self.store_db[0]["collaborators"] = [
+            {"email": "test@example.com", "name": "Test Me"}
+        ]
         errors = {}
         res = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
         self.assertEqual(len(errors), 0)

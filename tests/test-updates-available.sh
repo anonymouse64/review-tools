@@ -150,6 +150,11 @@ for i in test-store-unittest-lp1841848.db test-store-unittest-lp1841848-needed.d
     echo "" | tee -a "$tmp"
 done
 
+# Test collaborators store db
+echo "Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-1.db' --store-db='./tests/test-store-collaborators.db'" | tee -a "$tmp"
+PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-1.db' --store-db='./tests/test-store-collaborators.db' 2>&1 | tee -a "$tmp"
+echo "" | tee -a "$tmp"
+
 # Test snap-check-notices
 ## app
 echo "Running: snap-check-notices --no-fetch ./tests/test-snapcraft-manifest_0_amd64.snap" | tee -a "$tmp"

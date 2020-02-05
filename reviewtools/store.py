@@ -117,7 +117,9 @@ def get_pkg_revisions(item, secnot_db, errors):
     pkg_db["collaborators"] = []
     if "collaborators" in item:
         for c in item["collaborators"]:
-            cEmail = email.sanitize_addr(c)
+            if not isinstance(c, dict) or "email" not in c:
+                continue
+            cEmail = email.sanitize_addr(c["email"])
             if cEmail == "":
                 # Don't treat this as fatal for this snap
                 _add_error(
