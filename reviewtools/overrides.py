@@ -761,7 +761,7 @@ update_stage_packages = {
     # - modem-manager snapcraft.yaml doesn't specify base; mock xenial version
     "modem-manager": {"modemmanager": "1.6.4-1ubuntu0.16.04.1"},
     # - network-manager snapcraft.yaml doesn't specify base; mock xenial
-    "network-manager": {"network-manager": "1.2.2-22"},
+    "network-manager": {"network-manager": "1.2.6-0ubuntu0.16.04.3"},
     # - stlouis-kernel maintained by hwe
     "stlouis-kernel": {"linux-image-generic": "auto-kernel"},
     # - udisks2 snapcraft.yaml doesn't specify base; mock xenial versions
