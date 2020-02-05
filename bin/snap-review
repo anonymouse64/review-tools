@@ -32,7 +32,6 @@ class Results(object):
     warnings = {}
     info = {}
     rc = 0
-    sdk_output = ""
 
     def __init__(self, args):
         self.args = args
@@ -59,7 +58,14 @@ class Results(object):
                 )
             )
         elif self.args.sdk:
-            print(self.sdk_output)
+            for section in sorted(self.results.keys()):
+                output = self.results[section]
+                print("= %s =" % section)
+                print(
+                    json.dumps(output, sort_keys=True, indent=2, separators=(",", ": "))
+                )
+                if output["error"] or output["warn"]:
+                    self.rc = 1
         else:
             print_findings(self.errors, "Errors")
             print_findings(self.warnings, "Warnings")
@@ -78,23 +84,6 @@ class Results(object):
             self.rc = 2
         elif self.warnings:
             self.rc = 3
-
-    def _report_module_sdk(self, section):
-        """
-        This is currently only used in the --sdk option.
-        It will print the output for each section when it's
-        available. This will prevent the SDK from having to wait
-        until all checks have been run.
-        """
-        output = self.results[section]
-        if self.sdk_output != "":
-            self.sdk_output += "\n"
-        self.sdk_output += "= %s =" % section
-        self.sdk_output += "\n%s" % json.dumps(
-            output, sort_keys=True, indent=2, separators=(",", ": ")
-        )
-        if output["error"] or output["warn"]:
-            self.rc = 1
 
     def _run_module_checks(self, module, overrides, report_type):
         # What we are doing here is basically what all the
@@ -122,21 +111,27 @@ class Results(object):
         return None
 
     def run_all_checks(self, overrides):
-        report_type = None
-
-        if self.args.sdk:
-            for module in self.modules:
-                section = self._run_module_checks(module, overrides, report_type)
-                if section:
-                    self._report_module_sdk(section)
+        if self.args.json:
+            report_type = "json"
+        elif self.args.sdk:
+            # this should probably be "json", but leave as None since it has
+            # always been that way
+            report_type = None
         else:
-            # put runtime errors in json if --json is specified, otherwise
-            # output to console
             report_type = "console"
-            if self.args.json:
-                report_type = "json"
-            for module in self.modules:
-                self._run_module_checks(module, overrides, report_type)
+
+        for module in self.modules:
+            self._run_module_checks(module, overrides, report_type)
+
+    def add_runtime_error(self, args, name, msg):
+        section = "runtime-errors"
+        if section not in self.results:
+            self.results[section] = {}
+        self.results[section] = {
+            "error": {name: {"text": msg, "manual_review": False}},
+            "info": {},
+            "warn": {},
+        }
 
 
 def main():

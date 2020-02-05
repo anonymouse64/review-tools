@@ -75,7 +75,7 @@ testsnap="./tests/hello-world_25.snap"
 rtpath="./tests/review-tools-extras"
 for j in "" "--sdk" "--json" ; do
     snap=$(basename "$testsnap")
-    echo "= RT_EXTRAS_PATH with $testsnap ="
+    echo "= RT_EXTRAS_PATH with $j $testsnap ="
     if [ "$testtype" = "snap-review" ]; then
         RT_EXTRAS_PATH="$rtpath" review-tools.snap-review $j "$testsnap" 2>&1 | sed -e 's#./tests/##g' -e 's/"text": "SKIPPED (could not import apt_pkg)"/"text": "OK"/' | tee "$tmpjson"
     else
