@@ -21,7 +21,7 @@ import reviewtools.sr_tests as sr_tests
 class TestSnapReviewCommon(sr_tests.TestSnapReview):
     def setUp(self):
         super().setUp()
-        self.review = SnapReview("app.snap", "review_type")
+        self.review = SnapReview("app.snap", "sr_common_review_type")
 
     def test_verify_pkgversion(self):
         """Check _verify_pkgversion"""

@@ -1,13 +1,22 @@
 #!/usr/bin/python3
 
 from reviewtools import modules
-from reviewtools.common import error
 import argparse
+import copy
 import json
 import os
+import shutil
 import sys
+import tempfile
 import textwrap
 import traceback
+
+from reviewtools.common import (
+    MKDTEMP_PREFIX,
+    error,
+    init_override_state_input,
+    verify_override_state,
+)
 
 
 def print_findings(results, description):
@@ -177,6 +186,8 @@ def main():
     )
     parser.add_argument("--on-store", default=None, help="store id for the snap")
     parser.add_argument("--on-brand", default=None, help="brand id for the snap")
+    parser.add_argument("--state-input", default=None, help="store state input blob")
+    parser.add_argument("--state-output", default=None, help="store state output blob")
     args = parser.parse_args()
 
     error_output_type = "console"
@@ -220,7 +231,82 @@ def main():
             overrides = {}
         overrides["snap_on_brand"] = args.on_brand
 
+    # --state-input alone is unsupported
+    if args.state_input and not args.state_output:
+        error(
+            "Must specify --state-output with --state-input",
+            output_type=error_output_type,
+        )
+
+    if args.state_output:
+        if overrides is None:
+            overrides = {}
+
+        if args.state_input:
+            # --state-input --state-output indicates we have previous state
+            if not os.path.exists(args.state_input):
+                error(
+                    "file '%s' does not exist." % args.state_input,
+                    output_type=error_output_type,
+                )
+            try:
+                with open(args.state_input, "rb") as in_f:
+                    st = in_f.read().decode("utf-8")
+                    overrides["state_input"] = json.loads(st)
+            except Exception as e:
+                error(
+                    "Could not read state input: %s" % e, output_type=error_output_type
+                )
+        else:
+            # --state-output alone indicates we are bootstrapping
+            overrides["state_input"] = init_override_state_input()
+
+        # fail early if the state input fails to verify
+        try:
+            verify_override_state(overrides["state_input"])
+        except Exception as e:
+            error("state-input failed to verify: %s" % e, output_type=error_output_type)
+
+        overrides["state_output"] = copy.deepcopy(overrides["state_input"])
+
+    # Run the tests
     results.run_all_checks(overrides)
+
+    # Write out our state
+    if args.state_output:
+        # If our updated state-output fails to verify, then mark it as an
+        # error and use the (already verified) state input instead. In this
+        # manner, we avoid storing an invalid state in the store.
+        try:
+            verify_override_state(overrides["state_output"])
+        except Exception as e:
+            results.add_runtime_error(
+                args, "state-output-verify", "state-output failed to verify: %s" % e
+            )
+            overrides["state_output"] = copy.deepcopy(overrides["state_input"])
+
+        # Unconditionally overwrite the output file, per
+        # https://docs.google.com/document/d/1HEfBVBb5pie4383tPZODyPVufAJNrnTRCYxSek6nCno/edit#heading=h.17b7d6xrozfw
+        if os.path.exists(args.state_output):
+            os.unlink(args.state_output)
+
+        prefix = "%sstate-output-" % MKDTEMP_PREFIX
+        try:
+            with tempfile.NamedTemporaryFile(prefix=prefix) as out_f:
+                out_f.write(
+                    json.dumps(
+                        overrides["state_output"], sort_keys=True, indent=2
+                    ).encode("utf-8")
+                )
+                out_f.write("\n".encode("utf-8"))
+                out_f.flush()
+                shutil.copyfile(out_f.name, args.state_output)
+        except Exception as e:
+            results.add_runtime_error(
+                args, "state-output-write", "Could not write state output: %s" % e
+            )
+
+    # Show the results of the report
     results.complete_report()
 
     sys.exit(results.rc)

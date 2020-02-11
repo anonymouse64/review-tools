@@ -1,0 +1,1955 @@
+= Test --state-output
+Running: snap-review --state-output=./out
+./tests/hello-world_25.snap: pass
+
+= Test --state-input/--state-output
+Running: snap-review --state-input=./in --state-output=./out
+./tests/hello-world_25.snap: pass
+
+= Test --state-input only
+Running: snap-review --state-input=./in
+ERROR: Must specify --state-output with --state-input
+
+= Test --state-input=nonexistent/--state-output
+Running: snap-review --state-input=/nonexistent --state-output=./out
+ERROR: file '/nonexistent' does not exist.
+
+= Test --state-input=<invalid>/--state-output
+Running: snap-review --state-input=./in --state-output=./out
+ERROR: state-input failed to verify: 'format' should be a positive JSON integer <= 1
+
+= Test --state-input=<eperm>/--state-output
+Running: snap-review --state-input=./in --state-output=./out
+ERROR: Could not read state input: [Errno 13] Permission denied: './in'
+
+= Test --state-output=<eperm>
+Running: snap-review --state-output=./not-allowed/out
+Errors
+------
+ - state-output-write
+	Could not write state output: [Errno 13] Permission denied: './not-allowed/out'
+./tests/hello-world_25.snap: FAIL
+
+= Test --state-output
+Running: snap-review --json --state-output=./out
+{
+  "snap.v2_declaration": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "snap.v2_functional": {
+    "error": {},
+    "info": {
+      "functional-snap-v2:execstack": {
+        "manual_review": false,
+        "text": "OK"
+      }
+    },
+    "warn": {}
+  },
+  "snap.v2_lint": {
+    "error": {},
+    "info": {
+      "lint-snap-v2:apps": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_entry:echo": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_entry:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_entry:evil": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_entry:sh": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_entry:showdev": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_entry:usehw": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_present": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_required:echo": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_required:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_required:evil": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_required:sh": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_required:showdev": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_required:usehw": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_unknown:echo": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_unknown:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_unknown:evil": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_unknown:sh": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_unknown:showdev": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_unknown:usehw": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:architecture_valid": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:assumes_valid": {
+        "manual_review": false,
+        "text": "OK (assumes not specified)"
+      },
+      "lint-snap-v2:cli_required:echo": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:cli_required:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:cli_required:evil": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:cli_required:sh": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:cli_required:showdev": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:cli_required:usehw": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:command:echo": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:command:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:command:evil": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:command:sh": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:command:showdev": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:command:usehw": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:daemon_required:echo": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:daemon_required:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:daemon_required:evil": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:daemon_required:sh": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:daemon_required:showdev": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:daemon_required:usehw": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:description": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:description_present": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:external_symlinks": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:hooks_present": {
+        "manual_review": false,
+        "text": "OK (optional hooks field not specified)"
+      },
+      "lint-snap-v2:iffy_files": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:name_valid": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:snap_type_redflag": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:snap_type_valid": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:summary": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:summary_present": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:title_present": {
+        "manual_review": false,
+        "text": "OK (optional title field not specified)"
+      },
+      "lint-snap-v2:unknown_field": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:unknown_refresh_mode": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:unknown_stop_mode": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:valid_contents_for_architecture": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:valid_unicode": {
+        "manual_review": false,
+        "text": "ok"
+      },
+      "lint-snap-v2:vcs_files": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:version_valid": {
+        "manual_review": false,
+        "text": "OK"
+      }
+    },
+    "warn": {}
+  },
+  "snap.v2_security": {
+    "error": {},
+    "info": {
+      "security-snap-v2:profile_name_length:echo": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "security-snap-v2:profile_name_length:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "security-snap-v2:profile_name_length:evil": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "security-snap-v2:profile_name_length:sh": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "security-snap-v2:profile_name_length:showdev": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "security-snap-v2:profile_name_length:usehw": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "security-snap-v2:squashfs_files": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "security-snap-v2:squashfs_repack_checksum": {
+        "manual_review": false,
+        "text": "OK"
+      }
+    },
+    "warn": {}
+  }
+}
+
+= Test --state-input/--state-output
+Running: snap-review --json --state-input=./in --state-output=./out
+{
+  "snap.v2_declaration": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "snap.v2_functional": {
+    "error": {},
+    "info": {
+      "functional-snap-v2:execstack": {
+        "manual_review": false,
+        "text": "OK"
+      }
+    },
+    "warn": {}
+  },
+  "snap.v2_lint": {
+    "error": {},
+    "info": {
+      "lint-snap-v2:apps": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_entry:echo": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_entry:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_entry:evil": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_entry:sh": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_entry:showdev": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_entry:usehw": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_present": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_required:echo": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_required:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_required:evil": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_required:sh": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_required:showdev": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_required:usehw": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_unknown:echo": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_unknown:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_unknown:evil": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_unknown:sh": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_unknown:showdev": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_unknown:usehw": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:architecture_valid": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:assumes_valid": {
+        "manual_review": false,
+        "text": "OK (assumes not specified)"
+      },
+      "lint-snap-v2:cli_required:echo": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:cli_required:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:cli_required:evil": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:cli_required:sh": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:cli_required:showdev": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:cli_required:usehw": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:command:echo": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:command:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:command:evil": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:command:sh": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:command:showdev": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:command:usehw": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:daemon_required:echo": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:daemon_required:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:daemon_required:evil": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:daemon_required:sh": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:daemon_required:showdev": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:daemon_required:usehw": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:description": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:description_present": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:external_symlinks": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:hooks_present": {
+        "manual_review": false,
+        "text": "OK (optional hooks field not specified)"
+      },
+      "lint-snap-v2:iffy_files": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:name_valid": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:snap_type_redflag": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:snap_type_valid": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:summary": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:summary_present": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:title_present": {
+        "manual_review": false,
+        "text": "OK (optional title field not specified)"
+      },
+      "lint-snap-v2:unknown_field": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:unknown_refresh_mode": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:unknown_stop_mode": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:valid_contents_for_architecture": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:valid_unicode": {
+        "manual_review": false,
+        "text": "ok"
+      },
+      "lint-snap-v2:vcs_files": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:version_valid": {
+        "manual_review": false,
+        "text": "OK"
+      }
+    },
+    "warn": {}
+  },
+  "snap.v2_security": {
+    "error": {},
+    "info": {
+      "security-snap-v2:profile_name_length:echo": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "security-snap-v2:profile_name_length:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "security-snap-v2:profile_name_length:evil": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "security-snap-v2:profile_name_length:sh": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "security-snap-v2:profile_name_length:showdev": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "security-snap-v2:profile_name_length:usehw": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "security-snap-v2:squashfs_files": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "security-snap-v2:squashfs_repack_checksum": {
+        "manual_review": false,
+        "text": "OK"
+      }
+    },
+    "warn": {}
+  }
+}
+
+= Test --state-input only
+Running: snap-review --json --state-input=./in
+{
+  "runtime-errors": {
+    "error": {
+      "msg": {
+        "manual_review": true,
+        "text": "Must specify --state-output with --state-input"
+      }
+    },
+    "info": {},
+    "warn": {}
+  }
+}
+
+= Test --state-input=nonexistent/--state-output
+Running: snap-review --json --state-input=/nonexistent --state-output=./out
+{
+  "runtime-errors": {
+    "error": {
+      "msg": {
+        "manual_review": true,
+        "text": "file '/nonexistent' does not exist."
+      }
+    },
+    "info": {},
+    "warn": {}
+  }
+}
+
+= Test --state-input=<invalid>/--state-output
+Running: snap-review --json --state-input=./in --state-output=./out
+{
+  "runtime-errors": {
+    "error": {
+      "msg": {
+        "manual_review": true,
+        "text": "state-input failed to verify: 'format' should be a positive JSON integer <= 1"
+      }
+    },
+    "info": {},
+    "warn": {}
+  }
+}
+
+= Test --state-input=<eperm>/--state-output
+Running: snap-review --json --state-input=./in --state-output=./out
+{
+  "runtime-errors": {
+    "error": {
+      "msg": {
+        "manual_review": true,
+        "text": "Could not read state input: [Errno 13] Permission denied: './in'"
+      }
+    },
+    "info": {},
+    "warn": {}
+  }
+}
+
+= Test --state-output=<eperm>
+Running: snap-review --json --state-output=./not-allowed/out
+{
+  "runtime-errors": {
+    "error": {
+      "state-output-write": {
+        "manual_review": false,
+        "text": "Could not write state output: [Errno 13] Permission denied: './not-allowed/out'"
+      }
+    },
+    "info": {},
+    "warn": {}
+  },
+  "snap.v2_declaration": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "snap.v2_functional": {
+    "error": {},
+    "info": {
+      "functional-snap-v2:execstack": {
+        "manual_review": false,
+        "text": "OK"
+      }
+    },
+    "warn": {}
+  },
+  "snap.v2_lint": {
+    "error": {},
+    "info": {
+      "lint-snap-v2:apps": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_entry:echo": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_entry:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_entry:evil": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_entry:sh": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_entry:showdev": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_entry:usehw": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_present": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_required:echo": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_required:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_required:evil": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_required:sh": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_required:showdev": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_required:usehw": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_unknown:echo": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_unknown:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_unknown:evil": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_unknown:sh": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_unknown:showdev": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:apps_unknown:usehw": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:architecture_valid": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:assumes_valid": {
+        "manual_review": false,
+        "text": "OK (assumes not specified)"
+      },
+      "lint-snap-v2:cli_required:echo": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:cli_required:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:cli_required:evil": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:cli_required:sh": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:cli_required:showdev": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:cli_required:usehw": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:command:echo": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:command:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:command:evil": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:command:sh": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:command:showdev": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:command:usehw": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:daemon_required:echo": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:daemon_required:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:daemon_required:evil": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:daemon_required:sh": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:daemon_required:showdev": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:daemon_required:usehw": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:description": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:description_present": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:external_symlinks": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:hooks_present": {
+        "manual_review": false,
+        "text": "OK (optional hooks field not specified)"
+      },
+      "lint-snap-v2:iffy_files": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:name_valid": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:snap_type_redflag": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:snap_type_valid": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:summary": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:summary_present": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:title_present": {
+        "manual_review": false,
+        "text": "OK (optional title field not specified)"
+      },
+      "lint-snap-v2:unknown_field": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:unknown_refresh_mode": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:unknown_stop_mode": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:valid_contents_for_architecture": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:valid_unicode": {
+        "manual_review": false,
+        "text": "ok"
+      },
+      "lint-snap-v2:vcs_files": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:version_valid": {
+        "manual_review": false,
+        "text": "OK"
+      }
+    },
+    "warn": {}
+  },
+  "snap.v2_security": {
+    "error": {},
+    "info": {
+      "security-snap-v2:profile_name_length:echo": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "security-snap-v2:profile_name_length:env": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "security-snap-v2:profile_name_length:evil": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "security-snap-v2:profile_name_length:sh": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "security-snap-v2:profile_name_length:showdev": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "security-snap-v2:profile_name_length:usehw": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "security-snap-v2:squashfs_files": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "security-snap-v2:squashfs_repack_checksum": {
+        "manual_review": false,
+        "text": "OK"
+      }
+    },
+    "warn": {}
+  }
+}
+
+= Test --state-output
+Running: snap-review --sdk --state-output=./out
+= snap.v2_declaration =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= snap.v2_functional =
+{
+  "error": {},
+  "info": {
+    "functional-snap-v2:execstack": {
+      "manual_review": false,
+      "text": "OK"
+    }
+  },
+  "warn": {}
+}
+= snap.v2_lint =
+{
+  "error": {},
+  "info": {
+    "lint-snap-v2:apps": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_entry:echo": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_entry:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_entry:evil": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_entry:sh": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_entry:showdev": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_entry:usehw": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_present": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_required:echo": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_required:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_required:evil": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_required:sh": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_required:showdev": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_required:usehw": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_unknown:echo": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_unknown:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_unknown:evil": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_unknown:sh": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_unknown:showdev": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_unknown:usehw": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:architecture_valid": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:assumes_valid": {
+      "manual_review": false,
+      "text": "OK (assumes not specified)"
+    },
+    "lint-snap-v2:cli_required:echo": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:cli_required:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:cli_required:evil": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:cli_required:sh": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:cli_required:showdev": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:cli_required:usehw": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:command:echo": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:command:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:command:evil": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:command:sh": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:command:showdev": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:command:usehw": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:daemon_required:echo": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:daemon_required:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:daemon_required:evil": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:daemon_required:sh": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:daemon_required:showdev": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:daemon_required:usehw": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:description": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:description_present": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:external_symlinks": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:hooks_present": {
+      "manual_review": false,
+      "text": "OK (optional hooks field not specified)"
+    },
+    "lint-snap-v2:iffy_files": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:name_valid": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:snap_type_redflag": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:snap_type_valid": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:summary": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:summary_present": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:title_present": {
+      "manual_review": false,
+      "text": "OK (optional title field not specified)"
+    },
+    "lint-snap-v2:unknown_field": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:unknown_refresh_mode": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:unknown_stop_mode": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:valid_contents_for_architecture": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:valid_unicode": {
+      "manual_review": false,
+      "text": "ok"
+    },
+    "lint-snap-v2:vcs_files": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:version_valid": {
+      "manual_review": false,
+      "text": "OK"
+    }
+  },
+  "warn": {}
+}
+= snap.v2_security =
+{
+  "error": {},
+  "info": {
+    "security-snap-v2:profile_name_length:echo": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "security-snap-v2:profile_name_length:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "security-snap-v2:profile_name_length:evil": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "security-snap-v2:profile_name_length:sh": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "security-snap-v2:profile_name_length:showdev": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "security-snap-v2:profile_name_length:usehw": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "security-snap-v2:squashfs_files": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "security-snap-v2:squashfs_repack_checksum": {
+      "manual_review": false,
+      "text": "OK"
+    }
+  },
+  "warn": {}
+}
+
+= Test --state-input/--state-output
+Running: snap-review --sdk --state-input=./in --state-output=./out
+= snap.v2_declaration =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= snap.v2_functional =
+{
+  "error": {},
+  "info": {
+    "functional-snap-v2:execstack": {
+      "manual_review": false,
+      "text": "OK"
+    }
+  },
+  "warn": {}
+}
+= snap.v2_lint =
+{
+  "error": {},
+  "info": {
+    "lint-snap-v2:apps": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_entry:echo": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_entry:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_entry:evil": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_entry:sh": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_entry:showdev": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_entry:usehw": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_present": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_required:echo": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_required:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_required:evil": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_required:sh": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_required:showdev": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_required:usehw": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_unknown:echo": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_unknown:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_unknown:evil": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_unknown:sh": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_unknown:showdev": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_unknown:usehw": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:architecture_valid": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:assumes_valid": {
+      "manual_review": false,
+      "text": "OK (assumes not specified)"
+    },
+    "lint-snap-v2:cli_required:echo": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:cli_required:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:cli_required:evil": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:cli_required:sh": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:cli_required:showdev": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:cli_required:usehw": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:command:echo": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:command:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:command:evil": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:command:sh": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:command:showdev": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:command:usehw": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:daemon_required:echo": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:daemon_required:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:daemon_required:evil": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:daemon_required:sh": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:daemon_required:showdev": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:daemon_required:usehw": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:description": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:description_present": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:external_symlinks": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:hooks_present": {
+      "manual_review": false,
+      "text": "OK (optional hooks field not specified)"
+    },
+    "lint-snap-v2:iffy_files": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:name_valid": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:snap_type_redflag": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:snap_type_valid": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:summary": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:summary_present": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:title_present": {
+      "manual_review": false,
+      "text": "OK (optional title field not specified)"
+    },
+    "lint-snap-v2:unknown_field": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:unknown_refresh_mode": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:unknown_stop_mode": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:valid_contents_for_architecture": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:valid_unicode": {
+      "manual_review": false,
+      "text": "ok"
+    },
+    "lint-snap-v2:vcs_files": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:version_valid": {
+      "manual_review": false,
+      "text": "OK"
+    }
+  },
+  "warn": {}
+}
+= snap.v2_security =
+{
+  "error": {},
+  "info": {
+    "security-snap-v2:profile_name_length:echo": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "security-snap-v2:profile_name_length:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "security-snap-v2:profile_name_length:evil": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "security-snap-v2:profile_name_length:sh": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "security-snap-v2:profile_name_length:showdev": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "security-snap-v2:profile_name_length:usehw": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "security-snap-v2:squashfs_files": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "security-snap-v2:squashfs_repack_checksum": {
+      "manual_review": false,
+      "text": "OK"
+    }
+  },
+  "warn": {}
+}
+
+= Test --state-input only
+Running: snap-review --sdk --state-input=./in
+{
+  "runtime-errors": {
+    "error": {
+      "msg": {
+        "manual_review": true,
+        "text": "Must specify --state-output with --state-input"
+      }
+    },
+    "info": {},
+    "warn": {}
+  }
+}
+
+= Test --state-input=nonexistent/--state-output
+Running: snap-review --sdk --state-input=/nonexistent --state-output=./out
+{
+  "runtime-errors": {
+    "error": {
+      "msg": {
+        "manual_review": true,
+        "text": "file '/nonexistent' does not exist."
+      }
+    },
+    "info": {},
+    "warn": {}
+  }
+}
+
+= Test --state-input=<invalid>/--state-output
+Running: snap-review --sdk --state-input=./in --state-output=./out
+{
+  "runtime-errors": {
+    "error": {
+      "msg": {
+        "manual_review": true,
+        "text": "state-input failed to verify: 'format' should be a positive JSON integer <= 1"
+      }
+    },
+    "info": {},
+    "warn": {}
+  }
+}
+
+= Test --state-input=<eperm>/--state-output
+Running: snap-review --sdk --state-input=./in --state-output=./out
+{
+  "runtime-errors": {
+    "error": {
+      "msg": {
+        "manual_review": true,
+        "text": "Could not read state input: [Errno 13] Permission denied: './in'"
+      }
+    },
+    "info": {},
+    "warn": {}
+  }
+}
+
+= Test --state-output=<eperm>
+Running: snap-review --sdk --state-output=./not-allowed/out
+= runtime-errors =
+{
+  "error": {
+    "state-output-write": {
+      "manual_review": false,
+      "text": "Could not write state output: [Errno 13] Permission denied: './not-allowed/out'"
+    }
+  },
+  "info": {},
+  "warn": {}
+}
+= snap.v2_declaration =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= snap.v2_functional =
+{
+  "error": {},
+  "info": {
+    "functional-snap-v2:execstack": {
+      "manual_review": false,
+      "text": "OK"
+    }
+  },
+  "warn": {}
+}
+= snap.v2_lint =
+{
+  "error": {},
+  "info": {
+    "lint-snap-v2:apps": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_entry:echo": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_entry:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_entry:evil": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_entry:sh": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_entry:showdev": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_entry:usehw": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_present": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_required:echo": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_required:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_required:evil": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_required:sh": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_required:showdev": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_required:usehw": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_unknown:echo": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_unknown:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_unknown:evil": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_unknown:sh": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_unknown:showdev": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:apps_unknown:usehw": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:architecture_valid": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:assumes_valid": {
+      "manual_review": false,
+      "text": "OK (assumes not specified)"
+    },
+    "lint-snap-v2:cli_required:echo": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:cli_required:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:cli_required:evil": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:cli_required:sh": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:cli_required:showdev": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:cli_required:usehw": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:command:echo": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:command:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:command:evil": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:command:sh": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:command:showdev": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:command:usehw": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:daemon_required:echo": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:daemon_required:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:daemon_required:evil": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:daemon_required:sh": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:daemon_required:showdev": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:daemon_required:usehw": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:description": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:description_present": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:external_symlinks": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:hooks_present": {
+      "manual_review": false,
+      "text": "OK (optional hooks field not specified)"
+    },
+    "lint-snap-v2:iffy_files": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:name_valid": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:snap_type_redflag": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:snap_type_valid": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:summary": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:summary_present": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:title_present": {
+      "manual_review": false,
+      "text": "OK (optional title field not specified)"
+    },
+    "lint-snap-v2:unknown_field": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:unknown_refresh_mode": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:unknown_stop_mode": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:valid_contents_for_architecture": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:valid_unicode": {
+      "manual_review": false,
+      "text": "ok"
+    },
+    "lint-snap-v2:vcs_files": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:version_valid": {
+      "manual_review": false,
+      "text": "OK"
+    }
+  },
+  "warn": {}
+}
+= snap.v2_security =
+{
+  "error": {},
+  "info": {
+    "security-snap-v2:profile_name_length:echo": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "security-snap-v2:profile_name_length:env": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "security-snap-v2:profile_name_length:evil": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "security-snap-v2:profile_name_length:sh": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "security-snap-v2:profile_name_length:showdev": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "security-snap-v2:profile_name_length:usehw": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "security-snap-v2:squashfs_files": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "security-snap-v2:squashfs_repack_checksum": {
+      "manual_review": false,
+      "text": "OK"
+    }
+  },
+  "warn": {}
+}
+

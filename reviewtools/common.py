@@ -1094,3 +1094,38 @@ def assign_type_to_dict_values(d, assignments):
     for key in assignments:
         if key in d and d[key] is None:
             d[key] = assignments[key]
+
+
+# --state-input/--state-output format version. Layout:
+#   Version 1:
+#     {
+#       "format": 1,
+#       "<review_type>": {...}
+#     }
+#
+#     where <review_type> is self.review_type (as setup by __init__(...)
+#
+STATE_FORMAT_VERSION = 1
+
+
+def init_override_state_input():
+    """Initialize the state input"""
+    return {"format": STATE_FORMAT_VERSION}
+
+
+def verify_override_state(st):
+    """Verify state as specified by st"""
+    # XXX for now, just do it this way. Eventually as we understand the
+    # stored state, perhaps by schema
+
+    if not isinstance(st, dict):
+        raise ValueError("state object is not a dict")
+
+    if "format" not in st:
+        raise ValueError("missing required 'format' key")
+
+    f = st["format"]
+    if not isinstance(f, int) or f < 1 or f > STATE_FORMAT_VERSION:
+        raise ValueError(
+            "'format' should be a positive JSON integer <= %d" % STATE_FORMAT_VERSION
+        )
