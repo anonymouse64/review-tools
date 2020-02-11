@@ -1,4 +1,4 @@
-review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
+review-tools (0.48+20200211-1) RELEASED; urgency=medium
 
   [ Jamie Strandboge ]
   * sr_security.py: add checks to warn if iref matches another interface
@@ -14,7 +14,7 @@ review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
   [ Alfonso Sánchez-Beato ]
   * overrides.py: update network-manager deb version
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Mon, 03 Feb 2020 15:06:21 -0600
+ -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 11 Feb 2020 12:37:15 -0600
 
 review-tools (0.48+20200203-1) RELEASED; urgency=medium
 
