@@ -1,8 +1,18 @@
 review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
 
+  [ Jamie Strandboge ]
   * sr_security.py: add checks to warn if iref matches another interface
   * sr_declaration.py: add plug-names/slot-names checks
   * sr_{available,store}.py: support collaborators (LP: #1859034)
+  * testsuite:
+    - bring test_store.py back to 100% coverage
+    - reviewtools/tests/test_*: s/assertEquals/assertEqual/
+  * snap-review:
+    - output the report in a second step from the checks
+    - refactor --sdk code; add add_runtime_error()
+
+  [ Alfonso Sánchez-Beato ]
+  * overrides.py: update network-manager deb version
 
  -- Jamie Strandboge <jamie@ubuntu.com>  Mon, 03 Feb 2020 15:06:21 -0600
 
