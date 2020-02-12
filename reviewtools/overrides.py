@@ -439,6 +439,7 @@ sec_iface_ref_overrides = {
         "kubernetes-worker": ["dot-kube"],
         "kubicorn": ["kube-config"],
         "liquibase": ["dot-m2-repository"],
+        "ludo": ["config-ludo"],
         "microk8s": ["dot-kube"],
         "ngrok": ["ngrok-config"],
         "popeye": ["kube-config"],
