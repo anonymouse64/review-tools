@@ -1,6 +1,7 @@
 review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
 
   * snap-review: support --state-input and --state-output
+  * overrides.py: adjust for ludo and bcc
 
  -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 11 Feb 2020 15:56:23 -0600
 

@@ -544,7 +544,7 @@ canonical_foundations = [
     "steve.langasek@canonical.com",
 ]
 
-canonical_kernel = ["brad.figg@canonical.com", "tyler.hicks@canonical.com"]
+canonical_kernel = ["brad.figg@canonical.com", "terry.rudd@canonical.com"]
 
 canonical_hwe = [
     "anthony.wong@canonical.com",
