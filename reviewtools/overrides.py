@@ -598,6 +598,7 @@ update_publisher_overrides = {
         "azure-kernel": canonical_kernel,
         "bare": canonical_snapd,
         "base-18": canonical_snapd,
+        "bcc": ["colin.king@canonical.com"] + canonical_kernel,
         "bluez": canonical_enablement,
         "candid": canonical_commercial_systems,
         "caracalla-kernel": canonical_hwe,
