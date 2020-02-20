@@ -60,6 +60,10 @@ class SnapReviewDeclaration(SnapReview):
 
             self._verify_declaration(self.snap_declaration, base=False)
 
+            # do this after the verify since _verify_declaration() calls
+            # _add_result() and we don't want that for our defaults
+            self._ensure_snap_declaration_defaults()
+
     def is_bool(self, item):
         if isinstance(item, int) and (item is True or item is False):
             return True
@@ -71,6 +75,60 @@ class SnapReviewDeclaration(SnapReview):
         if s == "false" or s == "False":
             return False
         return s
+
+    def _ensure_snap_declaration_defaults(self):
+        """Ensure defaults are set for non-present keys in the snap
+           declaration.
+        """
+        if self.snap_declaration is None:
+            return
+
+        # https://bugs.launchpad.net/review-tools/+bug/1864103
+        #
+        # Historically we've said "if we have no scoped rules, then it is as if
+        # the snap decl wasn't specified for this constraint". However, we
+        # really need to say is for a particular interface and in all the
+        # cstr_types (ie, installation, connection, auto-connection):
+        #
+        #  * if there are no scoped rules or unscoped rules in the snap decl,
+        #     use the base decl
+        #  * if we have scoped rules in the snap decl for any cstr_types, use
+        #    those and defaults for the missing cstr_types
+        #  * if we have no scoped rules but have unscoped rules, use unscoped
+        #    rules and defaults for missing cstr_types
+        #
+        # In practical terms, this means that an interface in the base decl
+        # that has an installation constraint and slot side connection
+        # constraint (ie, two things that could cause an automated review),
+        # only needs only one in the snap decl to pass automated review.
+        #
+        # Considering the above, we can reduce this to simply: "if the snap
+        # declaration for this interface has any cstr_type, use it and use
+        # defaults for any missing cstr_types).
+
+        cstr_types = ["installation", "connection", "auto-connection"]
+
+        for side in ["plugs", "slots"]:
+            if side in self.snap_declaration:
+                for iface in self.snap_declaration[side]:
+                    missing = []
+                    for cstr_type in cstr_types:
+                        found = False
+                        for t in ["allow", "deny"]:
+                            key = "%s-%s" % (t, cstr_type)
+                            if key in self.snap_declaration[side][iface]:
+                                found = True
+                                break
+                        if not found:
+                            missing.append(cstr_type)
+
+                    # As a special case, we don't add defaults if
+                    # self.snap_declaration[side][iface] didn't have anything
+                    # to say about any cstr_types
+                    if len(missing) < len(cstr_types):
+                        for cstr in missing:
+                            dkey = "allow-%s" % cstr
+                            self.snap_declaration[side][iface][dkey] = True
 
     def _verify_declaration(self, decl, base=False):
         """Verify declaration"""
@@ -479,7 +537,7 @@ class SnapReviewDeclaration(SnapReview):
 
     def _get_rules(self, decl, cstr_type):
         """Obtain the rules, if any, from the specified decl for this
-           constraint type (eg, 'connection' or 'installation'.
+           constraint type (eg, 'connection' or 'installation').
         """
         scoped = True
         rules = {}
@@ -869,6 +927,12 @@ class SnapReviewDeclaration(SnapReview):
         #   - slots-per-plug: *
         #
         # correctly evaluates to: allow-connection: true
+
+        # When we have scoped snap decl rules ('snap' in whence) for a deny
+        # constraint but had no matching checks, then treat the scoped rule
+        # as a bool.
+        if "snap" in whence and num_checked == 0 and cstr.startswith("deny"):
+            return "human review required due to '%s' constraint (scoped bool)" % cstr
 
         # If multiple constraints are specified, they all must match
         if num_checked > 0 and len(tmp) == num_checked:

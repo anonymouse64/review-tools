@@ -4739,7 +4739,7 @@ slots:
         expected["info"][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
-    def test_check_declaration_slots_docker_override_installation(self):
+    def test_check_declaration_slots_docker_override_installation_no_scoping(self):
         """Test check_declaration - slots docker - override installation"""
         slots = {"iface": {"interface": "docker"}}
         self.set_test_snap_yaml("slots", slots)
@@ -4750,17 +4750,17 @@ slots:
 
         c.check_declaration()
         r = c.review_report
-        expected_counts = {"info": 1, "warn": 0, "error": 1}
+        expected_counts = {"info": 2, "warn": 0, "error": 0}
         self.check_results(r, expected_counts)
 
         expected = dict()
         expected["error"] = dict()
         expected["warn"] = dict()
         expected["info"] = dict()
-        name = "declaration-snap-v2:slots_connection:iface:docker"
-        expected["error"][name] = {
-            "text": "human review required due to 'deny-connection' constraint (bool)"
-        }
+        name = "declaration-snap-v2:slots:iface:docker"
+        # specified allow-installation but missing connection (defaults to
+        # allow)
+        expected["info"][name] = {"text": "OK"}
         name = "declaration-snap-v2:valid_slots:docker:allow-installation"
         expected["info"][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
@@ -5085,6 +5085,40 @@ slots:
         }
         self.check_results(r, expected=expected)
 
+    def test_check_declaration_docker_on_store_install_deny_connect(self):
+        """Test check_declaration - override - on-store install/deny connect"""
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            "snap_decl_slots": {
+                "docker": {
+                    "allow-installation": {"on-store": ["mystore"]},
+                    "deny-connection": {"on-store": ["mystore"]},
+                }
+            },
+            "snap_on_store": "mystore",
+        }
+        slots = {"iface": {"interface": "docker"}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.review_report
+        expected_counts = {"info": 2, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:valid_slots:docker:allow-installation"
+        expected["info"][name] = {"text": "OK"}
+        name = "declaration-snap-v2:slots_connection:iface:docker"
+        expected["error"][name] = {
+            "text": "human review required due to 'deny-connection' constraint (scoped bool)"
+        }
+        self.check_results(r, expected=expected)
+
     def test_check_declaration_docker_on_store_install(self):
         """Test check_declaration - override - on-store only install"""
         self.set_test_snap_yaml("type", "app")
@@ -5101,7 +5135,7 @@ slots:
 
         c.check_declaration()
         r = c.review_report
-        expected_counts = {"info": 1, "warn": 0, "error": 1}
+        expected_counts = {"info": 2, "warn": 0, "error": 0}
         self.check_results(r, expected_counts)
 
         expected = dict()
@@ -5110,11 +5144,43 @@ slots:
         expected["info"] = dict()
         name = "declaration-snap-v2:valid_slots:docker:allow-installation"
         expected["info"][name] = {"text": "OK"}
-        # specified allow-installation but missing connection
-        name = "declaration-snap-v2:slots_connection:iface:docker"
-        expected["error"][name] = {
-            "text": "human review required due to 'deny-connection' constraint (bool)"
+        # specified allow-installation without connection results in defaults
+        name = "declaration-snap-v2:slots:iface:docker"
+        expected["info"][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_docker_on_store_connect_deny_install(self):
+        """Test check_declaration - override - on-store connect (deny install)"""
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            "snap_decl_slots": {
+                "docker": {
+                    "allow-connection": {"on-store": ["mystore"]},
+                    "deny-installation": {"on-store": ["mystore"]},
+                }
+            },
+            "snap_on_store": "mystore",
         }
+        slots = {"iface": {"interface": "docker"}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.review_report
+        expected_counts = {"info": 2, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:slots_installation:iface:docker"
+        expected["error"][name] = {
+            "text": "human review required due to 'deny-installation' constraint (scoped bool)"
+        }
+        name = "declaration-snap-v2:valid_slots:docker:allow-connection"
+        expected["info"][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_docker_on_store_connect(self):
@@ -5133,18 +5199,16 @@ slots:
 
         c.check_declaration()
         r = c.review_report
-        expected_counts = {"info": 1, "warn": 0, "error": 1}
+        expected_counts = {"info": 2, "warn": 0, "error": 0}
         self.check_results(r, expected_counts)
 
         expected = dict()
         expected["error"] = dict()
         expected["warn"] = dict()
         expected["info"] = dict()
-        # specified allow-connection, but missing installation
-        name = "declaration-snap-v2:slots_installation:iface:docker"
-        expected["error"][name] = {
-            "text": "human review required due to 'allow-installation' constraint (bool)"
-        }
+        # specified allow-connection without installation results in defaults
+        name = "declaration-snap-v2:slots:iface:docker"
+        expected["info"][name] = {"text": "OK"}
         name = "declaration-snap-v2:valid_slots:docker:allow-connection"
         expected["info"][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
@@ -5372,6 +5436,40 @@ slots:
         }
         self.check_results(r, expected=expected)
 
+    def test_check_declaration_docker_on_brand_install_deny_connect(self):
+        """Test check_declaration - override - on-brand install (deny connect)"""
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            "snap_decl_slots": {
+                "docker": {
+                    "allow-installation": {"on-brand": ["mybrand"]},
+                    "deny-connection": {"on-brand": ["mybrand"]},
+                }
+            },
+            "snap_on_brand": "mybrand",
+        }
+        slots = {"iface": {"interface": "docker"}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.review_report
+        expected_counts = {"info": 2, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:valid_slots:docker:allow-installation"
+        expected["info"][name] = {"text": "OK"}
+        name = "declaration-snap-v2:slots_connection:iface:docker"
+        expected["error"][name] = {
+            "text": "human review required due to 'deny-connection' constraint (scoped bool)"
+        }
+        self.check_results(r, expected=expected)
+
     def test_check_declaration_docker_on_brand_install(self):
         """Test check_declaration - override - on-brand install"""
         self.set_test_snap_yaml("type", "app")
@@ -5388,7 +5486,7 @@ slots:
 
         c.check_declaration()
         r = c.review_report
-        expected_counts = {"info": 1, "warn": 0, "error": 1}
+        expected_counts = {"info": 2, "warn": 0, "error": 0}
         self.check_results(r, expected_counts)
 
         expected = dict()
@@ -5397,11 +5495,44 @@ slots:
         expected["info"] = dict()
         name = "declaration-snap-v2:valid_slots:docker:allow-installation"
         expected["info"][name] = {"text": "OK"}
-        # specified allow-installation but missing connection
-        name = "declaration-snap-v2:slots_connection:iface:docker"
-        expected["error"][name] = {
-            "text": "human review required due to 'deny-connection' constraint (bool)"
+        # specified allow-installation without connection results in defaults
+        name = "declaration-snap-v2:slots:iface:docker"
+        expected["info"][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_docker_on_brand_connect_deny_install(self):
+        """Test check_declaration - override - on-brand connect (deny install)"""
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            "snap_decl_slots": {
+                "docker": {
+                    "deny-installation": {"on-brand": ["mybrand"]},
+                    "allow-connection": {"on-brand": ["mybrand"]},
+                }
+            },
+            "snap_on_brand": "mybrand",
         }
+        slots = {"iface": {"interface": "docker"}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.review_report
+        expected_counts = {"info": 2, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        # specified allow-connection without installation results in defaults
+        name = "declaration-snap-v2:slots_installation:iface:docker"
+        expected["error"][name] = {
+            "text": "human review required due to 'deny-installation' constraint (scoped bool)"
+        }
+        name = "declaration-snap-v2:valid_slots:docker:allow-connection"
+        expected["info"][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_docker_on_brand_connect(self):
@@ -5420,18 +5551,16 @@ slots:
 
         c.check_declaration()
         r = c.review_report
-        expected_counts = {"info": 1, "warn": 0, "error": 1}
+        expected_counts = {"info": 2, "warn": 0, "error": 0}
         self.check_results(r, expected_counts)
 
         expected = dict()
         expected["error"] = dict()
         expected["warn"] = dict()
         expected["info"] = dict()
-        # specified allow-connection but missing installation
-        name = "declaration-snap-v2:slots_installation:iface:docker"
-        expected["error"][name] = {
-            "text": "human review required due to 'allow-installation' constraint (bool)"
-        }
+        # specified allow-connection without installation results in defaults
+        name = "declaration-snap-v2:slots:iface:docker"
+        expected["info"][name] = {"text": "OK"}
         name = "declaration-snap-v2:valid_slots:docker:allow-connection"
         expected["info"][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
@@ -6391,3 +6520,64 @@ slots:
             except SnapDeclarationException:
                 return
             raise Exception("base declaration should be invalid")  # pragma: nocover
+
+    def test_check_declaration_lp1864103(self):
+        """Test check_declaration - LP: #1864103"""
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            "snap_decl_plugs": {"browser-support": {"allow-auto-connection": True}}
+        }
+        plugs = {"iface": {"interface": "browser-support", "allow-sandbox": True}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.review_report
+        expected_counts = {"info": 2, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:valid_plugs:browser-support:allow-auto-connection"
+        expected["info"][name] = {"text": "OK"}
+        name = "declaration-snap-v2:plugs:iface:browser-support"
+        expected["info"][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_lp1864103_deny_connect(self):
+        """Test check_declaration - LP: #1864103 deny connect"""
+        self.set_test_snap_yaml("type", "app")
+        overrides = {
+            "snap_decl_plugs": {
+                "browser-support": {
+                    "allow-auto-connection": True,
+                    "deny-connection": {"plug-attributes": {"allow-sandbox": True}},
+                }
+            }
+        }
+        plugs = {"iface": {"interface": "browser-support", "allow-sandbox": True}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        self._use_test_base_declaration(c)
+
+        c.check_declaration()
+        r = c.review_report
+        expected_counts = {"info": 2, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:valid_plugs:browser-support:allow-auto-connection"
+        expected["info"][name] = {"text": "OK"}
+        name = "declaration-snap-v2:valid_plugs:browser-support:deny-connection"
+        expected["info"][name] = {"text": "OK"}
+        name = "declaration-snap-v2:plugs_connection:iface:browser-support"
+        expected["error"][name] = {
+            "text": "human review required due to 'deny-connection' constraint (interface attributes). If using a chromium webview, you can disable the internal sandbox (eg, use --no-sandbox) and remove the 'allow-sandbox' attribute instead. For QtWebEngine webviews, export QTWEBENGINE_DISABLE_SANDBOX=1 to disable its internal sandbox."
+        }
+        self.check_results(r, expected=expected)
