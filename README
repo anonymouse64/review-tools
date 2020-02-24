@@ -138,8 +138,8 @@ procedure for creating a new tag is:
 Install the required snaps for the below commands:
 $ sudo snap install review-tools
 $ sudo snap disconnect review-tools:home   # optional, but good for security
-$ sudo snap install http
-$ sudo snap install jq
+$ sudo snap install http  # or apt-get install httpie
+$ sudo snap install jq    # or apt-get install jq
 $ sudo snap install what-snap
 
 To download a snap (and all of its assertions):
@@ -186,6 +186,7 @@ snap-name: emoj
 
 # References
 
+https://api.snapcraft.io/docs/info.html
 https://docs.ubuntu.com/core/en/reference/rest
 
 What distros support reexec: snapd.git/cmd/cmd_linux.go
