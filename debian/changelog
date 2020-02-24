@@ -1,4 +1,4 @@
-review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
+review-tools (0.48+20200224-1) RELEASED; urgency=medium
 
   * snap-review: support --state-input and --state-output
   * overrides.py:
