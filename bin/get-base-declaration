@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import argparse
+import json
 import yaml
 import sys
 
@@ -21,9 +22,12 @@ def _verify_interface(iface):
     return found
 
 
-def print_decl(interfaces=[]):
+def print_decl(interfaces=[], output_json=False):
     if len(interfaces) == 0:
-        print(yaml.dump(base_decl, sort_keys=True, indent=2))
+        if output_json:
+            print(json.dumps(base_decl, sort_keys=True, indent=2))
+        else:
+            print(yaml.dump(base_decl, indent=2))
     else:
         interfaces.sort()
         for side in ["plugs", "slots"]:
@@ -40,7 +44,10 @@ def print_decl(interfaces=[]):
                         subdecl[side] = {}
                     subdecl[side][i] = base_decl[side][i]
 
-        print(yaml.dump(subdecl, sort_keys=True, indent=2))
+        if output_json:
+            print(json.dumps(subdecl, sort_keys=True, indent=2))
+        else:
+            print(yaml.dump(subdecl, indent=2))
 
 
 def main():
@@ -52,12 +59,15 @@ def main():
     parser.add_argument(
         "-i", "--interfaces", type=str, help="list of interfaces to allow connection"
     )
+    parser.add_argument(
+        "--json", help="output json", action="store_true"
+    )
     args = parser.parse_args()
 
     if args.interfaces:
-        print_decl(args.interfaces.split(","))
+        print_decl(interfaces=args.interfaces.split(","), output_json=args.json)
     else:
-        print_decl()
+        print_decl(output_json=args.json)
 
 
 if __name__ == "__main__":
