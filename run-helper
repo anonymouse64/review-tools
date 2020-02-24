@@ -28,6 +28,7 @@ for i in ./reviewtools/*py \
          ./reviewtools/tests/*py \
          ./bin/snap-review \
          ./bin/create-snap-declaration \
+         ./bin/get-base-declaration \
          ./bin/dump-tool \
          ./bin/snap-updates-available \
          ./bin/snap-check-* ; do

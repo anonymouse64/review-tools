@@ -22,6 +22,9 @@ apps:
   snap-declaration:
     command: create-snap-declaration
     plugs: [ mount-observe ]
+  base-declaration:
+    command: get-base-declaration
+    plugs: [ mount-observe ]
   updates-available:
     command: snap-updates-available
     plugs: [ home, mount-observe, network ]
