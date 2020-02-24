@@ -136,52 +136,66 @@ procedure for creating a new tag is:
 # Helpful commands
 
 Install the required snaps for the below commands:
-$ sudo snap install review-tools
-$ sudo snap disconnect review-tools:home   # optional, but good for security
-$ sudo snap install http  # or apt-get install httpie
-$ sudo snap install jq    # or apt-get install jq
-$ sudo snap install what-snap
+
+    $ sudo snap install review-tools
+    $ sudo snap disconnect review-tools:home   # optional, but good for security
 
 To download a snap (and all of its assertions):
-$ snap download emoj
-Fetching snap "emoj"
-Fetching assertions for "emoj"
-Install the snap with:
-   snap ack emoj_53.assert
-   snap install emoj_53.snap
+
+    $ snap download emoj
+    Fetching snap "emoj"
+    Fetching assertions for "emoj"
+    Install the snap with:
+       snap ack emoj_53.assert
+       snap install emoj_53.snap
 
 To perform a review via snap:
-$ snap-review $HOME/snap/review-tools/common/path/to/snap
+
+    $ snap-review $HOME/snap/review-tools/common/path/to/snap
+
 (need not be in SNAP_USER_COMMON if 'home' is connected)
 
 To unpack the snap to 'squashfs-root' in the cwd (files are owned by invoking
 user unless using sudo, which isn't recommended):
-$ unsquashfs ./the.snap
+
+    $ unsquashfs ./the.snap
 
 Find the snap name for a given snap-id:
-$ what-snap HjdctDwq9fm9TnLPSvUXgyXeY9zmRsB5
-HjdctDwq9fm9TnLPSvUXgyXeY9zmRsB5: emoj
+
+    $ review-tools.store-query --snap-info HjdctDwq9fm9TnLPSvUXgyXeY9zmRsB5 | grep " name:"
+      name: emoj
 
 Find the snap-id for a given snap name:
-$ SNAPNAME=emoj ; http https://api.snapcraft.io/v2/snaps/info/$SNAPNAME Snap-Device-Series:16 | jq -r '."snap-id"'
-HjdctDwq9fm9TnLPSvUXgyXeY9zmRsB5
 
-Download the snap.yaml for a given snap (and architecture) from the store (uses latest revision):
-$ SNAPNAME=emoj ; http https://api.snapcraft.io/v2/snaps/info/$SNAPNAME Snap-Device-Series:16 architecture==amd64 fields==snap-yaml | jq -r '."channel-map"[0]."snap-yaml"'
+    $ review-tools.store-query --snap-info emoj | grep 'snap-id'
+      snap-id: HjdctDwq9fm9TnLPSvUXgyXeY9zmRsB5
 
-name: emoj
-version: v2.0.0
-...
+Download the snap.yaml for a given snap (and optionally channel and
+architecture) from the store (defaults to latest/stable amd64):
 
-Download the snap declaration for a given snap from the store:
-$ snap known --remote snap-declaration series=16 snap-id=HjdctDwq9fm9TnLPSvUXgyXeY9zmRsB5
-type: snap-declaration
-authority-id: canonical
-series: 16
-snap-id: HjdctDwq9fm9TnLPSvUXgyXeY9zmRsB5
-publisher-id: ekRMaarzOfN1Vu3sDY0Bt1aGnM8Cd4kG
-snap-name: emoj
-...
+    $ review-tools.store-query --snap-decl emoj
+    apps:
+      emoj:
+        command: command-emoj.wrapper
+    ...
+
+    $ review-tools.store-query --snap-yaml --channel=17.03/stable --arch=amd64 docker
+    apps:
+      compose:
+        command: command-compose.wrapper
+    ...
+
+Download the snap-declaration for a given snap from the store:
+
+    $ review-tools.store-query --snap-decl ufw
+    ...
+    plugs:
+      firewall-control:
+        allow-auto-connection: true
+    snap-id: Jb8klqgs5djfejP5egB9Za8KYVK686Pe
+    snap-name: ufw
+    type: snap-declaration
+    ...
 
 
 # References

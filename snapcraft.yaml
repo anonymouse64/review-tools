@@ -25,6 +25,9 @@ apps:
   base-declaration:
     command: get-base-declaration
     plugs: [ mount-observe ]
+  store-query:
+    command: store-query
+    plugs: [ mount-observe, network ]
   updates-available:
     command: snap-updates-available
     plugs: [ home, mount-observe, network ]

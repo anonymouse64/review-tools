@@ -1,0 +1,412 @@
+#!/usr/bin/python3
+
+# https://api.snapcraft.io/docs
+# https://api.snapcraft.io/docs/info.html
+#
+# Simple wrapper around curl/httpie for store APIs
+#
+# Examples using httpie:
+#
+# Find the snap-id of a given snap name:
+# $ http https://api.snapcraft.io/v2/snaps/info/$SNAP_NAME Snap-Device-Series:16 | jq -r '."snap-id"'
+#
+# Find the snap-declaration for a given snap id
+# $ http https://assertions.ubuntu.com/v1/assertions/snap-declaration/16/$SNAP_ID?max-format=-1
+#
+# Find the snap-name for a given snap-id via its snap-declaration
+# $ http https://assertions.ubuntu.com/v1/assertions/snap-declaration/16/$SNAP_ID?max-format=0 | jq -r '."headers"."snap-name"'
+#
+# Find the signed snap-declaration for a given snap declaration format (note,
+# the value of max-format depends on when the store signed the given snap
+# snap declaration. The store will always return the highest formatted version
+# based on max-format, but may have other formats stored (eg, 2 and 3)
+# $ http https://assertions.ubuntu.com/v1/assertions/snap-declaration/16/$SNAP_ID?max-format=$FORMAT
+#
+# Find the snap-yamls for a given snap-name (by channel-map)
+# $ http https://api.snapcraft.io/v2/snaps/info/$SNAP_NAME?fields=snap-yaml Snap-Device-Series:16
+#
+# Note, in all of the above, the series uses '16' since that is the only
+# supported series.
+
+import argparse
+import json
+import re
+import requests
+import yaml
+
+import reviewtools.common as common
+from reviewtools.common import debug, error
+
+from reviewtools.sr_common import SnapReview
+
+store_api = "https://api.snapcraft.io"
+assertions_api = "https://assertions.ubuntu.com"
+snap_device_series = "16"
+responses = {}
+# see maxSupportedFormat in asserts/asserts.go
+# store_highest_snap_decl_format = 4  # not as of 2020-02-25
+store_highest_snap_decl_format = 3
+
+
+def format_resp(r, output_json=False):
+    """Format the stored response in pretty format"""
+    if output_json:
+        return json.dumps(r, sort_keys=True, indent=2)
+    return yaml.dump(r, indent=2, default_flow_style=False)
+
+
+def _verify_snap_id(s):
+    """Validate snap-id"""
+    if not isinstance(s, str):
+        raise ValueError("invalid type for snap-id (not a string)")
+    if len(s) != 32:
+        raise ValueError("invalid length for snap-id (%d)" % len(s))
+    if not re.match(r"^[a-zA-Z0-9]{32}$", s):
+        raise ValueError("invalid snap-id (%s)" % s)
+    return
+
+
+def _fetch(url, headers=None):
+    """Fetch a url with any request headers. If we've fetch it already, then
+       return the previous response.
+    """
+
+    def _convert_assertion_to_yaml(resp):
+        """Convert resp from application/json to application/x.ubuntu.assertion.
+           This isn't meant to be comprehensive but instead to help with
+           readability.
+        """
+        int_fields = ["revision", "series", "format"]
+        for f in int_fields:
+            if f in resp:
+                resp[f] = int(resp[f])
+
+        # handle:
+        #   plugs:
+        #     foo:
+        #       allow-installation: 'true'
+        #       allow-connection: 'true'
+        #       allow-auto-connection: 'false'
+        #
+        # XXX: this should really do nesting
+        for side in ["plugs", "slots"]:
+            if side not in resp:
+                continue
+            for iface in resp[side]:
+                for k in resp[side][iface]:
+                    if isinstance(resp[side][iface][k], str) and resp[side][iface][
+                        k
+                    ] in ["true", "false"]:
+                        b = False
+                        if resp[side][iface][k] == "true":
+                            b = True
+                        resp[side][iface][k] = b
+        return resp
+
+    def format_assertion(assertion, content_type):
+        """Strip the assertion signature off of the application/x.ubuntu.assertion"""
+        # most are json, but assertions might be application/x.ubuntu.assertion
+        if content_type == "application/json":
+            if "headers" not in assertion:
+                raise Exception(
+                    "Could not parse assertion (%s): %s" % (content_type, assertion)
+                )
+            resp = yaml.load(r.text, Loader=yaml.SafeLoader)
+            return _convert_assertion_to_yaml(resp["headers"])
+        elif content_type == "application/x.ubuntu.assertion":
+            # authority-id: canonical
+            # revision: 16
+            # series: 16
+            # snap-id: <snap id>
+            # ...
+            # sign-key-sha3-384: <sha384>
+            # <line break>
+            # <multi-line signature>
+            # <line break>
+            s = None
+            for line in assertion.splitlines():
+                if s is None:
+                    s = line
+                elif line == "":
+                    break
+                else:
+                    s += "\n" + line
+
+            return yaml.load(s, Loader=yaml.SafeLoader)
+        raise Exception(
+            "Count not parse assertion of unknown type (%s): %s"
+            % (content_type, assertion)
+        )
+
+    h = str(headers)
+    if url in responses and h in responses[url]:
+        debug("Cache: %s, headers=%s" % (url, headers))
+        return responses[url][h]
+
+    debug("Fetch: %s, headers=%s" % (url, headers))
+    if headers is None:
+        r = requests.get(url)
+    else:
+        r = requests.get(url, headers=headers)
+
+    if r.status_code != 200:
+        raise Exception("Status code: %s (%s)" % (r.status_code, r.headers))
+
+    debug("Response headers=%s" % r.headers)
+
+    if url not in responses:
+        responses[url] = {}
+    if h not in responses[url]:
+        if "Content-Type" not in r.headers:
+            raise Exception("Could not determine Content-Type: %s" % (r.headers))
+
+        if r.headers["Content-Type"] not in [
+            "application/json",
+            "application/x.ubuntu.assertion",
+        ]:
+            raise Exception("Unexpected Content-Type: %s" % (r.headers))
+
+        if url.startswith(assertions_api):
+            responses[url][h] = format_assertion(r.text, r.headers["Content-Type"])
+        else:
+            # json is a subset of yaml, so let's use yaml.SafeLoader to read
+            # in the text (instead of r.json())
+            responses[url][h] = yaml.load(r.text, Loader=yaml.SafeLoader)
+
+    return responses[url][h]
+
+
+# $ http https://api.snapcraft.io/v2/snaps/info/$SNAP_NAME Snap-Device-Series:16 | jq -r '."snap-id"'
+def _get_snap_info_by_name(snap_name):
+    """Get snap info via snap name"""
+    url = "%s/v2/snaps/info/%s" % (store_api, snap_name)
+    headers = {"Snap-Device-Series": snap_device_series}
+    return _fetch(url, headers)
+
+
+# $ http https://assertions.ubuntu.com/v1/assertions/snap-declaration/16/$SNAP_ID?max-format=-1
+def _get_snap_declaration_assertion_by_id(snap_id, max_format=None):
+    """Get snap-declaration assertion for snap id"""
+    if max_format is None:
+        m = -1
+    else:
+        m = int(max_format)
+
+    url = "%s/v1/assertions/snap-declaration/%s/%s?max-format=%d" % (
+        assertions_api,
+        snap_device_series,
+        snap_id,
+        m,
+    )
+    return _fetch(url)
+
+
+# $ http https://assertions.ubuntu.com/v1/assertions/snap-declaration/16/$SNAP_ID?max-format=0 | jq -r '."headers"."snap-name"'
+def _get_snap_name_from_snap_declaration(snap_id):
+    """Get the snap name from the snap declaration assertion"""
+    res = _get_snap_declaration_assertion_by_id(snap_id, max_format=0)
+    if "snap-name" not in res:
+        raise Exception(
+            "Could not find snap-name in response: %s"
+            % format_resp(res, output_json=True)
+        )
+    return res["snap-name"]
+
+
+# $ http https://api.snapcraft.io/v2/snaps/info/$SNAP_NAME?fields=snap-yaml Snap-Device-Series:16
+def _get_snap_yaml(snap_name, channel=None, arch=None):
+    """Get snap.yaml"""
+    url = "%s/v2/snaps/info/%s?fields=snap-yaml" % (store_api, snap_name)
+    headers = {"Snap-Device-Series": snap_device_series}
+    res = _fetch(url, headers)
+
+    risk = "stable"
+    track = "latest"
+    if arch is None:
+        arch = "amd64"
+    if arch not in SnapReview(None, None).valid_compiled_architectures:
+        raise ValueError("Unsupported arch '%s'" % arch)
+
+    if channel is not None:
+        if "/" not in channel:  # default to 'latest'
+            risk = channel
+        else:
+            (track, risk) = channel.split("/", 2)
+
+    if risk not in ["stable", "candidate", "beta", "edge"]:
+        raise Exception("Invalid risk '%s'" % risk)
+
+    for item in res["channel-map"]:
+        if "channel" not in item:
+            continue
+        if "snap-yaml" not in item:
+            continue
+        if "risk" not in item["channel"]:
+            continue
+        if "track" not in item["channel"]:
+            continue
+        if "architecture" not in item["channel"]:
+            continue
+
+        if (
+            risk == item["channel"]["risk"]
+            and track == item["channel"]["track"]
+            and arch == item["channel"]["architecture"]
+        ):
+            return yaml.load(item["snap-yaml"], Loader=yaml.SafeLoader)
+
+    debug(format_resp(res, output_json=True))
+    raise Exception(
+        "Could not find snap-yaml for (channel=%s, arch=%s)" % (channel, arch)
+    )
+
+
+def _get_snap_info_by_id(snap_id):
+    """Get the snap info with just the snap id"""
+    name = _get_snap_name_from_snap_declaration(snap_id)
+    return _get_snap_info_by_name(name)
+
+
+def _get_snap_yaml_by_id(snap_id, channel=None, arch=None):
+    """Get the snap-yaml for a given snap-id, limited by channel and arch"""
+    name = _get_snap_name_from_snap_declaration(snap_id)
+    return _get_snap_yaml(name, channel, arch)
+
+
+def _get_field_from_info(info, field):
+    if field not in info:
+        return None
+    return info[field]
+
+
+def _get_all_snap_declarations_by_id(snap_id):
+    """Return all stored snap declarations for a given snap-id"""
+    # The idea is, start with the highest store format and go down to 0,
+    # display any that are different.
+    #
+    # Note: the unsigned application/json are json dicts (ie, strings)
+    # whereas the signed application/x.ubuntu.assertion are yaml dicts (ie,
+    # may contain objects like bools, ints, datetime.datetime
+    decls = {}
+    seen = []
+    for f in range(store_highest_snap_decl_format, -1, -1):  # higher ... 0
+        r = _get_snap_declaration_assertion_by_id(snap_id, max_format=f)
+        # timestamp' is formatted differently between application/json and
+        # application/x.ubuntu.assertion.
+        if "timestamp" not in r:
+            raise Exception("Could not find 'timestamp': %s" % r)
+
+        raw_ts = str(r["timestamp"])
+        if raw_ts.endswith("Z"):
+            # 2019-04-09T22:41:05.913307Z
+            ts = raw_ts[:-1].replace("T", " ")
+        else:
+            # 2019-04-09 22:41:05.913307+00:00
+            ts = raw_ts[:-1].split("+")[0]
+        if ts not in seen:
+            decls[str(f)] = r
+            seen.append(ts)
+
+    return decls
+
+
+def main():
+    common.REPORT_OUTPUT = "console"
+    parser = argparse.ArgumentParser(
+        prog="store-query",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description="Output base declaration from the review-tools",
+    )
+
+    parser.add_argument(
+        "name_or_id", metavar="SNAP_NAME_OR_ID", nargs="?", help="snap-name or snap-id"
+    )
+    parser.add_argument("--snap-id", type=str, help="query by explicit snap id")
+
+    # snap-decl
+    parser.add_argument(
+        "--snap-decl", help="fetch snap declaration", action="store_true"
+    )
+    parser.add_argument(
+        "--max-format",
+        type=str,
+        help="max format of the snap declaration ('all' for all store supported formats)",
+    )
+
+    # snap-info
+    parser.add_argument("--snap-info", help="fetch snap info", action="store_true")
+    parser.add_argument(
+        "--full", help="show full snap info response", action="store_true"
+    )
+
+    # snap-yaml
+    parser.add_argument("--snap-yaml", help="fetch snap.yaml", action="store_true")
+    parser.add_argument("--arch", type=str, help="limit to arch")
+    parser.add_argument(
+        "--channel",
+        type=str,
+        help="channel (<track>/<risk>) to use (defaults to latest/stable)",
+    )
+
+    args = parser.parse_args()
+
+    if args.name_or_id is None and args.snap_id is None:
+        error("Must specify a snap name or snap id. Aborting")
+
+    if not args.snap_decl and not args.snap_info and not args.snap_yaml:
+        error("Must specify one of --snap-decl, --snap-info or --snap-yaml. Aborting")
+
+    # Note snap names are lower case, with numbers and '-' but snap ids are
+    # alphanumerics of exactly 32. While possible that a snap-id and a name
+    # might clash, this is unlikely. Can use --snap-id in this case
+    if args.snap_id:
+        snap_id = args.snap_id
+    elif len(args.name_or_id) == 32 and not SnapReview(None, None)._verify_pkgname(
+        args.name_or_id
+    ):
+        snap_id = args.name_or_id
+    else:
+        res = _get_snap_info_by_name(args.name_or_id)
+        snap_id = _get_field_from_info(res, "snap-id")
+
+    _verify_snap_id(snap_id)  # raises an excecption
+
+    # show only snap info
+    if args.snap_info:
+        res = _get_snap_info_by_id(snap_id)
+        if args.full:
+            print(format_resp(res))
+        else:
+            j = {"snap": res["snap"]}
+            print(format_resp(j))
+
+    # show only snap decl
+    elif args.snap_decl:
+        if args.max_format is not None:
+            if args.max_format != "all":
+                try:
+                    mf = int(args.max_format)
+                    if mf < 0:
+                        raise ValueError
+                except ValueError:
+                    error("--max-format should be 'all' or integer >= 0")
+
+        if args.max_format == "all":
+            snap_decl = _get_all_snap_declarations_by_id(snap_id)
+        else:
+            snap_decl = _get_snap_declaration_assertion_by_id(
+                snap_id, args.max_format
+            )
+        print(format_resp(snap_decl))
+
+    # show only snap.yaml
+    elif args.snap_yaml:
+        res = _get_snap_yaml_by_id(snap_id, channel=args.channel, arch=args.arch)
+        print(format_resp(res))
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        error("Aborted.")
