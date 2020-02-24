@@ -9,8 +9,9 @@ review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
     - properly handle scoped snap declaration deny rules with no matching
       checks
   * sr_security.py: support lists for sec_mode_override
+  * add bin/get-base-declaration
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 11 Feb 2020 15:56:23 -0600
+ -- Jamie Strandboge <jamie@ubuntu.com>  Mon, 24 Feb 2020 12:13:40 -0600
 
 review-tools (0.48+20200211-1) RELEASED; urgency=medium
 
