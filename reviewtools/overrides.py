@@ -203,7 +203,7 @@ sec_mode_overrides = {
         "./usr/bin/wall": "rwxr-sr-x",
         "./usr/lib/dbus-1.0/dbus-daemon-launch-helper": "rwsr-xr--",
         "./usr/lib/openssh/ssh-keysign": "rwsr-xr-x",
-        "./usr/lib/snapd/snap-confine": "rwsr-sr-x",
+        "./usr/lib/snapd/snap-confine": ["rwsr-sr-x", "rwsr-xr-x"],
         "./usr/local/lib/python3.5": "rwxrwsr-x",
         "./usr/local/lib/python3.5/dist-packages": "rwxrwsr-x",
         "./usr/sbin/pppd": "rwsr-xr--",
@@ -308,7 +308,7 @@ sec_mode_overrides = {
     "opera-developer": {  # official Opera snap
         "./usr/lib/x86_64-linux-gnu/opera-developer/opera_sandbox": "rwsr-xr-x"
     },
-    "snapd": {"./usr/lib/snapd/snap-confine": "rwsr-sr-x"},
+    "snapd": {"./usr/lib/snapd/snap-confine": ["rwsr-sr-x", "rwsr-xr-x"]},
     "test-snapd-core18": {
         "./bin/mount": "rwsr-xr-x",
         "./bin/ping": "rwsr-xr-x",

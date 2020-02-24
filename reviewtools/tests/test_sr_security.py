@@ -299,6 +299,75 @@ drwxrwxr-x root/root                48 2016-03-11 12:26 squashfs-root/meta
         expected_counts = {"info": 1, "warn": 0, "error": 0}
         self.check_results(report, expected_counts)
 
+    def test_check_squashfs_files_no_override(self):
+        """Test check_squashfs_files()"""
+        out = """Parallel unsquashfs: Using 4 processors
+8 inodes (8 blocks) to write
+
+drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
+-rwsr-xr-x root/root                31 2016-02-12 10:07 squashfs-root/test
+"""
+        self.set_test_unsquashfs_lls(out)
+        c = SnapReviewSecurity(self.test_name)
+        c.check_squashfs_files()
+        report = c.review_report
+        expected_counts = {"info": 0, "warn": 0, "error": 1}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "security-snap-v2:squashfs_files"
+        expected["error"][name] = {
+            "text": "found errors in file output: unusual mode 'rwsr-xr-x' for entry './test'"
+        }
+        self.check_results(report, expected=expected)
+
+    def test_check_squashfs_files_override(self):
+        """Test check_squashfs_files()"""
+        out = """Parallel unsquashfs: Using 4 processors
+8 inodes (8 blocks) to write
+
+drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
+-rwsr-xr-x root/root                31 2016-02-12 10:07 squashfs-root/test
+"""
+        self.set_test_unsquashfs_lls(out)
+
+        # update the overrides
+        from reviewtools.overrides import sec_mode_overrides
+
+        sec_mode_overrides["foo"] = {"./test": "rwsr-xr-x"}
+        c = SnapReviewSecurity(self.test_name)
+        c.check_squashfs_files()
+        # clean up
+        del sec_mode_overrides["foo"]
+        report = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+
+    def test_check_squashfs_files_override_list(self):
+        """Test check_squashfs_files()"""
+        out = """Parallel unsquashfs: Using 4 processors
+8 inodes (8 blocks) to write
+
+drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
+-rwsr-xr-x root/root                31 2016-02-12 10:07 squashfs-root/test
+"""
+        self.set_test_unsquashfs_lls(out)
+
+        # update the overrides
+        from reviewtools.overrides import sec_mode_overrides
+
+        sec_mode_overrides["foo"] = {"./test": ["rwsr-sr-x", "rwsr-xr-x"]}
+        c = SnapReviewSecurity(self.test_name)
+        c.check_squashfs_files()
+        # clean up
+        del sec_mode_overrides["foo"]
+        report = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+
     def test_check_squashfs_files_short_output(self):
         """Test check_squashfs_files() - short output"""
         out = """output
@@ -1326,6 +1395,33 @@ slots:
         expected_counts = {"info": 0, "warn": 0, "error": 0}
         self.check_results(report, expected_counts)
 
+    def test__mode_in_override(self):
+        """Test check__mode_in_override()"""
+        # update the overrides
+        from reviewtools.overrides import sec_mode_overrides
+
+        pkg = "review-tools-testsuite"
+
+        tests = [
+            # pkgname, f, m, override, exp
+            (None, "/fn", "rwxr-xr-x", None, False),
+            (pkg, "/fn", "rwxr-xr-x", {"/test": "rwxrwxrwt"}, False),
+            (pkg, "/test", "--x--x--x", {"/test": "rwxrwxrwt"}, False),
+            (pkg, "/test", "--x--x--x", {"/test": ["rwxrwxrwt", "rwxrwxrwT"]}, False),
+            (pkg, "/test", "rwxrwxrwt", {"/test": "rwxrwxrwt"}, True),
+            (pkg, "/test", "rwxrwxrwt", {"/test": ["rwxrwxrwT", "rwxrwxrwt"]}, True),
+        ]
+        for (p, f, m, override, exp) in tests:
+            if p is not None:
+                sec_mode_overrides[p] = override
+            c = SnapReviewSecurity(self.test_name)
+            res = c._mode_in_override(p, f, m)
+            self.assertEqual(exp, res)
+
+            # then clean up
+            if p is not None:
+                del sec_mode_overrides[p]
+
 
 class TestSnapReviewSecurityNoMock(TestCase):
     """Tests without mocks where they are not needed."""
@@ -1914,6 +2010,75 @@ exit 0
 
         os.environ["SNAP_ENFORCE_RESQUASHFS"] = "1"
         c.check_squashfs_resquash()
+        os.environ.pop("SNAP_ENFORCE_RESQUASHFS")
+        os.environ["PATH"] = old_path
+        report = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "security-snap-v2:squashfs_repack_checksum"
+        expected["info"][name] = {
+            "text": "OK (check not enforced for app snaps with setuid/setgid overrides)"
+        }
+        self.check_results(report, expected=expected)
+
+    def test_check_squashfs_resquash_sha512sum_mismatch_enforce_app_override_list(self):
+        """Test check_squashfs_resquash() - sha512sum mismatch - enforce app
+           with override (list).
+        """
+        # update the overrides
+        from reviewtools.overrides import sec_mode_overrides
+
+        sec_mode_overrides["foo"] = {"./test": ["rwsr-xr-x"]}
+
+        output_dir = self.mkdtemp()
+        package = utils.make_snap2(output_dir=output_dir)
+        sy_path = os.path.join(output_dir, "snap.yaml")
+        content = """
+name: foo
+version: 0.1
+summary: some thing
+description: some desc
+architectures: [ amd64 ]
+"""
+        with open(sy_path, "w") as f:
+            f.write(content)
+
+        package = utils.make_snap2(
+            output_dir=output_dir, extra_files=["%s:meta/snap.yaml" % sy_path]
+        )
+
+        c = SnapReviewSecurity(package)
+
+        # fake sha512sum
+        sha512sum = os.path.join(output_dir, "sha512sum")
+        content = """#!/bin/sh
+bn=`basename "$1"`
+if [ "$bn" = "test_1.0_all.snap" ]; then
+    echo beefeeee $1
+else
+    echo deadbeef $1
+fi
+exit 0
+"""
+        with open(sha512sum, "w") as f:
+            f.write(content)
+        os.chmod(sha512sum, 0o775)
+
+        old_path = os.environ["PATH"]
+        if old_path:
+            os.environ["PATH"] = "%s:%s" % (output_dir, os.environ["PATH"])
+        else:
+            os.environ["PATH"] = output_dir  # pragma: nocover
+
+        os.environ["SNAP_ENFORCE_RESQUASHFS"] = "1"
+        c.check_squashfs_resquash()
+        # clean up
+        del sec_mode_overrides["foo"]
         os.environ.pop("SNAP_ENFORCE_RESQUASHFS")
         os.environ["PATH"] = old_path
         report = c.review_report

@@ -412,7 +412,14 @@ class SnapReviewSecurity(SnapReview):
                     has_sugid_override = False
                     setugid_pat = re.compile(r"[sS]")
                     for k in sec_mode_overrides[pkgname]:
-                        if setugid_pat.search(sec_mode_overrides[pkgname][k]):
+                        if isinstance(sec_mode_overrides[pkgname][k], list):
+                            for m in sec_mode_overrides[pkgname][k]:
+                                if setugid_pat.search(m):
+                                    has_sugid_override = True
+                                    break
+                            if has_sugid_override:
+                                break
+                        elif setugid_pat.search(sec_mode_overrides[pkgname][k]):
                             has_sugid_override = True
                             break
                     if has_sugid_override:
@@ -424,6 +431,24 @@ class SnapReviewSecurity(SnapReview):
                         link = None
 
         self._add_result(t, n, s, link)
+
+    def _mode_in_override(self, pkgname, fname, mode):
+        if (
+            pkgname not in sec_mode_overrides
+            or fname not in sec_mode_overrides[pkgname]
+        ):
+            return False
+        elif (
+            isinstance(sec_mode_overrides[pkgname][fname], list)
+            and mode not in sec_mode_overrides[pkgname][fname]
+        ):
+            return False
+        elif (
+            isinstance(sec_mode_overrides[pkgname][fname], str)
+            and sec_mode_overrides[pkgname][fname] != mode
+        ):
+            return False
+        return True
 
     def check_squashfs_files(self):
         """Check squashfs files"""
@@ -502,16 +527,11 @@ class SnapReviewSecurity(SnapReview):
                 perms = ["r", "w", "x", "-"]
                 if ftype == "d":  # allow sticky directories for stage-packages
                     perms.append("t")
-                if not _check_allowed_perms(mode, perms):
-                    if (
-                        pkgname not in sec_mode_overrides
-                        or fname not in sec_mode_overrides[pkgname]
-                        or sec_mode_overrides[pkgname][fname] != mode
-                    ):
-                        errors.append(
-                            "unusual mode '%s' for entry '%s'" % (mode, fname)
-                        )
-                        continue
+                if not _check_allowed_perms(mode, perms) and not self._mode_in_override(
+                    pkgname, fname, mode
+                ):
+                    errors.append("unusual mode '%s' for entry '%s'" % (mode, fname))
+                    continue
                 # No point checking for world-writable, the squashfs is
                 # readonly
                 # if mode[-2] != '-':
