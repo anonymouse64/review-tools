@@ -446,6 +446,7 @@ sec_iface_ref_overrides = {
         "rain": ["config-aws"],
         "redis-desktop-manager": ["dot-rdm"],
         "rofi-totp": ["dot-gauth"],
+        "snap-store": ["dot-snap-auth-json"],
         "spread": ["dot-spread", "dot-config-gcloud"],
         "universal-ctags": ["dot-ctags"],
         "vht": ["dot-vault-token"],
@@ -456,6 +457,7 @@ sec_iface_ref_overrides = {
         "get-iplayer": ["etc-get-iplayer-options"],
         "glances": ["etc-glances-config"],
         "gnome-system-monitor": ["run-systemd-sessions"],
+        "snap-store": ["hostfs-usr-share-applications"],
     },
 }
 
