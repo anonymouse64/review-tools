@@ -40,15 +40,6 @@ class SnapReviewLint(SnapReview):
     def __init__(self, fn, overrides=None):
         """Set up the class."""
         SnapReview.__init__(self, fn, "lint-snap-v2", overrides=overrides)
-        self.valid_compiled_architectures = [
-            "armhf",
-            "i386",
-            "amd64",
-            "arm64",
-            "powerpc",
-            "ppc64el",
-            "s390x",
-        ]
         self.valid_architectures = ["all"] + self.valid_compiled_architectures
         self.vcs_files = [
             ".bzr*",

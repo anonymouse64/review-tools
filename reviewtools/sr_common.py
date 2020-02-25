@@ -175,6 +175,16 @@ class SnapReview(Review):
     # overlord/snapstate/check_snap.go (but eventually store side)
     valid_system_usernames = ["snap_daemon"]
 
+    valid_compiled_architectures = [
+        "armhf",
+        "i386",
+        "amd64",
+        "arm64",
+        "powerpc",
+        "ppc64el",
+        "s390x",
+    ]
+
     # https://docs.google.com/document/d/1Q5_T00yTq0wobm_nHzCV-KV8R4jdk-PXcrtm80ETTLU/edit#
     # 'plugs':
     #    'interface': name
