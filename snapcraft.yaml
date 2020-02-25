@@ -64,6 +64,7 @@ parts:
     - pylint3
     - python3-coverage
     - python3-magic
+    - python3-requests
     - python3-simplejson
     - python3-yaml
     - squashfs-tools
