@@ -311,6 +311,8 @@ class SnapReview(Review):
     max_icon_size = 8 * 1024 * 1024
 
     def __init__(self, fn, review_type, overrides=None):
+        if review_type is None:  # for using utility functions
+            return
         Review.__init__(self, fn, review_type, overrides=overrides)
 
         # Anything importing this is assumed to be a snap v2 check
