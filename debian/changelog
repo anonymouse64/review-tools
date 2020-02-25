@@ -1,3 +1,9 @@
+review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
+
+  * add bin/store-query and update README
+
+ -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 25 Feb 2020 09:27:36 -0600
+
 review-tools (0.48+20200224-1) RELEASED; urgency=medium
 
   * snap-review: support --state-input and --state-output
