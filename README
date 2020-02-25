@@ -173,7 +173,7 @@ Find the snap-id for a given snap name:
 Download the snap.yaml for a given snap (and optionally channel and
 architecture) from the store (defaults to latest/stable amd64):
 
-    $ review-tools.store-query --snap-decl emoj
+    $ review-tools.store-query --snap-yaml emoj
     apps:
       emoj:
         command: command-emoj.wrapper
