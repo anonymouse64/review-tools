@@ -1,0 +1,26 @@
+# Cross-distro
+
+What distros support reexec: snapd.git/cmd/cmd_linux.go
+(distroSupportsReExec()) (as of 2019-10-15, only Ubuntu and Debian)
+
+https://snapcraft.io/docs/installing-snapd
+
+Arch: https://aur.archlinux.org/packages/snapd/
+CentOS: https://dl.fedoraproject.org/pub/epel/7/SRPMS/Packages/s/ (where '7' is the CentOS/RHEL version)
+Debian: https://packages.debian.org/search?suite=all&section=all&arch=any&searchon=sourcenames&keywords=snapd
+Elementary: based on Ubuntu LTS
+Fedora: https://dl.fedoraproject.org/pub/fedora/linux/updates/30/Everything/SRPMS/Packages/s/ (where '30' is the Fedora version)
+GalliumOS: fork of Ubuntu LTS but uses the Ubuntu archive with PPAs
+KDE Neon: fork of Ubuntu LTS but uses the Ubuntu archive with PPAs
+Kubuntu: Ubuntu flavor
+Lubuntu: Ubuntu flavor
+Manjaro: http://distro.ibiblio.org/manjaro/stable/extra/x86_64/
+Mint: fork of Ubuntu
+OpenSUSE: https://build.opensuse.org/package/show/system:snappy/snapd
+Parrot OS: https://deb.parrot.sh/parrot/pool/main/s/snapd/
+Pop_OS!: based on Ubuntu
+Raspbian: http://archive.raspbian.org/raspbian/pool/main/s/snapd/
+Solus: https://mirrors.rit.edu/solus/packages/shannon/s/snapd/ (where 'shannon' is the Solus version)
+Ubuntu: https://launchpad.net/ubuntu/+source/snapd
+Xubuntu: Ubuntu flavor
+Zorin: fork of Ubuntu LTS but uses the Ubuntu archive with PPAs
