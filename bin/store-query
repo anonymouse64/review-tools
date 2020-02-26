@@ -394,9 +394,7 @@ def main():
         if args.max_format == "all":
             snap_decl = _get_all_snap_declarations_by_id(snap_id)
         else:
-            snap_decl = _get_snap_declaration_assertion_by_id(
-                snap_id, args.max_format
-            )
+            snap_decl = _get_snap_declaration_assertion_by_id(snap_id, args.max_format)
         print(format_resp(snap_decl))
 
     # show only snap.yaml

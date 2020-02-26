@@ -59,9 +59,7 @@ def main():
     parser.add_argument(
         "-i", "--interfaces", type=str, help="list of interfaces to allow connection"
     )
-    parser.add_argument(
-        "--json", help="output json", action="store_true"
-    )
+    parser.add_argument("--json", help="output json", action="store_true")
     args = parser.parse_args()
 
     if args.interfaces:
