@@ -418,6 +418,7 @@ sec_resquashfs_overrides = [
 sec_iface_ref_overrides = {
     "personal-files": {
         "amass": ["dot-amass"],
+        "aws-cli": ["dot-aws"],
         "aws-sam-cli": ["config-aws"],
         "chromium": ["chromium-config"],
         "cw-sh": ["dot-aws-config-credentials"],
