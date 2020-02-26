@@ -1,8 +1,16 @@
-review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
+review-tools (0.48+20200226-1) RELEASED; urgency=medium
 
   * add bin/store-query and update README
+  * bin/get-base-declaration:
+    - add --json
+    - remove sort_keys=True from yaml.dump
+  * refactor README into README.cross-distro
+  * sr_lint.py: move valid_compiled_architectures to sr_common.py
+  * sr_common.py: allow using SnapReview(None, None) for utils
+  * snap packaging updates for store-query
+  * overrides.py: update for snap-store and aws-cli
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 25 Feb 2020 09:27:36 -0600
+ -- Jamie Strandboge <jamie@ubuntu.com>  Wed, 26 Feb 2020 16:01:54 -0600
 
 review-tools (0.48+20200224-1) RELEASED; urgency=medium
 
