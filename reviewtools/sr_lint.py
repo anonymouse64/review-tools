@@ -2429,8 +2429,10 @@ class SnapReviewLint(SnapReview):
             return True
 
         # arbitrary; 10 was agreed upon with snapd team (zyga) but found snaps
-        # with 8, so bumping to 15
-        maximum_layouts = 15
+        # with 8, so bumped to 15. Unfortunately, others hit the ceiling, so
+        # bumping to 30
+        # https://forum.snapcraft.io/t/why-are-snap-layouts-limited-to-15-entries/15337/3
+        maximum_layouts = 30
 
         key = "layout"
         t = "info"
