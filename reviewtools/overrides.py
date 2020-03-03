@@ -458,6 +458,11 @@ sec_iface_ref_overrides = {
         "get-iplayer": ["etc-get-iplayer-options"],
         "glances": ["etc-glances-config"],
         "gnome-system-monitor": ["run-systemd-sessions"],
+        "jabref": [
+            "hostfs-mozilla-native-messaging-jabref",
+            "etc-opt-chrome-native-messaging-jabref",
+            "hostfs-chromium-native-messaging-jabref",
+        ],
         "snap-store": ["hostfs-usr-share-applications"],
     },
 }
