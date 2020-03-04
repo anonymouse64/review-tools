@@ -461,7 +461,7 @@ sec_iface_ref_overrides = {
         "jabref": [
             "hostfs-mozilla-native-messaging-jabref",
             "etc-opt-chrome-native-messaging-jabref",
-            "hostfs-chromium-native-messaging-jabref",
+            "etc-chromium-native-messaging-jabref",
         ],
         "snap-store": ["hostfs-usr-share-applications"],
     },
