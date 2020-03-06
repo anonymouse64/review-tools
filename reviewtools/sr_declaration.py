@@ -618,6 +618,9 @@ class SnapReviewDeclaration(SnapReview):
         """
 
         def _check_attrib(val, against, side, rules_attrib):
+            # val = iface[rules_attrib]
+            # against = rules[rules_key][rules_attrib]
+
             if type(val) not in [str, list, dict, bool]:
                 raise SnapDeclarationException("unknown type '%s'" % val)
 
@@ -672,9 +675,12 @@ class SnapReviewDeclaration(SnapReview):
                 # if the attribute in the snap (val) is a list and the
                 # declaration value (against) is a string, then to match,
                 # against must be a regex that matches all entries in val
+                num_matched = 0
                 for i in val:
                     if _check_attrib(i, against, side, rules_attrib):
-                        matched = True
+                        num_matched += 1
+                if num_matched == len(val):
+                    matched = True
             else:  # bools and dicts (TODO: nested matches for dicts)
                 matched = against == val
 

@@ -6581,3 +6581,261 @@ slots:
             "text": "human review required due to 'deny-connection' constraint (interface attributes). If using a chromium webview, you can disable the internal sandbox (eg, use --no-sandbox) and remove the 'allow-sandbox' attribute instead. For QtWebEngine webviews, export QTWEBENGINE_DISABLE_SANDBOX=1 to disable its internal sandbox."
         }
         self.check_results(r, expected=expected)
+
+    # https://github.com/snapcore/snapd/pull/8226
+    def test_check_declaration_list_attrib_with_base_allow_install_false(self):
+        """Test check_declaration - list atributes with allow-installation: false"""
+
+        def _check_r(r, exp, snap_yaml, overrides):
+            import pprint
+
+            if (
+                len(r["info"]) != exp[0]
+                or len(r["warn"]) != exp[1]
+                or len(r["error"]) != exp[2]
+            ):
+                print("snap.yaml:")
+                pprint.pprint(snap_yaml)
+                print("overrides:")
+                pprint.pprint(overrides)
+                print("result:")
+                pprint.pprint(r)
+                if len(r["info"]) != exp[0]:
+                    raise Exception("%d != %d" % (len(r["info"]), exp[0]))
+                if len(r["warn"]) != exp[1]:
+                    raise Exception("%d != %d: %s" % (len(r["warn"]), exp[1], r))
+                if len(r["error"]) != exp[2]:
+                    raise Exception("%d != %d: %s" % (len(r["error"]), exp[2], r))
+
+        baseDecl = {
+            "slots": {
+                "system-files": {"allow-installation": {"slot-snap-type": ["core"]}}
+            },
+            "plugs": {"system-files": {"allow-installation": False}},
+        }
+
+        for plugs, overrides, exp in [
+            # expected match
+            (
+                {"p1": {"interface": "system-files", "write": ["/path1"]}},
+                {
+                    "snap_decl_plugs": {
+                        "system-files": {
+                            "allow-installation": {
+                                "plug-attributes": {"write": "/path1"}
+                            }
+                        }
+                    }
+                },
+                (2, 0, 0),
+            ),
+            (
+                {"p1": {"interface": "system-files", "write": ["/path1"]}},
+                {
+                    "snap_decl_plugs": {
+                        "system-files": {
+                            "allow-installation": {
+                                "plug-attributes": {"write": "/path1a?"}
+                            }
+                        }
+                    }
+                },
+                (2, 0, 0),
+            ),
+            (
+                {"p1": {"interface": "system-files", "write": ["/path1a"]}},
+                {
+                    "snap_decl_plugs": {
+                        "system-files": {
+                            "allow-installation": {
+                                "plug-attributes": {"write": "/path1a?"}
+                            }
+                        }
+                    }
+                },
+                (2, 0, 0),
+            ),
+            (
+                {"p1": {"interface": "system-files", "write": ["/path1", "/path1a"]}},
+                {
+                    "snap_decl_plugs": {
+                        "system-files": {
+                            "allow-installation": {
+                                "plug-attributes": {"write": "/path1a?"}
+                            }
+                        }
+                    }
+                },
+                (2, 0, 0),
+            ),
+            # expected match single alternation
+            (
+                {"p1": {"interface": "system-files", "write": ["/path1"]}},
+                {
+                    "snap_decl_plugs": {
+                        "system-files": {
+                            "allow-installation": [
+                                {"plug-attributes": {"write": "/path1"}}
+                            ]
+                        }
+                    }
+                },
+                (2, 0, 0),
+            ),
+            (
+                {"p1": {"interface": "system-files", "write": ["/path1"]}},
+                {
+                    "snap_decl_plugs": {
+                        "system-files": {
+                            "allow-installation": [
+                                {"plug-attributes": {"write": "/path1a?"}}
+                            ]
+                        }
+                    }
+                },
+                (2, 0, 0),
+            ),
+            (
+                {"p1": {"interface": "system-files", "write": ["/path1a"]}},
+                {
+                    "snap_decl_plugs": {
+                        "system-files": {
+                            "allow-installation": [
+                                {"plug-attributes": {"write": "/path1a?"}}
+                            ]
+                        }
+                    }
+                },
+                (2, 0, 0),
+            ),
+            (
+                {"p1": {"interface": "system-files", "write": ["/path1", "/path1a"]}},
+                {
+                    "snap_decl_plugs": {
+                        "system-files": {
+                            "allow-installation": [
+                                {"plug-attributes": {"write": "/path1a?"}}
+                            ]
+                        }
+                    }
+                },
+                (2, 0, 0),
+            ),
+            # expected match two
+            (
+                {
+                    "p1": {"interface": "system-files", "write": ["/path1"]},
+                    "p2": {"interface": "system-files", "write": ["/path1a"]},
+                },
+                {
+                    "snap_decl_plugs": {
+                        "system-files": {
+                            "allow-installation": {
+                                "plug-attributes": {"write": "/path1a?"}
+                            }
+                        }
+                    }
+                },
+                (3, 0, 0),
+            ),
+            (
+                {
+                    "p1": {"interface": "system-files", "write": ["/path1"]},
+                    "p2": {"interface": "system-files", "write": ["/path1a"]},
+                },
+                {
+                    "snap_decl_plugs": {
+                        "system-files": {
+                            "allow-installation": [
+                                {"plug-attributes": {"write": "/path1a?"}}
+                            ]
+                        }
+                    }
+                },
+                (3, 0, 0),
+            ),
+            (
+                {
+                    "p1": {"interface": "system-files", "write": ["/path1"]},
+                    "p2": {"interface": "system-files", "write": ["/path1a"]},
+                },
+                {
+                    "snap_decl_plugs": {
+                        "system-files": {
+                            "allow-installation": [
+                                {"plug-attributes": {"write": "/path1"}},
+                                {"plug-attributes": {"write": "/path1a"}},
+                            ]
+                        }
+                    }
+                },
+                (3, 0, 0),
+            ),
+            # expected no match
+            (
+                {"p1": {"interface": "system-files", "write": ["/path1", "/path1a"]}},
+                {
+                    "snap_decl_plugs": {
+                        "system-files": {
+                            "allow-installation": {
+                                "plug-attributes": {"write": "/path1"}
+                            }
+                        }
+                    }
+                },
+                (1, 0, 1),
+            ),
+            (
+                {"p1": {"interface": "system-files", "write": ["/path1", "/path1a"]}},
+                {
+                    "snap_decl_plugs": {
+                        "system-files": {
+                            "allow-installation": [
+                                {"plug-attributes": {"write": "/path1"}}
+                            ]
+                        }
+                    }
+                },
+                (1, 0, 1),
+            ),
+            (
+                {
+                    "p1": {"interface": "system-files", "write": ["/path1"]},
+                    "p2": {"interface": "system-files", "write": ["/path1nomatch"]},
+                },
+                {
+                    "snap_decl_plugs": {
+                        "system-files": {
+                            "allow-installation": [
+                                {"plug-attributes": {"write": "/path1a?"}}
+                            ]
+                        }
+                    }
+                },
+                (2, 0, 1),
+            ),
+            (
+                {
+                    "p1": {"interface": "system-files", "write": ["/path1"]},
+                    "p2": {"interface": "system-files", "write": ["/path1nomatch"]},
+                },
+                {
+                    "snap_decl_plugs": {
+                        "system-files": {
+                            "allow-installation": [
+                                {"plug-attributes": {"write": "/path1"}},
+                                {"plug-attributes": {"write": "/path1a"}},
+                            ]
+                        }
+                    }
+                },
+                (2, 0, 1),
+            ),
+        ]:
+            self.set_test_snap_yaml("plugs", plugs)
+            c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+            self._set_base_declaration(c, baseDecl)
+            c.check_declaration()
+
+            r = c.review_report
+            _check_r(r, exp, self.test_snap_yaml, overrides)
