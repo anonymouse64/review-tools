@@ -611,6 +611,7 @@ update_publisher_overrides = {
         "candid": canonical_commercial_systems,
         "caracalla-kernel": canonical_hwe,
         "cascade-kernel": canonical_hwe,
+        "charm": canonical_juju,
         "chromium": ["olivier.tilloy@canonical.com"] + canonical_desktop,
         "chromium-ffmpeg": ["olivier.tilloy@canonical.com"] + canonical_desktop,
         "chromium-mir-kiosk": ["olivier.tilloy@canonical.com"] + canonical_mir,
