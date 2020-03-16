@@ -1456,6 +1456,92 @@ class TestSnapReviewSecurityNoMock(TestCase):
         expected_counts = {"info": 1, "warn": 0, "error": 0}
         self.check_results(report, expected_counts)
 
+    def test_check_squashfs_resquash_lzo(self):
+        """Test check_squashfs_resquash() - lzo"""
+        package = utils.make_snap2(output_dir=self.mkdtemp(), compression="lzo")
+        c = SnapReviewSecurity(package)
+        c.check_squashfs_resquash()
+        report = c.review_report
+        expected_counts = {"info": 0, "warn": 0, "error": 1}
+        self.check_results(report, expected_counts)
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "security-snap-v2:squashfs_compression"
+        expected["error"][name] = {
+            "text": "compression algorithm 'lzo' not allowed"
+        }
+        self.check_results(report, expected=expected)
+
+    def test_check_squashfs_resquash_lzo_override(self):
+        """Test check_squashfs_resquash() - lzo override"""
+        package = utils.make_snap2(output_dir=self.mkdtemp(), compression="lzo")
+        c = SnapReviewSecurity(package)
+        # update the overrides with our snap
+        from reviewtools.overrides import sec_compression_overrides
+        sec_compression_overrides["test"] = ["lzo"]
+        # run the test
+        c.check_squashfs_resquash()
+        # then cleanup the overrides
+        del sec_compression_overrides["test"]
+
+        report = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "security-snap-v2:squashfs_repack_checksum"
+        expected["info"][name] = {
+            "text": "OK"
+        }
+        self.check_results(report, expected=expected)
+
+    def test_check_squashfs_resquash_lzo_override_wrong(self):
+        """Test check_squashfs_resquash() - lzo override"""
+        package = utils.make_snap2(output_dir=self.mkdtemp(), compression="lzo")
+        c = SnapReviewSecurity(package)
+        # update the overrides with our snap
+        from reviewtools.overrides import sec_compression_overrides
+        sec_compression_overrides["test"] = ["xz"]
+        # run the test
+        c.check_squashfs_resquash()
+        # then cleanup the overrides
+        del sec_compression_overrides["test"]
+
+        report = c.review_report
+        expected_counts = {"info": 0, "warn": 0, "error": 1}
+        self.check_results(report, expected_counts)
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "security-snap-v2:squashfs_compression"
+        expected["error"][name] = {
+            "text": "compression algorithm 'lzo' not allowed"
+        }
+        self.check_results(report, expected=expected)
+
+    def test_check_squashfs_resquash_gzip(self):
+        """Test check_squashfs_resquash() - gzip"""
+        package = utils.make_snap2(output_dir=self.mkdtemp(), compression="gzip")
+        c = SnapReviewSecurity(package)
+        c.check_squashfs_resquash()
+        report = c.review_report
+        expected_counts = {"info": 0, "warn": 0, "error": 1}
+        self.check_results(report, expected_counts)
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "security-snap-v2:squashfs_compression"
+        expected["error"][name] = {
+            "text": "unsupported compression algorithm 'gzip'"
+        }
+        self.check_results(report, expected=expected)
+
     def test_check_squashfs_resquash_no_fstime(self):
         """Test check_squashfs_resquash() - no -fstime"""
         output_dir = self.mkdtemp()
@@ -1465,9 +1551,10 @@ class TestSnapReviewSecurityNoMock(TestCase):
         # fake unsquashfs
         unsquashfs = os.path.join(output_dir, "unsquashfs")
         content = """#!/bin/sh
-if [ "$1" = "-s" ]; then
+if [ "$1" = "-stat" ]; then
     cat <<EOM
 ...
+Compression xz
 Number of fragments 0
 ...
 EOM
@@ -1535,9 +1622,10 @@ exit 1
 if [ "$1" = "-fstime" ]; then
     exit 0
 fi
-if [ "$1" = "-s" ]; then
+if [ "$1" = "-stat" ]; then
     cat <<EOM
 ...
+Compression xz
 Number of fragments 3
 ...
 EOM
@@ -1583,9 +1671,10 @@ exit 1
         # fake unsquashfs
         unsquashfs = os.path.join(output_dir, "unsquashfs")
         content = """#!/bin/sh
-if [ "$1" = "-s" ]; then
+if [ "$1" = "-stat" ]; then
     cat <<EOM
 ...
+Compression xz
 Number of fragments 3
 ...
 EOM
@@ -1638,9 +1727,10 @@ exit 0
 if [ "$1" = "-fstime" ]; then
     exit 0
 fi
-if [ "$1" = "-s" ]; then
+if [ "$1" = "-stat" ]; then
     cat <<EOM
 ...
+Compression xz
 Number of fragments 0
 ...
 EOM
@@ -1666,6 +1756,57 @@ exit 1
         report = c.review_report
         expected_counts = {"info": None, "warn": 0, "error": 1}
         self.check_results(report, expected_counts)
+
+    def test_check_squashfs_resquash_unsquashfs_comp_fail(self):
+        """Test check_squashfs_resquash() - unsquashfs detect compression"""
+        output_dir = self.mkdtemp()
+        package = utils.make_snap2(output_dir=output_dir)
+        c = SnapReviewSecurity(package)
+
+        # fake unsquashfs
+        unsquashfs = os.path.join(output_dir, "unsquashfs")
+        content = """#!/bin/sh
+if [ "$1" = "-fstime" ]; then
+    exit 0
+fi
+if [ "$1" = "-stat" ]; then
+    cat <<EOM
+...
+Compression b@d
+Number of fragments 0
+...
+EOM
+    exit 0
+fi
+echo test error: unsquashfs failure
+exit 1
+"""
+        with open(unsquashfs, "w") as f:
+            f.write(content)
+        os.chmod(unsquashfs, 0o775)
+
+        old_path = os.environ["PATH"]
+        if old_path:
+            os.environ["PATH"] = "%s:%s" % (output_dir, os.environ["PATH"])
+        else:
+            os.environ["PATH"] = output_dir  # pragma: nocover
+
+        os.environ["SNAP_ENFORCE_RESQUASHFS"] = "1"
+        c.check_squashfs_resquash()
+        os.environ.pop("SNAP_ENFORCE_RESQUASHFS")
+        os.environ["PATH"] = old_path
+        report = c.review_report
+        expected_counts = {"info": None, "warn": 0, "error": 1}
+        self.check_results(report, expected_counts)
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "security-snap-v2:squashfs_compression"
+        expected["error"][name] = {
+            "text": "could not determine compression algorithm"
+        }
+        self.check_results(report, expected=expected)
 
     def test_check_squashfs_resquash_mksquashfs_fail(self):
         """Test check_squashfs_resquash() - mksquashfs failure"""

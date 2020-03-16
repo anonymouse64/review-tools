@@ -404,6 +404,11 @@ sec_resquashfs_overrides = [
     "webstorm",  # end jetbrains
 ]
 
+# Snaps allowed to use a non-default compression
+sec_compression_overrides = {
+    "chromium": ["lzo"],
+}
+
 # https://forum.snapcraft.io/t/requesting-auto-connection-of-personal-files-to-sam-cli/10641/10
 # Until snapd has better controls on what the interface reference must be in
 # the snap declaration, we will have a cheap test to ensure that the interface

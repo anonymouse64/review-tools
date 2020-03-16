@@ -25,9 +25,12 @@ from reviewtools.common import (
     ReviewException,
     AA_PROFILE_NAME_MAXLEN,
     AA_PROFILE_NAME_ADVLEN,
+    MKSQUASHFS_DEFAULT_COMPRESSION,
     MKSQUASHFS_OPTS,
     UNSQUASHFS_IGNORED_ERRORS,
     unsquashfs_supports_ignore_errors,
+    set_lang,
+    restore_lang,
 )
 from reviewtools.overrides import (
     sec_browser_support_overrides,
@@ -35,7 +38,9 @@ from reviewtools.overrides import (
     sec_iface_ref_matches_base_decl_overrides,
     sec_mode_overrides,
     sec_resquashfs_overrides,
+    sec_compression_overrides,
 )
+import copy
 import os
 import re
 import shutil
@@ -50,6 +55,13 @@ class SnapReviewSecurity(SnapReview):
     def _unsquashfs_lls(self, snap_pkg):
         """Run unsquashfs -lls on a snap package"""
         return cmd(["unsquashfs", "-lls", snap_pkg])
+
+    def _unsquashfs_stat(self, snap_pkg):
+        """Run unsquashfs -stat on a snap package"""
+        (origLANG, origLC_ALL) = set_lang("C.UTF-8", "C.UTF-8")
+        (rc, out) = cmd(["unsquashfs", "-stat", snap_pkg])
+        restore_lang(origLANG, origLC_ALL)
+        return rc, out
 
     def check_security_plugs_browser_support_with_daemon(self):
         """Check security plugs - browser-support not used with daemon"""
@@ -177,15 +189,35 @@ class SnapReviewSecurity(SnapReview):
         # properly (LP: #1576763). This stat output for fragments has been
         # stable for at least the last 7 years, so just parse it. If it changes
         # we can consider examing the superblock directly.
-        oldlang = ""
-        if "LANG" in os.environ:
-            oldlang = os.environ["LANG"]
-        (rc, out) = cmd(["unsquashfs", "-s", fn])
-        os.environ["LANG"] = oldlang
+        (rc, out) = self._unsquashfs_stat(fn)
         if rc != 0:
             t = "error"
             n = self._get_check_name("squashfs_stat")
             s = "could not stat squashfs"
+            self._add_result(t, n, s)
+            return
+
+        comp = None
+        comp_pat = re.compile(r"^Compression [a-z0-9]+$")
+        for line in out.splitlines():
+            if comp_pat.search(line):
+                comp = line.split()[1]
+        if comp is None:
+            t = "error"
+            n = self._get_check_name("squashfs_compression")
+            s = "could not determine compression algorithm"
+            self._add_result(t, n, s)
+            return
+        elif comp not in self.supported_compression_algorithms:
+            t = "error"
+            n = self._get_check_name("squashfs_compression")
+            s = "unsupported compression algorithm '%s'" % comp
+            self._add_result(t, n, s)
+            return
+        elif comp != MKSQUASHFS_DEFAULT_COMPRESSION and (self.snap_yaml["name"] not in sec_compression_overrides or comp not in sec_compression_overrides[self.snap_yaml["name"]]):
+            t = "error"
+            n = self._get_check_name("squashfs_compression")
+            s = "compression algorithm '%s' not allowed" % comp
             self._add_result(t, n, s)
             return
 
@@ -273,7 +305,11 @@ class SnapReviewSecurity(SnapReview):
 
         try:
             fakeroot_args = []
-            mksquash_opts = MKSQUASHFS_OPTS
+            mksquash_opts = copy.copy(MKSQUASHFS_OPTS)
+            if comp != MKSQUASHFS_DEFAULT_COMPRESSION:
+                idx = mksquash_opts.index(MKSQUASHFS_DEFAULT_COMPRESSION)
+                mksquash_opts[idx] = comp
+
             if "SNAP_FAKEROOT_RESQUASHFS" in os.environ:
                 # run unsquashfs under fakeroot, saving the session to be
                 # reused by mksquashfs and thus preserving

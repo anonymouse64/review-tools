@@ -14,7 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from reviewtools.common import MKSQUASHFS_OPTS, cmd
+from reviewtools.common import (
+    MKSQUASHFS_DEFAULT_COMPRESSION,
+    MKSQUASHFS_OPTS,
+    cmd,
+)
+import copy
 import json
 import os
 import shutil
@@ -32,6 +37,7 @@ def make_snap2(
     output_dir=None,
     yaml=None,
     add_icon=True,
+    compression="xz",
 ):
     """Return the path to a snap v2 package with the given data.
 
@@ -54,7 +60,7 @@ def make_snap2(
         description = summary
         write_meta_data2(build_dir, name, version, summary, description, yaml=yaml)
         pkg_path = build_package(
-            build_dir, name, version, pkgfmt_type, pkgfmt_version, output_dir=output_dir
+            build_dir, name, version, pkgfmt_type, pkgfmt_version, output_dir=output_dir, pkgfmt_comp=compression
         )
     finally:
         shutil.rmtree(build_dir)
@@ -315,13 +321,17 @@ def write_other_files(path):
     write_empty_file(os.path.join(path, "DEBIAN", "md5sums"))
 
 
-def build_package(path, name, version, pkgfmt_type, pkgfmt_version, output_dir=None):
+def build_package(path, name, version, pkgfmt_type, pkgfmt_version, output_dir=None, pkgfmt_comp="xz"):
     filename = "{}_{}_all.{}".format(name, version, pkgfmt_type)
     output_dir = output_dir or tempfile.mkdtemp()
     output_path = os.path.join(output_dir, filename)
 
     if pkgfmt_type == "snap" and pkgfmt_version != "15.04":
-        args = ["mksquashfs", path, output_path] + MKSQUASHFS_OPTS
+        mksquash_opts = copy.copy(MKSQUASHFS_OPTS)
+        if pkgfmt_comp != MKSQUASHFS_DEFAULT_COMPRESSION:
+            idx = mksquash_opts.index(MKSQUASHFS_DEFAULT_COMPRESSION)
+            mksquash_opts[idx] = pkgfmt_comp
+        args = ["mksquashfs", path, output_path] + mksquash_opts
         # debugging
         # subprocess.check_call(args)
         # subprocess.check_call(['unsquashfs', '-lls', output_path])
