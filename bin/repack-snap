@@ -20,7 +20,23 @@ if [ "$uid" != "0" ]; then
     exit 1
 fi
 
-MKSQUASHFS_OPTS=$(python3 -c 'from reviewtools.common import MKSQUASHFS_OPTS; print(" ".join(MKSQUASHFS_OPTS))' | sed 's/ -all-root//')
+orig="$1"
+if [ -z "$orig" ]; then
+    usage
+    exit 1
+elif [ ! -e "$orig" ]; then
+    echo "'$orig' does not exist"
+    exit 1
+fi
+
+echo "Obtainging compression algorithm"
+comp=$(LC_ALL=C.UTF-8 LANG=C.UTF-8 unsquashfs -s "$orig" | grep "Compression " | cut -f 2 -d ' ')
+echo "$comp" | grep -Eq '^[a-z0-9]+$' || {
+    echo "Invalid compression algorithm: $comp"
+    exit 1
+}
+
+MKSQUASHFS_OPTS=$(python3 -c 'from reviewtools.common import MKSQUASHFS_OPTS; print(" ".join(MKSQUASHFS_OPTS))' | sed -e 's/ -all-root//' -e "s/-comp xz/-comp $comp/")
 if ! echo "$MKSQUASHFS_OPTS" | grep -q '\-comp' ; then
     echo "Could not determine mksquashfs options. Is PYTHONPATH set?"
     exit 1
@@ -39,15 +55,6 @@ if [ -z "$repacked" ]; then
     exit 1
 elif [ -e "$repacked" ]; then
     echo "'$repacked' already exists"
-    exit 1
-fi
-
-orig="$1"
-if [ -z "$orig" ]; then
-    usage
-    exit 1
-elif [ ! -e "$orig" ]; then
-    echo "'$orig' does not exist"
     exit 1
 fi
 
