@@ -45,7 +45,8 @@ TMP_DIR = None
 MKDTEMP_PREFIX = "review-tools-"
 MKDTEMP_DIR = None
 VALID_SYSCALL = r"^[a-z0-9_]{2,64}$"
-# This needs to match up with snapcraft
+# This needs to match up with snapcraft. Note, 'xz' is still the default
+# compression algorithm, but others may be supported
 MKSQUASHFS_OPTS = [
     "-noappend",
     "-comp",
@@ -590,9 +591,7 @@ def cmd_pipe(command1, command2):
     return [sp2.returncode, out]
 
 
-def cmdIgnoreErrorStrings(command, ignoreErrorStrings):
-    """Try to run command but only error if no ignored error strings"""
-    # Make sure we get untranslated strings
+def set_lang(lang, lc_all):
     origLANG = None
     origLC_ALL = None
     if "LANG" in os.environ:
@@ -602,10 +601,10 @@ def cmdIgnoreErrorStrings(command, ignoreErrorStrings):
     os.environ["LANG"] = "C.UTF-8"
     os.environ["LC_ALL"] = "C.UTF-8"
 
-    # run the command
-    (rc, out) = cmd(command)
+    return (origLANG, origLC_ALL)
 
-    # reset/unset
+
+def restore_lang(origLANG, origLC_ALL):
     if origLANG is None:
         del os.environ["LANG"]
     else:
@@ -614,6 +613,18 @@ def cmdIgnoreErrorStrings(command, ignoreErrorStrings):
         del os.environ["LC_ALL"]
     else:
         os.environ["LC_ALL"] = origLC_ALL
+
+
+def cmdIgnoreErrorStrings(command, ignoreErrorStrings):
+    """Try to run command but only error if no ignored error strings"""
+    # Make sure we get untranslated strings
+    (origLANG, origLC_ALL) = set_lang("C.UTF-8", "C.UTF-8")
+
+    # run the command
+    (rc, out) = cmd(command)
+
+    # reset/unset
+    restore_lang(origLANG, origLC_ALL)
 
     if rc != 0:
         redacted = ""
