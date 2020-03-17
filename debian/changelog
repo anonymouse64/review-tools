@@ -7,6 +7,9 @@ review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
   * common.py: refactor setting LANG/LC_ALL into set_lang()/restore_lang()
   * add snap-specific lzo support
   * snapd-base-declaration.yaml: add uio
+  * sr_common.py:
+    - add raw-volume path attribute
+    - add uio path attribute
 
  -- Jamie Strandboge <jamie@ubuntu.com>  Thu, 27 Feb 2020 10:43:11 -0600
 
