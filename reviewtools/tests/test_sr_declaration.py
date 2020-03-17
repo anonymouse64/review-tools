@@ -6831,3 +6831,175 @@ slots:
 
             r = c.review_report
             _check_r(r, exp, self.test_snap_yaml, overrides)
+
+    # This diverges somewhat from what snapd does: ie, we enforce all
+    # attributes are represented in the snap declaration that are specified
+    # with installation constraints and vice versa (snapd (correctly) doesn't
+    # check attributes in the snap that aren't in the base declaration).
+    def test_check_declaration_all_attribs_required_in_snap_decl(self):
+        """Test check_declaration - all attributes required in snap decl"""
+
+        def _check_r(r, exp, snap_yaml, overrides):
+            if (
+                len(r["info"]) != exp[0]
+                or len(r["warn"]) != exp[1]
+                or len(r["error"]) != exp[2]
+            ):
+                if len(r["info"]) != exp[0]:
+                    raise Exception("%d != %d" % (len(r["info"]), exp[0]))
+                if len(r["warn"]) != exp[1]:
+                    raise Exception("%d != %d: %s" % (len(r["warn"]), exp[1], r))
+                if len(r["error"]) != exp[2]:
+                    raise Exception("%d != %d: %s" % (len(r["error"]), exp[2], r))
+
+        baseDecl = {
+            "slots": {
+                "snapd-control": {"allow-installation": {"slot-snap-type": ["core"]}},
+                "system-files": {"allow-installation": {"slot-snap-type": ["core"]}},
+            },
+            "plugs": {
+                "snapd-control": {"allow-installation": False},
+                "system-files": {"allow-installation": False},
+            },
+        }
+
+        for plugs, overrides, exp in [
+            # expected match
+            (
+                {
+                    "p1": {
+                        "interface": "system-files",
+                        "read": ["/path1"],
+                        "write": ["/path2"],
+                    }
+                },
+                {
+                    "snap_decl_plugs": {
+                        "system-files": {
+                            "allow-installation": {
+                                "plug-attributes": {"read": "/path1", "write": "/path2"}
+                            }
+                        }
+                    }
+                },
+                (2, 0, 0),
+            ),
+            (
+                {
+                    "p1": {
+                        "interface": "system-files",
+                        "read": ["/path1"],
+                        "write": ["/path2"],
+                    }
+                },
+                {"snap_decl_plugs": {"system-files": {"allow-installation": True}}},
+                (2, 0, 0),
+            ),
+            (
+                {"p1": {"interface": "snapd-control"}},
+                {"snap_decl_plugs": {"snapd-control": {"allow-installation": True}}},
+                (2, 0, 0),
+            ),
+            (
+                {"p1": {"interface": "snapd-control", "refresh-schedule": "managed"}},
+                {"snap_decl_plugs": {"snapd-control": {"allow-installation": True}}},
+                (2, 0, 0),
+            ),
+            (
+                {"p1": {"interface": "snapd-control", "refresh-schedule": "managed"}},
+                {
+                    "snap_decl_plugs": {
+                        "snapd-control": {
+                            "allow-installation": [
+                                {"plug-attributes": {"refresh-schedule": "nomatch"}},
+                                True,
+                            ]
+                        }
+                    }
+                },
+                (2, 0, 0),
+            ),
+            (
+                {"p1": {"interface": "snapd-control", "refresh-schedule": "managed"}},
+                {
+                    "snap_decl_plugs": {
+                        "snapd-control": {
+                            "allow-installation": [
+                                {"plug-attributes": {"refresh-schedule": "nomatch"}},
+                                {"plug-attributes": {"refresh-schedule": "managed"}},
+                            ]
+                        }
+                    }
+                },
+                (2, 0, 0),
+            ),
+            # expected no match
+            # missing attributes from the snap declaration flag review
+            (
+                {
+                    "p1": {
+                        "interface": "system-files",
+                        "read": ["/path1"],
+                        "write": ["/path2"],
+                    }
+                },
+                {
+                    "snap_decl_plugs": {
+                        "system-files": {
+                            "allow-installation": {
+                                "plug-attributes": {"write": "/path2"}
+                            }
+                        }
+                    }
+                },
+                (1, 0, 1),
+            ),
+            # missing attributes from the snap when the snap declaration
+            # specifies them flags review
+            (
+                {"p1": {"interface": "system-files", "read": ["/path1"]}},
+                {
+                    "snap_decl_plugs": {
+                        "system-files": {
+                            "allow-installation": {
+                                "plug-attributes": {"read": "/path1", "write": "/path2"}
+                            }
+                        }
+                    }
+                },
+                (1, 0, 1),
+            ),
+            (
+                {"p1": {"interface": "system-files"}},
+                {
+                    "snap_decl_plugs": {
+                        "system-files": {
+                            "allow-installation": {
+                                "plug-attributes": {"read": "/path1"}
+                            }
+                        }
+                    }
+                },
+                (1, 0, 1),
+            ),
+            (
+                {"p1": {"interface": "snapd-control"}},
+                {
+                    "snap_decl_plugs": {
+                        "snapd-control": {
+                            "allow-installation": {
+                                "plug-attributes": {"refresh-schedule": "managed"}
+                            }
+                        }
+                    }
+                },
+                (1, 0, 1),
+            ),
+        ]:
+            self.set_test_snap_yaml("plugs", plugs)
+            c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+            self._set_base_declaration(c, baseDecl)
+            c.check_declaration()
+
+            r = c.review_report
+            _check_r(r, exp, self.test_snap_yaml, overrides)

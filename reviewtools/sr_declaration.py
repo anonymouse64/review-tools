@@ -615,6 +615,40 @@ class SnapReviewDeclaration(SnapReview):
            slot-attributes in plugging snaps when checking against the fallback
            base declaration slot since the slotting snap will have been flagged
            and require a snap declaration for snaps to connect to it
+
+           snapd itself applies the snap declaration to regulate installation
+           and connection. snapd does not require that the snap only has the
+           specified attributes in the snap decl. Eg, if snap has:
+
+             plugs:
+               iface-foo:
+                 interface: foo
+                 bar: blah
+                 baz: blahblah
+
+           and the snap declaration has only:
+
+             plugs:
+               foo:
+                 allow-installation:
+                   plug-attributes:
+                     bar: blah
+
+           then 'baz' is not considered (since the snap declaration declares
+           what must match). This is convenient for interfaces like content
+           or dbus which have many attributes but we only want to regulate one.
+           snapd does enforce that if the attribute is in the declaration, they
+           cannot be missing from the snap.
+
+           To promote writing better snap declarations for installation
+           constraints with interface attributes, not only do we enforce that
+           the snap uses all the attributes in the snap declaration (see
+           above), we also diverge from snapd and require that all specified
+           attributes in the snap are also in the snap declaration. Since
+           there isn't a convenient way to express '<attrib> should not be
+           specified' in the snap declaration syntax, this logic ensures that
+           if a snap adds another attribute at some later point, it is flagged
+           for review.
         """
 
         def _check_attrib(val, against, side, rules_attrib):
@@ -705,6 +739,29 @@ class SnapReviewDeclaration(SnapReview):
                 # constrains when falling back since the slot's snap
                 # declaration will cover this
                 continue
+            elif "installation" in cstr and "snap" in whence:
+                # Ensure that if attributes are specified with an installation
+                # constraint, the snap declaration must have something for each
+                # attribute specified in the snap. This promotes better snap
+                # declarations (see above).
+
+                # Quick check: ensure that if the snap declaration specified
+                # attributes that the interface also specifies attributes (the
+                # matching logic, below, will ensure that everything matches).
+                if len(iface) == 1 and len(rules[rules_key]) > 0:
+                    checked = True
+                    continue
+
+                # Make sure nothing from the snap is missing from the snap
+                # declaration.
+                missing = False
+                for i in iface:
+                    if i != "interface" and i not in rules[rules_key]:
+                        missing = True
+                        break
+                if missing:
+                    checked = True
+                    continue
 
             attributes_matched[rules_key] = {}
             attributes_matched[rules_key]["len"] = len(rules[rules_key])
