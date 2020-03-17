@@ -243,6 +243,7 @@ class SnapReview(Review):
         "snapd-control": {"refresh-schedule/plugs": ""},
         "spi": {"path/slots": ""},
         "system-files": {"read/plugs": [], "write/plugs": []},
+        "uio": {"path/slots": ""},
     }
 
     # interfaces_required[iface] lists required attributes as combinations.
