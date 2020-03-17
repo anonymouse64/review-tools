@@ -772,6 +772,12 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  uio:
+    allow-installation:
+      slot-snap-type:
+        - core
+        - gadget
+    deny-auto-connection: true
   unity7:
     allow-installation:
       slot-snap-type:
