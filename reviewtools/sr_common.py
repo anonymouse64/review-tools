@@ -312,7 +312,7 @@ class SnapReview(Review):
     # https://github.com/snapcore/snapd/pull/6767 specifies 8M
     max_icon_size = 8 * 1024 * 1024
 
-    supported_compression_algorithms = ['xz', 'lzo']
+    supported_compression_algorithms = ["xz", "lzo"]
 
     def __init__(self, fn, review_type, overrides=None):
         if review_type is None:  # for using utility functions

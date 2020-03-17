@@ -214,7 +214,10 @@ class SnapReviewSecurity(SnapReview):
             s = "unsupported compression algorithm '%s'" % comp
             self._add_result(t, n, s)
             return
-        elif comp != MKSQUASHFS_DEFAULT_COMPRESSION and (self.snap_yaml["name"] not in sec_compression_overrides or comp not in sec_compression_overrides[self.snap_yaml["name"]]):
+        elif comp != MKSQUASHFS_DEFAULT_COMPRESSION and (
+            self.snap_yaml["name"] not in sec_compression_overrides
+            or comp not in sec_compression_overrides[self.snap_yaml["name"]]
+        ):
             t = "error"
             n = self._get_check_name("squashfs_compression")
             s = "compression algorithm '%s' not allowed" % comp

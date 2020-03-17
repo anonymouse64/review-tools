@@ -1469,9 +1469,7 @@ class TestSnapReviewSecurityNoMock(TestCase):
         expected["warn"] = dict()
         expected["info"] = dict()
         name = "security-snap-v2:squashfs_compression"
-        expected["error"][name] = {
-            "text": "compression algorithm 'lzo' not allowed"
-        }
+        expected["error"][name] = {"text": "compression algorithm 'lzo' not allowed"}
         self.check_results(report, expected=expected)
 
     def test_check_squashfs_resquash_lzo_override(self):
@@ -1480,6 +1478,7 @@ class TestSnapReviewSecurityNoMock(TestCase):
         c = SnapReviewSecurity(package)
         # update the overrides with our snap
         from reviewtools.overrides import sec_compression_overrides
+
         sec_compression_overrides["test"] = ["lzo"]
         # run the test
         c.check_squashfs_resquash()
@@ -1494,9 +1493,7 @@ class TestSnapReviewSecurityNoMock(TestCase):
         expected["warn"] = dict()
         expected["info"] = dict()
         name = "security-snap-v2:squashfs_repack_checksum"
-        expected["info"][name] = {
-            "text": "OK"
-        }
+        expected["info"][name] = {"text": "OK"}
         self.check_results(report, expected=expected)
 
     def test_check_squashfs_resquash_lzo_override_wrong(self):
@@ -1505,6 +1502,7 @@ class TestSnapReviewSecurityNoMock(TestCase):
         c = SnapReviewSecurity(package)
         # update the overrides with our snap
         from reviewtools.overrides import sec_compression_overrides
+
         sec_compression_overrides["test"] = ["xz"]
         # run the test
         c.check_squashfs_resquash()
@@ -1519,9 +1517,7 @@ class TestSnapReviewSecurityNoMock(TestCase):
         expected["warn"] = dict()
         expected["info"] = dict()
         name = "security-snap-v2:squashfs_compression"
-        expected["error"][name] = {
-            "text": "compression algorithm 'lzo' not allowed"
-        }
+        expected["error"][name] = {"text": "compression algorithm 'lzo' not allowed"}
         self.check_results(report, expected=expected)
 
     def test_check_squashfs_resquash_gzip(self):
@@ -1537,9 +1533,7 @@ class TestSnapReviewSecurityNoMock(TestCase):
         expected["warn"] = dict()
         expected["info"] = dict()
         name = "security-snap-v2:squashfs_compression"
-        expected["error"][name] = {
-            "text": "unsupported compression algorithm 'gzip'"
-        }
+        expected["error"][name] = {"text": "unsupported compression algorithm 'gzip'"}
         self.check_results(report, expected=expected)
 
     def test_check_squashfs_resquash_no_fstime(self):
@@ -1803,9 +1797,7 @@ exit 1
         expected["warn"] = dict()
         expected["info"] = dict()
         name = "security-snap-v2:squashfs_compression"
-        expected["error"][name] = {
-            "text": "could not determine compression algorithm"
-        }
+        expected["error"][name] = {"text": "could not determine compression algorithm"}
         self.check_results(report, expected=expected)
 
     def test_check_squashfs_resquash_mksquashfs_fail(self):
