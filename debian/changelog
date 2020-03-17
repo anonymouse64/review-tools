@@ -1,7 +1,10 @@
 review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
 
   * sr_lint.py: update maximum layouts to 30
-  * sr_declaration.py: fix logic error when comparing lists
+  * sr_declaration.py:
+    - fix logic error when comparing lists
+    - enforce better written snap decls for installation
+    - rearrange comments into preamble and code comments
   * overrides.py: add/update for various public snaps
   * bin/repack-snap: detect and reuse the compression algorithm
   * common.py: refactor setting LANG/LC_ALL into set_lang()/restore_lang()
