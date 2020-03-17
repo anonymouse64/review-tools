@@ -1,4 +1,4 @@
-review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
+review-tools (0.48+20200317-1) RELEASED; urgency=medium
 
   * sr_lint.py: update maximum layouts to 30
   * sr_declaration.py:
@@ -14,7 +14,7 @@ review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
     - add raw-volume path attribute
     - add uio path attribute
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 17 Mar 2020 16:15:44 -0500
+ -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 17 Mar 2020 16:48:44 -0500
 
 review-tools (0.48+20200226-1) RELEASED; urgency=medium
 
