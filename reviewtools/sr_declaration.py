@@ -1,6 +1,6 @@
 """sr_declaration.py: snap declaration"""
 #
-# Copyright (C) 2014-2019 Canonical Ltd.
+# Copyright (C) 2014-2020 Canonical Ltd.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,8 +19,100 @@ from reviewtools.sr_common import SnapReview, SnapReviewException
 import copy
 import re
 
-# Specification:
+# Specification for snapd:
 # https://docs.google.com/document/d/1QkglVjSzHC65lPthXV3ZlQcqPpKxuGEBL-FMuGP6ogs/edit#
+#
+# Key terms:
+#
+# * the "base declaration" declares the policy as shipped in snapd
+# * the "snap declaration" declares the optional policy is provided by the
+#   store
+# * constraints are things like "allow-installation: false" or
+#   "deny-connection: true". In this code, we consider "installation" and
+#   "connection" as "constraint types"
+#
+# Rationale for how the review-tools interpret the base and snap declarations
+# for when to decide when to trigger a manual review:
+#
+# * only connection and installation are considered (see _verify_iface()).
+#   auto-connection is not considered since snapd mediates the access
+# * if the snap declaration has something to say for this constraint type, only
+#   it is consulted (there is no merging with base declaration). Specifically,
+#   first the snap declaration's plug is examined, then the snap declaration's
+#   slot, then the base declaration's plugs, then the base declaration's
+#   slots. See snapd specification and _check_side()
+#   * specifically, when a snap declaration doesn't have anything to say about
+#     a given interface and the base declaration doesn't have anything to say
+#     about a given interface, the checks fallback to the "slots" from the base
+#     declaration. This is known as the "base/fallback"
+# * if the snap declaration specifies one constraint type (eg, "connection"),
+#   and another is missing (eg, "installation"), then the missing type uses
+#   the constraint type's defaults. The default is "allow". See the snapd
+#   specification and _ensure_snap_declaration_defaults()
+# * _verify_iface() and the functions it calls loosely follows snapd's
+#   algorithm in policy.go where first installation constrainsts are checked,
+#   then connection. Since when to trigger for manual review is a different
+#   question than how snapd applies the base/snap declarations for a given
+#   constraint, the logic here differs.
+# * To avoid superflous manual reviews, we want to limit when we want to check
+#   to:
+#   * any installation constraints
+#   * slotting non-core snap connection constraints (ie, a snap providing a
+#     service to other snaps via an interface)
+#   * plugging snap connection constraints (eg, a snap that plugs dbus to
+#     connect to specific slotting snap). We won't flag if the constaint is
+#     boolean when falling back to consult the base declaration since the
+#     slotting snap will have been flagged and require a snap declaration for
+#     snaps to connect to it. See _check_constraints1()
+#
+# The specific checks are (see _check_constraints1()):
+# * _check_names() checks if specified plug-names/slot-names in the snap
+#   declaration matches the interface reference
+# * _check_attributes() checks if there are any matching attributes in the
+#   constraint. Importantly:
+#   * if attributes are specified in the constraint, they all must match
+#   * if the attribute in the constraint is a list, just one must match (since
+#     it is considered a list of alternatives)
+#   * don't check slot-attributes with plugs in connection constrains when
+#     falling back since the slot's snap declaration will cover this
+#   * to promote writing better snap declarations for installation constraints
+#     with interface attributes, enforce that both:
+#     * the snap uses all the attributes in the snap declaration (as per snapd)
+#     * the snap declaration uses all the attributes in the snap (diverges from
+#       snapd). We diverge from snapd since there isn't a convenient way to
+#       express '<attrib> should not be specified' in the snap declaration
+#       syntax so this logic ensures that if a snap adds another attribute at
+#       some later point, it is flagged for review
+#   * the type of the attribute in the snap declaration means something
+#     different than the type in the snap.yaml (see _check_attrib())
+# * _check_snap_type() checks if the snap type in the snap matches the snap's
+#   type as specified in snap.yaml (defaulting to "app")
+# * _check_on_classic() checks "on-classic" for "app" snaps and will flag when:
+#   * installation constraint is specified with on-classic, since it will be
+#     blocked somewhere
+#   * a providing (slotting) non-core snap on an all-snaps system has
+#     allow/on-classic True or deny/on-classic False with connection since it
+#     will be blocked on core (we omit core snaps since they are blocked for
+#     other reasons)
+#   Ignore plugs with on classic for connections since core snaps won't plugs
+#   and app snaps will obtain their connection ability from the providing
+#   (slotting) snap
+# * all constraints are automatically scoped to a snap unless "on-store" and/or
+#   "on-brand" is specified in the snap declaration. See _check_side() and
+#   _ensure_snap_declaration_defaults(). When --on-store or --on-brand is
+#   specified to the review-tools:
+#   * if the snap declaration constraint specifies "on-store" or "on-brand", it
+#     must match --on-store or --on-brand, respectively
+#   * if the the snap declaration constraint does not specify "on-store" and/or
+#     "on-brand", --on-store and/or --on-brand are ignored (if store behavior
+#     changes, this might need revisiting). See _is_scoped()
+# * slots-per-plug/plugs-per-slot (aka "Arities") are not considered since they
+#   only affect snapd's decision making wrt choosing how many slots/plugs to
+#   connect. Note that evaluation rules apply (see above) and so specifying
+#   only "allow-connection": {"slots-per-plug": "*"} means that the constraint
+#   correctly evaluates to "allow-connection: true". The snap declaration
+#   author should take care to replicate the base declaration when doing
+#   something like this.
 
 
 class SnapDeclarationException(SnapReviewException):
@@ -91,7 +183,7 @@ class SnapReviewDeclaration(SnapReview):
         # cstr_types (ie, installation, connection, auto-connection):
         #
         #  * if there are no scoped rules or unscoped rules in the snap decl,
-        #     use the base decl
+        #    use the base decl
         #  * if we have scoped rules in the snap decl for any cstr_types, use
         #    those and defaults for the missing cstr_types
         #  * if we have no scoped rules but have unscoped rules, use unscoped
@@ -99,8 +191,8 @@ class SnapReviewDeclaration(SnapReview):
         #
         # In practical terms, this means that an interface in the base decl
         # that has an installation constraint and slot side connection
-        # constraint (ie, two things that could cause an automated review),
-        # only needs only one in the snap decl to pass automated review.
+        # constraint (ie, two things that could cause an manual review), only
+        # needs only one in the snap decl to pass automated review.
         #
         # Considering the above, we can reduce this to simply: "if the snap
         # declaration for this interface has any cstr_type, use it and use
@@ -608,47 +700,7 @@ class SnapReviewDeclaration(SnapReview):
 
     def _check_attributes(self, side, iface, rules, cstr, whence):
         """Check if there are any matching attributes for this side, interface,
-           rules and constraint. If attributes are specified in the constraint,
-           they all must match. If the attribute in the constraint is a list,
-           just one must match (it is considered a list of alternatives). As a
-           practical matter, don't flag connection constraints for
-           slot-attributes in plugging snaps when checking against the fallback
-           base declaration slot since the slotting snap will have been flagged
-           and require a snap declaration for snaps to connect to it
-
-           snapd itself applies the snap declaration to regulate installation
-           and connection. snapd does not require that the snap only has the
-           specified attributes in the snap decl. Eg, if snap has:
-
-             plugs:
-               iface-foo:
-                 interface: foo
-                 bar: blah
-                 baz: blahblah
-
-           and the snap declaration has only:
-
-             plugs:
-               foo:
-                 allow-installation:
-                   plug-attributes:
-                     bar: blah
-
-           then 'baz' is not considered (since the snap declaration declares
-           what must match). This is convenient for interfaces like content
-           or dbus which have many attributes but we only want to regulate one.
-           snapd does enforce that if the attribute is in the declaration, they
-           cannot be missing from the snap.
-
-           To promote writing better snap declarations for installation
-           constraints with interface attributes, not only do we enforce that
-           the snap uses all the attributes in the snap declaration (see
-           above), we also diverge from snapd and require that all specified
-           attributes in the snap are also in the snap declaration. Since
-           there isn't a convenient way to express '<attrib> should not be
-           specified' in the snap declaration syntax, this logic ensures that
-           if a snap adds another attribute at some later point, it is flagged
-           for review.
+           rules and constraint.
         """
 
         def _check_attrib(val, against, side, rules_attrib):
@@ -720,6 +772,7 @@ class SnapReviewDeclaration(SnapReview):
 
             return matched
 
+        # If attributes are specified in the constraint, they all must match.
         matched = False
         checked = False
         attributes_matched = {}
@@ -735,15 +788,48 @@ class SnapReviewDeclaration(SnapReview):
                 and rules_key == "slot-attributes"
                 and whence == "base/fallback"
             ):
-                # don't check slot-attributes with plugs in connection
-                # constrains when falling back since the slot's snap
-                # declaration will cover this
+                # As a practical matter, don't flag connection constraints for
+                # slot-attributes in plugging snaps when checking against the
+                # fallback base declaration slot since the slotting snap will
+                # have been flagged and require a snap declaration for snaps to
+                # connect to it
                 continue
             elif "installation" in cstr and "snap" in whence:
-                # Ensure that if attributes are specified with an installation
-                # constraint, the snap declaration must have something for each
-                # attribute specified in the snap. This promotes better snap
-                # declarations (see above).
+                # snapd itself applies the snap declaration to regulate
+                # installation and connection. snapd does not require that the
+                # snap only has the specified attributes in the snap decl. Eg,
+                # if snap has:
+                #
+                #   plugs:
+                #     iface-foo:
+                #       interface: foo
+                #       bar: blah
+                #       baz: blahblah
+                #
+                # and the snap declaration has only:
+                #
+                #   plugs:
+                #     foo:
+                #       allow-installation:
+                #         plug-attributes:
+                #           bar: blah
+                #
+                # then 'baz' is not considered (since the snap declaration
+                # declares what must match). This is convenient for interfaces
+                # like content or dbus which have many attributes but we only
+                # want to regulate one. snapd does enforce that if the
+                # attribute is in the declaration, they cannot be missing from
+                # the snap.
+                #
+                # To promote writing better snap declarations for installation
+                # constraints with interface attributes, not only do we enforce
+                # that the snap uses all the attributes in the snap declaration
+                # (see above), we also diverge from snapd and require that all
+                # specified attributes in the snap are also in the snap
+                # declaration. Since there isn't a convenient way to express
+                # '<attrib> should not be specified' in the snap declaration
+                # syntax, this logic ensures that if a snap adds another
+                # attribute at some later point, it is flagged for review.
 
                 # Quick check: ensure that if the snap declaration specified
                 # attributes that the interface also specifies attributes (the
@@ -773,8 +859,10 @@ class SnapReviewDeclaration(SnapReview):
                     against = rules[rules_key][rules_attrib]
 
                     if isinstance(against, list):
-                        # when the attribute in the declaration is a list, only
-                        # one must match (list of OR constraints)
+                        # As a practical matter, if the attribute in the
+                        # constraint is a list, just one must match (it is
+                        # considered a list of alternatives, aka, a list of
+                        # OR constraints).
                         for i in against:
                             if _check_attrib(val, i, side, rules_attrib):
                                 attributes_matched[rules_key]["matched"] += 1
@@ -876,17 +964,6 @@ class SnapReviewDeclaration(SnapReview):
     def _check_on_classic(self, side, iface, rules, cstr):
         """Check if there is a matching on-classic for this side, interface,
            rules and constraint.
-
-           Flag when:
-           - installation constraint is specified with on-classic, since it
-             will be blocked somewhere
-           - a providing (slotting) !core snap on all-snaps system has
-             allow/on-classic True or deny/on-classic False with connection
-             since it will be blocked on core (we omit core snaps since they
-             are blocked for other reasons
-           - we ignore plugs with on classic for connections since core snaps
-             won't plugs and app snaps will obtain their connection ability
-             from the providing (slotting) snap
         """
         snap_type = "app"
         if "type" in self.snap_yaml:
@@ -905,12 +982,19 @@ class SnapReviewDeclaration(SnapReview):
             checked = True
 
             if "installation" in cstr:
+                # If installation is specified with on-classic, it might be
+                # blocked somewhere, so always consider it.
                 matched = True
             else:
+                # Note: we ignore plugs for connections since core snaps won't
+                # plugs and app snaps will obtain their connection ability
+                # from the providing (slotting) snap
                 if side == "slots" and (
                     (cstr.startswith("allow") and rules["on-classic"])
                     or (cstr.startswith("deny") and not rules["on-classic"])
                 ):
+                    # A snap that slots with a connection constraint might
+                    # be blocked on all-snaps systems, so consider it too.
                     matched = True
 
         if matched:
@@ -923,21 +1007,13 @@ class SnapReviewDeclaration(SnapReview):
 
     # based on, func check*Constraints1() in interfaces/policy/helpers.go
     def _check_constraints1(self, side, iref, iface, rules, cstr, whence):
-        """Check one constraint
-
-           To avoid superflous manual reviews, we want to limit when we want to
-           check to:
-           - any installation constraints
-           - slotting non-core snap connection constraints
-           - plugging snap connection constraints (excepting when not boolean
-             in the fallback base declaration slot, since as a practical
-             matter, the slotting snap will have been flagged and require a
-             snap declaration for snaps to connect to it) no need to check the
-             others if we have a toplevel constraint
-        """
+        """Check one constraint"""
         if isinstance(rules, bool):
-            # don't flag connection constraints in the base/fallback in
-            # plugging snaps
+            # Don't flag connection constraints in the base/fallback in
+            # plugging snaps when the constraint is boolean. Normally the
+            # slotting snap will have been flagged and require a snap
+            # declaration for snaps to connect to it, so don't worry about
+            # checking the plugging snap in this scenario.
             if side == "plugs" and "connection" in cstr and whence == "base/fallback":
                 return None
 
@@ -1067,8 +1143,9 @@ class SnapReviewDeclaration(SnapReview):
         if snapHasSay:
             (decl, whence) = self._get_decl(side, iface["interface"], True)
             (rules, scoped) = self._get_rules(decl, cstr_type)
-            # if we have no scoped rules, then it is as if the snap decl wasn't
-            # specified for this constraint
+            # The snap declaration can only have a say if its rules are scoped
+            # to the snap. If we have no scoped rules, then it is as if the
+            # snap decl wasn't specified for this constraint
             if scoped and rules is not None:
                 return self._check_rule(side, iref, iface, rules, cstr_type, whence)
 
