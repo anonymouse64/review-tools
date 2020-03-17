@@ -6587,19 +6587,11 @@ slots:
         """Test check_declaration - list atributes with allow-installation: false"""
 
         def _check_r(r, exp, snap_yaml, overrides):
-            import pprint
-
             if (
                 len(r["info"]) != exp[0]
                 or len(r["warn"]) != exp[1]
                 or len(r["error"]) != exp[2]
             ):
-                print("snap.yaml:")
-                pprint.pprint(snap_yaml)
-                print("overrides:")
-                pprint.pprint(overrides)
-                print("result:")
-                pprint.pprint(r)
                 if len(r["info"]) != exp[0]:
                     raise Exception("%d != %d" % (len(r["info"]), exp[0]))
                 if len(r["warn"]) != exp[1]:
