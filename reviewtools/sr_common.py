@@ -233,6 +233,7 @@ class SnapReview(Review):
         "mpris": {"name/slots": ""},
         "optical-drive": {"write/plugs": False},
         "personal-files": {"read/plugs": [], "write/plugs": []},
+        "raw-volume": {"path/slots": ""},
         "serial-port": {
             "path/slots": "",
             "usb-vendor/slots": 0,
