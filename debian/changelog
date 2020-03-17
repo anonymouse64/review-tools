@@ -3,6 +3,10 @@ review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
   * sr_lint.py: update maximum layouts to 30
   * sr_declaration.py: fix logic error when comparing lists
   * overrides.py: add/update for various public snaps
+  * bin/repack-snap: detect and reuse the compression algorithm
+  * common.py: refactor setting LANG/LC_ALL into set_lang()/restore_lang()
+  * add snap-specific lzo support
+  * snapd-base-declaration.yaml: add uio
 
  -- Jamie Strandboge <jamie@ubuntu.com>  Thu, 27 Feb 2020 10:43:11 -0600
 
