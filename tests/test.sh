@@ -30,6 +30,7 @@ tmp=$(mktemp)
 tmpjson=$(mktemp)
 
 for i in ./tests/*.snap ; do
+    echo "$i" | grep -q "/test-resquash_" && continue  # test these elsewhere
     for j in "" "--sdk" "--json" ; do
         snap=$(basename "$i")
         echo "= $j $snap ="
@@ -68,6 +69,28 @@ for i in ./tests/test-classic*.snap ; do
         fi
         echo
     done
+done | tee -a "$tmp"
+
+# test-resquash_0.snap takes forever. Just test it with --json
+for i in ./tests/test-resquash_*.snap ; do
+    snap=$(basename "$i")
+    echo "= --json $snap ="
+    if [ "$testtype" = "snap-review" ]; then
+        review-tools.snap-review --json "$i" 2>&1 | sed -e 's#./tests/##g' -e 's/"text": "SKIPPED (could not import apt_pkg)"/"text": "OK"/' > "$tmpjson"
+    else
+        PYTHONPATH=./ ./bin/click-review --json "$i" 2>&1 | sed -e 's#./tests/##g' > "$tmpjson"
+    fi
+
+    jq '.' "$tmpjson" >/dev/null || {
+        echo "'jq . $tmpjson' failed"
+        exit 1
+    }
+
+    # now show all the output that with the deleted error text
+    jq 'del(."snap.v2_security"."error"."security-snap-v2:squashfs_files"."text")' "$tmpjson" | tee -a "$tmp"
+
+    # now show the error text in a more easily diffable form
+    jq '."snap.v2_security"."error"."security-snap-v2:squashfs_files"."text"' "$tmpjson" | sed -e 's/^"//' -e 's/"$//' -e 's/, /\n/g' | sort
 done | tee -a "$tmp"
 
 # test RT_EXTRAS_PATH
