@@ -37,6 +37,7 @@ from reviewtools.overrides import (
     sec_iface_ref_overrides,
     sec_iface_ref_matches_base_decl_overrides,
     sec_mode_overrides,
+    sec_mode_dev_overrides,
     sec_resquashfs_overrides,
     sec_compression_overrides,
 )
@@ -394,7 +395,7 @@ class SnapReviewSecurity(SnapReview):
             if "SNAP_DEBUG_RESQUASHFS" in os.environ:
                 print(self._debug_resquashfs(tmpdir, fn, tmp_repack))
 
-                if os.environ["SNAP_DEBUG_RESQUASHFS"] == "2":
+                if os.environ["SNAP_DEBUG_RESQUASHFS"] == "2":  # pragma: nocover
                     import subprocess
 
                     print(
@@ -489,6 +490,33 @@ class SnapReviewSecurity(SnapReview):
             return False
         return True
 
+    def _device_in_override(self, pkgname, fname, ftype_mode, owner):
+        def _check_type_mode_owner(over_ftype_mode, over_owner, ftype_mode, owner):
+            if over_ftype_mode == ftype_mode and over_owner == owner:
+                return True
+            return False
+
+        if (
+            pkgname not in sec_mode_dev_overrides
+            or fname not in sec_mode_dev_overrides[pkgname]
+        ):
+            return False
+
+        if isinstance(sec_mode_dev_overrides[pkgname][fname], list):
+            found = False
+            for tmp in sec_mode_dev_overrides[pkgname][fname]:
+                if _check_type_mode_owner(tmp[0], tmp[1], ftype_mode, owner):
+                    found = True
+                    break
+            return found
+
+        return _check_type_mode_owner(
+            sec_mode_dev_overrides[pkgname][fname][0],
+            sec_mode_dev_overrides[pkgname][fname][1],
+            ftype_mode,
+            owner,
+        )
+
     def check_squashfs_files(self):
         """Check squashfs files"""
 
@@ -523,6 +551,8 @@ class SnapReviewSecurity(SnapReview):
         time_pat = re.compile(r"^\d\d:\d\d$")
         mknod_pat_full = re.compile(r".,.")
         readdir_pat = re.compile(r"^r.xr.xr.x")
+        # based on osutil/user.go from snapd
+        owner_pat = re.compile(r"^[a-z0-9][-a-z0-9+._]*/[a-z0-9][-a-z0-9+._]*$")
         count = 0
 
         for line in out.splitlines():
@@ -553,6 +583,12 @@ class SnapReviewSecurity(SnapReview):
                 malformed.append("mode '%s' malformed for '%s'" % (mode, fname))
                 continue
 
+            # verify ownership
+            owner = tmp[1]
+            if not owner_pat.search(owner):
+                malformed.append("user/group '%s' malformed for '%s'" % (owner, fname))
+                continue
+
             # https://forum.snapcraft.io/t/incorrect-permissions-in-meta-snap-yaml/1161/8
             if fname_full in ["squashfs-root", "squashfs-root/meta"]:
                 if not readdir_pat.search(mode):
@@ -580,15 +616,19 @@ class SnapReviewSecurity(SnapReview):
                 if mode != "rwxrwxrwx":
                     errors.append("unusual mode '%s' for symlink '%s'" % (mode, fname))
                     continue
-            else:
-                if snap_type != "base" and snap_type != "os":
-                    errors.append("file type '%s' not allowed (%s)" % (ftype, fname))
+            elif snap_type in ["base", "os"]:
+                combined = "%s%s" % (ftype, mode)
+                if not self._device_in_override(pkgname, fname, combined, owner):
+                    errors.append(
+                        "unapproved mode/owner '%s %s' for entry '%s'"
+                        % (combined, owner, fname)
+                    )
                     continue
-
-            # verify user and group
-            if "/" not in tmp[1]:
-                malformed.append("user/group '%s' malformed for '%s'" % (tmp[1], fname))
+            else:
+                errors.append("file type '%s' not allowed (%s)" % (ftype, fname))
                 continue
+
+            # user and group verified up above
             (user, group) = tmp[1].split("/")
             # we enforce 'root/root'
             if (

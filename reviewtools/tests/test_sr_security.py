@@ -368,6 +368,170 @@ drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
         expected_counts = {"info": 1, "warn": 0, "error": 0}
         self.check_results(report, expected_counts)
 
+    def test_check_squashfs_files_dev_no_override_app(self):
+        """Test check_squashfs_files() - device with app"""
+        out = """Parallel unsquashfs: Using 4 processors
+8 inodes (8 blocks) to write
+
+drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
+drwxr-xr-x root/root                27 2020-03-23 08:11 squashfs-root/dev
+crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
+"""
+        self.set_test_unsquashfs_lls(out)
+        c = SnapReviewSecurity(self.test_name)
+        c.check_squashfs_files()
+        report = c.review_report
+        expected_counts = {"info": 0, "warn": 0, "error": 1}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "security-snap-v2:squashfs_files"
+        expected["error"][name] = {
+            "text": "found errors in file output: file type 'c' not allowed (./dev/null)"
+        }
+        self.check_results(report, expected=expected)
+
+    def test_check_squashfs_files_dev_override_app(self):
+        """Test check_squashfs_files() - device with app with non-functional override"""
+        out = """Parallel unsquashfs: Using 4 processors
+8 inodes (8 blocks) to write
+
+drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
+drwxr-xr-x root/root                27 2020-03-23 08:11 squashfs-root/dev
+crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
+"""
+        self.set_test_unsquashfs_lls(out)
+        # update the overrides
+        from reviewtools.overrides import sec_mode_dev_overrides
+
+        sec_mode_dev_overrides["foo"] = {"./dev/null": ("crw-rw-rw-", "root/root")}
+        c = SnapReviewSecurity(self.test_name)
+        c.check_squashfs_files()
+        # clean up
+        del sec_mode_dev_overrides["foo"]
+        report = c.review_report
+        expected_counts = {"info": 0, "warn": 0, "error": 1}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "security-snap-v2:squashfs_files"
+        expected["error"][name] = {
+            "text": "found errors in file output: file type 'c' not allowed (./dev/null)"
+        }
+        self.check_results(report, expected=expected)
+
+    def test_check_squashfs_files_dev_no_override(self):
+        """Test check_squashfs_files() - device"""
+        out = """Parallel unsquashfs: Using 4 processors
+8 inodes (8 blocks) to write
+
+drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
+drwxr-xr-x root/root                27 2020-03-23 08:11 squashfs-root/dev
+crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
+"""
+        self.set_test_unsquashfs_lls(out)
+        self.set_test_snap_yaml("type", "base")
+        c = SnapReviewSecurity(self.test_name)
+        c.check_squashfs_files()
+        report = c.review_report
+        expected_counts = {"info": 0, "warn": 0, "error": 1}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "security-snap-v2:squashfs_files"
+        expected["error"][name] = {
+            "text": "found errors in file output: unapproved mode/owner 'crw-rw-rw- root/root' for entry './dev/null'"
+        }
+        self.check_results(report, expected=expected)
+
+    def test_check_squashfs_files_dev_override(self):
+        """Test check_squashfs_files() - device with override"""
+        out = """Parallel unsquashfs: Using 4 processors
+8 inodes (8 blocks) to write
+
+drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
+drwxr-xr-x root/root                27 2020-03-23 08:11 squashfs-root/dev
+crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
+"""
+        self.set_test_unsquashfs_lls(out)
+        # update the overrides
+        from reviewtools.overrides import sec_mode_dev_overrides
+
+        sec_mode_dev_overrides["foo"] = {"./dev/null": ("crw-rw-rw-", "root/root")}
+        self.set_test_snap_yaml("type", "base")
+        c = SnapReviewSecurity(self.test_name)
+        c.check_squashfs_files()
+        # clean up
+        del sec_mode_dev_overrides["foo"]
+        report = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+
+    def test_check_squashfs_files_dev_override_nomatch(self):
+        """Test check_squashfs_files() - device with unmatching override"""
+        out = """Parallel unsquashfs: Using 4 processors
+8 inodes (8 blocks) to write
+
+drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
+drwxr-xr-x root/root                27 2020-03-23 08:11 squashfs-root/dev
+crw-rw-r-- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
+"""
+        self.set_test_unsquashfs_lls(out)
+        # update the overrides
+        from reviewtools.overrides import sec_mode_dev_overrides
+
+        sec_mode_dev_overrides["foo"] = {"./dev/null": ("crw-rw-rw-", "root/root")}
+        self.set_test_snap_yaml("type", "base")
+        c = SnapReviewSecurity(self.test_name)
+        c.check_squashfs_files()
+        # clean up
+        del sec_mode_dev_overrides["foo"]
+        report = c.review_report
+        expected_counts = {"info": 0, "warn": 0, "error": 1}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "security-snap-v2:squashfs_files"
+        expected["error"][name] = {
+            "text": "found errors in file output: unapproved mode/owner 'crw-rw-r-- root/root' for entry './dev/null'"
+        }
+        self.check_results(report, expected=expected)
+
+    def test_check_squashfs_files_dev_override_list(self):
+        """Test check_squashfs_files() - device with list override"""
+        out = """Parallel unsquashfs: Using 4 processors
+8 inodes (8 blocks) to write
+
+drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
+drwxr-xr-x root/root                27 2020-03-23 08:11 squashfs-root/dev
+crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
+"""
+        self.set_test_unsquashfs_lls(out)
+        # update the overrides
+        from reviewtools.overrides import sec_mode_dev_overrides
+
+        sec_mode_dev_overrides["foo"] = {"./dev/null": [("crw-rw-rw-", "root/root")]}
+        self.set_test_snap_yaml("type", "base")
+        c = SnapReviewSecurity(self.test_name)
+        c.check_squashfs_files()
+        # clean up
+        del sec_mode_dev_overrides["foo"]
+        report = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+
     def test_check_squashfs_files_short_output(self):
         """Test check_squashfs_files() - short output"""
         out = """output
@@ -644,8 +808,18 @@ brw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
-        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        expected_counts = {"info": 0, "warn": 0, "error": 1}
         self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "security-snap-v2:squashfs_files"
+        expected["error"][name] = {
+            "text": "found errors in file output: unapproved mode/owner 'brw-rw-rw- root/root' for entry './foo'"
+        }
+        self.check_results(report, expected=expected)
 
     def test_check_squashfs_files_type_block_base(self):
         """Test check_squashfs_files() - type - block os"""
@@ -659,8 +833,18 @@ brw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
-        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        expected_counts = {"info": 0, "warn": 0, "error": 1}
         self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "security-snap-v2:squashfs_files"
+        expected["error"][name] = {
+            "text": "found errors in file output: unapproved mode/owner 'brw-rw-rw- root/root' for entry './foo'"
+        }
+        self.check_results(report, expected=expected)
 
     def test_check_squashfs_files_bad_type_block(self):
         """Test check_squashfs_files() - bad type - block"""
@@ -853,9 +1037,15 @@ srw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
 crw-rw-rw- root/root                a,  0 2016-03-11 12:25 squashfs-root/foo
 """
         self.set_test_unsquashfs_lls(out)
+        # update the overrides
+        from reviewtools.overrides import sec_mode_dev_overrides
+
+        sec_mode_dev_overrides["foo"] = {"./foo": ("crw-rw-rw-", "root/root")}
         self.set_test_snap_yaml("type", "os")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
+        # clean up
+        del sec_mode_dev_overrides["foo"]
         report = c.review_report
         expected_counts = {"info": None, "warn": 0, "error": 1}
         self.check_results(report, expected_counts)
@@ -878,9 +1068,15 @@ crw-rw-rw- root/root                a,  0 2016-03-11 12:25 squashfs-root/foo
 crw-rw-rw- root/root                a,120 2016-03-11 12:25 squashfs-root/foo
 """
         self.set_test_unsquashfs_lls(out)
+        # update the overrides
+        from reviewtools.overrides import sec_mode_dev_overrides
+
+        sec_mode_dev_overrides["foo"] = {"./foo": ("crw-rw-rw-", "root/root")}
         self.set_test_snap_yaml("type", "os")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
+        # clean up
+        del sec_mode_dev_overrides["foo"]
         report = c.review_report
         expected_counts = {"info": None, "warn": 0, "error": 1}
         self.check_results(report, expected_counts)
@@ -903,9 +1099,15 @@ crw-rw-rw- root/root                a,120 2016-03-11 12:25 squashfs-root/foo
 brw-rw-rw- root/root                8,  a 2016-03-11 12:25 squashfs-root/foo
 """
         self.set_test_unsquashfs_lls(out)
+        # update the overrides
+        from reviewtools.overrides import sec_mode_dev_overrides
+
+        sec_mode_dev_overrides["foo"] = {"./foo": ("brw-rw-rw-", "root/root")}
         self.set_test_snap_yaml("type", "os")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
+        # clean up
+        del sec_mode_dev_overrides["foo"]
         report = c.review_report
         expected_counts = {"info": None, "warn": 0, "error": 1}
         self.check_results(report, expected_counts)
@@ -928,9 +1130,15 @@ brw-rw-rw- root/root                8,  a 2016-03-11 12:25 squashfs-root/foo
 brw-rw-rw- root/root                8,12a 2016-03-11 12:25 squashfs-root/foo
 """
         self.set_test_unsquashfs_lls(out)
+        # update the overrides
+        from reviewtools.overrides import sec_mode_dev_overrides
+
+        sec_mode_dev_overrides["foo"] = {"./foo": ("brw-rw-rw-", "root/root")}
         self.set_test_snap_yaml("type", "os")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
+        # clean up
+        del sec_mode_dev_overrides["foo"]
         report = c.review_report
         expected_counts = {"info": None, "warn": 0, "error": 1}
         self.check_results(report, expected_counts)
