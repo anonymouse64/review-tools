@@ -300,7 +300,7 @@ drwxrwxr-x root/root                48 2016-03-11 12:26 squashfs-root/meta
         self.check_results(report, expected_counts)
 
     def test_check_squashfs_files_no_override(self):
-        """Test check_squashfs_files()"""
+        """Test check_squashfs_files() - no override"""
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
@@ -325,7 +325,7 @@ drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
         self.check_results(report, expected=expected)
 
     def test_check_squashfs_files_override(self):
-        """Test check_squashfs_files()"""
+        """Test check_squashfs_files() - override"""
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
@@ -347,7 +347,7 @@ drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
         self.check_results(report, expected_counts)
 
     def test_check_squashfs_files_override_list(self):
-        """Test check_squashfs_files()"""
+        """Test check_squashfs_files() - list override"""
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
