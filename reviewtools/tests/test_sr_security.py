@@ -24,6 +24,7 @@ import yaml
 
 from reviewtools.common import cleanup_unpack
 from reviewtools.common import check_results as common_check_results
+from reviewtools.common import unsquashfs_lls_parse as common_unsquashfs_lls_parse
 from reviewtools.sr_security import SnapReviewSecurity
 import reviewtools.sr_tests as sr_tests
 from reviewtools.tests import utils
@@ -59,6 +60,10 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
         }
         return slots
 
+    def _set_unsquashfs_lls(self, out):
+        hdr, entries = common_unsquashfs_lls_parse(out)
+        self.set_test_unsquashfs_lls(hdr, entries)
+
     # The next two checks just make sure every check is run. One with the
     # default snap from the tests and one empty. We do it this way so as not
     # to add separate tests for short-circuit returns like:
@@ -66,6 +71,7 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
     #     return
     def test_all_checks_as_v2(self):
         """Test snap v2 has checks"""
+        self.set_test_unsquashfs_lls("", None)  # these checks happen elsewhere
         self.set_test_pkgfmt("snap", "16.04")
 
         plugs = self._create_top_plugs()
@@ -91,6 +97,7 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
 
     def test_all_checks_as_empty_v2(self):
         """Test snap v2 has checks - (mostly) empty yaml"""
+        self.set_test_unsquashfs_lls("", None)  # these checks happen elsewhere
         self.set_test_pkgfmt("snap", "16.04")
         tmp = []
         for key in self.test_snap_yaml:
@@ -292,7 +299,7 @@ drwxrwxr-x root/root                48 2016-03-11 12:26 squashfs-root/meta
 -rw-rw-r-- root/root             18267 2016-02-12 10:07 squashfs-root/meta/icon.png
 -rw-rw-r-- root/root               813 2016-03-11 12:26 squashfs-root/meta/snap.yaml
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -307,7 +314,7 @@ drwxrwxr-x root/root                48 2016-03-11 12:26 squashfs-root/meta
 drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
 -rwsr-xr-x root/root                31 2016-02-12 10:07 squashfs-root/test
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -332,7 +339,7 @@ drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
 drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
 -rwsr-xr-x root/root                31 2016-02-12 10:07 squashfs-root/test
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
 
         # update the overrides
         from reviewtools.overrides import sec_mode_overrides
@@ -354,7 +361,7 @@ drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
 drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
 -rwsr-xr-x root/root                31 2016-02-12 10:07 squashfs-root/test
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
 
         # update the overrides
         from reviewtools.overrides import sec_mode_overrides
@@ -377,7 +384,7 @@ drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
 drwxr-xr-x root/root                27 2020-03-23 08:11 squashfs-root/dev
 crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -403,7 +410,7 @@ drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
 drwxr-xr-x root/root                27 2020-03-23 08:11 squashfs-root/dev
 crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         # update the overrides
         from reviewtools.overrides import sec_mode_dev_overrides
 
@@ -435,7 +442,7 @@ drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
 drwxr-xr-x root/root                27 2020-03-23 08:11 squashfs-root/dev
 crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         self.set_test_snap_yaml("type", "base")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
@@ -462,7 +469,7 @@ drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
 drwxr-xr-x root/root                27 2020-03-23 08:11 squashfs-root/dev
 crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         # update the overrides
         from reviewtools.overrides import sec_mode_dev_overrides
 
@@ -485,7 +492,7 @@ drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
 drwxr-xr-x root/root                27 2020-03-23 08:11 squashfs-root/dev
 crw-rw-r-- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         # update the overrides
         from reviewtools.overrides import sec_mode_dev_overrides
 
@@ -518,7 +525,7 @@ drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
 drwxr-xr-x root/root                27 2020-03-23 08:11 squashfs-root/dev
 crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         # update the overrides
         from reviewtools.overrides import sec_mode_dev_overrides
 
@@ -532,91 +539,6 @@ crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
         expected_counts = {"info": 1, "warn": 0, "error": 0}
         self.check_results(report, expected_counts)
 
-    def test_check_squashfs_files_short_output(self):
-        """Test check_squashfs_files() - short output"""
-        out = """output
-too
-short
-"""
-        self.set_test_unsquashfs_lls(out)
-        c = SnapReviewSecurity(self.test_name)
-        c.check_squashfs_files()
-        report = c.review_report
-        expected_counts = {"info": None, "warn": 0, "error": 1}
-        self.check_results(report, expected_counts)
-
-    def test_check_squashfs_files_bad_mode_invalid_type(self):
-        """Test check_squashfs_files() - bad mode - invalid type"""
-        out = """Parallel unsquashfs: Using 4 processors
-8 inodes (8 blocks) to write
-
-:rwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root/foo
-"""
-        self.set_test_unsquashfs_lls(out)
-        c = SnapReviewSecurity(self.test_name)
-        c.check_squashfs_files()
-        report = c.review_report
-        expected_counts = {"info": None, "warn": 0, "error": 1}
-        self.check_results(report, expected_counts)
-
-        expected = dict()
-        expected["error"] = dict()
-        expected["warn"] = dict()
-        expected["info"] = dict()
-        name = "security-snap-v2:squashfs_files"
-        expected["error"][name] = {
-            "text": "found errors in file output: unknown type ':' for entry './foo'"
-        }
-        self.check_results(report, expected=expected)
-
-    def test_check_squashfs_files_bad_line(self):
-        """Test check_squashfs_files() - bad line"""
-        out = """Parallel unsquashfs: Using 4 processors
-8 inodes (8 blocks) to write
-
--rwxrwxr-x root/root                38 2016-03-11
-"""
-        self.set_test_unsquashfs_lls(out)
-        c = SnapReviewSecurity(self.test_name)
-        c.check_squashfs_files()
-        report = c.review_report
-        expected_counts = {"info": None, "warn": 0, "error": 1}
-        self.check_results(report, expected_counts)
-
-        expected = dict()
-        expected["error"] = dict()
-        expected["warn"] = dict()
-        expected["info"] = dict()
-        name = "security-snap-v2:squashfs_files_malformed_line"
-        expected["error"][name] = {
-            "text": "malformed lines in unsquashfs output: 'wrong number of fields in '-rwxrwxr-x root/root                38 2016-03-11''"
-        }
-        self.check_results(report, expected=expected)
-
-    def test_check_squashfs_files_bad_mode_length(self):
-        """Test check_squashfs_files() - bad mode - length"""
-        out = """Parallel unsquashfs: Using 4 processors
-8 inodes (8 blocks) to write
-
--rwxrwxr-xx root/root                38 2016-03-11 12:25 squashfs-root/foo
-"""
-        self.set_test_unsquashfs_lls(out)
-        c = SnapReviewSecurity(self.test_name)
-        c.check_squashfs_files()
-        report = c.review_report
-        expected_counts = {"info": None, "warn": 0, "error": 1}
-        self.check_results(report, expected_counts)
-
-        expected = dict()
-        expected["error"] = dict()
-        expected["warn"] = dict()
-        expected["info"] = dict()
-        name = "security-snap-v2:squashfs_files_malformed_line"
-        expected["error"][name] = {
-            "text": "malformed lines in unsquashfs output: 'mode 'rwxrwxr-xx' malformed for './foo''"
-        }
-        self.check_results(report, expected=expected)
-
     def test_check_squashfs_files_bad_mode_suid(self):
         """Test check_squashfs_files() - bad mode - suid"""
         out = """Parallel unsquashfs: Using 4 processors
@@ -624,7 +546,7 @@ short
 
 -rwsrwxr-x root/root                38 2016-03-11 12:25 squashfs-root/foo
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -648,7 +570,7 @@ short
 
 -rwsrwxr-x root/root                38 2016-03-11 12:25 squashfs-root/foo
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         self.set_test_snap_yaml("name", "ubuntu-core")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
@@ -673,7 +595,7 @@ short
 
 -rwsr-xr-x root/root                38 2016-03-11 12:25 squashfs-root/usr/bin/sudo
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         self.set_test_snap_yaml("name", "ubuntu-core")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
@@ -688,7 +610,7 @@ short
 
 -rwsr-xr-x root/root                38 2016-03-11 12:25 squashfs-root/usr/bin/sudo
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         self.set_test_snap_yaml("name", "bare")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
@@ -711,7 +633,7 @@ short
 
 -rwsr-xr-x root/root             14528 2016-08-02 18:18 squashfs-root/opt/google/chrome/chrome-sandbox
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         self.set_test_snap_yaml("name", "chrome-test")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
@@ -726,7 +648,7 @@ short
 
 -rwxrwxrwt root/root             14528 2016-08-02 18:18 squashfs-root/rootfs/tmp
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         self.set_test_snap_yaml("name", "openwrt")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
@@ -741,7 +663,7 @@ short
 
 drwxrwxrwt root/root                38 2016-03-11 12:25 squashfs-root/foo
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -755,7 +677,7 @@ drwxrwxrwt root/root                38 2016-03-11 12:25 squashfs-root/foo
 
 -rwxrwxrwt root/root                38 2016-03-11 12:25 squashfs-root/foo
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -779,7 +701,7 @@ drwxrwxrwt root/root                38 2016-03-11 12:25 squashfs-root/foo
 
 lrwxrwxrw- root/root                38 2016-03-11 12:25 squashfs-root/foo
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -796,6 +718,35 @@ lrwxrwxrw- root/root                38 2016-03-11 12:25 squashfs-root/foo
         }
         self.check_results(report, expected=expected)
 
+    def test_check_squashfs_files_bad_entry(self):
+        """Test check_squashfs_files() - bad entry"""
+        # mock a bad entry
+        hdr = [
+            "Parallel unsquashfs: Using 4 processors",
+            "8 inodes (8 blocks) to write",
+        ]
+        entries = [
+            (
+                "-rwsrwxr-x bad                      38 2016-03-11 12:25 squashfs-root/foo",
+                None,
+            )
+        ]
+        self.set_test_unsquashfs_lls(hdr, entries)
+
+        c = SnapReviewSecurity(self.test_name)
+        c.check_squashfs_files()
+        report = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "security-snap-v2:squashfs_files"
+        expected["info"][name] = {"text": "OK"}
+        self.check_results(report, expected=expected)
+
     def test_check_squashfs_files_type_block_os(self):
         """Test check_squashfs_files() - type - block os"""
         out = """Parallel unsquashfs: Using 4 processors
@@ -803,7 +754,7 @@ lrwxrwxrw- root/root                38 2016-03-11 12:25 squashfs-root/foo
 
 brw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         self.set_test_snap_yaml("type", "os")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
@@ -828,7 +779,7 @@ brw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
 
 brw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         self.set_test_snap_yaml("type", "base")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
@@ -853,7 +804,7 @@ brw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
 
 brw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -877,7 +828,7 @@ brw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
 
 crw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -899,9 +850,9 @@ crw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-prw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
+prw-rw-rw- root/root                    0 2016-03-11 12:25 squashfs-root/foo
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -919,13 +870,13 @@ prw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
         self.check_results(report, expected=expected)
 
     def test_check_squashfs_files_bad_type_socket(self):
-        """Test check_squashfs_files() - bad type - block"""
+        """Test check_squashfs_files() - bad type - socket"""
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-srw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
+srw-rw-rw- root/root                    0 2016-03-11 12:25 squashfs-root/foo
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -942,30 +893,6 @@ srw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
         }
         self.check_results(report, expected=expected)
 
-    def test_check_squashfs_files_bad_owner(self):
-        """Test check_squashfs_files() - bad owner"""
-        out = """Parallel unsquashfs: Using 4 processors
-8 inodes (8 blocks) to write
-
--rw-rw-r-- bad                8 2016-03-11 12:25 squashfs-root/foo
-"""
-        self.set_test_unsquashfs_lls(out)
-        c = SnapReviewSecurity(self.test_name)
-        c.check_squashfs_files()
-        report = c.review_report
-        expected_counts = {"info": None, "warn": 0, "error": 1}
-        self.check_results(report, expected_counts)
-
-        expected = dict()
-        expected["error"] = dict()
-        expected["warn"] = dict()
-        expected["info"] = dict()
-        name = "security-snap-v2:squashfs_files_malformed_line"
-        expected["error"][name] = {
-            "text": "malformed lines in unsquashfs output: 'user/group 'bad' malformed for './foo''"
-        }
-        self.check_results(report, expected=expected)
-
     def test_check_squashfs_files_bad_user(self):
         """Test check_squashfs_files() - bad user"""
         out = """Parallel unsquashfs: Using 4 processors
@@ -973,7 +900,7 @@ srw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
 
 -rw-rw-r-- bad/root                8 2016-03-11 12:25 squashfs-root/foo
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -997,7 +924,7 @@ srw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
 
 -rw-rw-r-- root/bad                8 2016-03-11 12:25 squashfs-root/foo
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -1021,209 +948,13 @@ srw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
 
 -rw-rw-r-- other/root                8 2016-03-11 12:25 squashfs-root/foo
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         self.set_test_snap_yaml("type", "os")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
         expected_counts = {"info": 1, "warn": 0, "error": 0}
         self.check_results(report, expected_counts)
-
-    def test_check_squashfs_files_bad_major(self):
-        """Test check_squashfs_files() - bad major"""
-        out = """Parallel unsquashfs: Using 4 processors
-8 inodes (8 blocks) to write
-
-crw-rw-rw- root/root                a,  0 2016-03-11 12:25 squashfs-root/foo
-"""
-        self.set_test_unsquashfs_lls(out)
-        # update the overrides
-        from reviewtools.overrides import sec_mode_dev_overrides
-
-        sec_mode_dev_overrides["foo"] = {"./foo": ("crw-rw-rw-", "root/root")}
-        self.set_test_snap_yaml("type", "os")
-        c = SnapReviewSecurity(self.test_name)
-        c.check_squashfs_files()
-        # clean up
-        del sec_mode_dev_overrides["foo"]
-        report = c.review_report
-        expected_counts = {"info": None, "warn": 0, "error": 1}
-        self.check_results(report, expected_counts)
-
-        expected = dict()
-        expected["error"] = dict()
-        expected["warn"] = dict()
-        expected["info"] = dict()
-        name = "security-snap-v2:squashfs_files_malformed_line"
-        expected["error"][name] = {
-            "text": "malformed lines in unsquashfs output: 'major 'a' malformed for './foo''"
-        }
-        self.check_results(report, expected=expected)
-
-    def test_check_squashfs_files_bad_major2(self):
-        """Test check_squashfs_files() - bad major 2"""
-        out = """Parallel unsquashfs: Using 4 processors
-8 inodes (8 blocks) to write
-
-crw-rw-rw- root/root                a,120 2016-03-11 12:25 squashfs-root/foo
-"""
-        self.set_test_unsquashfs_lls(out)
-        # update the overrides
-        from reviewtools.overrides import sec_mode_dev_overrides
-
-        sec_mode_dev_overrides["foo"] = {"./foo": ("crw-rw-rw-", "root/root")}
-        self.set_test_snap_yaml("type", "os")
-        c = SnapReviewSecurity(self.test_name)
-        c.check_squashfs_files()
-        # clean up
-        del sec_mode_dev_overrides["foo"]
-        report = c.review_report
-        expected_counts = {"info": None, "warn": 0, "error": 1}
-        self.check_results(report, expected_counts)
-
-        expected = dict()
-        expected["error"] = dict()
-        expected["warn"] = dict()
-        expected["info"] = dict()
-        name = "security-snap-v2:squashfs_files_malformed_line"
-        expected["error"][name] = {
-            "text": "malformed lines in unsquashfs output: 'major 'a' malformed for './foo''"
-        }
-        self.check_results(report, expected=expected)
-
-    def test_check_squashfs_files_bad_minor(self):
-        """Test check_squashfs_files() - bad minor"""
-        out = """Parallel unsquashfs: Using 4 processors
-8 inodes (8 blocks) to write
-
-brw-rw-rw- root/root                8,  a 2016-03-11 12:25 squashfs-root/foo
-"""
-        self.set_test_unsquashfs_lls(out)
-        # update the overrides
-        from reviewtools.overrides import sec_mode_dev_overrides
-
-        sec_mode_dev_overrides["foo"] = {"./foo": ("brw-rw-rw-", "root/root")}
-        self.set_test_snap_yaml("type", "os")
-        c = SnapReviewSecurity(self.test_name)
-        c.check_squashfs_files()
-        # clean up
-        del sec_mode_dev_overrides["foo"]
-        report = c.review_report
-        expected_counts = {"info": None, "warn": 0, "error": 1}
-        self.check_results(report, expected_counts)
-
-        expected = dict()
-        expected["error"] = dict()
-        expected["warn"] = dict()
-        expected["info"] = dict()
-        name = "security-snap-v2:squashfs_files_malformed_line"
-        expected["error"][name] = {
-            "text": "malformed lines in unsquashfs output: 'minor 'a' malformed for './foo''"
-        }
-        self.check_results(report, expected=expected)
-
-    def test_check_squashfs_files_bad_minor2(self):
-        """Test check_squashfs_files() - bad minor 2"""
-        out = """Parallel unsquashfs: Using 4 processors
-8 inodes (8 blocks) to write
-
-brw-rw-rw- root/root                8,12a 2016-03-11 12:25 squashfs-root/foo
-"""
-        self.set_test_unsquashfs_lls(out)
-        # update the overrides
-        from reviewtools.overrides import sec_mode_dev_overrides
-
-        sec_mode_dev_overrides["foo"] = {"./foo": ("brw-rw-rw-", "root/root")}
-        self.set_test_snap_yaml("type", "os")
-        c = SnapReviewSecurity(self.test_name)
-        c.check_squashfs_files()
-        # clean up
-        del sec_mode_dev_overrides["foo"]
-        report = c.review_report
-        expected_counts = {"info": None, "warn": 0, "error": 1}
-        self.check_results(report, expected_counts)
-
-        expected = dict()
-        expected["error"] = dict()
-        expected["warn"] = dict()
-        expected["info"] = dict()
-        name = "security-snap-v2:squashfs_files_malformed_line"
-        expected["error"][name] = {
-            "text": "malformed lines in unsquashfs output: 'minor '12a' malformed for './foo''"
-        }
-        self.check_results(report, expected=expected)
-
-    def test_check_squashfs_files_bad_size(self):
-        """Test check_squashfs_files() - bad size"""
-        out = """Parallel unsquashfs: Using 4 processors
-8 inodes (8 blocks) to write
-
--rw-rw-rw- root/root                a 2016-03-11 12:25 squashfs-root/foo
-"""
-        self.set_test_unsquashfs_lls(out)
-        c = SnapReviewSecurity(self.test_name)
-        c.check_squashfs_files()
-        report = c.review_report
-        expected_counts = {"info": None, "warn": 0, "error": 1}
-        self.check_results(report, expected_counts)
-
-        expected = dict()
-        expected["error"] = dict()
-        expected["warn"] = dict()
-        expected["info"] = dict()
-        name = "security-snap-v2:squashfs_files_malformed_line"
-        expected["error"][name] = {
-            "text": "malformed lines in unsquashfs output: 'size 'a' malformed for './foo''"
-        }
-        self.check_results(report, expected=expected)
-
-    def test_check_squashfs_files_bad_date(self):
-        """Test check_squashfs_files() - bad date"""
-        out = """Parallel unsquashfs: Using 4 processors
-8 inodes (8 blocks) to write
-
--rw-rw-rw- root/root                8 2016-0e-11 12:25 squashfs-root/foo
-"""
-        self.set_test_unsquashfs_lls(out)
-        c = SnapReviewSecurity(self.test_name)
-        c.check_squashfs_files()
-        report = c.review_report
-        expected_counts = {"info": None, "warn": 0, "error": 1}
-        self.check_results(report, expected_counts)
-
-        expected = dict()
-        expected["error"] = dict()
-        expected["warn"] = dict()
-        expected["info"] = dict()
-        name = "security-snap-v2:squashfs_files_malformed_line"
-        expected["error"][name] = {
-            "text": "malformed lines in unsquashfs output: 'date '2016-0e-11' malformed for './foo''"
-        }
-        self.check_results(report, expected=expected)
-
-    def test_check_squashfs_files_bad_time(self):
-        """Test check_squashfs_files() - bad time"""
-        out = """Parallel unsquashfs: Using 4 processors
-8 inodes (8 blocks) to write
-
--rw-rw-rw- root/root                8 2016-03-11 z2:25 squashfs-root/foo
-"""
-        self.set_test_unsquashfs_lls(out)
-        c = SnapReviewSecurity(self.test_name)
-        c.check_squashfs_files()
-        report = c.review_report
-        expected_counts = {"info": None, "warn": 0, "error": 1}
-        self.check_results(report, expected_counts)
-
-        expected = dict()
-        expected["error"] = dict()
-        expected["warn"] = dict()
-        expected["info"] = dict()
-        name = "security-snap-v2:squashfs_files_malformed_line"
-        expected["error"][name] = {
-            "text": "malformed lines in unsquashfs output: 'time 'z2:25' malformed for './foo''"
-        }
-        self.check_results(report, expected=expected)
 
     def test_check_squashfs_files_bad_squashfs_root(self):
         """Test check_squashfs_files() - bad squashfs-root and meta"""
@@ -1234,7 +965,7 @@ drwx------ root/root                38 2016-03-11 12:25 squashfs-root
 drwx------ root/root                48 2016-03-11 12:26 squashfs-root/meta
 -rw-rw-r-- root/root               813 2016-03-11 12:26 squashfs-root/meta/snap.yaml
 """
-        self.set_test_unsquashfs_lls(out)
+        self._set_unsquashfs_lls(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -2506,6 +2237,7 @@ exit 1
         os.environ["PATH"] = old_path
         self.assertTrue(re.search(r"unsquashfs -lls .*\.snap' failed", r))
 
+    # run this once without mocking
     def test_check_squashfs_files(self):
         """Test check_squashfs_files()"""
         output_dir = self.mkdtemp()
@@ -2515,32 +2247,4 @@ exit 1
         c.check_squashfs_files()
         report = c.review_report
         expected_counts = {"info": 1, "warn": 0, "error": 0}
-        self.check_results(report, expected_counts)
-
-    def test_check_squashfs_files_unsquashfs_failed(self):
-        """Test check_squashfs_files()"""
-        output_dir = self.mkdtemp()
-        package = utils.make_snap2(output_dir=output_dir)
-        c = SnapReviewSecurity(package)
-
-        # fake unsquashfs
-        unsquashfs = os.path.join(output_dir, "unsquashfs")
-        content = """#!/bin/sh
-echo test error: unsquashfs failure
-exit 1
-"""
-        with open(unsquashfs, "w") as f:
-            f.write(content)
-        os.chmod(unsquashfs, 0o775)
-
-        old_path = os.environ["PATH"]
-        if old_path:
-            os.environ["PATH"] = "%s:%s" % (output_dir, os.environ["PATH"])
-        else:
-            os.environ["PATH"] = output_dir  # pragma: nocover
-
-        c.check_squashfs_files()
-        os.environ["PATH"] = old_path
-        report = c.review_report
-        expected_counts = {"info": None, "warn": 0, "error": 1}
         self.check_results(report, expected_counts)

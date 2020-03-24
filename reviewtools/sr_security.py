@@ -1,6 +1,6 @@
 """sr_security.py: snap security checks"""
 #
-# Copyright (C) 2013-2018 Canonical Ltd.
+# Copyright (C) 2013-2020 Canonical Ltd.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ from reviewtools.common import (
     unsquashfs_supports_ignore_errors,
     set_lang,
     restore_lang,
+    StatLLS,
 )
 from reviewtools.overrides import (
     sec_browser_support_overrides,
@@ -52,10 +53,6 @@ class SnapReviewSecurity(SnapReview):
 
     def __init__(self, fn, overrides=None):
         SnapReview.__init__(self, fn, "security-snap-v2", overrides=overrides)
-
-    def _unsquashfs_lls(self, snap_pkg):
-        """Run unsquashfs -lls on a snap package"""
-        return cmd(["unsquashfs", "-lls", snap_pkg])
 
     def _unsquashfs_stat(self, snap_pkg):
         """Run unsquashfs -stat on a snap package"""
@@ -526,68 +523,29 @@ class SnapReviewSecurity(SnapReview):
                     return False
             return True
 
+        if self.unsquashfs_lls_entries is None:
+            return
+
         pkgname = self.snap_yaml["name"]
 
         snap_type = "app"
         if "type" in self.snap_yaml:
             snap_type = self.snap_yaml["type"]
 
-        fn = os.path.abspath(self.pkg_filename)
-
-        (rc, out) = self._unsquashfs_lls(fn)
-        if rc != 0:
-            t = "error"
-            n = self._get_check_name("squashfs_files_unsquash")
-            s = "unsquashfs -lls <snap> failed"
-            self._add_result(t, n, s)
-            return
-
-        in_header = True
-        malformed = []
+        readdir_pat = re.compile(r"^r.xr.xr.x")
         errors = []
 
-        fname_pat = re.compile(r".* (squashfs-root)")
-        date_pat = re.compile(r"^\d\d\d\d-\d\d-\d\d$")
-        time_pat = re.compile(r"^\d\d:\d\d$")
-        mknod_pat_full = re.compile(r".,.")
-        readdir_pat = re.compile(r"^r.xr.xr.x")
-        # based on osutil/user.go from snapd
-        owner_pat = re.compile(r"^[a-z0-9][-a-z0-9+._]*/[a-z0-9][-a-z0-9+._]*$")
-        count = 0
-
-        for line in out.splitlines():
-            count += 1
-            if in_header:
-                if len(line) < 1:
-                    in_header = False
+        for (line, item) in self.unsquashfs_lls_entries:
+            if item is None:
                 continue
 
-            tmp = line.split()
-            if len(tmp) < 6:
-                malformed.append("wrong number of fields in '%s'" % line)
-                continue
-
-            fname = fname_pat.sub(".", line)
-            fname_full = fname_pat.sub("\\1", line)
-            ftype = tmp[0][0]
-
-            # Also see 'info ls', but we list only the Linux ones
-            ftype = line[0]
-            if ftype not in ["b", "c", "d", "l", "p", "s", "-"]:
-                errors.append("unknown type '%s' for entry '%s'" % (ftype, fname))
-                continue
-
-            # verify mode
-            mode = tmp[0][1:]
-            if len(mode) != 9:
-                malformed.append("mode '%s' malformed for '%s'" % (mode, fname))
-                continue
-
-            # verify ownership
-            owner = tmp[1]
-            if not owner_pat.search(owner):
-                malformed.append("user/group '%s' malformed for '%s'" % (owner, fname))
-                continue
+            fname = item[StatLLS.FILENAME]
+            fname_full = item[StatLLS.FULLNAME]
+            ftype = item[StatLLS.FILETYPE]
+            mode = item[StatLLS.MODE]
+            owner = item[StatLLS.OWNER]
+            user = item[StatLLS.USER]
+            group = item[StatLLS.GROUP]
 
             # https://forum.snapcraft.io/t/incorrect-permissions-in-meta-snap-yaml/1161/8
             if fname_full in ["squashfs-root", "squashfs-root/meta"]:
@@ -628,69 +586,14 @@ class SnapReviewSecurity(SnapReview):
                 errors.append("file type '%s' not allowed (%s)" % (ftype, fname))
                 continue
 
-            # user and group verified up above
-            (user, group) = tmp[1].split("/")
             # we enforce 'root/root'
             if (
                 snap_type != "base"
                 and snap_type != "os"
                 and (user != "root" or group != "root")
             ):
-                errors.append("unusual user/group '%s' for '%s'" % (tmp[1], fname))
+                errors.append("unusual user/group '%s' for '%s'" % (owner, fname))
                 continue
-
-            date_idx = 3
-            time_idx = 4
-            if ftype == "b" or ftype == "c":
-                # Account for unsquashfs -lls doing:
-                # crw-rw-rw- root/root             1,  8 2016-08-09 ...
-                # crw-rw---- root/root            10,141 2016-08-09 ...
-
-                if mknod_pat_full.search(tmp[2]):
-                    (major, minor) = tmp[2].split(",")
-                else:
-                    date_idx = 4
-                    time_idx = 5
-                    major = tmp[2][:-1]
-                    minor = tmp[3]
-
-                try:
-                    int(major)
-                except Exception:
-                    malformed.append("major '%s' malformed for '%s'" % (major, fname))
-                try:
-                    int(minor)
-                except Exception:
-                    malformed.append("minor '%s' malformed for '%s'" % (minor, fname))
-            else:
-                size = tmp[2]
-                try:
-                    int(size)
-                except Exception:
-                    malformed.append("size '%s' malformed for '%s'" % (size, fname))
-                    continue
-
-            date = tmp[date_idx]
-            if not date_pat.search(date):
-                malformed.append("date '%s' malformed for '%s'" % (date, fname))
-                continue
-
-            time = tmp[time_idx]
-            if not time_pat.search(time):
-                malformed.append("time '%s' malformed for '%s'" % (time, fname))
-                continue
-
-        if count < 4:
-            t = "error"
-            n = self._get_check_name("squashfs_files_malformed output")
-            s = "unsquashfs -lls ouput too short"
-            self._add_result(t, n, s)
-
-        if len(malformed) > 0:
-            t = "error"
-            n = self._get_check_name("squashfs_files_malformed_line")
-            s = "malformed lines in unsquashfs output: '%s'" % ", ".join(malformed)
-            self._add_result(t, n, s)
 
         t = "info"
         n = self._get_check_name("squashfs_files")

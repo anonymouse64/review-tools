@@ -1,6 +1,6 @@
 """sr_tests.py: common setup and tests for test modules"""
 #
-# Copyright (C) 2013-2016 Canonical Ltd.
+# Copyright (C) 2013-2020 Canonical Ltd.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import copy
 import io
 import os
 import yaml
@@ -28,7 +29,8 @@ TEST_SNAP_MANIFEST_YAML = ""
 TEST_PKGFMT_TYPE = "snap"
 TEST_PKGFMT_VERSION = "16.04"
 TEST_UNPACK_DIR = "/fake"
-TEST_UNSQUASHFS_LLS = ""
+TEST_UNSQUASHFS_LLS_HDR = ""
+TEST_UNSQUASHFS_LLS_ENTRIES = ("", None)
 
 
 #
@@ -66,7 +68,7 @@ def __get_unpack_dir(self):
 
 def _unsquashfs_lls(self, fn):
     """Pretend we ran unsquashfs -lls fn"""
-    return (0, TEST_UNSQUASHFS_LLS)
+    return (TEST_UNSQUASHFS_LLS_HDR, TEST_UNSQUASHFS_LLS_ENTRIES)
 
 
 def create_patches():
@@ -106,13 +108,8 @@ def create_patches():
         patch("reviewtools.sr_common.SnapReview._get_unpack_dir", __get_unpack_dir)
     )
     patches.append(patch("reviewtools.sr_common.SnapReview._pkgfmt_type", _pkgfmt_type))
-
-    # sr_security
     patches.append(
-        patch(
-            "reviewtools.sr_security.SnapReviewSecurity._unsquashfs_lls",
-            _unsquashfs_lls,
-        )
+        patch("reviewtools.sr_common.SnapReview._unsquashfs_lls", _unsquashfs_lls)
     )
 
     return patches
@@ -203,9 +200,11 @@ class TestSnapReview(TestCase):
         global TEST_UNPACK_DIR
         TEST_UNPACK_DIR = d
 
-    def set_test_unsquashfs_lls(self, s):
-        global TEST_UNSQUASHFS_LLS
-        TEST_UNSQUASHFS_LLS = s
+    def set_test_unsquashfs_lls(self, hdr, entries):
+        global TEST_UNSQUASHFS_LLS_HDR
+        global TEST_UNSQUASHFS_LLS_ENTRIES
+        TEST_UNSQUASHFS_LLS_HDR = hdr
+        TEST_UNSQUASHFS_LLS_ENTRIES = copy.copy(entries)
 
     def setUp(self):
         """Make sure our patches are applied everywhere"""
@@ -226,7 +225,9 @@ class TestSnapReview(TestCase):
         TEST_PKGFMT_VERSION = "16.04"
         global TEST_UNPACK_DIR
         TEST_UNPACK_DIR = "/fake"
-        global TEST_UNSQUASHFS_LLS
-        TEST_UNSQUASHFS_LLS = ""
+        global TEST_UNSQUASHFS_LLS_HDR
+        TEST_UNSQUASHFS_LLS_HDR = ""
+        global TEST_UNSQUASHFS_LLS_ENTRIES
+        TEST_UNSQUASHFS_LLS_ENTRIES = ("", None)
 
         self._reset_test_data()

@@ -152,9 +152,6 @@ security-snap-v2:interface-reference-matches-base-decl|
 security-snap-v2:profile_name_length|
 security-snap-v2:squashfs_compression|
 security-snap-v2:squashfs_files|
-security-snap-v2:squashfs_files_malformed_line|
-security-snap-v2:squashfs_files_malformed output|
-security-snap-v2:squashfs_files_unsquash|
 security-snap-v2:squashfs_fragments|
 security-snap-v2:squashfs_repack_checksum|https://forum.snapcraft.io/t/automated-reviews-and-snapcraft-2-38/4982/17
 security-snap-v2:squashfs_resquash|
