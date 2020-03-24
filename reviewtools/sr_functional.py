@@ -16,12 +16,14 @@
 
 from __future__ import print_function
 from reviewtools.sr_common import SnapReview
-from reviewtools.common import cmd
+from reviewtools.common import cmd, StatLLS
 from reviewtools.overrides import (
     func_execstack_overrides,
     func_execstack_skipped_pats,
     func_base_mountpoints_overrides,
+    redflagged_snap_types_overrides,
 )
+import copy
 import os
 import re
 
@@ -32,6 +34,102 @@ class SnapReviewFunctional(SnapReview):
     def __init__(self, fn, overrides=None):
         SnapReview.__init__(self, fn, "functional-snap-v2", overrides=overrides)
         self._list_all_compiled_binaries()
+
+        # State files only for base snaps, if have -lls output and
+        # --state-output is specified
+        self.curr_state = None
+        self.prev_state = None
+        if (
+            self.snap_yaml["type"] == "base"
+            and self.unsquashfs_lls_entries is not None
+            and "state_output" in self.overrides
+        ):
+            # if the name of this changes, then this field in the last state
+            # input file won't match and all previous state will be ignored
+            self.state_key = self._get_check_name("state_files")
+
+            # read in current state
+            self.curr_state = {}
+            for (line, item) in self.unsquashfs_lls_entries:
+                if item is None:
+                    continue
+                self.curr_state[item[StatLLS.FILENAME]] = item
+
+            # update state_output with our current state
+            self.overrides["state_output"][self.state_key] = self._serialize(
+                self.curr_state
+            )
+
+            # read in previous state
+            self.prev_state = {}
+            if self.state_key in self.overrides["state_input"]:
+                self.prev_state = self._deserialize(
+                    self.overrides["state_input"][self.state_key]
+                )
+
+    def _serialize(self, state):
+        """Serialize a review-tools state"""
+
+        def item2dict(item):
+            for required in [
+                StatLLS.FILENAME,
+                StatLLS.FILETYPE,
+                StatLLS.MODE,
+                StatLLS.OWNER,
+            ]:
+                if required not in item:
+                    return {}
+
+            d = {}
+            fname = item[StatLLS.FILENAME]
+
+            d[fname] = {}
+            d[fname]["filetype"] = item[StatLLS.FILETYPE]
+            d[fname]["mode"] = item[StatLLS.MODE]
+            d[fname]["owner"] = item[StatLLS.OWNER]
+            if StatLLS.MAJOR in item and item[StatLLS.MAJOR] is not None:
+                d[fname]["major"] = item[StatLLS.MAJOR]
+            if StatLLS.MINOR in item and item[StatLLS.MINOR] is not None:
+                d[fname]["minor"] = item[StatLLS.MINOR]
+
+            return d
+
+        serial = {}
+        for fname in state:
+            d = item2dict(state[fname])
+            if fname in d:
+                serial[fname] = d[fname]
+        return copy.deepcopy(serial)
+
+    def _deserialize(self, serial):
+        """Deserialize a review-tools serialized state"""
+
+        def dict2item(d):
+            fname = list(d)[0]
+            for required in ["filetype", "mode", "owner"]:
+                if required not in d[fname]:
+                    return None
+
+            item = {}
+            item[StatLLS.FILENAME] = fname
+            item[StatLLS.FILETYPE] = d[fname]["filetype"]
+            item[StatLLS.MODE] = d[fname]["mode"]
+            item[StatLLS.OWNER] = d[fname]["owner"]
+            if "major" in d[fname]:
+                item[StatLLS.MAJOR] = d[fname]["major"]
+            if "minor" in d[fname]:
+                item[StatLLS.MINOR] = d[fname]["minor"]
+
+            return item
+
+        state = {}
+        for entry in serial:
+            item = dict2item({entry: serial[entry]})
+            if item is None:
+                continue
+            fname = item[StatLLS.FILENAME]
+            state[fname] = item
+        return copy.deepcopy(state)
 
     def check_execstack(self):
         """Check execstack"""
@@ -121,3 +219,104 @@ class SnapReviewFunctional(SnapReview):
             else:
                 s += " (overridden)"
         self._add_result(t, n, s)
+
+    def check_state_base_files(self):
+        """Verify base snap has the expected files"""
+        if (
+            self.snap_yaml["type"] != "base"
+            or self.prev_state is None
+            or self.curr_state is None
+        ):
+            return
+
+        t = "info"
+        n = self._get_check_name("state_base_files")
+        s = "OK"
+
+        # Skip checking base snaps that we haven't yet allowed in the store. In
+        # this manner, they can keep changing as needed.
+        if self.snap_yaml["name"] not in redflagged_snap_types_overrides["base"]:
+            if (
+                "SNAP_FORCE_STATE_CHECK" not in os.environ
+                or os.environ["SNAP_FORCE_STATE_CHECK"] != "1"
+            ):
+                s = "OK (skipped, snap type not overridden for this snap)"
+                self._add_result(t, n, s)
+                # preserve previous state if not an approved snap
+                if (
+                    "state_output" in self.overrides
+                    and self.state_key in self.overrides["state_output"]
+                ):
+                    if (
+                        "state_input" in self.overrides
+                        and self.state_key in self.overrides["state_input"]
+                    ):
+                        self.overrides["state_output"][self.state_key] = copy.deepcopy(
+                            self.overrides["state_input"][self.state_key]
+                        )
+                    else:
+                        del self.overrides["state_output"][self.state_key]
+                return
+
+        if len(self.prev_state) == 0:
+            s = "OK (no previous state)"
+            self._add_result(t, n, s)
+            return
+
+        missing = []
+        missing_keys = {}
+        different_keys = {}
+
+        # iterate through files in prev_state since this naturally ignores
+        # newly added files
+        for fname in self.prev_state:
+            if fname not in self.curr_state:
+                missing.append(fname)
+                continue
+            # likewise, iterate through metadata keys in prev_state since this
+            # allows us to freely add new metadata as our checks evolve
+            for k in self.prev_state[fname]:
+                kname = str(k).split(".")[1].lower()
+                if k not in self.curr_state[fname]:
+                    if fname not in missing_keys:
+                        missing_keys[fname] = []
+                    missing_keys[fname].append(kname)
+                elif self.prev_state[fname][k] != self.curr_state[fname][k]:
+                    if fname not in different_keys:
+                        different_keys[fname] = []
+                    different_keys[fname].append(
+                        "current %s '%s' != '%s'"
+                        % (kname, self.prev_state[fname][k], self.curr_state[fname][k])
+                    )
+
+        if len(missing) == 0 and len(missing_keys) == 0 and len(different_keys) == 0:
+            self._add_result(t, n, s)
+            return
+
+        if len(missing) > 0:
+            t = "warn"
+            n = self._get_check_name("state_base_files", app="missing")
+            s = "missing files since last review: %s" % " ,".join(sorted(missing))
+            self._add_result(t, n, s)
+
+        if len(missing_keys) > 0:
+            t = "warn"
+            n = self._get_check_name(
+                "state_base_files", app="metadata", extra="missing"
+            )
+            tmp = []
+            for fn in missing_keys:
+                tmp.append("%s (%s)" % (fn, ", ".join(missing_keys[fn])))
+            s = "missing metadata since last review: %s" % ", ".join(sorted(tmp))
+            self._add_result(t, n, s)
+
+        if len(different_keys) > 0:
+            t = "warn"
+            n = self._get_check_name(
+                "state_base_files", app="metadata", extra="different"
+            )
+            tmp = []
+            for fn in different_keys:
+                tmp.append("%s (%s)" % (fn, ", ".join(different_keys[fn])))
+            s = "differing metadata since last review: %s" % ", ".join(sorted(tmp))
+            self._add_result(t, n, s)

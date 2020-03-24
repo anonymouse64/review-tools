@@ -16,16 +16,17 @@
 
 from __future__ import print_function
 from unittest import TestCase
+import copy
 import os
 import shutil
 import tempfile
 
 from reviewtools.common import cleanup_unpack
 from reviewtools.common import check_results as common_check_results
-from reviewtools.common import cmd as cmd
 from reviewtools.sr_functional import SnapReviewFunctional
 import reviewtools.sr_tests as sr_tests
 from reviewtools.tests import utils
+from reviewtools.common import STATE_FORMAT_VERSION, StatLLS, cmd, unsquashfs_lls_parse
 
 
 class TestSnapReviewFunctional(sr_tests.TestSnapReview):
@@ -34,6 +35,88 @@ class TestSnapReviewFunctional(sr_tests.TestSnapReview):
     def setUp(self):
         super().setUp()
         self.set_test_pkgfmt("snap", "16.04")
+        self.state_files_key = "functional-snap-v2:state_files"
+
+    def tearDown(self):
+        super().setUp()
+        self.set_test_pkgfmt("snap", "16.04")
+        if "SNAP_FORCE_STATE_CHECK" in os.environ:
+            del os.environ["SNAP_FORCE_STATE_CHECK"]
+
+    def _set_unsquashfs_lls(self, out):
+        header = """Parallel unsquashfs: Using 4 processors
+8 inodes (8 blocks) to write
+
+"""
+        hdr, entries = unsquashfs_lls_parse(header + out)
+        self.set_test_unsquashfs_lls(hdr, entries)
+
+    def _set_default_state(self):
+        lls = """drwxr-xr-x root/root               215 2020-03-23 14:23 squashfs-root
+drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
+-rwxr-xr-x root/root             43416 2020-03-23 14:23 squashfs-root/bin/cat
+"""
+        self._set_unsquashfs_lls(lls)
+
+        exp_lls_state = {
+            ".": {
+                StatLLS.FILENAME: ".",
+                StatLLS.FULLNAME: "squashfs-root",
+                StatLLS.FILETYPE: "d",
+                StatLLS.MODE: "rwxr-xr-x",
+                StatLLS.OWNER: "root/root",
+                StatLLS.USER: "root",
+                StatLLS.GROUP: "root",
+                StatLLS.SIZE: "215",
+                StatLLS.DATE: "2020-03-23",
+                StatLLS.TIME: "14:23",
+            },
+            "./bin": {
+                StatLLS.FILENAME: "./bin",
+                StatLLS.FULLNAME: "squashfs-root/bin",
+                StatLLS.FILETYPE: "d",
+                StatLLS.MODE: "rwxr-xr-x",
+                StatLLS.OWNER: "root/root",
+                StatLLS.USER: "root",
+                StatLLS.GROUP: "root",
+                StatLLS.SIZE: "73",
+                StatLLS.DATE: "2020-03-23",
+                StatLLS.TIME: "14:23",
+            },
+            "./bin/cat": {
+                StatLLS.FILENAME: "./bin/cat",
+                StatLLS.FULLNAME: "squashfs-root/bin/cat",
+                StatLLS.FILETYPE: "-",
+                StatLLS.MODE: "rwxr-xr-x",
+                StatLLS.OWNER: "root/root",
+                StatLLS.USER: "root",
+                StatLLS.GROUP: "root",
+                StatLLS.SIZE: "43416",
+                StatLLS.DATE: "2020-03-23",
+                StatLLS.TIME: "14:23",
+            },
+        }
+
+        exp_override_state = copy.deepcopy(exp_lls_state)
+        # these fields aren't stored in state files
+        for fname in exp_override_state:
+            for k in [
+                StatLLS.FULLNAME,
+                StatLLS.USER,
+                StatLLS.GROUP,
+                StatLLS.SIZE,
+                StatLLS.DATE,
+                StatLLS.TIME,
+            ]:
+                del exp_override_state[fname][k]
+
+        exp_override = {
+            ".": {"filetype": "d", "mode": "rwxr-xr-x", "owner": "root/root"},
+            "./bin": {"filetype": "d", "mode": "rwxr-xr-x", "owner": "root/root"},
+            "./bin/cat": {"filetype": "-", "mode": "rwxr-xr-x", "owner": "root/root"},
+        }
+
+        return exp_lls_state, exp_override, exp_override_state
 
     def test_all_checks_as_v2(self):
         """Test snap v2 has checks"""
@@ -44,6 +127,725 @@ class TestSnapReviewFunctional(sr_tests.TestSnapReview):
         for i in c.review_report:
             sum += len(c.review_report[i])
         self.assertTrue(sum != 0)
+
+    def test__serialize(self):
+        """Test _serialize()"""
+        # convenient way to get a list of items
+        lls = """Parallel unsquashfs: Using 4 processors
+8 inodes (8 blocks) to write
+
+drwxr-xr-x root/root               215 2020-03-23 14:32 squashfs-root
+drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
+-rwxr-xr-x root/root             43416 2020-03-23 14:23 squashfs-root/bin/cat
+drwxr-xr-x root/root               181 2020-03-23 14:27 squashfs-root/lib/x86_64-linux-gnu
+-rwxr-xr-x root/root           2029224 2020-03-23 14:24 squashfs-root/lib/x86_64-linux-gnu/libc-2.31.so
+lrwxrwxrwx root/root                12 2020-03-14 18:21 squashfs-root/lib/x86_64-linux-gnu/libc.so.6 -> libc-2.31.so
+crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
+"""
+        hdr, entries = unsquashfs_lls_parse(lls)
+
+        state = {}
+        for (line, item) in entries:
+            state[item[StatLLS.FILENAME]] = item
+
+        c = SnapReviewFunctional(self.test_name)
+        serial = c._serialize(state)
+
+        self.assertEqual(len(entries), len(serial))
+        self.assertEqual(len(serial), 7)
+        for (idx, map) in [
+            (".", {"filetype": "d", "mode": "rwxr-xr-x", "owner": "root/root"}),
+            ("./bin", {"filetype": "d", "mode": "rwxr-xr-x", "owner": "root/root"}),
+            ("./bin/cat", {"filetype": "-", "mode": "rwxr-xr-x", "owner": "root/root"}),
+            (
+                "./lib/x86_64-linux-gnu",
+                {"filetype": "d", "mode": "rwxr-xr-x", "owner": "root/root"},
+            ),
+            (
+                "./lib/x86_64-linux-gnu/libc-2.31.so",
+                {"filetype": "-", "mode": "rwxr-xr-x", "owner": "root/root"},
+            ),
+            (
+                "./lib/x86_64-linux-gnu/libc.so.6 -> libc-2.31.so",
+                {"filetype": "l", "mode": "rwxrwxrwx", "owner": "root/root"},
+            ),
+            (
+                "./dev/null",
+                {
+                    "filetype": "c",
+                    "mode": "rw-rw-rw-",
+                    "owner": "root/root",
+                    "major": "1",
+                    "minor": "3",
+                },
+            ),
+        ]:
+            self.assertTrue(idx in serial)
+            for k in map:
+                self.assertTrue(k in serial[idx])
+                self.assertEqual(serial[idx][k], map[k])
+
+    def test__serialize_bad_item(self):
+        """Test _serialize() - bad item"""
+        # mock a bad entry
+        entries = [
+            # one bad missing StatLLS.OWNER
+            (
+                "-rwxr-xr-x root/root             43416 2020-03-23 14:23 squashfs-root/bin/cat",
+                {
+                    StatLLS.FILENAME: "./bin/cat",
+                    StatLLS.FILETYPE: "-",
+                    StatLLS.MODE: "rwxr-xr-x",
+                },
+            ),
+            # one good
+            (
+                "-rwxr-xr-x root/root           2029224 2020-03-23 14:24 squashfs-root/lib/x86_64-linux-gnu/libc-2.31.so",
+                {
+                    StatLLS.FILENAME: "./lib/x86_64-linux-gnu/libc-2.31.so",
+                    StatLLS.FILETYPE: "-",
+                    StatLLS.MODE: "rwxr-xr-x",
+                    StatLLS.OWNER: "root/root",
+                },
+            ),
+        ]
+        c = SnapReviewFunctional(self.test_name)
+
+        state = {}
+        for (line, item) in entries:
+            state[item[StatLLS.FILENAME]] = item
+
+        serial = c._serialize(state)
+
+        self.assertEqual(len(serial), 1)
+        self.assertTrue("./bin/cat" not in serial)
+        idx = "./lib/x86_64-linux-gnu/libc-2.31.so"
+        map = {"filetype": "-", "mode": "rwxr-xr-x", "owner": "root/root"}
+        self.assertTrue(idx in serial)
+        for k in map:
+            self.assertTrue(k in serial[idx])
+            self.assertEqual(serial[idx][k], map[k])
+
+    def test__deserialize(self):
+        """Test _deserialize()"""
+        # convenient way to get a list of items
+        lls = """Parallel unsquashfs: Using 4 processors
+8 inodes (8 blocks) to write
+
+drwxr-xr-x root/root               215 2020-03-23 14:32 squashfs-root
+drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
+-rwxr-xr-x root/root             43416 2020-03-23 14:23 squashfs-root/bin/cat
+drwxr-xr-x root/root               181 2020-03-23 14:27 squashfs-root/lib/x86_64-linux-gnu
+-rwxr-xr-x root/root           2029224 2020-03-23 14:24 squashfs-root/lib/x86_64-linux-gnu/libc-2.31.so
+lrwxrwxrwx root/root                12 2020-03-14 18:21 squashfs-root/lib/x86_64-linux-gnu/libc.so.6 -> libc-2.31.so
+crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
+"""
+        hdr, entries = unsquashfs_lls_parse(lls)
+
+        serial = {
+            ".": {"filetype": "d", "mode": "rwxr-xr-x", "owner": "root/root"},
+            "./bin": {"filetype": "d", "mode": "rwxr-xr-x", "owner": "root/root"},
+            "./bin/cat": {"filetype": "-", "mode": "rwxr-xr-x", "owner": "root/root"},
+            "./dev/null": {
+                "filetype": "c",
+                "major": "1",
+                "minor": "3",
+                "mode": "rw-rw-rw-",
+                "owner": "root/root",
+            },
+            "./lib/x86_64-linux-gnu": {
+                "filetype": "d",
+                "mode": "rwxr-xr-x",
+                "owner": "root/root",
+            },
+            "./lib/x86_64-linux-gnu/libc-2.31.so": {
+                "filetype": "-",
+                "mode": "rwxr-xr-x",
+                "owner": "root/root",
+            },
+            "./lib/x86_64-linux-gnu/libc.so.6 -> libc-2.31.so": {
+                "filetype": "l",
+                "mode": "rwxrwxrwx",
+                "owner": "root/root",
+            },
+        }
+
+        c = SnapReviewFunctional(self.test_name)
+        state = c._deserialize(serial)
+        self.assertEqual(len(state), len(entries))
+        self.assertEqual(len(state), 7)
+
+        for (idx, item) in [
+            (
+                ".",
+                {
+                    StatLLS.FILENAME: ".",
+                    StatLLS.FILETYPE: "d",
+                    StatLLS.MODE: "rwxr-xr-x",
+                    StatLLS.OWNER: "root/root",
+                },
+            ),
+            (
+                "./bin",
+                {
+                    StatLLS.FILENAME: "./bin",
+                    StatLLS.FILETYPE: "d",
+                    StatLLS.MODE: "rwxr-xr-x",
+                    StatLLS.OWNER: "root/root",
+                },
+            ),
+            (
+                "./bin/cat",
+                {
+                    StatLLS.FILENAME: "./bin/cat",
+                    StatLLS.FILETYPE: "-",
+                    StatLLS.MODE: "rwxr-xr-x",
+                    StatLLS.OWNER: "root/root",
+                },
+            ),
+            (
+                "./lib/x86_64-linux-gnu",
+                {
+                    StatLLS.FILENAME: "./lib/x86_64-linux-gnu",
+                    StatLLS.FILETYPE: "d",
+                    StatLLS.MODE: "rwxr-xr-x",
+                    StatLLS.OWNER: "root/root",
+                },
+            ),
+            (
+                "./lib/x86_64-linux-gnu/libc-2.31.so",
+                {
+                    StatLLS.FILENAME: "./lib/x86_64-linux-gnu/libc-2.31.so",
+                    StatLLS.FILETYPE: "-",
+                    StatLLS.MODE: "rwxr-xr-x",
+                    StatLLS.OWNER: "root/root",
+                },
+            ),
+            (
+                "./lib/x86_64-linux-gnu/libc.so.6 -> libc-2.31.so",
+                {
+                    StatLLS.FILENAME: "./lib/x86_64-linux-gnu/libc.so.6 -> libc-2.31.so",
+                    StatLLS.FILETYPE: "l",
+                    StatLLS.MODE: "rwxrwxrwx",
+                    StatLLS.OWNER: "root/root",
+                },
+            ),
+            (
+                "./dev/null",
+                {
+                    StatLLS.FILENAME: "./dev/null",
+                    StatLLS.FILETYPE: "c",
+                    StatLLS.MODE: "rw-rw-rw-",
+                    StatLLS.OWNER: "root/root",
+                    StatLLS.MAJOR: "1",
+                    StatLLS.MINOR: "3",
+                },
+            ),
+        ]:
+            self.assertTrue(idx in state)
+            for k in item:
+                self.assertTrue(k in state[idx])
+                self.assertEqual(state[idx][k], item[k])
+
+    def test__deserialize_bad_entry(self):
+        """Test _serialize() - bad entry"""
+        serial = {
+            "./bin": {},
+            ".": {"filetype": "d", "mode": "rwxr-xr-x", "owner": "root/root"},
+        }
+
+        c = SnapReviewFunctional(self.test_name)
+        state = c._deserialize(serial)
+        self.assertEqual(len(state), 1)
+
+        self.assertTrue("./bin" not in state)
+        fname = "."
+        exp = {
+            fname: {
+                StatLLS.FILENAME: ".",
+                StatLLS.FILETYPE: "d",
+                StatLLS.MODE: "rwxr-xr-x",
+                StatLLS.OWNER: "root/root",
+            }
+        }
+        self.assertTrue(fname in state)
+        self.assertEqual(len(exp[fname]), len(state[fname]))
+        for k in exp[fname]:
+            self.assertTrue(k in state[fname])
+            self.assertEqual(exp[fname][k], state[fname][k])
+
+    def test_serialize_deserialize_roundtrip(self):
+        """Test serialize()/deserialize() round trip"""
+        serial = {
+            ".": {"filetype": "d", "mode": "rwxr-xr-x", "owner": "root/root"},
+            "./bin": {"filetype": "d", "mode": "rwxr-xr-x", "owner": "root/root"},
+            "./bin/cat": {"filetype": "-", "mode": "rwxr-xr-x", "owner": "root/root"},
+            "./dev/null": {
+                "filetype": "c",
+                "major": "1",
+                "minor": "3",
+                "mode": "rw-rw-rw-",
+                "owner": "root/root",
+            },
+            "./lib/x86_64-linux-gnu": {
+                "filetype": "d",
+                "mode": "rwxr-xr-x",
+                "owner": "root/root",
+            },
+            "./lib/x86_64-linux-gnu/libc-2.31.so": {
+                "filetype": "-",
+                "mode": "rwxr-xr-x",
+                "owner": "root/root",
+            },
+            "./lib/x86_64-linux-gnu/libc.so.6 -> libc-2.31.so": {
+                "filetype": "l",
+                "mode": "rwxrwxrwx",
+                "owner": "root/root",
+            },
+            "./😃": {"filetype": "-", "mode": "rw-r--r--", "owner": "root/root"},
+        }
+
+        c = SnapReviewFunctional(self.test_name)
+        state = c._deserialize(serial)
+        self.assertEqual(len(state), len(serial))
+
+        serial2 = c._serialize(state)
+        self.assertEqual(len(serial2), len(serial))
+
+        state2 = c._deserialize(serial2)
+        self.assertEqual(len(state2), len(serial))
+
+        for j in serial:
+            self.assertTrue(j in serial2)
+            self.assertTrue(len(serial[j]), len(serial2[j]))
+            for k in serial[j]:
+                self.assertTrue(k in serial2[j])
+                self.assertEqual(serial[j][k], serial2[j][k])
+
+    def _verify_dict2(self, state, exp):
+        """Verifies dictionary that is 2 levels deep"""
+        self.assertEqual(len(exp), len(state))
+
+        for fname in exp:
+            self.assertTrue(fname in state)
+            self.assertEqual(len(state[fname]), len(exp[fname]))
+            for k in exp[fname]:
+                self.assertTrue(k in state[fname])
+                self.assertEqual(exp[fname][k], state[fname][k])
+
+    def test_check_state_base_files_app(self):
+        """Test check_state_base_files() - app"""
+        self._set_default_state()
+
+        c = SnapReviewFunctional(self.test_name)
+        c.check_state_base_files()
+        report = c.review_report
+        expected_counts = {"info": 0, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+
+        # verify prev_state not set
+        self.assertTrue(c.prev_state is None)
+
+        # verify curr_state not set
+        self.assertTrue(c.curr_state is None)
+
+        # verify state_input not set
+        self.assertFalse("state_input" in c.overrides)
+
+        # verify state_output not set
+        self.assertFalse("state_output" in c.overrides)
+
+    def test_check_state_base_files_app_output(self):
+        """Test check_state_base_files() - --state-output (app)"""
+        self._set_default_state()
+
+        overrides = {
+            "state_input": {"format": STATE_FORMAT_VERSION},
+            "state_output": {"format": STATE_FORMAT_VERSION},
+        }
+        c = SnapReviewFunctional(self.test_name, overrides=overrides)
+        c.check_state_base_files()
+        report = c.review_report
+        expected_counts = {"info": 0, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+
+        # verify prev_state not set
+        self.assertTrue(c.prev_state is None)
+
+        # verify curr_state not set
+        self.assertTrue(c.curr_state is None)
+
+        # verify state_input not set
+        self.assertFalse(self.state_files_key in c.overrides["state_input"])
+
+        # verify state_output not set
+        self.assertFalse(self.state_files_key in c.overrides["state_output"])
+
+    def test_check_state_base_files_app_input_output(self):
+        """Test check_state_base_files() - --state-input/--state-output (app)"""
+        self._set_default_state()
+
+        overrides = {
+            "state_input": {"format": STATE_FORMAT_VERSION, "something": "else"},
+            "state_output": {"format": STATE_FORMAT_VERSION},
+        }
+        c = SnapReviewFunctional(self.test_name, overrides=overrides)
+        c.check_state_base_files()
+        report = c.review_report
+        expected_counts = {"info": 0, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+
+        # verify prev_state not set
+        self.assertTrue(c.prev_state is None)
+
+        # verify curr_state not set
+        self.assertTrue(c.curr_state is None)
+
+        # verify state_input not set
+        self.assertFalse(self.state_files_key in c.overrides["state_input"])
+
+        # verify state_output not set
+        self.assertFalse(self.state_files_key in c.overrides["state_output"])
+
+    def test_check_state_base_files_no_state(self):
+        """Test check_state_base_files() - no state"""
+        os.environ["SNAP_FORCE_STATE_CHECK"] = "1"
+        self._set_default_state()
+
+        self.set_test_snap_yaml("type", "base")
+        c = SnapReviewFunctional(self.test_name)
+        c.check_state_base_files()
+        report = c.review_report
+        expected_counts = {"info": 0, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+
+        # verify prev_state not set
+        self.assertTrue(c.prev_state is None)
+
+        # verify curr_state not set
+        self.assertTrue(c.curr_state is None)
+
+        # verify state_input not set
+        self.assertFalse("state_input" in c.overrides)
+
+        # verify state_output not set
+        self.assertFalse("state_output" in c.overrides)
+
+    def test_check_state_base_files_output(self):
+        """Test check_state_base_files() - --state-output"""
+        os.environ["SNAP_FORCE_STATE_CHECK"] = "1"
+        exp_lls_state, exp_override, exp_override_state = self._set_default_state()
+
+        self.set_test_snap_yaml("type", "base")
+        overrides = {
+            "state_input": {"format": STATE_FORMAT_VERSION},
+            "state_output": {"format": STATE_FORMAT_VERSION},
+        }
+        c = SnapReviewFunctional(self.test_name, overrides=overrides)
+        c.check_state_base_files()
+        report = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "functional-snap-v2:state_base_files"
+        expected["info"][name] = {"text": "OK (no previous state)"}
+        self.check_results(report, expected=expected)
+
+        # verify prev_state is empty
+        self._verify_dict2(c.prev_state, {})
+
+        # verify curr_state has expected state
+        self._verify_dict2(c.curr_state, exp_lls_state)
+
+        # verify state_input is not set
+        self.assertFalse(self.state_files_key in c.overrides["state_input"])
+
+        # verify state_output is set
+        self.assertTrue(self.state_files_key in c.overrides["state_output"])
+        self._verify_dict2(
+            c.overrides["state_output"][self.state_files_key], exp_override
+        )
+
+    def test_check_state_base_files_output_base_not_overridden(self):
+        """Test check_state_base_files() - --state-output and base not
+           overridden
+        """
+        os.environ["SNAP_FORCE_STATE_CHECK"] = "0"
+        exp_lls_state, exp_override, exp_override_state = self._set_default_state()
+
+        self.set_test_snap_yaml("type", "base")
+        overrides = {
+            "state_input": {"format": STATE_FORMAT_VERSION},
+            "state_output": {"format": STATE_FORMAT_VERSION},
+        }
+        c = SnapReviewFunctional(self.test_name, overrides=overrides)
+        c.check_state_base_files()
+        report = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "functional-snap-v2:state_base_files"
+        expected["info"][name] = {
+            "text": "OK (skipped, snap type not overridden for this snap)"
+        }
+        self.check_results(report, expected=expected)
+
+        # verify prev_state is empty
+        self._verify_dict2(c.prev_state, {})
+
+        # verify curr_state has expected state
+        self._verify_dict2(c.curr_state, exp_lls_state)
+
+        # verify state_input is not set
+        self.assertFalse(self.state_files_key in c.overrides["state_input"])
+
+        # verify state_output is not state
+        self.assertFalse(self.state_files_key in c.overrides["state_output"])
+
+    def test_check_state_base_files_input_output_base_not_overridden(self):
+        """Test check_state_base_files() - --state-input/--state-output and
+           base not overridden
+        """
+        os.environ["SNAP_FORCE_STATE_CHECK"] = "0"
+        exp_lls_state, exp_override, exp_override_state = self._set_default_state()
+        prev_override = copy.deepcopy(exp_override)
+        prev_override["./bin/ls"] = {
+            "filetype": "-",
+            "mode": "rwxr-xr-x",
+            "owner": "root/root",
+        }
+
+        self.set_test_snap_yaml("type", "base")
+        overrides = {
+            "state_input": {
+                "format": STATE_FORMAT_VERSION,
+                self.state_files_key: prev_override,
+            },
+            "state_output": {"format": STATE_FORMAT_VERSION},
+        }
+        c = SnapReviewFunctional(self.test_name, overrides=overrides)
+        c.check_state_base_files()
+        report = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "functional-snap-v2:state_base_files"
+        expected["info"][name] = {
+            "text": "OK (skipped, snap type not overridden for this snap)"
+        }
+        self.check_results(report, expected=expected)
+
+        # verify state_input didn't change
+        self.assertTrue(self.state_files_key in c.overrides["state_input"])
+        self._verify_dict2(
+            c.overrides["state_input"][self.state_files_key], prev_override
+        )
+
+        # verify state_input is copied to state_output
+        self.assertTrue(self.state_files_key in c.overrides["state_output"])
+        self._verify_dict2(
+            c.overrides["state_output"][self.state_files_key], prev_override
+        )
+
+    def test_check_state_base_files_output_bad_item(self):
+        """Test check_state_base_files() - --state-output"""
+        os.environ["SNAP_FORCE_STATE_CHECK"] = "1"
+        lls = """Parallel unsquashfs: Using 4 processors
+8 inodes (8 blocks) to write
+
+drwxr-xr-x root/root               215 2020-03-23 14:23 squashfs-root
+drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
+-rwxr-xr-x root/root             43416 2020-03-23 14:23 squashfs-root/bin/cat
+"""
+        hdr, entries = unsquashfs_lls_parse(lls)
+        entries.append(("bad line ./squashfs-root/bad", None))
+        self.set_test_unsquashfs_lls(hdr, entries)
+
+        self.set_test_snap_yaml("type", "base")
+        overrides = {
+            "state_input": {"format": STATE_FORMAT_VERSION},
+            "state_output": {"format": STATE_FORMAT_VERSION},
+        }
+        c = SnapReviewFunctional(self.test_name, overrides=overrides)
+        c.check_state_base_files()
+        report = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "functional-snap-v2:state_base_files"
+        expected["info"][name] = {"text": "OK (no previous state)"}
+        self.check_results(report, expected=expected)
+
+        self.assertEqual(len(c.curr_state), 3)
+        self.assertTrue(self.state_files_key in c.overrides["state_output"])
+        self.assertEqual(len(c.overrides["state_output"][self.state_files_key]), 3)
+        for fname in [".", "./bin", "./bin/cat"]:
+            self.assertTrue(fname in c.curr_state)
+            self.assertTrue(fname in c.overrides["state_output"][self.state_files_key])
+
+    def test_check_state_base_files_input_output_same(self):
+        """Test check_state_base_files() - with --state-input/--state-output"""
+        os.environ["SNAP_FORCE_STATE_CHECK"] = "1"
+        exp_lls_state, exp_override, exp_override_state = self._set_default_state()
+
+        self.set_test_snap_yaml("type", "base")
+        overrides = {
+            "state_input": {
+                "format": STATE_FORMAT_VERSION,
+                self.state_files_key: exp_override,
+            },
+            "state_output": {"format": STATE_FORMAT_VERSION},
+        }
+        c = SnapReviewFunctional(self.test_name, overrides=overrides)
+        c.check_state_base_files()
+        report = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "functional-snap-v2:state_base_files"
+        expected["info"][name] = {"text": "OK"}
+        self.check_results(report, expected=expected)
+
+        # verify prev_state has expected state
+        self._verify_dict2(c.prev_state, exp_override_state)
+
+        # verify curr_state has expected state
+        self._verify_dict2(c.curr_state, exp_lls_state)
+
+        # verify state_input is present and same as state_output
+        self.assertTrue(self.state_files_key in c.overrides["state_input"])
+        self._verify_dict2(
+            c.overrides["state_input"][self.state_files_key], exp_override
+        )
+
+        # verify state_output is present with expected output
+        self.assertTrue(self.state_files_key in c.overrides["state_output"])
+        self._verify_dict2(
+            c.overrides["state_output"][self.state_files_key], exp_override
+        )
+
+    def test_check_state_base_files_input_output_missing(self):
+        """Test check_state_base_files() - --state-input/--state-output
+           (missing file)
+        """
+        os.environ["SNAP_FORCE_STATE_CHECK"] = "1"
+        exp_lls_state, exp_override, exp_override_state = self._set_default_state()
+
+        prev_override = copy.deepcopy(exp_override)
+        prev_override["./bin/ls"] = {
+            "filetype": "-",
+            "mode": "rwxr-xr-x",
+            "owner": "root/root",
+        }
+        self.set_test_snap_yaml("type", "base")
+        overrides = {
+            "state_input": {
+                "format": STATE_FORMAT_VERSION,
+                self.state_files_key: prev_override,
+            },
+            "state_output": {"format": STATE_FORMAT_VERSION},
+        }
+        c = SnapReviewFunctional(self.test_name, overrides=overrides)
+        c.check_state_base_files()
+        report = c.review_report
+        expected_counts = {"info": 0, "warn": 1, "error": 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "functional-snap-v2:state_base_files:missing"
+        expected["warn"][name] = {"text": "missing files since last review: ./bin/ls"}
+        self.check_results(report, expected=expected)
+
+    def test_check_state_base_files_input_output_different(self):
+        """Test check_state_base_files() - --state-input/--state-output
+           (different file)
+        """
+        os.environ["SNAP_FORCE_STATE_CHECK"] = "1"
+        exp_lls_state, exp_override, exp_override_state = self._set_default_state()
+
+        prev_override = copy.deepcopy(exp_override)
+        prev_override["./bin/cat"]["mode"] = "rwxrwxr-x"
+        self.set_test_snap_yaml("type", "base")
+        overrides = {
+            "state_input": {
+                "format": STATE_FORMAT_VERSION,
+                self.state_files_key: prev_override,
+            },
+            "state_output": {"format": STATE_FORMAT_VERSION},
+        }
+        c = SnapReviewFunctional(self.test_name, overrides=overrides)
+        c.check_state_base_files()
+        report = c.review_report
+        expected_counts = {"info": 0, "warn": 1, "error": 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "functional-snap-v2:state_base_files:metadata:different"
+        expected["warn"][name] = {
+            "text": "differing metadata since last review: ./bin/cat (current mode 'rwxrwxr-x' != 'rwxr-xr-x')"
+        }
+        self.check_results(report, expected=expected)
+
+    def test_check_state_base_files_input_output_metadata_missing(self):
+        """Test check_state_base_files() - --state-input/--state-output
+           (missing metadata)
+        """
+        os.environ["SNAP_FORCE_STATE_CHECK"] = "1"
+        exp_lls_state, exp_override, exp_override_state = self._set_default_state()
+
+        self.set_test_snap_yaml("type", "base")
+        overrides = {
+            "state_input": {
+                "format": STATE_FORMAT_VERSION,
+                self.state_files_key: exp_override,
+            },
+            "state_output": {"format": STATE_FORMAT_VERSION},
+        }
+        c = SnapReviewFunctional(self.test_name, overrides=overrides)
+
+        # modify one of the files
+        del c.curr_state["./bin/cat"][StatLLS.MODE]
+
+        c.check_state_base_files()
+        report = c.review_report
+        expected_counts = {"info": 0, "warn": 1, "error": 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "functional-snap-v2:state_base_files:metadata:missing"
+        expected["warn"][name] = {
+            "text": "missing metadata since last review: ./bin/cat (mode)"
+        }
+        self.check_results(report, expected=expected)
 
 
 class TestSnapReviewFunctionalNoMock(TestCase):

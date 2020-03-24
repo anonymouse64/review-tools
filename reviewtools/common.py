@@ -698,6 +698,7 @@ unsquashfs_lls_regex = {
 }
 
 
+# do not change the order
 class StatLLS(Enum):
     FILETYPE = 1  # file type
     MODE = 2  # expressed as ls output, eg, rwx-r-xr-x
@@ -715,7 +716,7 @@ class StatLLS(Enum):
 
 def unsquashfs_lls_parse_line(line):
     """Parse a line of unsquashfs -lls output"""
-    item = {}
+    item = {}  # XXX: make object to ease with comparisons, etc
 
     if "\x00" in line:
         raise ReviewException("entry may not contain NUL characters: %s" % line)

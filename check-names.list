@@ -15,6 +15,7 @@ declaration-snap-v2:valid_slots_bool|
 declaration-snap-v2:valid_slots_dict|
 functional-snap-v2:base_mountpoints|
 functional-snap-v2:execstack|https://forum.snapcraft.io/t/snap-and-executable-stacks/1812
+functional-snap-v2:state_base_files|
 lint-snap-v2:after_exists|
 lint-snap-v2:aliases_valid|https://forum.snapcraft.io/t/process-for-reviewing-aliases-auto-connections-and-track-requests/455
 lint-snap-v2:alias_valid|
