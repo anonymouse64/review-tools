@@ -1,14 +1,30 @@
 = Test --state-output
 Running: snap-review --state-output=./out
 ./tests/hello-world_25.snap: pass
+out:
+{
+  "format": 1
+}
 
 = Test --state-input/--state-output
 Running: snap-review --state-input=./in --state-output=./out
 ./tests/hello-world_25.snap: pass
+in:
+{
+  "format": 1
+}
+out:
+{
+  "format": 1
+}
 
 = Test --state-input only
 Running: snap-review --state-input=./in
 ERROR: Must specify --state-output with --state-input
+in:
+{
+  "format": 1
+}
 
 = Test --state-input=nonexistent/--state-output
 Running: snap-review --state-input=/nonexistent --state-output=./out
@@ -17,6 +33,10 @@ ERROR: file '/nonexistent' does not exist.
 = Test --state-input=<invalid>/--state-output
 Running: snap-review --state-input=./in --state-output=./out
 ERROR: state-input failed to verify: 'format' should be a positive JSON integer <= 1
+in:
+{
+  "format": 0
+}
 
 = Test --state-input=<eperm>/--state-output
 Running: snap-review --state-input=./in --state-output=./out
@@ -325,6 +345,10 @@ Running: snap-review --json --state-output=./out
     "warn": {}
   }
 }
+out:
+{
+  "format": 1
+}
 
 = Test --state-input/--state-output
 Running: snap-review --json --state-input=./in --state-output=./out
@@ -621,6 +645,14 @@ Running: snap-review --json --state-input=./in --state-output=./out
     "warn": {}
   }
 }
+in:
+{
+  "format": 1
+}
+out:
+{
+  "format": 1
+}
 
 = Test --state-input only
 Running: snap-review --json --state-input=./in
@@ -635,6 +667,10 @@ Running: snap-review --json --state-input=./in
     "info": {},
     "warn": {}
   }
+}
+in:
+{
+  "format": 1
 }
 
 = Test --state-input=nonexistent/--state-output
@@ -665,6 +701,10 @@ Running: snap-review --json --state-input=./in --state-output=./out
     "info": {},
     "warn": {}
   }
+}
+in:
+{
+  "format": 0
 }
 
 = Test --state-input=<eperm>/--state-output
@@ -1285,6 +1325,10 @@ Running: snap-review --sdk --state-output=./out
   },
   "warn": {}
 }
+out:
+{
+  "format": 1
+}
 
 = Test --state-input/--state-output
 Running: snap-review --sdk --state-input=./in --state-output=./out
@@ -1583,6 +1627,14 @@ Running: snap-review --sdk --state-input=./in --state-output=./out
   },
   "warn": {}
 }
+in:
+{
+  "format": 1
+}
+out:
+{
+  "format": 1
+}
 
 = Test --state-input only
 Running: snap-review --sdk --state-input=./in
@@ -1597,6 +1649,10 @@ Running: snap-review --sdk --state-input=./in
     "info": {},
     "warn": {}
   }
+}
+in:
+{
+  "format": 1
 }
 
 = Test --state-input=nonexistent/--state-output
@@ -1627,6 +1683,10 @@ Running: snap-review --sdk --state-input=./in --state-output=./out
     "info": {},
     "warn": {}
   }
+}
+in:
+{
+  "format": 0
 }
 
 = Test --state-input=<eperm>/--state-output
