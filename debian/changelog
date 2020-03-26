@@ -2,6 +2,7 @@ review-tools (0.48+YYYMMDD-1) UNRELEASED; urgency=medium
 
   * sr_security.py: regulate device files in os and base snaps
   * refactor unsquashfs -lls and its parsing to common.py and sr_common.py
+  * sr_functional.py: use state files for preliminary base file checks
 
  -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 17 Mar 2020 16:51:37 -0500
 
