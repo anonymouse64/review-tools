@@ -35,7 +35,8 @@ class TestSnapReviewFunctional(sr_tests.TestSnapReview):
     def setUp(self):
         super().setUp()
         self.set_test_pkgfmt("snap", "16.04")
-        self.state_files_key = "functional-snap-v2:state_files"
+        # ["all"] is the default in sr_tests.py
+        self.state_files_key = "functional-snap-v2:state_files:all"
 
     def tearDown(self):
         super().setUp()

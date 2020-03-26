@@ -93,11 +93,11 @@ for args in "" "--json" "--sdk" ; do
     run test-state-base_1_amd64.snap $args --state-input="./base.last" --state-output="./base.current"
 
     # but a new run with different input will cause error
-    jq 'setpath(["functional-snap-v2:state_files","./bin/cp","filetype"]; "-")' "./base.current" > "./base.tmp"
+    jq 'setpath(["functional-snap-v2:state_files:amd64","./bin/cp","filetype"]; "-")' "./base.current" > "./base.tmp"
     mv "./base.tmp" "./base.missing-cp"
-    jq 'setpath(["functional-snap-v2:state_files","./bin/cp","mode"]; "rwxr-xr-x")' "./base.missing-cp" > "./base.tmp"
+    jq 'setpath(["functional-snap-v2:state_files:amd64","./bin/cp","mode"]; "rwxr-xr-x")' "./base.missing-cp" > "./base.tmp"
     mv "./base.tmp" "./base.missing-cp"
-    jq 'setpath(["functional-snap-v2:state_files","./bin/cp","owner"]; "root/root")' "./base.missing-cp" > "./base.tmp"
+    jq 'setpath(["functional-snap-v2:state_files:amd64","./bin/cp","owner"]; "root/root")' "./base.missing-cp" > "./base.tmp"
     mv "./base.tmp" "./base.missing-cp"
     comment "= Test --state-input=base.missing-cp --state-output=base.current test-state-base_1_amd64.snap"
     run test-state-base_1_amd64.snap $args --state-input="./base.missing-cp" --state-output="./base.current"

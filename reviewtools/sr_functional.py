@@ -53,7 +53,9 @@ class SnapReviewFunctional(SnapReview):
         ):
             # if the name of this changes, then this field in the last state
             # input file won't match and all previous state will be ignored
-            self.state_key = self._get_check_name("state_files")
+            self.state_key = self._get_check_name(
+                "state_files", extra=",".join(sorted(self.pkg_arch))
+            )
 
             # read in current state
             self.curr_state = {}
