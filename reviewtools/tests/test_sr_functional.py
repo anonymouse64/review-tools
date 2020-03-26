@@ -847,6 +847,54 @@ drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
         }
         self.check_results(report, expected=expected)
 
+    def test_check_state_base_files_input_output_same_core(self):
+        """Test check_state_base_files() - with --state-input/--state-output
+           for core snap
+        """
+        os.environ["SNAP_FORCE_STATE_CHECK"] = "1"
+        exp_lls_state, exp_override, exp_override_state = self._set_default_state()
+
+        self.set_test_snap_yaml("type", "os")
+        self.set_test_snap_yaml("name", "core")
+        overrides = {
+            "state_input": {
+                "format": STATE_FORMAT_VERSION,
+                self.state_files_key: exp_override,
+            },
+            "state_output": {"format": STATE_FORMAT_VERSION},
+        }
+        c = SnapReviewFunctional(self.test_name, overrides=overrides)
+        c.check_state_base_files()
+        report = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "functional-snap-v2:state_base_files"
+        expected["info"][name] = {"text": "OK"}
+        self.check_results(report, expected=expected)
+
+        # verify prev_state has expected state
+        self._verify_dict2(c.prev_state, exp_override_state)
+
+        # verify curr_state has expected state
+        self._verify_dict2(c.curr_state, exp_lls_state)
+
+        # verify state_input is present and same as state_output
+        self.assertTrue(self.state_files_key in c.overrides["state_input"])
+        self._verify_dict2(
+            c.overrides["state_input"][self.state_files_key], exp_override
+        )
+
+        # verify state_output is present with expected output
+        self.assertTrue(self.state_files_key in c.overrides["state_output"])
+        self._verify_dict2(
+            c.overrides["state_output"][self.state_files_key], exp_override
+        )
+
 
 class TestSnapReviewFunctionalNoMock(TestCase):
     """Tests without mocks where they are not needed."""

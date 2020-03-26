@@ -40,7 +40,8 @@ class SnapReviewFunctional(SnapReview):
         self.curr_state = None
         self.prev_state = None
         if (
-            self.snap_yaml["type"] == "base"
+            # also see check_state_base_files()
+            (self.snap_yaml["type"] == "base" or (self.snap_yaml["type"] in ["core", "os"] and self.snap_yaml["name"] == "core"))
             and self.unsquashfs_lls_entries is not None
             and "state_output" in self.overrides
         ):
@@ -222,8 +223,14 @@ class SnapReviewFunctional(SnapReview):
 
     def check_state_base_files(self):
         """Verify base snap has the expected files"""
+        # Don't check state if not a base snap or the "core" os snap (which
+        # historically functions as a base). Also no need to to check if
+        # --state-input/--state-ouput not specified (note, self.prev_state is
+        # empty (ie, not None) when only --state-output is specified)
         if (
-            self.snap_yaml["type"] != "base"
+            # also see __init__()
+            "type" not in self.snap_yaml
+            or (self.snap_yaml["type"] != "base" and (self.snap_yaml["type"] not in ["core", "os"] and self.snap_yaml["name"] != "core"))
             or self.prev_state is None
             or self.curr_state is None
         ):
