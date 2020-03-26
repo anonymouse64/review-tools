@@ -212,6 +212,7 @@ class TestSnapReview(TestCase):
         for p in patches:
             p.start()
             self.addCleanup(p.stop)
+        self.old_umask = os.umask(0o022)
 
     def tearDown(self):
         """Make sure we reset everything to known good values"""
@@ -231,3 +232,4 @@ class TestSnapReview(TestCase):
         TEST_UNSQUASHFS_LLS_ENTRIES = ("", None)
 
         self._reset_test_data()
+        os.umask(self.old_umask)
