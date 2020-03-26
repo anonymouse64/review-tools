@@ -851,7 +851,6 @@ drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
         """Test check_state_base_files() - with --state-input/--state-output
            for core snap
         """
-        os.environ["SNAP_FORCE_STATE_CHECK"] = "1"
         exp_lls_state, exp_override, exp_override_state = self._set_default_state()
 
         self.set_test_snap_yaml("type", "os")

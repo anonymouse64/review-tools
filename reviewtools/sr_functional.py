@@ -41,7 +41,13 @@ class SnapReviewFunctional(SnapReview):
         self.prev_state = None
         if (
             # also see check_state_base_files()
-            (self.snap_yaml["type"] == "base" or (self.snap_yaml["type"] in ["core", "os"] and self.snap_yaml["name"] == "core"))
+            (
+                self.snap_yaml["type"] == "base"
+                or (
+                    self.snap_yaml["type"] in ["core", "os"]
+                    and self.snap_yaml["name"] == "core"
+                )
+            )
             and self.unsquashfs_lls_entries is not None
             and "state_output" in self.overrides
         ):
@@ -230,7 +236,13 @@ class SnapReviewFunctional(SnapReview):
         if (
             # also see __init__()
             "type" not in self.snap_yaml
-            or (self.snap_yaml["type"] != "base" and (self.snap_yaml["type"] not in ["core", "os"] and self.snap_yaml["name"] != "core"))
+            or (
+                self.snap_yaml["type"] != "base"
+                and (
+                    self.snap_yaml["type"] not in ["core", "os"]
+                    and self.snap_yaml["name"] != "core"
+                )
+            )
             or self.prev_state is None
             or self.curr_state is None
         ):
@@ -241,8 +253,12 @@ class SnapReviewFunctional(SnapReview):
         s = "OK"
 
         # Skip checking base snaps that we haven't yet allowed in the store. In
-        # this manner, they can keep changing as needed.
-        if self.snap_yaml["name"] not in redflagged_snap_types_overrides["base"]:
+        # this manner, they can keep changing as needed. Allow the historic
+        # core os snap.
+        if (
+            self.snap_yaml["name"] not in redflagged_snap_types_overrides["base"]
+            and self.snap_yaml["name"] != "core"
+        ):
             if (
                 "SNAP_FORCE_STATE_CHECK" not in os.environ
                 or os.environ["SNAP_FORCE_STATE_CHECK"] != "1"
