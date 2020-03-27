@@ -482,7 +482,7 @@ class SnapReviewFunctional(SnapReview):
         if len(missing) > 0:
             t = "warn"
             n = self._get_check_name("state_base_files", app="missing")
-            s = "missing files since last review: %s" % " ,".join(sorted(missing))
+            s = "missing files since last review: %s" % ", ".join(sorted(missing))
             self._add_result(t, n, s)
 
         if len(missing_keys) > 0:
@@ -513,7 +513,7 @@ class SnapReviewFunctional(SnapReview):
             tmp = []
             for fn in missing_symbols:
                 tmp.append("%s (%s)" % (fn, ", ".join(sorted(missing_symbols[fn]))))
-            s = "missing symbols since last review: %s" % " ,".join(sorted(tmp))
+            s = "missing symbols since last review: %s" % ", ".join(sorted(tmp))
             self._add_result(t, n, s)
 
         if len(different_symbols) > 0:
