@@ -809,7 +809,7 @@ drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
         expected["info"] = dict()
         name = "functional-snap-v2:state_base_files:metadata:different"
         expected["warn"][name] = {
-            "text": "differing metadata since last review: ./bin/cat (current mode 'rwxrwxr-x' != 'rwxr-xr-x')"
+            "text": "differing metadata since last review: ./bin/cat (current mode 'rwxr-xr-x' != 'rwxrwxr-x')"
         }
         self.check_results(report, expected=expected)
 

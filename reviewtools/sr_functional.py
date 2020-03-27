@@ -311,7 +311,7 @@ class SnapReviewFunctional(SnapReview):
                         different_keys[fname] = []
                     different_keys[fname].append(
                         "current %s '%s' != '%s'"
-                        % (kname, self.prev_state[fname][k], self.curr_state[fname][k])
+                        % (kname, self.curr_state[fname][k], self.prev_state[fname][k])
                     )
 
         if len(missing) == 0 and len(missing_keys) == 0 and len(different_keys) == 0:
