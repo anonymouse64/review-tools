@@ -1,6 +1,6 @@
 """sr_functional.py: snap functional"""
 #
-# Copyright (C) 2017-2019 Canonical Ltd.
+# Copyright (C) 2017-2020 Canonical Ltd.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 
 from __future__ import print_function
 from reviewtools.sr_common import SnapReview
-from reviewtools.common import cmd, StatLLS
+from reviewtools.common import StatLLS, cmd
 from reviewtools.overrides import (
     func_execstack_overrides,
     func_execstack_skipped_pats,
@@ -62,6 +62,12 @@ class SnapReviewFunctional(SnapReview):
             for (line, item) in self.unsquashfs_lls_entries:
                 if item is None:
                     continue
+
+                if ".so" in os.path.basename(item[StatLLS.FILENAME]):
+                    symbols = self._find_symbols(item[StatLLS.FILENAME])
+                    if symbols is not None:
+                        item["symbols"] = symbols
+
                 self.curr_state[item[StatLLS.FILENAME]] = item
 
             # update state_output with our current state
@@ -76,6 +82,76 @@ class SnapReviewFunctional(SnapReview):
                     self.overrides["state_input"][self.state_key]
                 )
 
+    def _cmd_nm(self, args):  # pragma: nocover
+        """_cmd_nm indirection for unittests"""
+        real_path = os.path.join(self.unpack_dir, args[-1])
+        if real_path not in self.pkg_bin_files:
+            return -1, ""
+        args[-1] = real_path
+
+        return cmd(["nm"] + args)
+
+    def _find_symbols(self, fn):
+        """Find the ABI for the list of files"""
+        if not fn.startswith("./"):
+            return None
+
+        symbols = {}
+        nm_args = [
+            "--format=bsd",
+            "--dynamic",
+            "--demangle",
+            "--defined-only",
+            "--with-symbol-versions",
+            fn[2:],
+        ]
+        # --format=bsd: explicitly use the bsd format
+        # --dynamic: only care about shared libraries
+        # --demangle: demangle symbols
+        # --defined-only: only show defined symbols
+        # --with-symbol-versions: also show the symbols version
+        #
+        # Format:
+        # 000000000000089a T gtk_show_uri@@Base
+        # |                | |           |
+        # |                | |            -> symbol version
+        # |                |  -------------> symbol name
+        # |                 ---------------> symbol type
+        #  --------------------------------> address
+        #
+        # see 'man nm'
+        rc, report = self._cmd_nm(nm_args)
+        if rc != 0:
+            return None
+
+        for line in report.splitlines():
+            tmp = line.split(maxsplit=2)
+            if len(tmp) < 3:
+                continue
+            symbol_type = tmp[1]
+            symbol = tmp[2]
+            symbol_version = ""
+            idx = tmp[2].find("@")
+            if idx > 1:
+                symbol = tmp[2][:idx]
+                symbol_version = tmp[2][idx:]
+
+            # quick check if global symbols (uppercase and special global 'u',
+            # 'v', 'w' (note, --defined-only should remove u, v and w))
+            if symbol_type.isupper() or symbol_type in ["u", "v", "w"]:
+                # skipped symbols:
+                # * N - debugging
+                # * U - undefined (note, --defined-only should handle this)
+                if symbol_type not in ["N", "U"]:
+                    if symbol not in symbols:
+                        symbols[symbol] = {
+                            "type": symbol_type,
+                            "version": symbol_version,
+                        }
+                # ???: filter out @@GLIBC_PRIVATE?
+
+        return symbols
+
     def _serialize(self, state):
         """Serialize a review-tools state"""
 
@@ -89,6 +165,11 @@ class SnapReviewFunctional(SnapReview):
                 if required not in item:
                     return {}
 
+            # validate dict is well-formed
+            for k in item:
+                if k != "symbols" and not isinstance(item[k], str):
+                    return {}
+
             d = {}
             fname = item[StatLLS.FILENAME]
 
@@ -100,6 +181,23 @@ class SnapReviewFunctional(SnapReview):
                 d[fname]["major"] = item[StatLLS.MAJOR]
             if StatLLS.MINOR in item and item[StatLLS.MINOR] is not None:
                 d[fname]["minor"] = item[StatLLS.MINOR]
+
+            # read in well-formed symbols
+            if "symbols" in item and isinstance(item["symbols"], dict):
+                for symbol in item["symbols"]:
+                    if isinstance(item["symbols"][symbol], dict):
+                        malformed = False
+                        for k in ["type", "version"]:
+                            if k not in item["symbols"][symbol] or not isinstance(
+                                item["symbols"][symbol][k], str
+                            ):
+                                malformed = True
+                        if not malformed:
+                            if "symbols" not in d[fname]:
+                                d[fname]["symbols"] = {}
+                            d[fname]["symbols"][symbol] = copy.deepcopy(
+                                item["symbols"][symbol]
+                            )
 
             return d
 
@@ -119,6 +217,11 @@ class SnapReviewFunctional(SnapReview):
                 if required not in d[fname]:
                     return None
 
+            # validate dict is well-formed
+            for k in d[fname]:
+                if k != "symbols" and not isinstance(d[fname][k], str):
+                    return None
+
             item = {}
             item[StatLLS.FILENAME] = fname
             item[StatLLS.FILETYPE] = d[fname]["filetype"]
@@ -128,6 +231,23 @@ class SnapReviewFunctional(SnapReview):
                 item[StatLLS.MAJOR] = d[fname]["major"]
             if "minor" in d[fname]:
                 item[StatLLS.MINOR] = d[fname]["minor"]
+
+            # read in well-formed symbols
+            if "symbols" in d[fname] and isinstance(d[fname]["symbols"], dict):
+                for symbol in d[fname]["symbols"]:
+                    if isinstance(d[fname]["symbols"][symbol], dict):
+                        malformed = False
+                        for k in ["type", "version"]:
+                            if k not in d[fname]["symbols"][symbol] or not isinstance(
+                                d[fname]["symbols"][symbol][k], str
+                            ):
+                                malformed = True
+                        if not malformed:
+                            if "symbols" not in item:
+                                item["symbols"] = {}
+                            item["symbols"][symbol] = copy.deepcopy(
+                                d[fname]["symbols"][symbol]
+                            )
 
             return item
 
@@ -292,6 +412,9 @@ class SnapReviewFunctional(SnapReview):
         missing_keys = {}
         different_keys = {}
 
+        missing_symbols = {}
+        different_symbols = {}
+
         # iterate through files in prev_state since this naturally ignores
         # newly added files
         for fname in self.prev_state:
@@ -301,11 +424,43 @@ class SnapReviewFunctional(SnapReview):
             # likewise, iterate through metadata keys in prev_state since this
             # allows us to freely add new metadata as our checks evolve
             for k in self.prev_state[fname]:
-                kname = str(k).split(".")[1].lower()
+                if k == "symbols":
+                    kname = k
+                else:
+                    kname = str(k).split(".")[1].lower()
+
                 if k not in self.curr_state[fname]:
                     if fname not in missing_keys:
                         missing_keys[fname] = []
                     missing_keys[fname].append(kname)
+                elif k == "symbols":
+                    for symbol in self.prev_state[fname][k]:
+                        symbol_str = "%s%s" % (
+                            symbol,
+                            self.prev_state[fname][k][symbol]["version"],
+                        )
+                        if symbol not in self.curr_state[fname][k]:
+                            if fname not in missing_symbols:
+                                missing_symbols[fname] = []
+                            missing_symbols[fname].append(symbol_str)
+                        else:
+                            prev_symtype = "%s%s %s" % (
+                                symbol,
+                                self.prev_state[fname][k][symbol]["version"],
+                                self.prev_state[fname][k][symbol]["type"],
+                            )
+                            curr_symtype = "%s%s %s" % (
+                                symbol,
+                                self.curr_state[fname][k][symbol]["version"],
+                                self.curr_state[fname][k][symbol]["type"],
+                            )
+                            if prev_symtype != curr_symtype:
+                                if fname not in different_symbols:
+                                    different_symbols[fname] = []
+                                different_symbols[fname].append(
+                                    "current '%s' != '%s'"
+                                    % (curr_symtype, prev_symtype)
+                                )
                 elif self.prev_state[fname][k] != self.curr_state[fname][k]:
                     if fname not in different_keys:
                         different_keys[fname] = []
@@ -314,7 +469,13 @@ class SnapReviewFunctional(SnapReview):
                         % (kname, self.curr_state[fname][k], self.prev_state[fname][k])
                     )
 
-        if len(missing) == 0 and len(missing_keys) == 0 and len(different_keys) == 0:
+        if (
+            len(missing) == 0
+            and len(missing_keys) == 0
+            and len(different_keys) == 0
+            and len(missing_symbols) == 0
+            and len(different_symbols) == 0
+        ):
             self._add_result(t, n, s)
             return
 
@@ -331,7 +492,7 @@ class SnapReviewFunctional(SnapReview):
             )
             tmp = []
             for fn in missing_keys:
-                tmp.append("%s (%s)" % (fn, ", ".join(missing_keys[fn])))
+                tmp.append("%s (%s)" % (fn, ", ".join(sorted(missing_keys[fn]))))
             s = "missing metadata since last review: %s" % ", ".join(sorted(tmp))
             self._add_result(t, n, s)
 
@@ -342,6 +503,26 @@ class SnapReviewFunctional(SnapReview):
             )
             tmp = []
             for fn in different_keys:
-                tmp.append("%s (%s)" % (fn, ", ".join(different_keys[fn])))
+                tmp.append("%s (%s)" % (fn, ", ".join(sorted(different_keys[fn]))))
             s = "differing metadata since last review: %s" % ", ".join(sorted(tmp))
+            self._add_result(t, n, s)
+
+        if len(missing_symbols) > 0:
+            t = "warn"
+            n = self._get_check_name("state_base_files", app="symbols", extra="missing")
+            tmp = []
+            for fn in missing_symbols:
+                tmp.append("%s (%s)" % (fn, ", ".join(sorted(missing_symbols[fn]))))
+            s = "missing symbols since last review: %s" % " ,".join(sorted(tmp))
+            self._add_result(t, n, s)
+
+        if len(different_symbols) > 0:
+            t = "warn"
+            n = self._get_check_name(
+                "state_base_files", app="symbols", extra="different"
+            )
+            tmp = []
+            for fn in different_symbols:
+                tmp.append("%s (%s)" % (fn, ", ".join(sorted(different_symbols[fn]))))
+            s = "differing symbols since last review: %s" % ", ".join(sorted(tmp))
             self._add_result(t, n, s)

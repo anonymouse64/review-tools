@@ -31,6 +31,7 @@ TEST_PKGFMT_VERSION = "16.04"
 TEST_UNPACK_DIR = "/fake"
 TEST_UNSQUASHFS_LLS_HDR = ""
 TEST_UNSQUASHFS_LLS_ENTRIES = ("", None)
+TEST_CMD_NM = (0, "")
 
 
 #
@@ -69,6 +70,11 @@ def __get_unpack_dir(self):
 def _unsquashfs_lls(self, fn):
     """Pretend we ran unsquashfs -lls fn"""
     return (TEST_UNSQUASHFS_LLS_HDR, TEST_UNSQUASHFS_LLS_ENTRIES)
+
+
+def _cmd_nm(self, args):
+    """Pretend ran nm ..."""
+    return TEST_CMD_NM
 
 
 def create_patches():
@@ -110,6 +116,11 @@ def create_patches():
     patches.append(patch("reviewtools.sr_common.SnapReview._pkgfmt_type", _pkgfmt_type))
     patches.append(
         patch("reviewtools.sr_common.SnapReview._unsquashfs_lls", _unsquashfs_lls)
+    )
+
+    # sr_functional
+    patches.append(
+        patch("reviewtools.sr_functional.SnapReviewFunctional._cmd_nm", _cmd_nm)
     )
 
     return patches
@@ -206,6 +217,10 @@ class TestSnapReview(TestCase):
         TEST_UNSQUASHFS_LLS_HDR = hdr
         TEST_UNSQUASHFS_LLS_ENTRIES = copy.copy(entries)
 
+    def set_test_cmd_nm(self, rc, s):
+        global TEST_CMD_NM
+        TEST_CMD_NM = (rc, s)
+
     def setUp(self):
         """Make sure our patches are applied everywhere"""
         patches = create_patches()
@@ -230,6 +245,8 @@ class TestSnapReview(TestCase):
         TEST_UNSQUASHFS_LLS_HDR = ""
         global TEST_UNSQUASHFS_LLS_ENTRIES
         TEST_UNSQUASHFS_LLS_ENTRIES = ("", None)
+        global TEST_CMD_NM
+        TEST_CMD_NM = (0, "")
 
         self._reset_test_data()
         os.umask(self.old_umask)

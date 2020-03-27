@@ -1,0 +1,131 @@
+#!/usr/bin/python3
+
+import magic
+import os
+import subprocess
+import sys
+
+
+#
+# Helpers (modified) from reviewtools.common
+#
+def cmd(command):
+    """Try to execute the given command."""
+    try:
+        sp = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    except OSError as ex:
+        return [127, str(ex)]
+
+    if sys.version_info[0] >= 3:
+        out = sp.communicate()[0].decode("ascii", "ignore")
+    else:
+        out = sp.communicate()[0]
+
+    return [sp.returncode, out]
+
+
+def error(out, exit_code=1):
+    """Print error message and exit"""
+    try:
+        print("ERROR: %s" % (out), file=sys.stderr)
+    except IOError:
+        pass
+    sys.exit(exit_code)
+
+
+#
+# End helpers
+#
+
+
+# XXX: use _find_symbols()
+def _get_symbols(filename):
+    """Gets the symbols of the file specified"""
+    symbols = {}
+    nm_args = [
+        "--format=bsd",
+        "--dynamic",
+        "--demangle",
+        "--defined-only",
+        "--with-symbol-versions",
+        filename,
+    ]
+    # --format=bsd: explicitly use the bsd format
+    # --dynamic: only care about shared libraries
+    # --demangle: demangle symbols
+    # --defined-only: only show defined symbols
+    # --with-symbol-versions: also show the symbols version
+    #
+    # Format:
+    # 000000000000089a T gtk_show_uri@@Base
+    # |                | |           |
+    # |                | |            -> symbol version
+    # |                |  -------------> symbol name
+    # |                 ---------------> symbol type
+    #  --------------------------------> address
+    #
+    # see 'man nm'
+    rc, report = cmd(["nm"] + nm_args)
+    if rc != 0:
+        error("nm failed: %s" % report)
+
+    for line in report.splitlines():
+        tmp = line.split(maxsplit=2)
+        if len(tmp) < 3:
+            continue
+        symbol_type = tmp[1]
+        symbol = tmp[2]
+        symbol_version = ""
+        idx = tmp[2].find("@")
+        if idx > 1:
+            symbol = tmp[2][:idx]
+            symbol_version = tmp[2][idx:]
+
+        # quick check if global symbols (uppercase and special global 'u',
+        # 'v', 'w' (note, --defined-only should remove u, v and w))
+        if symbol_type.isupper() or symbol_type in ["u", "v", "w"]:
+            # skipped symbols:
+            # * N - debugging
+            # * U - undefined (note, --defined-only should handle this)
+            if symbol_type not in ["N", "U"]:
+                if symbol not in symbols:
+                    symbols[symbol] = {"type": symbol_type, "version": symbol_version}
+            # ???: filter out @@GLIBC_PRIVATE?
+
+    return symbols
+
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: symbol-helper <lib1> <lib2> ...")
+        sys.exit(1)
+
+    mime = magic.open(magic.MAGIC_MIME)
+    mime.load()
+
+    symbols = {}
+    for fn in sys.argv[1:]:
+        if not os.path.exists(fn) or ".so" not in os.path.basename(fn):
+            print("%s: does not exist or not .so file" % fn)
+            continue
+
+        try:
+            res = mime.file(fn)
+        except Exception:
+            print("%s: could not determine mimetype" % fn)
+            continue
+
+        if "x-sharedlib" not in res:
+            print("%s: not x-sharedlib (%s)" % (fn, res))
+            continue
+
+        if fn not in symbols:
+            symbols[fn] = _get_symbols(fn)
+
+    for fn in sorted(symbols):
+        print("%s:" % fn)
+        for symbol in symbols[fn]:
+            print(
+                " %s%s %s"
+                % (symbol, symbols[fn][symbol]["version"], symbols[fn][symbol]["type"])
+            )

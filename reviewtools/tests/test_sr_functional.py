@@ -1,6 +1,6 @@
 """test_sr_functional.py: tests for the sr_functional module"""
 #
-# Copyright (C) 2017 Canonical Ltd.
+# Copyright (C) 2017-2020 Canonical Ltd.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -53,13 +53,15 @@ class TestSnapReviewFunctional(sr_tests.TestSnapReview):
         self.set_test_unsquashfs_lls(hdr, entries)
 
     def _set_default_state(self):
+        self.set_test_unpack_dir = "/nonexistent"
         lls = """drwxr-xr-x root/root               215 2020-03-23 14:23 squashfs-root
 drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
 -rwxr-xr-x root/root             43416 2020-03-23 14:23 squashfs-root/bin/cat
+-rw-r--r-- root/root            584392 2020-03-23 14:23 squashfs-root/lib/some.so
 """
         self._set_unsquashfs_lls(lls)
 
-        exp_lls_state = {
+        exp_state = {
             ".": {
                 StatLLS.FILENAME: ".",
                 StatLLS.FULLNAME: "squashfs-root",
@@ -96,9 +98,25 @@ drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
                 StatLLS.DATE: "2020-03-23",
                 StatLLS.TIME: "14:23",
             },
+            "./lib/some.so": {
+                StatLLS.FILENAME: "./lib/some.so",
+                StatLLS.FULLNAME: "squashfs-root/lib/some.so",
+                StatLLS.FILETYPE: "-",
+                StatLLS.MODE: "rw-r--r--",
+                StatLLS.OWNER: "root/root",
+                StatLLS.USER: "root",
+                StatLLS.GROUP: "root",
+                StatLLS.SIZE: "584392",
+                StatLLS.DATE: "2020-03-23",
+                StatLLS.TIME: "14:23",
+                "symbols": {
+                    "foo": {"type": "T", "version": "@@Base"},
+                    "bar": {"type": "T", "version": "@@Base"},
+                },
+            },
         }
 
-        exp_override_state = copy.deepcopy(exp_lls_state)
+        exp_override_state = copy.deepcopy(exp_state)
         # these fields aren't stored in state files
         for fname in exp_override_state:
             for k in [
@@ -115,9 +133,23 @@ drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
             ".": {"filetype": "d", "mode": "rwxr-xr-x", "owner": "root/root"},
             "./bin": {"filetype": "d", "mode": "rwxr-xr-x", "owner": "root/root"},
             "./bin/cat": {"filetype": "-", "mode": "rwxr-xr-x", "owner": "root/root"},
+            "./lib/some.so": {
+                "filetype": "-",
+                "mode": "rw-r--r--",
+                "owner": "root/root",
+                "symbols": {
+                    "foo": {"type": "T", "version": "@@Base"},
+                    "bar": {"type": "T", "version": "@@Base"},
+                },
+            },
         }
+        self.set_test_cmd_nm(
+            0,
+            """000000000000089a T foo@@Base
+0000000000000708 T bar@@Base""",
+        )
 
-        return exp_lls_state, exp_override, exp_override_state
+        return exp_state, exp_override, exp_override_state
 
     def test_all_checks_as_v2(self):
         """Test snap v2 has checks"""
@@ -128,6 +160,111 @@ drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
         for i in c.review_report:
             sum += len(c.review_report[i])
         self.assertTrue(sum != 0)
+
+    def test_find_symbols_good(self):
+        """Test _find_symbols()"""
+        self.set_test_cmd_nm(
+            0,
+            """00000000000559f0 T a64l@@GLIBC_2.2.5
+00000000001ed920 B __abort_msg@@GLIBC_PRIVATE
+00000000001eeb20 V __after_morecore_hook@@GLIBC_2.2.5
+0000000000049830 W clearenv@@GLIBC_2.2.5
+00000000001eb700 D __ctype32_b@GLIBC_2.2.5
+00000000001ed920 B foo@@Base
+0000000000000000 A CXXABI_1.3@@CXXABI_1.3
+00000000000a8e90 T operator delete[](void*)@@GLIBCXX_3.4
+00000000000a9b70 T __gxx_personality_v0@@CXXABI_1.3
+00000000000d15f0 T transaction clone for std::logic_error::~logic_error()@@GLIBCXX_3.4.22
+""",
+        )
+
+        c = SnapReviewFunctional(self.test_name)
+        res = c._find_symbols("./foo.so")
+        self.assertEqual(len(res), 10)
+        for symbol, symbol_type, symbol_version in [
+            ("a64l", "T", "@@GLIBC_2.2.5"),
+            ("__abort_msg", "B", "@@GLIBC_PRIVATE"),
+            ("__after_morecore_hook", "V", "@@GLIBC_2.2.5"),
+            ("clearenv", "W", "@@GLIBC_2.2.5"),
+            ("__ctype32_b", "D", "@GLIBC_2.2.5"),
+            ("foo", "B", "@@Base"),
+            ("CXXABI_1.3", "A", "@@CXXABI_1.3"),
+            ("operator delete[](void*)", "T", "@@GLIBCXX_3.4"),
+            ("__gxx_personality_v0", "T", "@@CXXABI_1.3"),
+            (
+                "transaction clone for std::logic_error::~logic_error()",
+                "T",
+                "@@GLIBCXX_3.4.22",
+            ),
+        ]:
+            self.assertTrue(symbol in res)
+            self.assertEqual(symbol_type, res[symbol]["type"])
+            self.assertEqual(symbol_version, res[symbol]["version"])
+
+    def test_find_symbols_skipped(self):
+        """Test _find_symbols() - debug"""
+        self.set_test_cmd_nm(
+            0,
+            """00000000001eb700 N foo@@Base
+00000000001eb700 U bar@@Base
+""",
+        )
+        c = SnapReviewFunctional(self.test_name)
+        res = c._find_symbols("./foo.so")
+        # debug symbols should be skipped
+        self.assertEqual(len(res), 0)
+
+    def test_find_symbols_cpp_demangled(self):
+        """Test _find_symbols() - c++ demangled"""
+        self.set_test_cmd_nm(
+            0,
+            """00000000000d15f0 T transaction clone for std::logic_error::~logic_error()@@GLIBCXX_3.4.22
+00000000000d15d0 T transaction clone for std::logic_error::~logic_error()@@GLIBCXX_3.4.22
+00000000000d15d0 T transaction clone for std::logic_error::~logic_error()@@GLIBCXX_3.4.22
+00000000000aae00 T __cxxabiv1::__pbase_type_info::~__pbase_type_info()@@CXXABI_1.3
+00000000000aade0 T __cxxabiv1::__pbase_type_info::~__pbase_type_info()@@CXXABI_1.3
+00000000000aade0 T __cxxabiv1::__pbase_type_info::~__pbase_type_info()@@CXXABI_1.3
+""",
+        )
+        c = SnapReviewFunctional(self.test_name)
+        res = c._find_symbols("./foo.so")
+        self.assertEqual(len(res), 2)
+        for symbol, symbol_type, symbol_version in [
+            (
+                "transaction clone for std::logic_error::~logic_error()",
+                "T",
+                "@@GLIBCXX_3.4.22",
+            ),
+            (
+                "__cxxabiv1::__pbase_type_info::~__pbase_type_info()",
+                "T",
+                "@@CXXABI_1.3",
+            ),
+        ]:
+            self.assertTrue(symbol in res)
+            self.assertEqual(symbol_type, res[symbol]["type"])
+            self.assertEqual(symbol_version, res[symbol]["version"])
+
+    def test_find_symbols_bad_rc(self):
+        """Test _find_symbols() - bad rc"""
+        self.set_test_cmd_nm(-1, "error")
+        c = SnapReviewFunctional(self.test_name)
+        res = c._find_symbols("./foo.so")
+        self.assertTrue(res is None)
+
+    def test_find_symbols_bad_file(self):
+        """Test _find_symbols() - bad file"""
+        c = SnapReviewFunctional(self.test_name)
+        res = c._find_symbols("blah")
+        print(res)
+        self.assertTrue(res is None)
+
+    def test_find_symbols_bad_result(self):
+        """Test _find_symbols() - bad result"""
+        self.set_test_cmd_nm(0, "000000000000089a T")
+        c = SnapReviewFunctional(self.test_name)
+        res = c._find_symbols("./foo.so")
+        self.assertEqual(len(res), 0)
 
     def test__serialize(self):
         """Test _serialize()"""
@@ -148,6 +285,11 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
         state = {}
         for (line, item) in entries:
             state[item[StatLLS.FILENAME]] = item
+            if "libc-2.31.so" in line:
+                state[item[StatLLS.FILENAME]]["symbols"] = {
+                    "GLIBC_2.10": {"type": "A", "version": "@@GLIBC_2.10"},
+                    "GLIBC_2.11": {"type": "A", "version": "@@GLIBC_2.10"},
+                }
 
         c = SnapReviewFunctional(self.test_name)
         serial = c._serialize(state)
@@ -164,7 +306,15 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
             ),
             (
                 "./lib/x86_64-linux-gnu/libc-2.31.so",
-                {"filetype": "-", "mode": "rwxr-xr-x", "owner": "root/root"},
+                {
+                    "filetype": "-",
+                    "mode": "rwxr-xr-x",
+                    "owner": "root/root",
+                    "symbols": {
+                        "GLIBC_2.10": {"type": "A", "version": "@@GLIBC_2.10"},
+                        "GLIBC_2.11": {"type": "A", "version": "@@GLIBC_2.10"},
+                    },
+                },
             ),
             (
                 "./lib/x86_64-linux-gnu/libc.so.6 -> libc-2.31.so",
@@ -199,7 +349,17 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
                     StatLLS.MODE: "rwxr-xr-x",
                 },
             ),
-            # one good
+            # another badly formatted
+            (
+                "-rwxr-xr-x root/root             43416 2020-03-23 14:23 squashfs-root/bin/cp",
+                {
+                    StatLLS.FILENAME: "./bin/cp",
+                    StatLLS.FILETYPE: "-",
+                    StatLLS.MODE: [],
+                    StatLLS.OWNER: "root/root",
+                },
+            ),
+            # one good but with one bad symbol
             (
                 "-rwxr-xr-x root/root           2029224 2020-03-23 14:24 squashfs-root/lib/x86_64-linux-gnu/libc-2.31.so",
                 {
@@ -207,6 +367,10 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
                     StatLLS.FILETYPE: "-",
                     StatLLS.MODE: "rwxr-xr-x",
                     StatLLS.OWNER: "root/root",
+                    "symbols": {
+                        "foo": {"type": "T", "version": "@@Base"},
+                        "bad": {"type": [], "version": "@@Base"},
+                    },
                 },
             ),
         ]
@@ -220,8 +384,14 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
 
         self.assertEqual(len(serial), 1)
         self.assertTrue("./bin/cat" not in serial)
+        self.assertTrue("./bin/cp" not in serial)
         idx = "./lib/x86_64-linux-gnu/libc-2.31.so"
-        map = {"filetype": "-", "mode": "rwxr-xr-x", "owner": "root/root"}
+        map = {
+            "filetype": "-",
+            "mode": "rwxr-xr-x",
+            "owner": "root/root",
+            "symbols": {"foo": {"type": "T", "version": "@@Base"}},
+        }
         self.assertTrue(idx in serial)
         for k in map:
             self.assertTrue(k in serial[idx])
@@ -263,6 +433,10 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
                 "filetype": "-",
                 "mode": "rwxr-xr-x",
                 "owner": "root/root",
+                "symbols": {
+                    "GLIBC_2.10": {"type": "A", "version": "@@GLIBC_2.10"},
+                    "GLIBC_2.11": {"type": "A", "version": "@@GLIBC_2.10"},
+                },
             },
             "./lib/x86_64-linux-gnu/libc.so.6 -> libc-2.31.so": {
                 "filetype": "l",
@@ -320,6 +494,10 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
                     StatLLS.FILETYPE: "-",
                     StatLLS.MODE: "rwxr-xr-x",
                     StatLLS.OWNER: "root/root",
+                    "symbols": {
+                        "GLIBC_2.10": {"type": "A", "version": "@@GLIBC_2.10"},
+                        "GLIBC_2.11": {"type": "A", "version": "@@GLIBC_2.10"},
+                    },
                 },
             ),
             (
@@ -353,6 +531,7 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
         serial = {
             "./bin": {},
             ".": {"filetype": "d", "mode": "rwxr-xr-x", "owner": "root/root"},
+            "./bad": {"filetype": "-", "mode": [], "owner": "root/root"},
         }
 
         c = SnapReviewFunctional(self.test_name)
@@ -360,13 +539,48 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
         self.assertEqual(len(state), 1)
 
         self.assertTrue("./bin" not in state)
+        self.assertTrue("./bad" not in state)
         fname = "."
         exp = {
             fname: {
-                StatLLS.FILENAME: ".",
+                StatLLS.FILENAME: fname,
                 StatLLS.FILETYPE: "d",
                 StatLLS.MODE: "rwxr-xr-x",
                 StatLLS.OWNER: "root/root",
+            }
+        }
+        self.assertTrue(fname in state)
+        self.assertEqual(len(exp[fname]), len(state[fname]))
+        for k in exp[fname]:
+            self.assertTrue(k in state[fname])
+            self.assertEqual(exp[fname][k], state[fname][k])
+
+    def test__deserialize_bad_symbol(self):
+        """Test _serialize() - bad symbol"""
+        serial = {
+            "./lib.so": {
+                "filetype": "-",
+                "mode": "rw-r--r--",
+                "owner": "root/root",
+                "symbols": {
+                    "foo": {"type": "T", "version": []},
+                    "bar": {"type": "T", "version": "@@Base"},
+                },
+            }
+        }
+
+        c = SnapReviewFunctional(self.test_name)
+        state = c._deserialize(serial)
+        self.assertEqual(len(state), 1)
+
+        fname = "./lib.so"
+        exp = {
+            fname: {
+                StatLLS.FILENAME: fname,
+                StatLLS.FILETYPE: "-",
+                StatLLS.MODE: "rw-r--r--",
+                StatLLS.OWNER: "root/root",
+                "symbols": {"bar": {"type": "T", "version": "@@Base"}},
             }
         }
         self.assertTrue(fname in state)
@@ -422,17 +636,6 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
             for k in serial[j]:
                 self.assertTrue(k in serial2[j])
                 self.assertEqual(serial[j][k], serial2[j][k])
-
-    def _verify_dict2(self, state, exp):
-        """Verifies dictionary that is 2 levels deep"""
-        self.assertEqual(len(exp), len(state))
-
-        for fname in exp:
-            self.assertTrue(fname in state)
-            self.assertEqual(len(state[fname]), len(exp[fname]))
-            for k in exp[fname]:
-                self.assertTrue(k in state[fname])
-                self.assertEqual(exp[fname][k], state[fname][k])
 
     def test_check_state_base_files_app(self):
         """Test check_state_base_files() - app"""
@@ -535,7 +738,7 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
     def test_check_state_base_files_output(self):
         """Test check_state_base_files() - --state-output"""
         os.environ["SNAP_FORCE_STATE_CHECK"] = "1"
-        exp_lls_state, exp_override, exp_override_state = self._set_default_state()
+        exp_state, exp_override, exp_override_state = self._set_default_state()
 
         self.set_test_snap_yaml("type", "base")
         overrides = {
@@ -557,17 +760,17 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
         self.check_results(report, expected=expected)
 
         # verify prev_state is empty
-        self._verify_dict2(c.prev_state, {})
+        self.assertEqual(c.prev_state, {})
 
         # verify curr_state has expected state
-        self._verify_dict2(c.curr_state, exp_lls_state)
+        self.assertEqual(c.curr_state, exp_state)
 
         # verify state_input is not set
         self.assertFalse(self.state_files_key in c.overrides["state_input"])
 
         # verify state_output is set
         self.assertTrue(self.state_files_key in c.overrides["state_output"])
-        self._verify_dict2(
+        self.assertEqual(
             c.overrides["state_output"][self.state_files_key], exp_override
         )
 
@@ -576,7 +779,7 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
            overridden
         """
         os.environ["SNAP_FORCE_STATE_CHECK"] = "0"
-        exp_lls_state, exp_override, exp_override_state = self._set_default_state()
+        exp_state, exp_override, exp_override_state = self._set_default_state()
 
         self.set_test_snap_yaml("type", "base")
         overrides = {
@@ -600,10 +803,10 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
         self.check_results(report, expected=expected)
 
         # verify prev_state is empty
-        self._verify_dict2(c.prev_state, {})
+        self.assertEqual(c.prev_state, {})
 
         # verify curr_state has expected state
-        self._verify_dict2(c.curr_state, exp_lls_state)
+        self.assertEqual(c.curr_state, exp_state)
 
         # verify state_input is not set
         self.assertFalse(self.state_files_key in c.overrides["state_input"])
@@ -616,7 +819,7 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
            base not overridden
         """
         os.environ["SNAP_FORCE_STATE_CHECK"] = "0"
-        exp_lls_state, exp_override, exp_override_state = self._set_default_state()
+        exp_state, exp_override, exp_override_state = self._set_default_state()
         prev_override = copy.deepcopy(exp_override)
         prev_override["./bin/ls"] = {
             "filetype": "-",
@@ -650,13 +853,13 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
 
         # verify state_input didn't change
         self.assertTrue(self.state_files_key in c.overrides["state_input"])
-        self._verify_dict2(
+        self.assertEqual(
             c.overrides["state_input"][self.state_files_key], prev_override
         )
 
         # verify state_input is copied to state_output
         self.assertTrue(self.state_files_key in c.overrides["state_output"])
-        self._verify_dict2(
+        self.assertEqual(
             c.overrides["state_output"][self.state_files_key], prev_override
         )
 
@@ -703,7 +906,7 @@ drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
     def test_check_state_base_files_input_output_same(self):
         """Test check_state_base_files() - with --state-input/--state-output"""
         os.environ["SNAP_FORCE_STATE_CHECK"] = "1"
-        exp_lls_state, exp_override, exp_override_state = self._set_default_state()
+        exp_state, exp_override, exp_override_state = self._set_default_state()
 
         self.set_test_snap_yaml("type", "base")
         overrides = {
@@ -727,21 +930,20 @@ drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
         expected["info"][name] = {"text": "OK"}
         self.check_results(report, expected=expected)
 
+        # https://docs.python.org/3/library/unittest.html#unittest.TestCase.assertDictEqual
         # verify prev_state has expected state
-        self._verify_dict2(c.prev_state, exp_override_state)
+        self.assertEqual(c.prev_state, exp_override_state)
 
         # verify curr_state has expected state
-        self._verify_dict2(c.curr_state, exp_lls_state)
+        self.assertEqual(c.curr_state, exp_state)
 
         # verify state_input is present and same as state_output
         self.assertTrue(self.state_files_key in c.overrides["state_input"])
-        self._verify_dict2(
-            c.overrides["state_input"][self.state_files_key], exp_override
-        )
+        self.assertEqual(c.overrides["state_input"][self.state_files_key], exp_override)
 
         # verify state_output is present with expected output
         self.assertTrue(self.state_files_key in c.overrides["state_output"])
-        self._verify_dict2(
+        self.assertEqual(
             c.overrides["state_output"][self.state_files_key], exp_override
         )
 
@@ -750,7 +952,7 @@ drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
            (missing file)
         """
         os.environ["SNAP_FORCE_STATE_CHECK"] = "1"
-        exp_lls_state, exp_override, exp_override_state = self._set_default_state()
+        exp_state, exp_override, exp_override_state = self._set_default_state()
 
         prev_override = copy.deepcopy(exp_override)
         prev_override["./bin/ls"] = {
@@ -785,7 +987,7 @@ drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
            (different file)
         """
         os.environ["SNAP_FORCE_STATE_CHECK"] = "1"
-        exp_lls_state, exp_override, exp_override_state = self._set_default_state()
+        exp_state, exp_override, exp_override_state = self._set_default_state()
 
         prev_override = copy.deepcopy(exp_override)
         prev_override["./bin/cat"]["mode"] = "rwxrwxr-x"
@@ -818,7 +1020,7 @@ drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
            (missing metadata)
         """
         os.environ["SNAP_FORCE_STATE_CHECK"] = "1"
-        exp_lls_state, exp_override, exp_override_state = self._set_default_state()
+        exp_state, exp_override, exp_override_state = self._set_default_state()
 
         self.set_test_snap_yaml("type", "base")
         overrides = {
@@ -848,11 +1050,85 @@ drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
         }
         self.check_results(report, expected=expected)
 
+    def test_check_state_base_files_input_output_missing_symbols(self):
+        """Test check_state_base_files() - --state-input/--state-output
+           (missing symbols)
+        """
+        os.environ["SNAP_FORCE_STATE_CHECK"] = "1"
+        exp_state, exp_override, exp_override_state = self._set_default_state()
+
+        prev_override = copy.deepcopy(exp_override)
+        prev_override["./lib/some.so"]["symbols"] = {
+            "foo": {"type": "T", "version": "@@Base"},
+            "bar": {"type": "T", "version": "@@Base"},
+            "norf": {"type": "T", "version": "@@Base"},
+            "baz": {"type": "T", "version": "@@Base"},
+        }
+        self.set_test_snap_yaml("type", "base")
+        overrides = {
+            "state_input": {
+                "format": STATE_FORMAT_VERSION,
+                self.state_files_key: prev_override,
+            },
+            "state_output": {"format": STATE_FORMAT_VERSION},
+        }
+        c = SnapReviewFunctional(self.test_name, overrides=overrides)
+        c.check_state_base_files()
+        report = c.review_report
+        expected_counts = {"info": 0, "warn": 1, "error": 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "functional-snap-v2:state_base_files:symbols:missing"
+        expected["warn"][name] = {
+            "text": "missing symbols since last review: ./lib/some.so (baz@@Base, norf@@Base)"
+        }
+        self.check_results(report, expected=expected)
+
+    def test_check_state_base_files_input_output_different_symbols(self):
+        """Test check_state_base_files() - --state-input/--state-output
+           (different symbols)
+        """
+        os.environ["SNAP_FORCE_STATE_CHECK"] = "1"
+        exp_state, exp_override, exp_override_state = self._set_default_state()
+
+        prev_override = copy.deepcopy(exp_override)
+        prev_override["./lib/some.so"]["symbols"] = {
+            "foo": {"type": "A", "version": "@@Base"},
+            "bar": {"type": "T", "version": "@@Other"},
+        }
+        self.set_test_snap_yaml("type", "base")
+        overrides = {
+            "state_input": {
+                "format": STATE_FORMAT_VERSION,
+                self.state_files_key: prev_override,
+            },
+            "state_output": {"format": STATE_FORMAT_VERSION},
+        }
+        c = SnapReviewFunctional(self.test_name, overrides=overrides)
+        c.check_state_base_files()
+        report = c.review_report
+        expected_counts = {"info": 0, "warn": 1, "error": 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "functional-snap-v2:state_base_files:symbols:different"
+        expected["warn"][name] = {
+            "text": "differing symbols since last review: ./lib/some.so (current 'bar@@Base T' != 'bar@@Other T', current 'foo@@Base T' != 'foo@@Base A')"
+        }
+        self.check_results(report, expected=expected)
+
     def test_check_state_base_files_input_output_same_core(self):
         """Test check_state_base_files() - with --state-input/--state-output
            for core snap
         """
-        exp_lls_state, exp_override, exp_override_state = self._set_default_state()
+        exp_state, exp_override, exp_override_state = self._set_default_state()
 
         self.set_test_snap_yaml("type", "os")
         self.set_test_snap_yaml("name", "core")
@@ -878,20 +1154,18 @@ drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
         self.check_results(report, expected=expected)
 
         # verify prev_state has expected state
-        self._verify_dict2(c.prev_state, exp_override_state)
+        self.assertEqual(c.prev_state, exp_override_state)
 
         # verify curr_state has expected state
-        self._verify_dict2(c.curr_state, exp_lls_state)
+        self.assertEqual(c.curr_state, exp_state)
 
         # verify state_input is present and same as state_output
         self.assertTrue(self.state_files_key in c.overrides["state_input"])
-        self._verify_dict2(
-            c.overrides["state_input"][self.state_files_key], exp_override
-        )
+        self.assertEqual(c.overrides["state_input"][self.state_files_key], exp_override)
 
         # verify state_output is present with expected output
         self.assertTrue(self.state_files_key in c.overrides["state_output"])
-        self._verify_dict2(
+        self.assertEqual(
             c.overrides["state_output"][self.state_files_key], exp_override
         )
 

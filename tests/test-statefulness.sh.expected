@@ -2101,6 +2101,18 @@ Warnings
 	missing files since last review: ./bin/cp
 ./tests/test-state-base_1_amd64.snap: FAIL
 
+= Test --state-input=base.missing-symbol --state-output=base.current test-state-base_1_amd64.snap
+Running: snap-review --state-input=./base.missing-symbol --state-output=./base.current
+Errors
+------
+ - lint-snap-v2:snap_type_redflag
+	(NEEDS REVIEW) type 'base' not allowed
+Warnings
+--------
+ - functional-snap-v2:state_base_files:symbols:missing
+	missing symbols since last review: ./lib/x86_64-linux-gnu/libc-2.31.so (foo@@GLIBC_2.2.5)
+./tests/test-state-base_1_amd64.snap: FAIL
+
 = Test --state-output=base.last test-state-base_1_amd64.snap
 Running: snap-review --json --state-output=./base.last
 {
@@ -2379,6 +2391,136 @@ Running: snap-review --json --state-input=./base.missing-cp --state-output=./bas
       "functional-snap-v2:state_base_files:missing": {
         "manual_review": false,
         "text": "missing files since last review: ./bin/cp"
+      }
+    }
+  },
+  "snap.v2_lint": {
+    "error": {
+      "lint-snap-v2:snap_type_redflag": {
+        "manual_review": true,
+        "text": "(NEEDS REVIEW) type 'base' not allowed"
+      }
+    },
+    "info": {
+      "lint-snap-v2:apps_present": {
+        "manual_review": false,
+        "text": "OK (optional apps field not specified)"
+      },
+      "lint-snap-v2:architecture_specified_needed:amd64": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:architecture_valid": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:assumes_valid": {
+        "manual_review": false,
+        "text": "OK (assumes not specified)"
+      },
+      "lint-snap-v2:base_interfaces:plugs": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:base_interfaces:slots": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:description": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:description_present": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:grade_valid": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:hooks_present": {
+        "manual_review": false,
+        "text": "OK (optional hooks field not specified)"
+      },
+      "lint-snap-v2:iffy_files": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:name_valid": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:snap_type_valid": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:summary": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:summary_present": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:title_present": {
+        "manual_review": false,
+        "text": "OK (optional title field not specified)"
+      },
+      "lint-snap-v2:unknown_field": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:valid_unicode": {
+        "manual_review": false,
+        "text": "ok"
+      },
+      "lint-snap-v2:vcs_files": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:version_valid": {
+        "manual_review": false,
+        "text": "OK"
+      }
+    },
+    "warn": {}
+  },
+  "snap.v2_security": {
+    "error": {},
+    "info": {
+      "security-snap-v2:squashfs_files": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "security-snap-v2:squashfs_repack_checksum": {
+        "manual_review": false,
+        "text": "OK"
+      }
+    },
+    "warn": {}
+  }
+}
+
+= Test --state-input=base.missing-symbol --state-output=base.current test-state-base_1_amd64.snap
+Running: snap-review --json --state-input=./base.missing-symbol --state-output=./base.current
+{
+  "snap.v2_declaration": {
+    "error": {},
+    "info": {},
+    "warn": {}
+  },
+  "snap.v2_functional": {
+    "error": {},
+    "info": {
+      "functional-snap-v2:base_mountpoints": {
+        "manual_review": false,
+        "text": "OK"
+      }
+    },
+    "warn": {
+      "functional-snap-v2:state_base_files:symbols:missing": {
+        "manual_review": false,
+        "text": "missing symbols since last review: ./lib/x86_64-linux-gnu/libc-2.31.so (foo@@GLIBC_2.2.5)"
       }
     }
   },
@@ -2772,6 +2914,138 @@ Running: snap-review --sdk --state-input=./base.missing-cp --state-output=./base
     "functional-snap-v2:state_base_files:missing": {
       "manual_review": false,
       "text": "missing files since last review: ./bin/cp"
+    }
+  }
+}
+= snap.v2_lint =
+{
+  "error": {
+    "lint-snap-v2:snap_type_redflag": {
+      "manual_review": true,
+      "text": "(NEEDS REVIEW) type 'base' not allowed"
+    }
+  },
+  "info": {
+    "lint-snap-v2:apps_present": {
+      "manual_review": false,
+      "text": "OK (optional apps field not specified)"
+    },
+    "lint-snap-v2:architecture_specified_needed:amd64": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:architecture_valid": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:assumes_valid": {
+      "manual_review": false,
+      "text": "OK (assumes not specified)"
+    },
+    "lint-snap-v2:base_interfaces:plugs": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:base_interfaces:slots": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:description": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:description_present": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:grade_valid": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:hooks_present": {
+      "manual_review": false,
+      "text": "OK (optional hooks field not specified)"
+    },
+    "lint-snap-v2:iffy_files": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:name_valid": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:snap_type_valid": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:summary": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:summary_present": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:title_present": {
+      "manual_review": false,
+      "text": "OK (optional title field not specified)"
+    },
+    "lint-snap-v2:unknown_field": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:valid_unicode": {
+      "manual_review": false,
+      "text": "ok"
+    },
+    "lint-snap-v2:vcs_files": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:version_valid": {
+      "manual_review": false,
+      "text": "OK"
+    }
+  },
+  "warn": {}
+}
+= snap.v2_security =
+{
+  "error": {},
+  "info": {
+    "security-snap-v2:squashfs_files": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "security-snap-v2:squashfs_repack_checksum": {
+      "manual_review": false,
+      "text": "OK"
+    }
+  },
+  "warn": {}
+}
+
+= Test --state-input=base.missing-symbol --state-output=base.current test-state-base_1_amd64.snap
+Running: snap-review --sdk --state-input=./base.missing-symbol --state-output=./base.current
+= snap.v2_declaration =
+{
+  "error": {},
+  "info": {},
+  "warn": {}
+}
+= snap.v2_functional =
+{
+  "error": {},
+  "info": {
+    "functional-snap-v2:base_mountpoints": {
+      "manual_review": false,
+      "text": "OK"
+    }
+  },
+  "warn": {
+    "functional-snap-v2:state_base_files:symbols:missing": {
+      "manual_review": false,
+      "text": "missing symbols since last review: ./lib/x86_64-linux-gnu/libc-2.31.so (foo@@GLIBC_2.2.5)"
     }
   }
 }

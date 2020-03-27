@@ -92,7 +92,7 @@ for args in "" "--json" "--sdk" ; do
     comment "= Test --state-input=base.last --state-output=base.current test-state-base_1_amd64.snap"
     run test-state-base_1_amd64.snap $args --state-input="./base.last" --state-output="./base.current"
 
-    # but a new run with different input will cause error
+    # but a new run with different input will cause error (missing file)
     jq 'setpath(["functional-snap-v2:state_files:amd64","./bin/cp","filetype"]; "-")' "./base.current" > "./base.tmp"
     mv "./base.tmp" "./base.missing-cp"
     jq 'setpath(["functional-snap-v2:state_files:amd64","./bin/cp","mode"]; "rwxr-xr-x")' "./base.missing-cp" > "./base.tmp"
@@ -101,6 +101,14 @@ for args in "" "--json" "--sdk" ; do
     mv "./base.tmp" "./base.missing-cp"
     comment "= Test --state-input=base.missing-cp --state-output=base.current test-state-base_1_amd64.snap"
     run test-state-base_1_amd64.snap $args --state-input="./base.missing-cp" --state-output="./base.current"
+
+    # and a new run with different input will cause error (missing symbol)
+    jq 'setpath(["functional-snap-v2:state_files:amd64","./lib/x86_64-linux-gnu/libc-2.31.so","symbols","foo","type"]; "T")' "./base.current" > "./base.tmp"
+    mv "./base.tmp" "./base.missing-symbol"
+    jq 'setpath(["functional-snap-v2:state_files:amd64","./lib/x86_64-linux-gnu/libc-2.31.so","symbols","foo","version"]; "@@GLIBC_2.2.5")' "./base.missing-symbol" > "./base.tmp"
+    mv "./base.tmp" "./base.missing-symbol"
+    comment "= Test --state-input=base.missing-symbol --state-output=base.current test-state-base_1_amd64.snap"
+    run test-state-base_1_amd64.snap $args --state-input="./base.missing-symbol" --state-output="./base.current"
 done
 
 cd "$orig_dir" || exit 1
