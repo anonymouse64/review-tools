@@ -5,6 +5,7 @@ review-tools (0.48+YYYMMDD-1) UNRELEASED; urgency=medium
   * sr_functional.py:
     - use state files for base snap missing/changed metadata file checks
     - use state files for base snap abi file checks
+  * overrides.py: add/update for public snap
 
  -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 17 Mar 2020 16:51:37 -0500
 
