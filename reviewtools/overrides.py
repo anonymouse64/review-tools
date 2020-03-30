@@ -736,6 +736,7 @@ sec_iface_ref_overrides = {
         "chromium": ["chromium-config"],
         "cw-sh": ["dot-aws-config-credentials"],
         "doctl": ["doctl-config", "kube-config"],
+        "dotrun": ["dot-npmrc", "dot-yarnrc"],
         "dynocsv": ["aws-config-credentials"],
         "enonic": ["dot-enonic"],
         "exoscale-cli": ["dot-exoscale"],
