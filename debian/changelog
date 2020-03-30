@@ -1,4 +1,4 @@
-review-tools (0.48+YYYMMDD-1) UNRELEASED; urgency=medium
+review-tools (0.48+20200330-1) RELEASED; urgency=medium
 
   * sr_security.py: regulate device files in os and base snaps
   * refactor unsquashfs -lls and its parsing to common.py and sr_common.py
@@ -7,7 +7,7 @@ review-tools (0.48+YYYMMDD-1) UNRELEASED; urgency=medium
     - use state files for base snap abi file checks
   * overrides.py: add/update for public snap
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 17 Mar 2020 16:51:37 -0500
+ -- Jamie Strandboge <jamie@ubuntu.com>  Mon, 30 Mar 2020 17:11:17 -0500
 
 review-tools (0.48+20200317-1) RELEASED; urgency=medium
 
