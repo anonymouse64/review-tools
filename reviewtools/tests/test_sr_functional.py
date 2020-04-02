@@ -1169,6 +1169,58 @@ drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
             c.overrides["state_output"][self.state_files_key], exp_override
         )
 
+    def test_check_state_base_files_input_output_missing_override(self):
+        """Test check_state_base_files() - with --state-input/--state-output
+           missing with override
+        """
+        os.environ["SNAP_FORCE_STATE_CHECK"] = "1"
+        exp_state, exp_override, exp_override_state = self._set_default_state()
+        prev_override = copy.deepcopy(exp_override)
+        prev_override["./skipped/foo"] = {
+            "filetype": "-",
+            "mode": "rwxr-xr-x",
+            "owner": "root/root",
+        }
+        prev_override["./not-skipped/bar"] = {
+            "filetype": "-",
+            "mode": "rwxr-xr-x",
+            "owner": "root/root",
+        }
+
+        self.set_test_snap_yaml("type", "base")
+        self.set_test_snap_yaml("name", "somebase")
+        overrides = {
+            "state_input": {
+                "format": STATE_FORMAT_VERSION,
+                self.state_files_key: prev_override,
+            },
+            "state_output": {"format": STATE_FORMAT_VERSION},
+        }
+        c = SnapReviewFunctional(self.test_name, overrides=overrides)
+        # update overrides for our snap
+        from reviewtools.overrides import func_base_state_files_overrides
+
+        func_base_state_files_overrides["somebase"] = ["skipped/.*"]
+
+        c.check_state_base_files()
+
+        # restore override
+        del func_base_state_files_overrides["somebase"]
+
+        report = c.review_report
+        expected_counts = {"info": 0, "warn": 1, "error": 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "functional-snap-v2:state_base_files:missing"
+        expected["warn"][name] = {
+            "text": "missing files since last review: ./not-skipped/bar"
+        }
+        self.check_results(report, expected=expected)
+
 
 class TestSnapReviewFunctionalNoMock(TestCase):
     """Tests without mocks where they are not needed."""

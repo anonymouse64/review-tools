@@ -21,6 +21,7 @@ from reviewtools.overrides import (
     func_execstack_overrides,
     func_execstack_skipped_pats,
     func_base_mountpoints_overrides,
+    func_base_state_files_overrides,
     redflagged_snap_types_overrides,
 )
 import copy
@@ -260,6 +261,12 @@ class SnapReviewFunctional(SnapReview):
             state[fname] = item
         return copy.deepcopy(state)
 
+    def _in_patterns(self, pats, f):
+        for pat in pats:
+            if pat.search(f):
+                return True
+        return False
+
     def check_execstack(self):
         """Check execstack"""
         # core snap is known to have these due to klibc. Executable stack
@@ -274,12 +281,6 @@ class SnapReviewFunctional(SnapReview):
 
             if out.startswith("X "):
                 return True
-            return False
-
-        def in_patterns(pats, f):
-            for pat in pats:
-                if pat.search(f):
-                    return True
             return False
 
         t = "info"
@@ -299,7 +300,7 @@ class SnapReviewFunctional(SnapReview):
             skipped_pats.append(re.compile(r"%s" % p))
 
         for i in self.pkg_bin_files:
-            if has_execstack(i) and not in_patterns(skipped_pats, i):
+            if has_execstack(i) and not self._in_patterns(skipped_pats, i):
                 bins.append(os.path.relpath(i, self.unpack_dir))
 
         if len(bins) > 0:
@@ -415,10 +416,19 @@ class SnapReviewFunctional(SnapReview):
         missing_symbols = {}
         different_symbols = {}
 
+        skipped_pats = []
+        if self.snap_yaml["name"] in func_base_state_files_overrides:
+            for p in func_base_state_files_overrides[self.snap_yaml["name"]]:
+                # the filename is prepended with ./ below, so prepend it here
+                skipped_pats.append(re.compile(r"\./%s" % p))
+
         # iterate through files in prev_state since this naturally ignores
         # newly added files
         for fname in self.prev_state:
             if fname not in self.curr_state:
+                if self._in_patterns(skipped_pats, fname):
+                    continue
+
                 missing.append(fname)
                 continue
             # likewise, iterate through metadata keys in prev_state since this

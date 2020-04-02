@@ -828,6 +828,16 @@ func_execstack_skipped_pats = [
 # won't be flagged for manual review.
 func_base_mountpoints_overrides = ["bare"]
 
+# Allow skipping checks for some files
+func_base_state_files_overrides = {
+    "core": [
+        # skip snapd-specific files per mvo
+        "usr/lib/snapd/.*",
+        "var/cache/snapd/.*",
+        "var/lib/snapd/.*",
+    ]
+}
+
 # By default we don't regulate which snaps specify which base snaps, but some
 # base snaps are highly specialized, so we limit what can use them. Base snaps
 # whose name is not a key in this dict don't flag for review. For base snaps
