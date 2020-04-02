@@ -1,3 +1,9 @@
+review-tools (0.48+20200402-1) RELEASE; urgency=medium
+
+  * sr_functional.py: allow skipping certain paths on core for missing files
+
+ -- Jamie Strandboge <jamie@ubuntu.com>  Thu, 02 Apr 2020 15:31:56 -0500
+
 review-tools (0.48+20200330-1) RELEASED; urgency=medium
 
   * sr_security.py: regulate device files in os and base snaps
