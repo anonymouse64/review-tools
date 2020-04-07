@@ -102,7 +102,7 @@ class SnapReview(Review):
     apps_optional_daemon = [
         "after",
         "before",
-        "bus-name",
+        "bus-name",  # May deprecate: https://forum.snapcraft.io/t/support-for-daemon-dbus/8855/11
         "daemon",
         "ports",
         "post-stop-command",
@@ -119,6 +119,7 @@ class SnapReview(Review):
         "watchdog-timeout",
     ]
     apps_optional_shared = [
+        "activates-on",  # eventually apps_optional_daemon (see https://forum.snapcraft.io/t/support-for-daemon-dbus/8855/11)
         "aliases",
         "command",
         "command-chain",
