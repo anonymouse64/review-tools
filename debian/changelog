@@ -1,3 +1,9 @@
+review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
+
+  * sr_common.py: preliminary support for "activates-on"
+
+ -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 07 Apr 2020 09:38:18 -0500
+
 review-tools (0.48+20200402-1) RELEASE; urgency=medium
 
   * sr_functional.py: allow skipping certain paths on core for missing files
