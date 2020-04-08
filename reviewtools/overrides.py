@@ -748,6 +748,7 @@ sec_iface_ref_overrides = {
         "guvcview": ["config-guvcview2"],
         "hw-probe": ["dot-local-share-xorg-logs"],
         "icdiff": ["gitconfig"],
+        "inkscape": ["dot-config-inkscape"],
         "jaas": ["dot-local-share-juju"],
         "k9s": ["kube-config"],
         "kubefwd": ["config-kube"],
