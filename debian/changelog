@@ -1,10 +1,11 @@
-review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
+review-tools (0.48+20200408-1) RELEASED; urgency=medium
 
   * sr_common.py: preliminary support for "activates-on"
+  * overrides.py: add/update for public snaps
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 07 Apr 2020 09:38:18 -0500
+ -- Jamie Strandboge <jamie@ubuntu.com>  Wed, 08 Apr 2020 15:10:07 -0500
 
-review-tools (0.48+20200402-1) RELEASE; urgency=medium
+review-tools (0.48+20200402-1) RELEASED; urgency=medium
 
   * sr_functional.py: allow skipping certain paths on core for missing files
 
