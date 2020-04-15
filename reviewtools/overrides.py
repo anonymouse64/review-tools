@@ -683,14 +683,32 @@ sec_mode_dev_overrides = {
     },
 }
 
-# Snaps that may specify 'daemon' with 'browser-support'. Normally this
-# shouldn't be granted because snaps running with 'daemon' run as root and this
-# grants more privileges than intended.
+# Snaps that may specify 'daemon' with 'browser-support'. Care must be taken
+# since snaps running with 'daemon' run as root and this grants more privileges
+# than intended. As of 2020-01-09 (see
+# https://forum.snapcraft.io/t/problem-with-releasing-kiosk-app/14861/14):
+#
+# "Today, there are two options:
+#  * if the snap is intended to be included in a brand store 1, then the
+#    publisher can distribute the snap in their brand store without worrying
+#    about the check (because the publisher owns the brand and access to the
+#    brand store is limited to devices associated with the brand)
+#  * if the snap is intended to be distributed via the public store, then:
+#    * the snap should be reviewed for suitability for distribution in the
+#      public store (eg, whether or not, due to branding, intended use, device
+#      deployments, etc, the snap makes sense for the public store)
+#    * the publisher should be vetted, as with classic snaps
+#    * the publisher modifies the snap to use system-usernames where the
+#      daemon is modified to drop privileges and the publisher agrees to not
+#      revert to starting as root
 sec_browser_support_overrides = [
+    # grandfathered overrides
     "chromium-mir-kiosk",  # mir team
     "dashkiosk-client-browser",  # ogra
     "screencloudplayer",
     "webdemo",
+    # new process overrides
+    "beefee-terminal-app",  # https://forum.snapcraft.io/t/problem-with-releasing-kiosk-app/14861/28
 ]
 
 # Snaps that for some reason do not resquash properly. This is primarily used
