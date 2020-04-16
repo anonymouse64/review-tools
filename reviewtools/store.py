@@ -151,14 +151,18 @@ def get_pkg_revisions(item, secnot_db, errors):
             m = get_faked_stage_packages(m)
             normalize_and_verify_snap_manifest(m)
         except Exception as e:
-            _add_error(pkg_db["name"], errors, "error loading manifest: %s" % e)
+            _add_error(
+                pkg_db["name"],
+                errors,
+                "error loading manifest for revision '%s': %s" % (r, e),
+            )
             continue
 
         try:
             report = get_secnots_for_manifest(m, secnot_db)
         except ValueError as e:
             if "not found in security notification database" not in str(e):
-                _add_error(pkg_db["name"], errors, "%s" % e)
+                _add_error(pkg_db["name"], errors, "(revision '%s') %s" % (r, e))
             continue
 
         if r not in pkg_db["revisions"]:

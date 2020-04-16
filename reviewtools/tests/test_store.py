@@ -119,7 +119,9 @@ class TestStore(TestCase):
         errors = {}
         store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
         self.assertEqual(len(errors), 1)
-        self.assertTrue(errors["0ad"][0].startswith("error loading manifest:"))
+        self.assertTrue(
+            errors["0ad"][0].startswith("error loading manifest for revision '12':")
+        )
 
     def test_check_get_package_revisions_bad_secnot(self):
         """Test get_package_revisions() - bad secnot db"""
@@ -257,7 +259,7 @@ class TestStore(TestCase):
         self.assertEqual(len(errors), 1)
         self.assertEqual(
             errors["0ad"][0],
-            "Could not determine Ubuntu release ('parts' not in manifest)",
+            "(revision '12') Could not determine Ubuntu release ('parts' not in manifest)",
         )
 
     def test_check_get_shared_snap_without_override_missing(self):
