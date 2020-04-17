@@ -746,6 +746,21 @@ class SnapReviewLint(SnapReview):
 
             self._verify_valid_values(app, key, valid)
 
+    def check_apps_daemon_scope(self):
+        """Check apps - daemon-scope"""
+        if "apps" not in self.snap_yaml:
+            return
+
+        valid = ["system", "user"]
+
+        for app in self.snap_yaml["apps"]:
+            key = "daemon-scope"
+            if key not in self.snap_yaml["apps"][app]:
+                # We check for required elsewhere
+                continue
+
+            self._verify_valid_values(app, key, valid)
+
     def check_apps_invalid_combinations(self):
         """Check apps - invalid combinations"""
         if "apps" not in self.snap_yaml:

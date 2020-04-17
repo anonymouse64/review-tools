@@ -1982,6 +1982,61 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {"info": None, "warn": 0, "error": 1}
         self.check_results(r, expected_counts)
 
+    def test_check_apps_daemon_scope_system(self):
+        """Test check_apps_daemon_scope() - system"""
+        entry = "system"
+        self.set_test_snap_yaml(
+            "apps", {"foo": {"daemon": "simple", "daemon-scope": entry}}
+        )
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_daemon_scope()
+        r = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_daemon_scope_user(self):
+        """Test check_apps_daemon_scope() - user"""
+        entry = "user"
+        self.set_test_snap_yaml(
+            "apps", {"foo": {"daemon": "simple", "daemon-scope": entry}}
+        )
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_daemon_scope()
+        r = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_daemon_scope_missing(self):
+        """Test check_apps_daemon() - missing"""
+        self.set_test_snap_yaml("apps", {"foo": {"daemon": "simple"}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_daemon_scope()
+        r = c.review_report
+        expected_counts = {"info": 0, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_daemon_scope_empty(self):
+        """Test check_apps_daemon() - empty"""
+        self.set_test_snap_yaml(
+            "apps", {"foo": {"daemon": "simple", "daemon-scope": ""}}
+        )
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_daemon_scope()
+        r = c.review_report
+        expected_counts = {"info": None, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_daemon_scope_invalid(self):
+        """Test check_apps_daemon() - list"""
+        self.set_test_snap_yaml(
+            "apps", {"foo": {"daemon": "simple", "daemon-scope": []}}
+        )
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_daemon_scope()
+        r = c.review_report
+        expected_counts = {"info": None, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
     def test_check_apps_invalid_combinations_nonexistent_daemon(self):
         """Test check_apps_invalid_combinations() - nonexistent daemon"""
         self.set_test_snap_yaml(
@@ -2314,6 +2369,17 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c.check_apps_invalid_combinations()
         r = c.review_report
         expected_counts = {"info": None, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_invalid_combinations_daemon_scope(self):
+        """Test check_apps_invalid_combinations() - daemon-scope"""
+        self.set_test_snap_yaml(
+            "apps", {"foo": {"command": "bin/bar", "daemon-scope": "system"}}
+        )
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_invalid_combinations()
+        r = c.review_report
+        expected_counts = {"info": None, "warn": 0, "error": 1}
         self.check_results(r, expected_counts)
 
     def test_check_apps_restart_condition_always(self):
