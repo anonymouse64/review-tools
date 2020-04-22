@@ -335,6 +335,14 @@ Revision r12 (i386; channels: candidate, beta)
         self.assertTrue(len(res) > 0)
         self.assertTrue("3323-1" in res)
 
+    def test_check_scan_snap_dpkg_list_app(self):
+        """Test scan_snap() - dpkg.list app"""
+        secnot_fn = "./tests/test-usn-core-with-dpkg-list.db"
+        snap_fn = "./tests/test-dpkg-list-app_1.0_amd64.snap"
+        res = available.scan_snap(secnot_fn, snap_fn)
+        self.assertTrue(len(res) > 0)
+        self.assertTrue("3323-1" in res)
+
     def test_check_scan_snap_kernel(self):
         """Test scan_snap() - kernel"""
         from reviewtools.overrides import update_stage_packages

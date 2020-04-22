@@ -1198,9 +1198,10 @@ def get_snap_manifest(fn):
 
     man = "snap/manifest.yaml"
     os_dpkg = "usr/share/snappy/dpkg.list"
+    snap_dpkg = "snap/dpkg.list"
     # unpack_pkg() fails if this exists, so this is safe
     dir = tempfile.mktemp(prefix=MKDTEMP_PREFIX, dir=MKDTEMP_DIR)
-    unpack_pkg(fn, dir, [man, os_dpkg])
+    unpack_pkg(fn, dir, [man, os_dpkg, snap_dpkg])
 
     man_fn = os.path.join(dir, man)
     if not os.path.isfile(man_fn):
@@ -1215,18 +1216,26 @@ def get_snap_manifest(fn):
             error("Could not load %s. Is it properly formatted?" % man)
 
     os_dpkg_fn = os.path.join(dir, os_dpkg)
-    os_dpkg_list = None
+    snap_dpkg_fn = os.path.join(dir, snap_dpkg)
+    dpkg_list = None
     if os.path.isfile(os_dpkg_fn):
         with open_file_read(os_dpkg_fn) as fd:
             try:
-                os_dpkg_list = fd.readlines()
+                dpkg_list = fd.readlines()
             except Exception:
                 recursive_rm(dir)
                 error("Could not load %s. Is it properly formatted?" % os_dpkg)
+    elif os.path.isfile(snap_dpkg_fn):
+        with open_file_read(snap_dpkg_fn) as fd:
+            try:
+                dpkg_list = fd.readlines()
+            except Exception:
+                recursive_rm(dir)
+                error("Could not load %s. Is it properly formatted?" % snap_dpkg)
 
     recursive_rm(dir)
 
-    return (man_yaml, os_dpkg_list)
+    return (man_yaml, dpkg_list)
 
 
 def get_os_codename(os, ver):

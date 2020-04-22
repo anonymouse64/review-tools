@@ -33,7 +33,6 @@ from reviewtools.store import (
     get_pkg_revisions,
     get_secnots_for_manifest,
     get_shared_snap_without_override,
-    get_staged_packages_from_manifest,
     get_faked_stage_packages,
 )
 from reviewtools.usn import read_usn_db
@@ -271,12 +270,11 @@ def scan_snap(secnot_db_fn, snap_fn, with_cves=False):
     (man, dpkg) = get_snap_manifest(snap_fn)
     man = get_faked_stage_packages(man)
 
-    # Use dpkg.list with os/base snaps if we don't have any stage-packages.
-    # This is limited to snap scans since dpkg.list doesn't exist in the store.
-    if "type" in man and man["type"] in ["base", "os", "core"] and dpkg is not None:
-        p = get_staged_packages_from_manifest(man)
-        fake_key = "faked-by-review-tools-os"
-        if p is None and "parts" in man and fake_key not in man["parts"]:
+    # Use dpkg.list when the snap ships it in a spot we honor. This is limited
+    # to snap scans since dpkg.list doesn't exist in the store.
+    if dpkg is not None:
+        fake_key = "faked-by-review-tools-dpkg"
+        if "parts" in man and fake_key not in man["parts"]:
             man["parts"][fake_key] = {}
             man["parts"][fake_key]["stage-packages"] = []
             for line in dpkg:
