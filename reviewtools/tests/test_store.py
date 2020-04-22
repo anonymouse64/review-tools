@@ -690,6 +690,43 @@ class TestStore(TestCase):
             in res["parts"]["faked-by-review-tools"]["stage-packages"]
         )
 
+    def test_get_faked_stage_packages_base_override(self):
+        """Test get_faked_stage_packages - base override"""
+        from reviewtools.overrides import update_stage_packages
+
+        update_stage_packages["foo"] = {"bar": "1.2~"}
+        update_stage_packages["foo/core18"] = {"bar": "2.0"}
+        m = {}
+        m["name"] = "foo"
+        m["base"] = "core18"
+        m["version"] = "1.2~"
+        m["parts"] = {}
+
+        res = store.get_faked_stage_packages(m)
+        self.assertTrue("faked-by-review-tools" in res["parts"])
+        self.assertTrue("stage-packages" in res["parts"]["faked-by-review-tools"])
+        self.assertTrue(
+            "bar=2.0" in res["parts"]["faked-by-review-tools"]["stage-packages"]
+        )
+
+    def test_get_faked_stage_packages_base_fallback(self):
+        """Test get_faked_stage_packages - base fallback"""
+        from reviewtools.overrides import update_stage_packages
+
+        update_stage_packages["foo"] = {"bar": "1.2~"}
+        m = {}
+        m["name"] = "foo"
+        m["base"] = "core18"
+        m["version"] = "1.2~"
+        m["parts"] = {}
+
+        res = store.get_faked_stage_packages(m)
+        self.assertTrue("faked-by-review-tools" in res["parts"])
+        self.assertTrue("stage-packages" in res["parts"]["faked-by-review-tools"])
+        self.assertTrue(
+            "bar=1.2~" in res["parts"]["faked-by-review-tools"]["stage-packages"]
+        )
+
     def test_check_get_package_revisions_empty_manifest(self):
         """Test get_package_revisions() - empty manifest"""
         self.store_db = read_file_as_json_dict("./tests/test-store-unittest-bare.db")

@@ -1086,11 +1086,24 @@ update_publisher_overrides = {
 # snaps that don't build from debs, etc). The os and base snaps are currently
 # treated separately and aren't listed here. Format:
 #
-#   update_stage_packages = { '<snap>': { '<deb>': '<version>|auto*' }}
+#   update_stage_packages = {'<snap>[/<base>]': {'<deb>': '<version>|auto*'}}
 #
 # where <snap> is the snap to operate on, <deb> is the Ubuntu binary and
 # <version> is the <deb> version. The special case of 'auto*' will use the
-# 'version' field from the snap version in some capacity
+# 'version' field from the snap version in some capacity.
+#
+# '/<base>' may optionally be specified. When it is specified, a snap that
+# specifies 'name: <snap>' and 'base: <base>' will be compared against this
+# version instead. For example, with:
+#   update_stage_packages = {
+#       "foo": {"bar": "1.2"},
+#       "foo/core18": {"bar": "2.0"},
+#   }
+# a snap named 'foo' whose revision uses 'base: core18' will have the deb 'bar'
+# compared against version '2.0'. If a different revision specified a different
+# base (or none at all), then 'bar' will be compared against '1.2'. In this
+# manner, different tracks can target different bases and be compared against
+# different revisions.
 update_stage_packages = {
     "aws-kernel": {"linux-image-aws": "auto-kernel"},
     "azure-kernel": {"linux-image-azure": "auto-kernel"},
@@ -1116,6 +1129,7 @@ update_stage_packages = {
     "modem-manager": {"modemmanager": "1.6.4-1ubuntu0.16.04.1"},
     # - network-manager snapcraft.yaml doesn't specify base; mock xenial
     "network-manager": {"network-manager": "1.2.6-0ubuntu0.16.04.3"},
+    "network-manager/core18": {"network-manager": "1.10.6-2ubuntu1.1"},
     # - stlouis-kernel maintained by hwe
     "stlouis-kernel": {"linux-image-generic": "auto-kernel"},
     # - udisks2 snapcraft.yaml doesn't specify base; mock xenial versions

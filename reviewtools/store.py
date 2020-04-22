@@ -75,15 +75,27 @@ def convert_canonical_app_version(s):
 
 def get_faked_stage_packages(m):
     """fake up stage-packages from overrides"""
-    if m["name"] in update_stage_packages:
+    # if the snap specifies a base, see if the override has a <snap>/<base>
+    # key. If not, fallback to <snap>
+    snapbase = ""
+    if "base" in m:
+        snapbase = m["base"]
+
+    key = "%s/%s" % (m["name"], snapbase)
+    if key not in update_stage_packages:
+        key = m["name"]
+
+    if key in update_stage_packages:
         fake_key = "faked-by-review-tools"
         if "parts" in m and fake_key not in m["parts"]:
             m["parts"][fake_key] = {}
             m["parts"][fake_key]["plugin"] = "null"
             for i in ["build-packages", "prime", "stage", "stage-packages"]:
                 m["parts"][fake_key][i] = []
-            for pkg in update_stage_packages[m["name"]]:
-                version = update_stage_packages[m["name"]][pkg]
+            # The override is:
+            #   update_stage_packages = {'<snap>': {'<deb>': '<version>|auto*'}}
+            for pkg in update_stage_packages[key]:
+                version = update_stage_packages[key][pkg]
                 if version == "auto":
                     version = convert_canonical_app_version(m["version"])
                 elif version == "auto-kernel":
