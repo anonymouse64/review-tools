@@ -128,6 +128,7 @@ OS_RELEASE_MAP = {
         "19.04": "disco",
         "19.10": "eoan",
         "20.04": "focal",
+        "20.10": "groovy",
     }
 }
 
