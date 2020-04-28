@@ -4,6 +4,26 @@ all:
 
 install: all
 
+DEPENDENCIES := \
+	black \
+	binutils \
+	execstack \
+	fakeroot \
+	file \
+	flake8 \
+	jq \
+	pylint \
+	python3-coverage \
+	python3-magic \
+	python3-requests \
+	python3-setuptools \
+	python3-simplejson \
+	python3-yaml \
+	squashfs-tools
+
+check-deps:
+	@for dep in $(DEPENDENCIES); do if ! dpkg -l $$dep 1>/dev/null 2>&1; then echo "Please apt install $$dep"; exit 1; fi; done
+
 test:
 	./run-tests
 
@@ -39,7 +59,7 @@ check-names:
 	diff -Naur check-names.list.orig check-names.list || exit 1
 	rm -f check-names.list.orig
 
-check: test functest-updates functest-dump-tool functest syntax-check style-check check-names
+check: check-deps test functest-updates functest-dump-tool functest syntax-check style-check check-names
 
 clean:
 	rm -rf ./reviewtools/__pycache__ ./reviewtools/tests/__pycache__
