@@ -21,6 +21,10 @@ if [ "$1" = "system" ]; then
        echo "Could not find snap-review. Is the review-tools snap installed?"
        exit 1
    fi
+   if ! snap connections review-tools | grep -Eq 'review-tools:home +:home' ; then
+       echo "Please connect the home interface with: sudo snap connect review-tools:home"
+       exit 1
+   fi
 elif [ -n "$1" ]; then
     help
     exit 1
