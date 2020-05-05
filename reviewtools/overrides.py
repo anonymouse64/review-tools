@@ -841,6 +841,11 @@ func_execstack_skipped_pats = [
     # investigate
     "usr/lib/arm-linux-gnueabihf/libx264.so.148",
     "usr/lib/arm-linux-gnueabihf/libvolk.so.1.1",
+    # s390x firmware in lxd snap (lxd ships in share/, so allow it too)
+    "share/qemu/s390-ccw.img",
+    "share/qemu/s390-netboot.img",
+    "usr/share/qemu/s390-ccw.img",
+    "usr/share/qemu/s390-netboot.img",
 ]
 
 # Most base snaps require certain mountpoints to be present. Snaps listed here
