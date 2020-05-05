@@ -1,3 +1,19 @@
+review-tools (0.48+20200505-1) RELEASED; urgency=medium
+
+  [ Jamie Strandboge ]
+  * overrides.py: add/update for public snaps
+  * store.py:
+    - add revision to error messages
+    - allow per-base update_stage_packages overrides
+  * sr_common.py: support daemon-scope
+
+  [ Alex Murray ]
+  * common.py: Add groovy to OS_RELEASE_MAP
+  * Makefile: Add check-deps target to check for required packages before
+    running checks
+
+ -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 05 May 2020 14:44:20 -0500
+
 review-tools (0.48+20200408-1) RELEASED; urgency=medium
 
   * sr_common.py: preliminary support for "activates-on"
