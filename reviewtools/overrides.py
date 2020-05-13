@@ -1025,6 +1025,7 @@ update_publisher_overrides = {
         "modem-manager": canonical_enablement,
         "multipass": canonical_multipass,
         "multipass-sshfs": canonical_multipass,
+        "mysql-shell": canonical_openstack,
         "network-manager": canonical_enablement,
         "openstack": canonical_openstack,
         "openwrt": canonical_enablement,
