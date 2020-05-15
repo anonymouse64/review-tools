@@ -1013,6 +1013,7 @@ update_publisher_overrides = {
         "lxd": canonical_lxd,
         "maas": canonical_maas,
         "maas-cli": canonical_maas,
+        "maas-test-db": canonical_maas,
         "microk8s": canonical_k8s,
         "microstack": canonical_openstack,
         "mir-kiosk": canonical_mir,
