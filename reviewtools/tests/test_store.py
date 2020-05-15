@@ -1,6 +1,6 @@
 """test_store.py: tests for the store module"""
 #
-# Copyright (C) 2018 Canonical Ltd.
+# Copyright (C) 2018-2020 Canonical Ltd.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
 
 from unittest import TestCase
 
+import copy
 import yaml
 
 import reviewtools.store as store
@@ -31,6 +32,57 @@ class TestStore(TestCase):
         """Read in a sample store and security notice db"""
         self.secnot_db = usn.read_usn_db("./tests/test-usn-unittest-1.db")
         self.store_db = read_file_as_json_dict("./tests/test-store-unittest-1.db")
+
+        self.manifest_basic = {
+            "apps": {"foo": {"command": "bin/foo"}},
+            "architectures": ["amd64"],
+            "build-packages": [],
+            "build-snaps": [],
+            "confinement": "strict",
+            "description": "some description",
+            "grade": "stable",
+            "name": "foo",
+            "parts": {
+                "part1": {
+                    "build-packages": [],
+                    "installed-packages": ["bar=1.2", "baz=3.4"],
+                    "installed-snaps": [],
+                    "plugin": "dump",
+                    "prime": [],
+                    "source": "snap",
+                    "stage": [],
+                    "stage-packages": ["libbar=1.2", "libbaz=3.4"],
+                    "uname": "Linux 5.4.0-29-generic #33-Ubuntu SMP Wed Apr 29 14:32:27 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux",
+                },
+                "part2": {
+                    "build-packages": ["autoconf", "dpkg-dev"],
+                    "install": "some_command",
+                    "installed-packages": ["norf=5.6", "baz=3.4"],
+                    "installed-snaps": [],
+                    "plugin": "nil",
+                    "prepare": "some_other_command",
+                    "prime": [],
+                    "source": "http://some/where/blah.tar.gz",
+                    "stage": [],
+                    "stage-packages": [],
+                    "uname": "Linux 5.4.0-29-generic #33-Ubuntu SMP Wed Apr 29 14:32:27 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux",
+                },
+                "part3": {
+                    "build-packages": [],
+                    "installed-packages": ["norf=5.6", "corge=7.8"],
+                    "installed-snaps": [],
+                    "organize": {"blah": "bin/blah"},
+                    "plugin": "dump",
+                    "prime": [],
+                    "source": "http://some/where/blah2.tar.gz",
+                    "stage": [],
+                    "stage-packages": [],
+                    "uname": "Linux 5.4.0-29-generic #33-Ubuntu SMP Wed Apr 29 14:32:27 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux",
+                },
+            },
+            "summary": "some summary",
+            "version": "0.1",
+        }
 
     def test_check_get_package_revisions_empty(self):
         """Test get_package_revisions() - empty item"""
@@ -435,19 +487,58 @@ class TestStore(TestCase):
         self.assertTrue(isinstance(res, dict))
         self.assertEqual(len(res), 0)
 
-    def test_check_get_ubuntu_release_from_manifest(self):
-        """Test get_ubuntu_release_from_manifest()"""
+    def test_check_get_ubuntu_release_from_manifest_store_db(self):
+        """Test get_ubuntu_release_from_manifest() - test-store-unittest-1.db"""
         m = yaml.load(
             self.store_db[0]["revisions"][0]["manifest_yaml"], Loader=yaml.SafeLoader
         )
         res = store.get_ubuntu_release_from_manifest(m)
         self.assertEqual(res, "xenial")
 
+    def test_check_get_ubuntu_release_from_manifest(self):
+        """Test get_ubuntu_release_from_manifest() - no base, use default"""
+        m = self.manifest_basic
+        res = store.get_ubuntu_release_from_manifest(m)
+        # no base
+        self.assertEqual(res, "xenial")
+
+    def test_check_get_ubuntu_release_from_manifest_known_bases(self):
+        """Test get_ubuntu_release_from_manifest() - base: <known>"""
+        for base in store.snap_to_release:
+            m = copy.deepcopy(self.manifest_basic)
+            m["base"] = base
+            res = store.get_ubuntu_release_from_manifest(m)
+            self.assertEqual(res, store.snap_to_release[base])
+
+    def test_check_get_ubuntu_release_from_manifest_unknown_base_snap1(self):
+        """Test get_ubuntu_release_from_manifest() - unknown base, known installed snap"""
+        for base in store.snap_to_release:
+            m = copy.deepcopy(self.manifest_basic)
+            m["base"] = "some-other-base"
+            m["parts"]["part2"]["installed-snaps"].append("%s=123" % base)
+
+            res = store.get_ubuntu_release_from_manifest(m)
+            self.assertEqual(res, store.snap_to_release[base])
+
+    def test_check_get_ubuntu_release_from_manifest_unknown_base_bad_snap(self):
+        """Test get_ubuntu_release_from_manifest() - unknown base, bad snap"""
+        m = copy.deepcopy(self.manifest_basic)
+        m["base"] = "some-other-base"
+        m["parts"]["part1"]["installed-snaps"] = ["core18"]
+        res = store.get_ubuntu_release_from_manifest(m)
+        self.assertEqual(res, "xenial")
+
+    def test_check_get_ubuntu_release_from_manifest_unknown_base_other_snap(self):
+        """Test get_ubuntu_release_from_manifest() - unknown base, other installed snap"""
+        m = copy.deepcopy(self.manifest_basic)
+        m["base"] = "some-other-base"
+        m["parts"]["part1"]["installed-snaps"] = ["other=234"]
+        res = store.get_ubuntu_release_from_manifest(m)
+        self.assertEqual(res, "xenial")
+
     def test_check_get_ubuntu_release_from_manifest_missing_parts(self):
         """Test get_ubuntu_release_from_manifest() - missing parts"""
-        m = yaml.load(
-            self.store_db[0]["revisions"][0]["manifest_yaml"], Loader=yaml.SafeLoader
-        )
+        m = copy.deepcopy(self.manifest_basic)
         del m["parts"]
 
         try:
@@ -457,44 +548,22 @@ class TestStore(TestCase):
 
         raise Exception("Should have raised ValueError")  # pragma: nocover
 
-    def test_check_get_ubuntu_release_from_manifest_bad_staged(self):
-        """Test get_ubuntu_release_from_manifest() - bad staged"""
-        m = yaml.load(
-            self.store_db[0]["revisions"][0]["manifest_yaml"], Loader=yaml.SafeLoader
-        )
-        m["parts"]["0ad-launcher"]["installed-snaps"].append("foo")
-
-        res = store.get_ubuntu_release_from_manifest(m)
-        self.assertEqual(res, "xenial")
-
-    def test_check_get_ubuntu_release_from_manifest_base18(self):
-        """Test get_ubuntu_release_from_manifest() - base-18"""
-        m = yaml.load(
-            self.store_db[0]["revisions"][0]["manifest_yaml"], Loader=yaml.SafeLoader
-        )
-        m["parts"]["0ad-launcher"]["installed-snaps"].append("base-18=123")
-
-        res = store.get_ubuntu_release_from_manifest(m)
-        self.assertEqual(res, "bionic")
-
     def test_check_get_ubuntu_release_from_manifest_base18_with_others(self):
-        """Test get_ubuntu_release_from_manifest() - base-18 with others"""
-        m = yaml.load(
-            self.store_db[0]["revisions"][0]["manifest_yaml"], Loader=yaml.SafeLoader
-        )
-        m["parts"]["0ad-launcher"]["installed-snaps"].append("abc=123")
-        m["parts"]["0ad-launcher"]["installed-snaps"].append("base-18=123")
+        """Test get_ubuntu_release_from_manifest() - unknown base, known installed with other"""
+        m = copy.deepcopy(self.manifest_basic)
+        m["base"] = "some-other-base"
+        m["parts"]["part1"]["installed-snaps"].append("abc=123")
+        m["parts"]["part2"]["installed-snaps"].append("base-18=123")
 
         res = store.get_ubuntu_release_from_manifest(m)
         self.assertEqual(res, "bionic")
 
     def test_check_get_ubuntu_release_from_manifest_base18_with_core(self):
-        """Test get_ubuntu_release_from_manifest() - base-18 with others"""
-        m = yaml.load(
-            self.store_db[0]["revisions"][0]["manifest_yaml"], Loader=yaml.SafeLoader
-        )
-        m["parts"]["0ad-launcher"]["installed-snaps"].append("core=123")
-        m["parts"]["0ad-launcher"]["installed-snaps"].append("base-18=123")
+        """Test get_ubuntu_release_from_manifest() - unknown base, two known installed"""
+        m = copy.deepcopy(self.manifest_basic)
+        m["base"] = "some-other-base"
+        m["parts"]["part1"]["installed-snaps"].append("core=123")
+        m["parts"]["part2"]["installed-snaps"].append("base-18=123")
 
         try:
             store.get_ubuntu_release_from_manifest(m)
@@ -503,41 +572,9 @@ class TestStore(TestCase):
 
         raise Exception("Should have raised ValueError")  # pragma: nocover
 
-    def test_check_get_ubuntu_release_from_manifest_core18(self):
-        """Test get_ubuntu_release_from_manifest() - core18"""
-        m = yaml.load(
-            self.store_db[0]["revisions"][0]["manifest_yaml"], Loader=yaml.SafeLoader
-        )
-        m["parts"]["0ad-launcher"]["installed-snaps"].append("core18=123")
-
-        res = store.get_ubuntu_release_from_manifest(m)
-        self.assertEqual(res, "bionic")
-
-    def test_check_get_ubuntu_release_from_manifest_core16(self):
-        """Test get_ubuntu_release_from_manifest() - core16"""
-        m = yaml.load(
-            self.store_db[0]["revisions"][0]["manifest_yaml"], Loader=yaml.SafeLoader
-        )
-        m["parts"]["0ad-launcher"]["installed-snaps"].append("core16=123")
-
-        res = store.get_ubuntu_release_from_manifest(m)
-        self.assertEqual(res, "xenial")
-
-    def test_check_get_ubuntu_release_from_manifest_core(self):
-        """Test get_ubuntu_release_from_manifest() - core"""
-        m = yaml.load(
-            self.store_db[0]["revisions"][0]["manifest_yaml"], Loader=yaml.SafeLoader
-        )
-        m["parts"]["0ad-launcher"]["installed-snaps"].append("core=123")
-
-        res = store.get_ubuntu_release_from_manifest(m)
-        self.assertEqual(res, "xenial")
-
     def test_check_get_ubuntu_release_from_manifest_os_release_xenial(self):
         """Test get_ubuntu_release_from_manifest() - ubuntu/xenial"""
-        m = yaml.load(
-            self.store_db[0]["revisions"][0]["manifest_yaml"], Loader=yaml.SafeLoader
-        )
+        m = copy.deepcopy(self.manifest_basic)
         m["snapcraft-os-release-id"] = "ubuntu"
         m["snapcraft-os-release-version-id"] = "16.04"
         res = store.get_ubuntu_release_from_manifest(m)
@@ -545,9 +582,7 @@ class TestStore(TestCase):
 
     def test_check_get_ubuntu_release_from_manifest_os_release_artful(self):
         """Test get_ubuntu_release_from_manifest() - ubuntu/artful"""
-        m = yaml.load(
-            self.store_db[0]["revisions"][0]["manifest_yaml"], Loader=yaml.SafeLoader
-        )
+        m = copy.deepcopy(self.manifest_basic)
         m["snapcraft-os-release-id"] = "ubuntu"
         m["snapcraft-os-release-version-id"] = "17.10"
         res = store.get_ubuntu_release_from_manifest(m)
@@ -555,21 +590,44 @@ class TestStore(TestCase):
 
     def test_check_get_ubuntu_release_from_manifest_os_release_bionic(self):
         """Test get_ubuntu_release_from_manifest() - ubuntu/bionic"""
-        m = yaml.load(
-            self.store_db[0]["revisions"][0]["manifest_yaml"], Loader=yaml.SafeLoader
-        )
+        m = copy.deepcopy(self.manifest_basic)
         m["snapcraft-os-release-id"] = "ubuntu"
         m["snapcraft-os-release-version-id"] = "18.04"
         res = store.get_ubuntu_release_from_manifest(m)
         self.assertEqual(res, "bionic")
 
-    def test_check_get_ubuntu_release_from_manifest_os_release_nonexist_os(self):
-        """Test get_ubuntu_release_from_manifest() - nonexistent"""
-        m = yaml.load(
-            self.store_db[0]["revisions"][0]["manifest_yaml"], Loader=yaml.SafeLoader
-        )
-        m["snapcraft-os-release-id"] = "nonexistent"
+    def test_check_get_ubuntu_release_from_manifest_os_release_neon_bionic_alt_base(self):
+        """Test get_ubuntu_release_from_manifest() - neon/18.04 with base: other"""
+        m = copy.deepcopy(self.manifest_basic)
+        m["base"] = "some-other-base"
+        m["snapcraft-os-release-id"] = "neon"
         m["snapcraft-os-release-version-id"] = "18.04"
+        res = store.get_ubuntu_release_from_manifest(m)
+        self.assertEqual(res, "bionic")
+
+    def test_check_get_ubuntu_release_from_manifest_os_release_neon_nonexist_ver(self):
+        """Test get_ubuntu_release_from_manifest() - neon/nonexistent with base: other"""
+        m = copy.deepcopy(self.manifest_basic)
+        m["base"] = "some-other-base"
+        m["snapcraft-os-release-id"] = "neon"
+        m["snapcraft-os-release-version-id"] = "1"
+        res = store.get_ubuntu_release_from_manifest(m)
+        self.assertEqual(res, "xenial")
+
+    def test_check_get_ubuntu_release_from_manifest_os_release_neon_bionic_core20(self):
+        """Test get_ubuntu_release_from_manifest() - neon/18.04 with base: core20"""
+        m = copy.deepcopy(self.manifest_basic)
+        m["base"] = "core20"
+        m["snapcraft-os-release-id"] = "neon"
+        m["snapcraft-os-release-version-id"] = "18.04"
+        res = store.get_ubuntu_release_from_manifest(m)
+        self.assertEqual(res, "focal")
+
+    def test_check_get_ubuntu_release_from_manifest_os_release_nonexist_os_and_ver(self):
+        """Test get_ubuntu_release_from_manifest() - nonexistent os/ver"""
+        m = copy.deepcopy(self.manifest_basic)
+        m["snapcraft-os-release-id"] = "nonexistent"
+        m["snapcraft-os-release-version-id"] = "1"
         res = store.get_ubuntu_release_from_manifest(m)
         # fallback to old behavior
         self.assertEqual(res, "xenial")
