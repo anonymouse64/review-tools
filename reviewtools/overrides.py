@@ -44,6 +44,7 @@ redflagged_snap_types_overrides = {
         "odroidxu4-kernel",
         "pc-lowlatency-kernel",
         "pi2-kernel-rt",
+        "rockpro64-kernel",
         "roseapple-pi-kernel",
         "roseapple-pi-kernel-ondra",
         "artik5-linux",  # 3rd party vendor kernels
@@ -84,6 +85,7 @@ redflagged_snap_types_overrides = {
         "pi2kyle",
         "pi3testbootsplash",
         "pocketbeagle",
+        "rockpro64-gadget",
         "roseapple-pi",
         "sabrelite",
         "wdl-nextcloud",
