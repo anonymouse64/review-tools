@@ -6098,6 +6098,42 @@ base: nix-base
         expected_counts = {"info": 0, "warn": 0, "error": 1}
         self.check_results(r, expected_counts)
 
+    def test_check_external_symlinks_has_symlink_to_usr_bin_python3(self):
+        """Test check_external_symlinks() - has symlink for /usr/bin/python3"""
+        package = utils.make_snap2(
+            output_dir=self.mkdtemp(),
+            extra_files=[
+                "/usr/bin/python3,usr/bin/python3",
+                "/usr/bin/python3.2,usr/bin/python3.2",
+                "/usr/bin/python3.5,usr/bin/python3.5",
+                "/usr/bin/python3.6,usr/bin/python3.6",
+                "/usr/bin/python3.8,usr/bin/python3.8",
+                "/usr/bin/python3.10,usr/bin/python3.10",
+                "/usr/bin/python3.999999,usr/bin/python3.999999",
+            ],
+        )
+        c = SnapReviewLint(package)
+        c.check_external_symlinks()
+        r = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_external_symlinks_has_symlink_to_usr_bin_python2(self):
+        """Test check_external_symlinks() - has symlink for /usr/bin/python3"""
+        package = utils.make_snap2(
+            output_dir=self.mkdtemp(),
+            extra_files=[
+                "/usr/bin/python2,usr/bin/python",
+                "/usr/bin/python2.1,usr/bin/python2.1",
+                "/usr/bin/python2.999999,usr/bin/python2.999999",
+            ],
+        )
+        c = SnapReviewLint(package)
+        c.check_external_symlinks()
+        r = c.review_report
+        expected_counts = {"info": 0, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
     def test_check_external_symlinks_type_kernel(self):
         """Test check_external_symlinks() - type kernel"""
         output_dir = self.mkdtemp()
