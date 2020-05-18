@@ -784,6 +784,7 @@ sec_iface_ref_overrides = {
         "rofi-totp": ["dot-gauth"],
         "snap-store": ["dot-snap-auth-json"],
         "spread": ["dot-spread", "dot-config-gcloud"],
+        "stmg": ["dot-local-share-stmm-games"],
         "universal-ctags": ["dot-ctags"],
         "vht": ["dot-vault-token"],
     },
