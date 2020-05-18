@@ -6099,7 +6099,7 @@ base: nix-base
         self.check_results(r, expected_counts)
 
     def test_check_external_symlinks_has_symlink_to_usr_bin_python3(self):
-        """Test check_external_symlinks() - has symlink for /usr/bin/python3"""
+        """Test check_external_symlinks() - symlink allowed for /usr/bin/python3"""
         package = utils.make_snap2(
             output_dir=self.mkdtemp(),
             extra_files=[
@@ -6119,7 +6119,7 @@ base: nix-base
         self.check_results(r, expected_counts)
 
     def test_check_external_symlinks_has_symlink_to_usr_bin_python2(self):
-        """Test check_external_symlinks() - has symlink for /usr/bin/python3"""
+        """Test check_external_symlinks() - symlink not allowed for /usr/bin/python2"""
         package = utils.make_snap2(
             output_dir=self.mkdtemp(),
             extra_files=[
