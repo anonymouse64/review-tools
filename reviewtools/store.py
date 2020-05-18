@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Canonical Ltd.
+# Copyright (C) 2018-2020 Canonical Ltd.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ snap_to_release = {
     "core": "xenial",
     "core16": "xenial",
     "core18": "bionic",
+    "core20": "focal",
 }
 
 
@@ -352,7 +353,6 @@ def get_secnots_for_manifest(m, secnot_db, with_cves=False):
     return pending_secnots
 
 
-# XXX: When LP: #1768820 is fixed, just use the manifest.yaml key
 def get_ubuntu_release_from_manifest(m):
     """Determine the Ubuntu release from the manifest"""
     if "parts" not in m:
@@ -360,12 +360,17 @@ def get_ubuntu_release_from_manifest(m):
             "Could not determine Ubuntu release ('parts' not in " "manifest)"
         )
 
+    ubuntu_release = None
+
+    # Record any installed snaps where we know the Ubuntu release that should
+    # be used
     installed_snaps = []
     for part in m["parts"]:
         if "installed-snaps" in m["parts"][part]:
             for entry in m["parts"][part]["installed-snaps"]:
                 if "=" not in entry:
                     warn("'%s' not properly formatted. Skipping" % entry)
+                    continue
                 pkg = entry.split("=")[0]  # we don't care about the version
 
                 if pkg in snap_to_release and pkg not in installed_snaps:
@@ -383,23 +388,56 @@ def get_ubuntu_release_from_manifest(m):
         except ValueError:
             pass
 
-    if len(installed_snaps) == 0:
-        default = "xenial"
-        debug(
-            "Could not determine Ubuntu release (no installed snaps). "
-            "Defaulting to '%s'" % default
-        )
-        ubuntu_release = default
-    else:
-        # NOTE: this will have to change if a snap ever has multiple cores or
-        # base snaps installed
-        if len(installed_snaps) > 1:
-            raise ValueError(
-                "Could not determine Ubuntu release (multiple "
-                "bases/cores: %s)" % ",".join(installed_snaps)
-            )
+    # Couldn't determine the ubuntu release from snapcraft-os-release-id and
+    # snapcraft-os-release-version-id, so let's make some guesses
+    default = "xenial"
 
-        ubuntu_release = snap_to_release[installed_snaps[0]]
+    # if no base is specified, use default
+    if "base" not in m:
+        ubuntu_release = default
+
+    # if we have a base we know about, use it
+    elif m["base"] in snap_to_release:
+        ubuntu_release = snap_to_release[m["base"]]
+
+    # otherwise we have a base we don't know about. Let's try to guess
+    else:
+        # make an educated guess if one installed snap
+        if len(installed_snaps) == 1:
+            ubuntu_release = snap_to_release[installed_snaps[0]]
+
+        # fake "ubuntu" and see if the ID matches something we know about.
+        # XXX: if/when snapcraft is updated to include ID_LIKE (eg,
+        # snapcraft-os-release-version-id), we could consider this as well.
+        elif "snapcraft-os-release-version-id" in m:
+            try:
+                ubuntu_release = get_os_codename(
+                    "ubuntu", m["snapcraft-os-release-version-id"]
+                )
+                debug(
+                    "Could not determine Ubuntu release (non-core base)."
+                    "Guessing based on snapcraft-os-release-version-id: %s"
+                    % (m["snapcraft-os-release-version-id"])
+                )
+            except ValueError:
+                ubuntu_release = None
+
+        if ubuntu_release is None:
+            # no installed snaps, use default
+            if len(installed_snaps) == 0:
+                debug(
+                    "Could not determine Ubuntu release (non-core base with no "
+                    "installed snaps). Defaulting to '%s'" % default
+                )
+                ubuntu_release = default
+
+            # error if more than one installed snap since we can't guess (note,
+            # we already checked for installed_snaps == 1, above)
+            elif len(installed_snaps) > 1:
+                raise ValueError(
+                    "Could not determine Ubuntu release (non-core base with "
+                    "multiple installed snaps: %s)" % ",".join(installed_snaps)
+                )
 
     debug("Ubuntu release=%s" % ubuntu_release)
 
