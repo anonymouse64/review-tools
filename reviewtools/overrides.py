@@ -778,6 +778,7 @@ sec_iface_ref_overrides = {
         "ludo": ["config-ludo"],
         "microk8s": ["dot-kube"],
         "ngrok": ["ngrok-config"],
+        "openstackclients": ["dot-config-openstack"],
         "popeye": ["kube-config"],
         "rain": ["config-aws"],
         "redis-desktop-manager": ["dot-rdm"],
