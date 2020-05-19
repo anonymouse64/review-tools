@@ -753,6 +753,7 @@ sec_iface_ref_overrides = {
         "amass": ["dot-amass"],
         "aws-cli": ["dot-aws"],
         "aws-sam-cli": ["config-aws"],
+        "autotrash-unofficial": ["dot-local-share-trash"],
         "chromium": ["chromium-config"],
         "cw-sh": ["dot-aws-config-credentials"],
         "doctl": ["doctl-config", "kube-config"],
