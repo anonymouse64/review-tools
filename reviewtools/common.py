@@ -1088,14 +1088,28 @@ def find_external_symlinks(unpack_dir, pkg_files, pkgname, prefix_ok=None):
     libc6_pats.append(re.compile(r"ld-linux-.*.so\.[0-9.]+$"))
     libc6_pats.append(re.compile(r"ld64.so\.[0-9.]+$"))  # ppc64el
 
+    # snapcraft 4.0 updated the python plugin to treat the python in the snap's
+    # runtime as essentially another virtual environment. To achieve this,
+    # snapcraft sets up symlinks to outside of the snap for python.
+    snapcraft_pats = [re.compile(r"^/usr/bin/python3(\.[0-9]*)?$")]
+
     def _in_patterns(pats, f):
         for pat in pats:
             if pat.search(f):
                 return True
         return False
 
-    def _is_external(link, pats, pkgname, prefix_ok=None):
+    def _is_external(link, rel_pats, abs_pats, pkgname, prefix_ok=None):
+        if not os.path.islink(link):
+            return False
+
+        # Perform a realpath so we can check if the file is in the unpack
+        # dir (which indicates it is inside the snap)
         rp = os.path.realpath(link)
+
+        # Perform a 'readlink' so we can check the path of the unresolved
+        # target against specific target patterns
+        rl = os.readlink(link)
 
         if (
             rp.startswith("/")
@@ -1116,14 +1130,20 @@ def find_external_symlinks(unpack_dir, pkg_files, pkgname, prefix_ok=None):
             not rp.startswith(unpack_dir + "/")
             and not rp.startswith(os.path.join("/snap", pkgname) + "/")
             and not rp.startswith(os.path.join("/var/snap", pkgname) + "/")
-            and not _in_patterns(pats, os.path.basename(link))
+            and not (
+                _in_patterns(rel_pats, os.path.basename(link))
+                or _in_patterns(abs_pats, rl)
+            )
         ):
             return True
         return False
 
     external_symlinks = list(
         filter(
-            lambda link: _is_external(link, libc6_pats, pkgname, prefix_ok), pkg_files
+            lambda link: _is_external(
+                link, libc6_pats, snapcraft_pats, pkgname, prefix_ok
+            ),
+            pkg_files,
         )
     )
 
