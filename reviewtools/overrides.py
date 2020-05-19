@@ -784,6 +784,7 @@ sec_iface_ref_overrides = {
         "rain": ["config-aws"],
         "redis-desktop-manager": ["dot-rdm"],
         "rofi-totp": ["dot-gauth"],
+        "shfmt": ["dot-editorconfig"],
         "snap-store": ["dot-snap-auth-json"],
         "spread": ["dot-spread", "dot-config-gcloud"],
         "stmg": ["dot-local-share-stmm-games"],
