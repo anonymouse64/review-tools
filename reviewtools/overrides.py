@@ -790,6 +790,7 @@ sec_iface_ref_overrides = {
         "stmg": ["dot-local-share-stmm-games"],
         "universal-ctags": ["dot-ctags"],
         "vht": ["dot-vault-token"],
+        "wtf-tui": ["dot-config-wtf-config-yml"],
     },
     "system-files": {
         "cvescan": ["apt-dpkg-db"],
