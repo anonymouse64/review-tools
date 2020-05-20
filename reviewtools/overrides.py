@@ -787,6 +787,7 @@ sec_iface_ref_overrides = {
         "shfmt": ["dot-editorconfig"],
         "snap-store": ["dot-snap-auth-json"],
         "spread": ["dot-spread", "dot-config-gcloud"],
+        "stimmtausch": ["dot-config-stimmtausch"],
         "stmg": ["dot-local-share-stmm-games"],
         "universal-ctags": ["dot-ctags"],
         "vht": ["dot-vault-token"],
