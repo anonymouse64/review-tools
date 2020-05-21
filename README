@@ -61,8 +61,47 @@ $ ./run-tests test_sr_security.py   # only security tests
 Or to run a specific test:
 $ python3 -m unittest reviewtools.tests.<filename>.<class>.<test>
 
-Eg:
-$ python3 -m unittest reviewtools.tests.test_sr_lint.TestSnapReviewLint.test_all_checks_as_v2
+Invocations for existing tests:
+
+ * available.py
+   $ python3 -m unittest reviewtools.tests.test_available.TestAvailable.foo
+
+ * common.py
+   $ python3 -m unittest reviewtools.tests.test_common.TestCommon.bar
+
+ * debversion.py
+   $ python3 -m unittest reviewtools.tests.test_debversion.TestDebVersion.baz
+
+ * email.py
+   $ python3 -m unittest reviewtools.tests.test_email.TestEmail.norf
+
+ * modules.py
+   $ python3 -m unittest reviewtools.tests.test_modules.TestModules.corge
+
+ * sr_common.py
+   $ python3 -m unittest reviewtools.tests.test_sr_common.TestSnapReviewCommon.qux
+
+ * sr_declaration.py:
+   $ python3 -m unittest reviewtools.tests.test_sr_declaration.TestSnapReviewDeclaration.test_all_checks_as_v2
+
+ * sr_functional.py:
+   $ python3 -m unittest reviewtools.tests.test_sr_functional.TestSnapReviewFunctional.test_all_checks_as_v2
+   $ python3 -m unittest reviewtools.tests.test_sr_functional.TestSnapReviewFunctionalNoMock.quxx
+
+ * sr_lint.py
+   $ python3 -m unittest reviewtools.tests.test_sr_lint.TestSnapReviewLint.test_all_checks_as_v2
+   $ python3 -m unittest reviewtools.tests.test_sr_lint.TestSnapReviewLintNoMock.blah
+
+ * sr_security.py:
+   $ python3 -m unittest reviewtools.tests.test_sr_security.TestSnapReviewSecurity.test_all_checks_as_v2
+   $ python3 -m unittest reviewtools.tests.test_sr_security.TestSnapReviewSecurityNoMock.blah2
+
+ * store.py
+   $ python3 -m unittest reviewtools.tests.test_store.TestStore.blah3
+
+ * usn.py
+   $ python3 -m unittest reviewtools.tests.test_usn.TestUSN.blah4
+
 
 Additional checks are:
 $ ./run-flake8
