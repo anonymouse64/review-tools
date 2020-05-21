@@ -26,7 +26,7 @@ from reviewtools.common import StatLLS
 from reviewtools.tests import utils
 
 
-class TestSnapReviewSkeleton(sr_tests.TestSnapReview):
+class TestCommon(sr_tests.TestSnapReview):
     """Tests for common module"""
 
     def setUp(self):
