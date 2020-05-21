@@ -1,9 +1,10 @@
-review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
+review-tools (0.48+20200521-1) RELEASED; urgency=medium
 
   * overrides.py: add/update for public snaps
   * store.py: make get_ubuntu_release_from_manifest() more robust
+  * common.py: also use readlink() to check for external py3
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Mon, 18 May 2020 13:38:36 -0500
+ -- Jamie Strandboge <jamie@ubuntu.com>  Thu, 21 May 2020 13:38:59 -0500
 
 review-tools (0.48+20200505-1) RELEASED; urgency=medium
 
