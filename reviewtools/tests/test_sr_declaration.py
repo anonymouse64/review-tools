@@ -5026,6 +5026,46 @@ slots:
         expected["info"][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
+    def test_check_declaration_plugs_desktop_launch(self):
+        """Test check_declaration - plugs desktop-launch"""
+        plugs = {"iface": {"interface": "desktop-launch"}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewDeclaration(self.test_name)
+
+        c.check_declaration()
+        r = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:plugs:iface:desktop-launch"
+        expected["info"][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_slots_desktop_launch(self):
+        """Test check_declaration - slots desktop-launch"""
+        slots = {"iface": {"interface": "desktop-launch"}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name)
+
+        c.check_declaration()
+        r = c.review_report
+        expected_counts = {"info": None, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:slots_installation:iface:desktop-launch"
+        expected["error"][name] = {
+            "text": "human review required due to 'allow-installation' constraint (snap-type)"
+        }
+        self.check_results(r, expected=expected)
+
     def test_check_declaration_plugs_uses_iface_reference(self):
         """Test check_declaration - plugs iface reference"""
         plugs = {"iface": {"interface": "browser-support", "allow-sandbox": True}}
