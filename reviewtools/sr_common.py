@@ -282,10 +282,24 @@ class SnapReview(Review):
     }
 
     # In progress interfaces are those that are not yet in snapd but for
-    # some reason we need them. Normally we will never want to do this, but
-    # for example the unity8 interface wass in progress and they wanted CI
-    # uploads
-    inprogress_interfaces = {"16": {"plugs": {}, "slots": {}}}
+    # some reason we need them. Normally we don't want to do this, but
+    # for example, if there are experimental PRs that need wider testing,
+    # this eases things
+    inprogress_interfaces = {
+        "16": {
+            "plugs": {},
+            "slots": {
+                # This will likely use allow-installation: False when added to
+                # snapd, but since this interface is unknown to the store and
+                # official snapds, we don't want to issue snap declarations
+                # just yet
+                "desktop-launch": {
+                    "allow-installation": {"slot-snap-type": ["core"]},
+                    "deny-auto-connection": True,
+                }
+            },
+        }
+    }
 
     # most are from cmd/snap-confine/mount-support.c:sc_populate_mount_ns()
     # Must be absolute paths
