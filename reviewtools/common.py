@@ -1102,7 +1102,7 @@ def find_external_symlinks(unpack_dir, pkg_files, pkgname, prefix_ok=None):
                 return True
         return False
 
-    def _is_external(link, rel_pats, abs_pats, pkgname, prefix_ok=None):
+    def _is_external(link, linkname_pats, abs_pats, pkgname, prefix_ok=None):
         if not os.path.islink(link):
             return False
 
@@ -1129,15 +1129,40 @@ def find_external_symlinks(unpack_dir, pkg_files, pkgname, prefix_ok=None):
         if prefix_ok is not None and rp.startswith(prefix_ok):
             return False
 
+        # Allowed external:
+        # - realpath: <unpackdir>/...
+        # - realpath: /snap/<snapname>/...
+        # - realpath: /var/snap/<snapname>/...
+        # - realpath matches a particular name (linkname_pats):
+        #   /.../libnsl-2.31.so
+        # - readlink (target) is an absolute path and matches an absolute path
+        #   (abs_pats): /usr/bin/python3
+        # - readlink (target) is a relative path and realpath matches an
+        #   absolute path (abs_paths): python3 -> /usr/bin/python3
+        #
+        # Disallowed (external)
+        # - realpath: /snap/<other snap>/...
+        # - realpath: /var/snap/<other snap>/...
+        # - realpath: /.../not-matching-link-name
+        # - realpath: /not-matching-absolute-path
+
+        # Check if the realpath is pointing to something outside the snap
         if (
             not rp.startswith(unpack_dir + "/")
             and not rp.startswith(os.path.join("/snap", pkgname) + "/")
             and not rp.startswith(os.path.join("/var/snap", pkgname) + "/")
-            and not (
-                _in_patterns(rel_pats, os.path.basename(link))
-                or _in_patterns(abs_pats, rl)
-            )
+            and not _in_patterns(linkname_pats, os.path.basename(link))
         ):
+            # If the target link is absolute, check the target link against
+            # allowed abs paths.
+            if rl.startswith("/") and _in_patterns(abs_pats, rl):
+                return False
+
+            # If the target link is relative, check the realpath against
+            # allowed abs paths
+            if not rl.startswith("/") and _in_patterns(abs_pats, rp):
+                return False
+
             return True
         return False
 

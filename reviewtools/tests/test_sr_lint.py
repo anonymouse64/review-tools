@@ -5982,10 +5982,15 @@ class TestSnapReviewLintNoMock(TestCase):
         expected_counts = {"info": 1, "warn": 0, "error": 0}
         self.check_results(r, expected_counts)
 
-    def test_check_external_symlinks_has_symlink(self):
-        """Test check_external_symlinks() - has symlink"""
+    def test_check_external_symlinks_has_symlink_to_outside(self):
+        """Test check_external_symlinks() - has symlink to outside"""
         package = utils.make_snap2(
-            output_dir=self.mkdtemp(), extra_files=["/some/where,outside"]
+            output_dir=self.mkdtemp(),
+            extra_files=[
+                "/some/where,outside",
+                "bar,foo",  # $SNAP/foo -> bar
+                "/some/where/else,bar",  # $SNAP/bar -> /some/where/else
+            ],
         )
         c = SnapReviewLint(package)
         c.check_external_symlinks()
@@ -5993,8 +5998,18 @@ class TestSnapReviewLintNoMock(TestCase):
         expected_counts = {"info": None, "warn": 0, "error": 1}
         self.check_results(r, expected_counts)
 
-    def test_check_external_symlinks_has_symlink_libc6(self):
-        """Test check_external_symlinks() - has symlink for libc6"""
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "lint-snap-v2:external_symlinks"
+        expected["error"][name] = {
+            "text": "package contains external symlinks: outside, bar, foo"
+        }
+        self.check_results(r, expected=expected)
+
+    def test_check_external_symlinks_has_symlink_name_libc6(self):
+        """Test check_external_symlinks() - has symlink name in libc6"""
         package = utils.make_snap2(
             output_dir=self.mkdtemp(),
             extra_files=["/usr/lib/x86_64-linux-gnu/libmvec.so,libmvec.so"],
@@ -6005,7 +6020,7 @@ class TestSnapReviewLintNoMock(TestCase):
         expected_counts = {"info": 1, "warn": 0, "error": 0}
         self.check_results(r, expected_counts)
 
-    def test_check_external_symlinks_has_symlink_libc6_ld_linux(self):
+    def test_check_external_symlinks_has_symlink_name_libc6_ld_linux(self):
         """Test check_external_symlinks() - ld-linux-x86-64.so.2"""
         package = utils.make_snap2(
             output_dir=self.mkdtemp(),
@@ -6034,6 +6049,42 @@ class TestSnapReviewLintNoMock(TestCase):
         package = utils.make_snap2(
             output_dir=self.mkdtemp(),
             extra_files=["/var/snap/test/current/foo,/var/snap/test/current/foo"],
+        )
+        c = SnapReviewLint(package)
+        c.check_external_symlinks()
+        r = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_external_symlinks_has_symlink_to_snap_other(self):
+        """Test check_external_symlinks() - /snap/<other>/..."""
+        package = utils.make_snap2(
+            output_dir=self.mkdtemp(),
+            extra_files=["/snap/other/current/foo,/snap/test/current/foo"],
+        )
+        c = SnapReviewLint(package)
+        c.check_external_symlinks()
+        r = c.review_report
+        expected_counts = {"info": None, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_external_symlinks_has_symlink_to_snap_data_other(self):
+        """Test check_external_symlinks() - /var/snap/<other>/..."""
+        package = utils.make_snap2(
+            output_dir=self.mkdtemp(),
+            extra_files=["/var/snap/other/current/foo,/var/snap/test/current/foo"],
+        )
+        c = SnapReviewLint(package)
+        c.check_external_symlinks()
+        r = c.review_report
+        expected_counts = {"info": None, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_external_symlinks_has_symlink_to_internal(self):
+        """Test check_external_symlinks() has symlink to internal"""
+        package = utils.make_snap2(
+            output_dir=self.mkdtemp(),
+            extra_files=["bar,foo", "baz,bar"],  # $SNAP/foo -> bar  # $SNAP/bar -> baz
         )
         c = SnapReviewLint(package)
         c.check_external_symlinks()
@@ -6103,6 +6154,8 @@ base: nix-base
         package = utils.make_snap2(
             output_dir=self.mkdtemp(),
             extra_files=[
+                "python3,python",  # $SNAP/python -> python3
+                "/usr/bin/python3,python3",  # $SNAP/python3 -> /usr/bin/python3
                 "/usr/bin/python3,usr/bin/python3",
                 "/usr/bin/python3.2,usr/bin/python3.2",
                 "/usr/bin/python3.5,usr/bin/python3.5",
@@ -6123,6 +6176,8 @@ base: nix-base
         package = utils.make_snap2(
             output_dir=self.mkdtemp(),
             extra_files=[
+                "python2,python",  # $SNAP/python -> python2
+                "/usr/bin/python2,python2",  # $SNAP/python2 -> /usr/bin/python2
                 "/usr/bin/python2,usr/bin/python",
                 "/usr/bin/python2.1,usr/bin/python2.1",
                 "/usr/bin/python2.999999,usr/bin/python2.999999",
@@ -6133,6 +6188,16 @@ base: nix-base
         r = c.review_report
         expected_counts = {"info": 0, "warn": 0, "error": 1}
         self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "lint-snap-v2:external_symlinks"
+        expected["error"][name] = {
+            "text": "package contains external symlinks: python, python2, usr/bin/python, usr/bin/python2.999999, usr/bin/python2.1"
+        }
+        self.check_results(r, expected=expected)
 
     def test_check_external_symlinks_type_kernel(self):
         """Test check_external_symlinks() - type kernel"""
