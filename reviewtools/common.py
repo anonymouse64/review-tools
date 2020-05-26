@@ -1146,7 +1146,21 @@ def find_external_symlinks(unpack_dir, pkg_files, pkgname, prefix_ok=None):
         # - realpath: /.../not-matching-link-name
         # - realpath: /not-matching-absolute-path
 
-        # Check if the realpath is pointing to something outside the snap
+        # Check if the realpath is pointing to something outside the snap. Note
+        # that os.path.realpath resolves all symlinks, so:
+        #
+        #   /<unpackdir>/foo -> /does-exist     - realpath is '/does-exist'
+        #   /<unpackdir>/foo -> /does-not-exist - realpath is '/does-not-exist'
+        #
+        # In either case, both point outside the snap so the realpath is ok as
+        # a first pass. Since 'unpack_dir' is a temporary directory, it should
+        # not be possible for a snap to do:
+        #
+        #   /<unpackdir>/foo -> /link/pointing/to/<unpackdir>/bar
+        #
+        # since /link/pointing/to/<unpackdir>/bar is not controllable by the
+        # snap (even if it could, this check is not a security check and is
+        # instead a warning that something could go wrong at runtime).
         if (
             not rp.startswith(unpack_dir + "/")
             and not rp.startswith(os.path.join("/snap", pkgname) + "/")
