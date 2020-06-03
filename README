@@ -29,6 +29,7 @@ This gives an alternate view on bin/snap-run-checks:
 - bin/snap-review
 
 Running checks locally:
+$ make check-deps  # install what it tells you
 $ PYTHONPATH=$PWD ./bin/snap-review /path/to/package
 
 Importable tests:
