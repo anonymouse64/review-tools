@@ -63,7 +63,10 @@ MKSQUASHFS_OPTS = [
 # behavior. Unfortunately, the return code for creating device files is
 # still non-zero, so we will check the error strings and only error out
 # if there are no ignored errors.
-UNSQUASHFS_IGNORED_ERRORS = ["because you're not superuser"]
+UNSQUASHFS_IGNORED_ERRORS = [
+    "because you're not superuser",     # non-root
+    "because Operation not permitted",  # lxc
+]
 # There are quite a few kernel interfaces that can cause problems with
 # long profile names. These are outlined in
 # https://launchpad.net/bugs/1499544. The big issue is that the audit
