@@ -46,6 +46,7 @@ import copy
 import os
 import re
 import shutil
+import sys
 
 
 class SnapReviewSecurity(SnapReview):
@@ -397,7 +398,7 @@ class SnapReviewSecurity(SnapReview):
 
         if orig_sum != repack_sum:
             if "SNAP_DEBUG_RESQUASHFS" in os.environ:
-                print(self._debug_resquashfs(tmpdir, fn, tmp_repack))
+                print(self._debug_resquashfs(tmpdir, fn, tmp_repack), file=sys.stderr)
 
                 if os.environ["SNAP_DEBUG_RESQUASHFS"] == "2":  # pragma: nocover
                     import subprocess
