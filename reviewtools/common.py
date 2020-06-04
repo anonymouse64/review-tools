@@ -698,7 +698,7 @@ unsquashfs_lls_regex = {
     "ftype_pat": re.compile(r"^[bcdlps-]$"),
     "mknod_pat_full": re.compile(r".,."),
     # based on osutil/user.go from snapd
-    "owner_pat": re.compile(r"^[a-z0-9][-a-z0-9+._]*/[a-z0-9][-a-z0-9+._]*$"),
+    "owner_pat": re.compile(r"^[a-z0-9_][-a-z0-9+._]*/[a-z0-9][-a-z0-9+._]*$"),
 }
 
 
