@@ -64,7 +64,7 @@ MKSQUASHFS_OPTS = [
 # still non-zero, so we will check the error strings and only error out
 # if there are no ignored errors.
 UNSQUASHFS_IGNORED_ERRORS = [
-    "because you're not superuser",     # non-root
+    "because you're not superuser",  # non-root
     "because Operation not permitted",  # lxc
 ]
 # There are quite a few kernel interfaces that can cause problems with
