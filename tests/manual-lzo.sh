@@ -336,7 +336,7 @@ for sn in "${all_snaps[@]}" ; do
         )
 
         if [ "$(echo "$repack_check" | jq -r '."snap.v2_security".info."security-snap-v2:squashfs_repack_checksum".text')" != "$expected" ]; then
-            echo ">>> TEST FAIL <<< snap $sn lzo compressed failed review-tools check for squashfs_repack_checksum"
+            echo ">>> TEST FAIL <<< snap $sn lzo compressed failed review-tools check for squashfs_repack_checksum in lxd $series.04 container"
             exit 1
         fi
 
