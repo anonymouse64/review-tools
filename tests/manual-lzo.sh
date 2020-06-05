@@ -1,4 +1,5 @@
 #!/bin/bash
+
 #
 # Author: Ian Johnson <ian.johnson@canonical.com>
 # Copyright (C) 2020 Canonical Ltd.
@@ -102,28 +103,6 @@ function is_core_snap {
     fi
 }
 
-function cleanup {
-    echo "signalled unexpectedly, triggering cleanup..."
-    set +x
-    set +e
-    trap - EXIT SIGINT SIGTERM
-    for series in 16 18 20; do
-        cont_name="review-tools-$series-04-checker"
-        if lxc list --fast | grep -q "${cont_name}"; then
-            sudo lxc delete "${cont_name}" --force || true
-        fi
-    done
-
-    for sn in "${all_snaps[@]}"; do
-        MAYBE_SUDO=$(maybe_sudo "$sn")
-        # also cleanup the intermediate hashed snaps
-        $MAYBE_SUDO rm -f "${sn}_lzo-"*.snap
-        $MAYBE_SUDO rm -rf "${sn}-src"
-
-    done
-    exit 1
-}
-trap cleanup EXIT SIGINT SIGTERM
 
 
 # step 0. ensure pre-reqs are available
@@ -148,11 +127,52 @@ for cmd in snap unsquashfs mksquashfs lxc sha256sum jq curl; do
     fi
 done
 
+# we need a recent enough jq otherwise older ones, i.e. 1.3 from trusty archive
+# will fail with an error like
+# error: syntax error, unexpected QQSTRING_START, expecting $end
+# . | ."snap.v2_security"."info"."security-snap-v2:squashfs_repack_checksum"."text"
+#      ^
+# 1 compile error
+
+if [ "$(jq --help 2>&1| grep version | grep -Po 'version 1\.\K[0-9]')" -le "4" ]; then
+    echo "jq version too old, please upgrade to at least 1.5"
+    echo "hint: the snap is currently at 1.5, snap install jq"
+    exit 1
+fi
+
+
+# on some distros, i.e. debian sudo does not have /snap/bin on path
+LXC=$(command -v lxc)
+
 # ensure that lxd is setup to not use zfs storage dir, as that is buggy
-if lxc info | grep -q "storage: zfs"; then
+if sudo "$LXC" info | grep -q "storage: zfs"; then
     echo "zfs storage dir for lxd is not supported due to a bug, please use storage: dir"
     exit 1
 fi
+
+function cleanup {
+    echo "signalled unexpectedly, triggering cleanup..."
+    set +x
+    set +e
+    trap - EXIT SIGINT SIGTERM
+    for series in 16 18 20; do
+        cont_name="review-tools-$series-04-checker"
+        if sudo "$LXC" list --fast | grep -q "${cont_name}"; then
+            sudo "$LXC" delete "${cont_name}" --force || true
+        fi
+    done
+
+    for sn in "${all_snaps[@]}"; do
+        MAYBE_SUDO=$(maybe_sudo "$sn")
+        # also cleanup the intermediate hashed snaps
+        $MAYBE_SUDO rm -f "${sn}_lzo-"*.snap
+        $MAYBE_SUDO rm -rf "${sn}-src"
+
+    done
+    exit 1
+}
+trap cleanup EXIT SIGINT SIGTERM
+
 
 # save some distro/system info
 {
@@ -186,22 +206,22 @@ sudo echo "useless sudo to keep authenticated against sudo during loops..." > /d
 for series in 16 18 20; do
     cont_name="review-tools-$series-04-checker"
 
-    sudo lxc launch "ubuntu:$series.04" "${cont_name}"
+    sudo "$LXC" launch "ubuntu:$series.04" "${cont_name}"
 
     # wait for networking to work before pushing any files to the container
-    sudo lxc exec "${cont_name}" -- /bin/bash -c 'until nslookup -timeout=1 archive.ubuntu.com; do sleep 0.1; done'
+    sudo "$LXC" exec "${cont_name}" -- /bin/bash -c 'until nslookup -timeout=1 archive.ubuntu.com; do sleep 0.1; done'
 
-    sudo lxc file push review-tools.tgz "${cont_name}/root/review-tools.tgz"
+    sudo "$LXC" file push review-tools.tgz "${cont_name}/root/review-tools.tgz"
 
-    sudo lxc exec "${cont_name}" -- apt update
-    sudo lxc exec "${cont_name}" -- apt upgrade -y
+    sudo "$LXC" exec "${cont_name}" -- apt update
+    sudo "$LXC" exec "${cont_name}" -- apt upgrade -y
 
     # dependencies for review-tools as per the snapcraft.yaml
-    sudo lxc exec "${cont_name}" -- apt install -y binutils fakeroot file libdb5.3 libmagic1 python3-magic python3-requests python3-simplejson python3-yaml squashfs-tools
-    sudo lxc exec "${cont_name}" -- apt clean
+    sudo "$LXC" exec "${cont_name}" -- apt install -y binutils fakeroot file libdb5.3 libmagic1 python3-magic python3-requests python3-simplejson python3-yaml squashfs-tools
+    sudo "$LXC" exec "${cont_name}" -- apt clean
 
-    sudo lxc exec "${cont_name}" -- mkdir /root/review-tools
-    sudo lxc exec "${cont_name}" -- tar -C /root/review-tools --strip-components=1 -xf /root/review-tools.tgz
+    sudo "$LXC" exec "${cont_name}" -- mkdir /root/review-tools
+    sudo "$LXC" exec "${cont_name}" -- tar -C /root/review-tools --strip-components=1 -xf /root/review-tools.tgz
 done
 
 # download all the snaps up front, this saves networking time for the long haul
@@ -215,7 +235,6 @@ for sn in "${all_snaps[@]}" ; do
         echo "waiting to re-try download"
         sleep 5
     done
-
 done
 
 for sn in "${all_snaps[@]}" ; do
@@ -280,11 +299,19 @@ for sn in "${all_snaps[@]}" ; do
     for series in 16 18 20; do
         cont_name="review-tools-$series-04-checker"
 
-        sudo lxc file push "${sn}_lzo.snap" "${cont_name}/root/${sn}_lzo.snap"
+        sudo "$LXC" file push "${sn}_lzo.snap" "${cont_name}/root/${sn}_lzo.snap"
 
-        # snapd and base snaps are not properly checked because they have root
-        # owned files, etc. so the test is somewhat artifical for those snaps
-        # but on all other snaps we should see "OK" exactly
+        # the core* base snaps are not properly checked within the lxd container
+        # by the review-tools because they have files like /dev/* that are not
+        # properly preserved when unpacked and repacked inside the lxd container
+        # because lxd does not allow mknod, etc.
+        # as such, the check for the base snaps is somewhat artifical, but we
+        # still expect a specific message from the review-tools to ensure that
+        # something else didn't fail
+        # note that root owned files and setuid files are ok here (i.e. from the
+        # chromium and snapd snaps), because we created the squashfs files above
+        # as root for snaps that have setuid , and when unpacking within the lxd
+        # container the files are ok to be created setuid, owned as root, etc.
         if is_core_snap "$sn"; then
             expected="OK (check not enforced for base and os snaps)"
         else
@@ -299,7 +326,7 @@ for sn in "${all_snaps[@]}" ; do
         # but we don't have that state available to us about the interfaces and
         # we don't really care about that the interface usage anyways
         repack_check=$(
-            sudo lxc exec \
+            sudo "$LXC" exec \
                 --cwd /root/review-tools \
                 --env SNAP_ENFORCE_RESQUASHFS_COMP=0 \
                 --env SNAP_DEBUG_RESQUASHFS=1 \
@@ -314,7 +341,7 @@ for sn in "${all_snaps[@]}" ; do
         fi
 
         # We're done with the lzo in the container
-        sudo lxc exec "${cont_name}" -- rm -f "/root/${sn}_lzo.snap"
+        sudo "$LXC" exec "${cont_name}" -- rm -f "/root/${sn}_lzo.snap"
 
         sudo echo "useless sudo to keep authenticated against sudo during loops..." > /dev/null
     done
@@ -327,8 +354,8 @@ done
 for series in 16 18 20; do
     cont_name="review-tools-$series-04-checker"
 
-    sudo lxc stop "${cont_name}" --force
-    sudo lxc delete "${cont_name}" --force
+    sudo "$LXC" stop "${cont_name}" --force
+    sudo "$LXC" delete "${cont_name}" --force
 done
 
 popd
