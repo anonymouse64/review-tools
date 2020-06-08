@@ -882,6 +882,8 @@ lint_redflagged_base_dep_override = {
 
 # Some publisher_emails represent a shared account. For snaps with a shared
 # email, also send to other addresses.
+canonical_anbox = ["stephane.graber@canonical.com", "simon.fels@canonical.com"]
+
 canonical_commercial_systems = [
     "uros.jovanovic@canonical.com",
     "francesco.banconi@canonical.com",
@@ -1056,6 +1058,7 @@ update_publisher_overrides = {
         "snapd": canonical_snapd,
         "snappy-debug": canonical_security,
         "snapweb": canonical_enablement,
+        "nats": canonical_anbox,
         "stlouis-kernel": canonical_hwe,
         "strace-static": canonical_snapd,
         "subiquity": canonical_foundations,
