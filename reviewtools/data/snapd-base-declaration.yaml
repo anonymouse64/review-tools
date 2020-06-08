@@ -557,8 +557,7 @@
   network-status:
     allow-installation:
       slot-snap-type:
-        - app
-    deny-connection: true
+        - core
   ofono:
     allow-installation:
       slot-snap-type:
@@ -617,6 +616,11 @@
         - core
     deny-auto-connection: true
   physical-memory-observe:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
+  power-control:
     allow-installation:
       slot-snap-type:
         - core
