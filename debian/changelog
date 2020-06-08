@@ -4,6 +4,7 @@ review-tools (0.48+20200608-1) UNRELEASED; urgency=medium
   * sr_security:
     - add SNAP_ENFORCE_RESQUASHFS_COMP=0
     - SNAP_DEBUG_RESQUASHFS should go to stderr
+    - mention using squashfs-tools >= 4.3
   * common.py:
     - adjust UNSQUASHFS_IGNORED_ERRORS for lxc failures
     - allow users with leading '_' (eg, _apt)
