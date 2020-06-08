@@ -756,7 +756,7 @@ sec_iface_ref_overrides = {
         "autotrash-unofficial": ["dot-local-share-trash"],
         "chromium": ["chromium-config"],
         "cw-sh": ["dot-aws-config-credentials"],
-        "doctl": ["doctl-config", "kube-config"],
+        "doctl": ["doctl-config", "dot-docker", "kube-config"],
         "dotrun": ["dot-npmrc", "dot-yarnrc"],
         "dynocsv": ["aws-config-credentials"],
         "enonic": ["dot-enonic"],
