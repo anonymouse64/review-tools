@@ -1,4 +1,4 @@
-review-tools (0.48+20200608-1) UNRELEASED; urgency=medium
+review-tools (0.48+20200608-1) RELEASED; urgency=medium
 
   * bin/snap-review: update help text wrt exit codes
   * sr_security:
@@ -11,7 +11,7 @@ review-tools (0.48+20200608-1) UNRELEASED; urgency=medium
     - clarify find_external_symlinks() and fix sym -> sym
   * snapd-base-declaration.yaml: update for 2.45
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Mon, 08 Jun 2020 10:33:01 -0500
+ -- Jamie Strandboge <jamie@ubuntu.com>  Mon, 08 Jun 2020 11:42:15 -0500
 
 review-tools (0.48+20200521-2) RELEASED; urgency=medium
 
