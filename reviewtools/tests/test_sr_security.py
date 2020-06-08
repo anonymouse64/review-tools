@@ -1916,7 +1916,7 @@ exit 0
         expected["info"] = dict()
         name = "security-snap-v2:squashfs_repack_checksum"
         expected["error"][name] = {
-            "text": "checksums do not match. Please ensure the snap is created with either 'snapcraft pack <DIR>' (using snapcraft >= 2.38) or 'mksquashfs <dir> <snap> -noappend -comp xz -all-root -no-xattrs -no-fragments'. If using electron-builder, please upgrade to latest stable (>= 20.14.7). See https://forum.snapcraft.io/t/automated-reviews-and-snapcraft-2-38/4982/17 for details."
+            "text": "checksums do not match. Please ensure the snap is created with either 'snapcraft pack <DIR>' (using snapcraft >= 2.38) or 'mksquashfs <dir> <snap> -noappend -comp xz -all-root -no-xattrs -no-fragments' (using squashfs-tools >= 4.3). If using electron-builder, please upgrade to latest stable (>= 20.14.7). See https://forum.snapcraft.io/t/automated-reviews-and-snapcraft-2-38/4982/17 for details."
         }
         self.check_results(report, expected=expected)
 
@@ -1971,7 +1971,7 @@ exit 0
         expected["info"] = dict()
         name = "security-snap-v2:squashfs_repack_checksum"
         expected["info"][name] = {
-            "text": "OK (check not enforced for this snap): checksums do not match. Please ensure the snap is created with either 'snapcraft pack <DIR>' (using snapcraft >= 2.38) or 'mksquashfs <dir> <snap> -noappend -comp xz -all-root -no-xattrs -no-fragments'. If using electron-builder, please upgrade to latest stable (>= 20.14.7). See https://forum.snapcraft.io/t/automated-reviews-and-snapcraft-2-38/4982/17 for details."
+            "text": "OK (check not enforced for this snap): checksums do not match. Please ensure the snap is created with either 'snapcraft pack <DIR>' (using snapcraft >= 2.38) or 'mksquashfs <dir> <snap> -noappend -comp xz -all-root -no-xattrs -no-fragments' (using squashfs-tools >= 4.3). If using electron-builder, please upgrade to latest stable (>= 20.14.7). See https://forum.snapcraft.io/t/automated-reviews-and-snapcraft-2-38/4982/17 for details."
         }
         self.check_results(report, expected=expected)
 

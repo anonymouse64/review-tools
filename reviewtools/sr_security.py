@@ -426,7 +426,7 @@ class SnapReviewSecurity(SnapReview):
                 + "created with either 'snapcraft pack <DIR>' (using "
                 + "snapcraft >= 2.38) or 'mksquashfs <dir> <snap> %s'"
                 % " ".join(mksquash_opts)
-                + ". If using electron-builder, "
+                + " (using squashfs-tools >= 4.3). If using electron-builder, "
                 "please upgrade to latest stable (>= 20.14.7). See %s "
                 "for details." % link
             )
