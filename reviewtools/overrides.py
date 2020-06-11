@@ -794,7 +794,7 @@ sec_iface_ref_overrides = {
         "wtf-tui": ["dot-config-wtf-config-yml"],
     },
     "system-files": {
-        "cvescan": ["apt-dpkg-db"],
+        "cvescan": ["apt-dpkg-db", "hostfs-var-lib-ubuntu-advantage-status-json"],
         "gallery-dl": ["etc-gallery-dl"],
         "get-iplayer": ["etc-get-iplayer-options"],
         "glances": ["etc-glances-config"],
