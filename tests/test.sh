@@ -91,7 +91,7 @@ for i in ./tests/test-resquash_*.snap ; do
     }
 
     # now show all the output that with the deleted error text
-    jq 'del(."snap.v2_security"."error"."security-snap-v2:squashfs_files"."text")' "$tmpjson" | tee -a "$tmp"
+    jq 'del(."snap.v2_security"."error"."security-snap-v2:squashfs_files"."text")' "$tmpjson"
 
     # now show the error text in a more easily diffable form
     jq '."snap.v2_security"."error"."security-snap-v2:squashfs_files"."text"' "$tmpjson" | sed -e 's/^"//' -e 's/"$//' -e 's/, /\n/g' | sort
