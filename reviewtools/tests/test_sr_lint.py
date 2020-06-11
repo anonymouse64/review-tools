@@ -6110,7 +6110,7 @@ class TestSnapReviewLintNoMock(TestCase):
         expected["info"] = dict()
         name = "lint-snap-v2:external_symlinks"
         expected["error"][name] = {
-            "text": "package contains external symlinks: outside, bar, foo"
+            "text": "package contains external symlinks: bar, foo, outside"
         }
         self.check_results(r, expected=expected)
 
@@ -6138,7 +6138,7 @@ class TestSnapReviewLintNoMock(TestCase):
         expected["info"] = dict()
         name = "lint-snap-v2:external_symlinks"
         expected["error"][name] = {
-            "text": "package contains external symlinks: python, python2, usr/bin/python, usr/bin/python2.999999, usr/bin/python2.1"
+            "text": "package contains external symlinks: python, python2, usr/bin/python, usr/bin/python2.1, usr/bin/python2.999999"
         }
         self.check_results(r, expected=expected)
 

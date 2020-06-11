@@ -1349,6 +1349,7 @@ class SnapReviewLint(SnapReview):
             self.snap_yaml["name"],
             prefix_ok=prefix_ok,
         )
+        links.sort()
         if len(links) > 0:
             t = "error"
             s = "package contains external symlinks: %s" % ", ".join(links)
