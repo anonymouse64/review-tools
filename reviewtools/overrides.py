@@ -735,7 +735,7 @@ sec_resquashfs_overrides = [
 ]
 
 # Snaps allowed to use a non-default compression
-sec_compression_overrides = {"chromium": ["lzo"]}
+sec_compression_overrides = {"chromium": ["lzo"], "test-snapd-sh-lzo": ["lzo"]}
 
 # https://forum.snapcraft.io/t/requesting-auto-connection-of-personal-files-to-sam-cli/10641/10
 # Until snapd has better controls on what the interface reference must be in
