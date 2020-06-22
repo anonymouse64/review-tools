@@ -1056,6 +1056,7 @@ update_publisher_overrides = {
         "quadrapassel": canonical_desktop,
         "se-test-tools": canonical_enablement,
         "simple-scan": canonical_desktop,
+        "simplestreams": canonical_openstack,
         "smt": canonical_security,
         "snap-store": canonical_desktop,
         "snapcraft": canonical_snapcraft,
