@@ -1,8 +1,9 @@
-review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
+review-tools (0.48+20200622-1) RELEASED; urgency=medium
 
-  * 
+  * overrides.py: add/update for public snaps
+  * sr_lint.py: sort the external symlinks, which should fix !x86 builds
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Mon, 08 Jun 2020 17:17:23 -0500
+ -- Jamie Strandboge <jamie@ubuntu.com>  Mon, 22 Jun 2020 15:06:49 -0500
 
 review-tools (0.48+20200608-1) RELEASED; urgency=medium
 
