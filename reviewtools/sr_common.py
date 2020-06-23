@@ -186,6 +186,7 @@ class SnapReview(Review):
         "i386",
         "powerpc",
         "ppc64el",
+        "riscv64",
         "s390x",
     ]
 
