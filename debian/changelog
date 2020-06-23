@@ -1,3 +1,11 @@
+review-tools (0.48+20200623-1) RELEASED; urgency=medium
+
+  * overrides.py: add/update for public snaps
+  * sr_common.py: add riscv64 architecture (thanks Dimitri John Ledkov,
+    LP: #1884820)
+
+ -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 23 Jun 2020 15:48:26 -0500
+
 review-tools (0.48+20200622-1) RELEASED; urgency=medium
 
   * overrides.py: add/update for public snaps
