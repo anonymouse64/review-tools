@@ -804,6 +804,15 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {"info": 1, "warn": 0, "error": 0}
         self.check_results(r, expected_counts)
 
+    def test_check_architectures_single_riscv64(self):
+        """Test check_architectures() (single arch, riscv64)"""
+        self.set_test_snap_yaml("architectures", ["riscv64"])
+        c = SnapReviewLint(self.test_name)
+        c.check_architectures()
+        r = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
+
     def test_check_architectures_single_s390x(self):
         """Test check_architectures() (single arch, s390x)"""
         self.set_test_snap_yaml("architectures", ["s390x"])
