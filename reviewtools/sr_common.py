@@ -180,10 +180,10 @@ class SnapReview(Review):
     valid_system_usernames = ["snap_daemon"]
 
     valid_compiled_architectures = [
-        "armhf",
-        "i386",
         "amd64",
         "arm64",
+        "armhf",
+        "i386",
         "powerpc",
         "ppc64el",
         "s390x",
