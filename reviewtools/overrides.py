@@ -946,6 +946,7 @@ canonical_security = [
     "joe.mcmanus@canonical.com",
     "alex.murray@canonical.com",
     "jamie@canonical.com",
+    "mike.salvatore@canonical.com",
 ]
 
 canonical_server = ["josh.powers@canonical.com", "robie.basak@canonical.com"]
@@ -984,6 +985,7 @@ update_publisher_overrides = {
         "core16": canonical_snapd,
         "core18": canonical_snapd,
         "core20": canonical_snapd,
+        "cvescan": canonical_security,
         "dell-edge-iot-kernel": canonical_kernel,
         "docker": canonical_enablement,
         "dragonboard": canonical_snapd,
