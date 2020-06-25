@@ -198,6 +198,46 @@ pushd "$SCRIPT_DIR"
 # this every time automatically with curl
 curl -L -o review-tools.tgz https://github.com/anonymouse64/review-tools/archive/lzo-test-2.tar.gz
 
+# NOTE: we can only do step 3 of this test, the deterministic resquash, on
+#       systems that have squashfs-tools with the -fstime option, as otherwise
+#       the resquashes will have different fstimes and thus never match. Thus,
+#       before running this check, we ensure that the mksquashfs we have
+#       available supports -fstime, and if it doesn't we skip it
+HAVE_FSTIME=yes
+
+# make simple squashfs
+rm -rf test-squashfs
+mkdir test-squashfs
+date "+%Y-%m-%dT%H:%M:%S%:z" > test-squashfs/filedate
+# don't need sudo cause no special device nodes or set{u,g}id bit files
+mksquashfs test-squashfs test-squashfs-1.snap -no-progress -noappend -comp lzo -all-root -no-xattrs -no-fragments
+
+if TEST_FSTIME=$(unsquashfs -fstime test-squashfs-1.snap); then
+    # verify that the fstime options actually works as advertised on this system
+    mksquashfs test-squashfs test-squashfs-2.snap -fstime "$TEST_FSTIME" -no-progress -noappend -comp lzo -all-root -no-xattrs -no-fragments
+    sleep 1
+    mksquashfs test-squashfs test-squashfs-3.snap -fstime "$TEST_FSTIME" -no-progress -noappend -comp lzo -all-root -no-xattrs -no-fragments
+
+    # all 3 snaps should have the same hash
+    # verify that the fstime option actually works by resquashing twice with the 
+    # option
+    prev_sum=""
+    for j in 1 2 3; do
+        sum=$(sha256sum "test-squashfs-$j.snap" | cut -f1 -d' ')
+        # if we have the previous one (not on the first iteration), check it matches
+        # the current one
+        if [ -n "$prev_sum" ] && [ "$sum" != "$prev_sum" ]; then
+            # fstime is broken, didn't produce the same hash of snap files
+            HAVE_FSTIME=no
+            break
+        fi
+        prev_sum=$sum
+    done
+else
+    # probably unsquashfs doesn't support fstime
+    HAVE_FSTIME=no
+fi
+
 
 sudo echo "useless sudo to keep authenticated against sudo during loops..." > /dev/null
 
@@ -246,53 +286,66 @@ for sn in "${all_snaps[@]}" ; do
     $MAYBE_SUDO rm -rf "${sn}-src" # in case of interrupted runs
     $MAYBE_SUDO unsquashfs -d "${sn}-src" "${sn}_xz.snap"
 
-    # also save the fstime of the snap for re-pack determinism check
-    fstime=$(unsquashfs -fstime "${sn}_xz.snap")
 
     # step 3. repack with lzo options set 10 times checking that the compressed
-    #         snap has the same hash each time
-    for i in $(seq 1 10); do
-        hashfile="${sn}.lzo.sha256"
+    #         snap has the same hash each time (only if we have fstime)
+    if [ "$HAVE_FSTIME" = "yes" ]; then
+        # get the fstime to use for the deterministm check
+        fstime=$(unsquashfs -fstime "${sn}_xz.snap")
 
-        # pack the snap - these options match "snap pack"
-        if [ -n "$MAYBE_SUDO" ]; then
-            # if we are calling sudo, don't use -all-root
-            sudo mksquashfs "${sn}-src" "${sn}_lzo-$i.snap" -fstime "$fstime" -no-progress -noappend -comp lzo -no-xattrs -no-fragments
-        else
-            # use -all-root when we are not using sudo
-            mksquashfs "${sn}-src" "${sn}_lzo-$i.snap" -fstime "$fstime" -no-progress -noappend -comp lzo -all-root -no-xattrs -no-fragments
-        fi
+        for i in $(seq 1 10); do
+            hashfile="${sn}.lzo.sha256"
 
-        # calculate the sha256sum for the re-packed snap
-        sum=$(sha256sum "${sn}_lzo-$i.snap" | cut -f1 -d' ')
-
-        # in the first go-around, save the hash
-        if [ "$i" = "1" ]; then
-            echo "$sum" > "$hashfile"
-        else
-            # in all other iterations make sure the calculated hash matches the
-            # saved one from the first iteration
-            if [ "$sum" != "$(cat "$hashfile")"  ]; then
-                echo ">>> TEST FAIL <<< snap $sn lzo compressed on iteration $i had sha256sum of $sum, expected $(cat "$hashfile") from iteration 1"
-                exit 1
+            # pack the snap - these options match "snap pack"
+            if [ -n "$MAYBE_SUDO" ]; then
+                # if we are calling sudo, don't use -all-root
+                sudo mksquashfs "${sn}-src" "${sn}_lzo-$i.snap" -fstime "$fstime" -no-progress -noappend -comp lzo -no-xattrs -no-fragments
+            else
+                # use -all-root when we are not using sudo
+                mksquashfs "${sn}-src" "${sn}_lzo-$i.snap" -fstime "$fstime" -no-progress -noappend -comp lzo -all-root -no-xattrs -no-fragments
             fi
 
-            # we're done with this passing lzo, so discard it to not waste
-            # space during the runs
-            rm -f "${sn}_lzo-$i.snap"
+            # calculate the sha256sum for the re-packed snap
+            sum=$(sha256sum "${sn}_lzo-$i.snap" | cut -f1 -d' ')
 
-            # sleep a small amount of time to ensure that the time is different
-            # when we re-pack again in the next iteration
-            sleep 0.5
+            # in the first go-around, save the hash
+            if [ "$i" = "1" ]; then
+                echo "$sum" > "$hashfile"
+            else
+                # in all other iterations make sure the calculated hash matches the
+                # saved one from the first iteration
+                if [ "$sum" != "$(cat "$hashfile")"  ]; then
+                    echo ">>> TEST FAIL <<< snap $sn lzo compressed on iteration $i had sha256sum of $sum, expected $(cat "$hashfile") from iteration 1"
+                    exit 1
+                fi
+
+                # we're done with this passing lzo, so discard it to not waste
+                # space during the runs
+                rm -f "${sn}_lzo-$i.snap"
+
+                # sleep a small amount of time to ensure that the time is different
+                # when we re-pack again in the next iteration
+                sleep 0.5
+            fi
+
+            sudo echo "useless sudo to keep authenticated against sudo during loops..." > /dev/null
+        done
+
+        # cleanup the re-packed snaps, saving the first one for later usage
+        $MAYBE_SUDO mv "${sn}_lzo-1.snap" "${sn}_lzo.snap"
+        $MAYBE_SUDO rm -f "${sn}_lzo-"*.snap
+        $MAYBE_SUDO rm -rf "${sn}-src"
+    else
+        # we don't have -fstime, but we still need to produce a lzo snap to test
+        # in the store check
+        if [ -n "$MAYBE_SUDO" ]; then
+            # if we are calling sudo, don't use -all-root
+            sudo mksquashfs "${sn}-src" "${sn}_lzo.snap" -no-progress -noappend -comp lzo -no-xattrs -no-fragments
+        else
+            # use -all-root when we are not using sudo
+            mksquashfs "${sn}-src" "${sn}_lzo.snap" -no-progress -noappend -comp lzo -all-root -no-xattrs -no-fragments
         fi
-
-        sudo echo "useless sudo to keep authenticated against sudo during loops..." > /dev/null
-    done
-
-    # cleanup the re-packed snaps, saving the first one for later usage
-    $MAYBE_SUDO mv "${sn}_lzo-1.snap" "${sn}_lzo.snap"
-    $MAYBE_SUDO rm -f "${sn}_lzo-"*.snap
-    $MAYBE_SUDO rm -rf "${sn}-src"
+    fi
 
     # step 4. run the review-tools inside the various ubuntu lxc containers to
     #         check that the snap is unsquashed and resquashed to the same blob
