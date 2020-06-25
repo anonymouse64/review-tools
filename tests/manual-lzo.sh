@@ -56,7 +56,7 @@ case "$(uname -m)" in
         echo "running on i386"
         all_snaps=("${i386_snaps[@]}" "${all_arch_snaps[@]}")
         ;;
-    powerpc64le)
+    ppc64le)
         echo "running on ppc64el"
         all_snaps=("${ppc64el_snaps[@]}" "${all_arch_snaps[@]}")
         ;;
