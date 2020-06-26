@@ -210,13 +210,13 @@ rm -rf test-squashfs
 mkdir test-squashfs
 date "+%Y-%m-%dT%H:%M:%S%:z" > test-squashfs/filedate
 # don't need sudo cause no special device nodes or set{u,g}id bit files
-mksquashfs test-squashfs test-squashfs-1.snap -no-progress -noappend -comp lzo -all-root -no-xattrs -no-fragments
+mksquashfs test-squashfs test-squashfs-1.snap -no-progress -noappend -comp xz -all-root -no-xattrs -no-fragments
 
 if TEST_FSTIME=$(unsquashfs -fstime test-squashfs-1.snap); then
     # verify that the fstime options actually works as advertised on this system
-    mksquashfs test-squashfs test-squashfs-2.snap -fstime "$TEST_FSTIME" -no-progress -noappend -comp lzo -all-root -no-xattrs -no-fragments
+    mksquashfs test-squashfs test-squashfs-2.snap -fstime "$TEST_FSTIME" -no-progress -noappend -comp xz -all-root -no-xattrs -no-fragments
     sleep 1
-    mksquashfs test-squashfs test-squashfs-3.snap -fstime "$TEST_FSTIME" -no-progress -noappend -comp lzo -all-root -no-xattrs -no-fragments
+    mksquashfs test-squashfs test-squashfs-3.snap -fstime "$TEST_FSTIME" -no-progress -noappend -comp xz -all-root -no-xattrs -no-fragments
 
     # all 3 snaps should have the same hash
     # verify that the fstime option actually works by resquashing twice with the 
