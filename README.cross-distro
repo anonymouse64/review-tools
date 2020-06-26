@@ -11,15 +11,17 @@ Debian: https://packages.debian.org/search?suite=all&section=all&arch=any&search
 Elementary: based on Ubuntu LTS
 Fedora: https://dl.fedoraproject.org/pub/fedora/linux/updates/30/Everything/SRPMS/Packages/s/ (where '30' is the Fedora version)
 GalliumOS: fork of Ubuntu LTS but uses the Ubuntu archive with PPAs
+Kali: fork of Debian
 KDE Neon: fork of Ubuntu LTS but uses the Ubuntu archive with PPAs
 Kubuntu: Ubuntu flavor
+Linux Mint: fork of Ubuntu
 Lubuntu: Ubuntu flavor
 Manjaro: http://distro.ibiblio.org/manjaro/stable/extra/x86_64/
-Mint: fork of Ubuntu
 OpenSUSE: https://build.opensuse.org/package/show/system:snappy/snapd
 Parrot OS: https://deb.parrot.sh/parrot/pool/main/s/snapd/
 Pop_OS!: based on Ubuntu
 Raspbian: http://archive.raspbian.org/raspbian/pool/main/s/snapd/
+RHEL (EPEL): https://dl.fedoraproject.org/pub/epel/<version>/SRPMS/Packages/s/ (7.6 and 8) 
 Solus: https://mirrors.rit.edu/solus/packages/shannon/s/snapd/ (where 'shannon' is the Solus version)
 Ubuntu: https://launchpad.net/ubuntu/+source/snapd
 Xubuntu: Ubuntu flavor
