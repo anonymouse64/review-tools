@@ -1752,7 +1752,8 @@ class SnapReviewLint(SnapReview):
                 link = "https://forum.snapcraft.io/t/process-for-reviewing-aliases-auto-connections-and-track-requests/455"
             self._add_result(t, n, s, link=link)
 
-            # from validate.go in snapd
+            # from snap/naming/validate.go in snapd
+            # TODO: share this with bin/create-snap-declaration
             pat = re.compile(r"^[a-zA-Z0-9][-_.a-zA-Z0-9]*$")
             for alias in aliases:
                 t = "info"

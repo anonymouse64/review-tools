@@ -13,7 +13,8 @@ base_decl_series, base_decl = read_snapd_base_declaration()
 
 
 def _verify_alias(alias):
-    # from snapd validate.go
+    # from snapd snap/naming/validate.go
+    # TODO: share this with sr_lint.py
     pat = re.compile(r"^[a-zA-Z0-9][-_.a-zA-Z0-9]*$")
     if not pat.search(alias):
         raise Exception(
