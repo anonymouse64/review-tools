@@ -353,6 +353,11 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  hugepages-control:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   i2c:
     allow-installation:
       slot-snap-type:
@@ -718,6 +723,16 @@
         - core
     deny-auto-connection: true
   system-observe:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
+  system-packages-doc:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
+  system-source-code:
     allow-installation:
       slot-snap-type:
         - core
