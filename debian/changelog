@@ -1,3 +1,11 @@
+review-tools (0.48+20200706-1) RELEASED; urgency=medium
+
+  * tests/manual-lzo.sh updates (thanks to Ian Johnson)
+  * README.cross-distro: update urls
+  * snapd-base-declaration.yaml: update for newly added 2.46 interfaces
+
+ -- Jamie Strandboge <jamie@ubuntu.com>  Mon, 06 Jul 2020 11:01:46 -0500
+
 review-tools (0.48+20200623-1) RELEASED; urgency=medium
 
   * overrides.py: add/update for public snaps
