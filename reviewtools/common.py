@@ -200,24 +200,10 @@ class ReviewException(Exception):
         return repr(self.value)
 
 
-class Review(object):
-    """Common review class"""
+class ReviewBase(object):
+    """Base review class"""
 
-    magic_binary_file_descriptions = [
-        "application/x-executable; charset=binary",
-        "application/x-sharedlib; charset=binary",
-        "application/x-object; charset=binary",
-        # 18.04 and higher doesn't show the charset
-        "application/x-executable",
-        "application/x-sharedlib",
-        "application/x-object",
-        "application/x-pie-executable",
-    ]
-
-    def __init__(self, fn, review_type, overrides=None):
-        self.pkg_filename = fn
-        self._check_package_exists()
-
+    def __init__(self, review_type, overrides=None):
         self.review_type = review_type
         # TODO: rename as pkg_report
         self.review_report = dict()
@@ -228,39 +214,6 @@ class Review(object):
             self.review_report[r] = dict()
             self.stage_report[r] = dict()
 
-        global MKDTEMP_DIR
-        if (
-            MKDTEMP_DIR is None
-            and "SNAP_USER_COMMON" in os.environ
-            and os.path.exists(os.environ["SNAP_USER_COMMON"])
-        ):
-            MKDTEMP_DIR = os.environ["SNAP_USER_COMMON"]
-
-        global UNPACK_DIR
-        if UNPACK_DIR is None:
-            UNPACK_DIR = unpack_pkg(fn)
-        self.unpack_dir = UNPACK_DIR
-
-        # unpack_pkg() now only supports snap v2, so just hardcode these
-        self.is_snap2 = True
-        self.pkgfmt = {"type": "snap", "version": "16.04"}
-
-        global RAW_UNPACK_DIR
-        if RAW_UNPACK_DIR is None:
-            RAW_UNPACK_DIR = raw_unpack_pkg(fn)
-        self.raw_unpack_dir = RAW_UNPACK_DIR
-
-        # Get a list of all unpacked files
-        self.pkg_files = []
-        # self._list_all_files() sets self.pkg_files so we can mock it
-        self._list_all_files()
-
-        # Setup what is needed to get a list of all unpacked compiled binaries
-        self.pkg_bin_files = []
-        # self._list_all_compiled_binaries() sets self.pkg_files so we can
-        # mock it
-        self._list_all_compiled_binaries()
-
         self.overrides = overrides if overrides is not None else {}
 
         self.override_result_type = None
@@ -270,96 +223,6 @@ class Review(object):
         if t is not None and t in ["console", "json"]:
             REPORT_OUTPUT = t
 
-    def _check_innerpath_executable(self, fn):
-        """Check that the provided path exists and is executable"""
-        return os.access(fn, os.X_OK)
-
-    def _extract_statinfo(self, fn):
-        """Extract statinfo from file"""
-        try:
-            st = os.stat(fn)
-        except Exception:
-            return None
-        return st
-
-    def _extract_file(self, fn):
-        """Extract file"""
-        if not fn.startswith("/"):
-            error("_extract_file() expects absolute path")
-        rel = os.path.relpath(fn, self.unpack_dir)
-
-        if not os.path.isfile(fn):
-            error("Could not find '%s'" % rel)
-        return open_file_read(fn)
-
-    def _path_join(self, dirname, rest):
-        return os.path.join(dirname, rest)
-
-    def _get_sha512sum(self, fn):
-        """Get sha512sum of file"""
-        (rc, out) = cmd(["sha512sum", fn])
-        if rc != 0:
-            return None
-        return out.split()[0]
-
-    def _pkgfmt_type(self):
-        """Return the package format type"""
-        if "type" not in self.pkgfmt:
-            return ""
-        return self.pkgfmt["type"]
-
-    def _pkgfmt_version(self):
-        """Return the package format version"""
-        if "version" not in self.pkgfmt:
-            return ""
-        return self.pkgfmt["version"]
-
-    def _check_package_exists(self):
-        """Check that the provided package exists"""
-        if not os.path.exists(self.pkg_filename):
-            error("Could not find '%s'" % self.pkg_filename)
-
-    def _list_all_files(self):
-        """List all files included in this package."""
-        global PKG_FILES
-        if PKG_FILES is None:
-            PKG_FILES = []
-            for root, dirnames, filenames in os.walk(self.unpack_dir):
-                for f in filenames:
-                    PKG_FILES.append(os.path.join(root, f))
-
-        self.pkg_files = PKG_FILES
-
-    def _check_if_message_catalog(self, fn):
-        """Check if file is a message catalog (.mo file)."""
-        if fn.endswith(".mo"):
-            return True
-        return False
-
-    def _list_all_compiled_binaries(self):
-        """List all compiled binaries in this package."""
-        global PKG_BIN_FILES
-        if PKG_BIN_FILES is None:
-            self.mime = magic.open(magic.MAGIC_MIME)
-            self.mime.load()
-            PKG_BIN_FILES = []
-            for i in self.pkg_files:
-                try:
-                    res = self.mime.file(i)
-                except Exception:  # pragma: nocover
-                    # workaround for zesty python3-magic
-                    debug("could not detemine mime type of '%s'" % i)
-                    continue
-
-                if (
-                    res in self.magic_binary_file_descriptions
-                    and not self._check_if_message_catalog(i)
-                    and i not in PKG_BIN_FILES
-                ):
-                    PKG_BIN_FILES.append(i)
-
-        self.pkg_bin_files = PKG_BIN_FILES
-
     def _get_check_name(self, name, app="", extra=""):
         name = ":".join([self.review_type, name])
         if app:
@@ -367,19 +230,6 @@ class Review(object):
         if extra:
             name += ":" + extra
         return name
-
-    def _verify_pkgversion(self, v):
-        """Verify package name"""
-        if not isinstance(v, (str, int, float)):
-            return False
-        re_valid_version = re.compile(
-            r"^((\d+):)?"  # epoch
-            "([A-Za-z0-9.+:~-]+?)"  # upstream
-            "(-([A-Za-z0-9+.~]+))?$"
-        )  # debian
-        if re_valid_version.match(str(v)):
-            return True
-        return False
 
     # review_report[<result_type>][<review_name>] = <result>
     #   result_type: info, warn, error
@@ -485,6 +335,163 @@ class Review(object):
     def set_review_type(self, name):
         """Set review name"""
         self.review_type = name
+
+
+class Review(ReviewBase):
+    """Common review class"""
+
+    magic_binary_file_descriptions = [
+        "application/x-executable; charset=binary",
+        "application/x-sharedlib; charset=binary",
+        "application/x-object; charset=binary",
+        # 18.04 and higher doesn't show the charset
+        "application/x-executable",
+        "application/x-sharedlib",
+        "application/x-object",
+        "application/x-pie-executable",
+    ]
+
+    def __init__(self, fn, review_type, overrides=None):
+        ReviewBase.__init__(self, review_type, overrides)
+
+        self.pkg_filename = fn
+        self._check_package_exists()
+
+        global MKDTEMP_DIR
+        if (
+            MKDTEMP_DIR is None
+            and "SNAP_USER_COMMON" in os.environ
+            and os.path.exists(os.environ["SNAP_USER_COMMON"])
+        ):
+            MKDTEMP_DIR = os.environ["SNAP_USER_COMMON"]
+
+        global UNPACK_DIR
+        if UNPACK_DIR is None:
+            UNPACK_DIR = unpack_pkg(fn)
+        self.unpack_dir = UNPACK_DIR
+
+        # unpack_pkg() now only supports snap v2, so just hardcode these
+        self.is_snap2 = True
+        self.pkgfmt = {"type": "snap", "version": "16.04"}
+
+        global RAW_UNPACK_DIR
+        if RAW_UNPACK_DIR is None:
+            RAW_UNPACK_DIR = raw_unpack_pkg(fn)
+        self.raw_unpack_dir = RAW_UNPACK_DIR
+
+        # Get a list of all unpacked files
+        self.pkg_files = []
+        # self._list_all_files() sets self.pkg_files so we can mock it
+        self._list_all_files()
+
+        # Setup what is needed to get a list of all unpacked compiled binaries
+        self.pkg_bin_files = []
+        # self._list_all_compiled_binaries() sets self.pkg_files so we can
+        # mock it
+        self._list_all_compiled_binaries()
+
+    def _check_innerpath_executable(self, fn):
+        """Check that the provided path exists and is executable"""
+        return os.access(fn, os.X_OK)
+
+    def _extract_statinfo(self, fn):
+        """Extract statinfo from file"""
+        try:
+            st = os.stat(fn)
+        except Exception:
+            return None
+        return st
+
+    def _extract_file(self, fn):
+        """Extract file"""
+        if not fn.startswith("/"):
+            error("_extract_file() expects absolute path")
+        rel = os.path.relpath(fn, self.unpack_dir)
+
+        if not os.path.isfile(fn):
+            error("Could not find '%s'" % rel)
+        return open_file_read(fn)
+
+    def _path_join(self, dirname, rest):
+        return os.path.join(dirname, rest)
+
+    def _get_sha512sum(self, fn):
+        """Get sha512sum of file"""
+        (rc, out) = cmd(["sha512sum", fn])
+        if rc != 0:
+            return None
+        return out.split()[0]
+
+    def _pkgfmt_type(self):
+        """Return the package format type"""
+        if "type" not in self.pkgfmt:
+            return ""
+        return self.pkgfmt["type"]
+
+    def _pkgfmt_version(self):
+        """Return the package format version"""
+        if "version" not in self.pkgfmt:
+            return ""
+        return self.pkgfmt["version"]
+
+    def _check_package_exists(self):
+        """Check that the provided package exists"""
+        if not os.path.exists(self.pkg_filename):
+            error("Could not find '%s'" % self.pkg_filename)
+
+    def _list_all_files(self):
+        """List all files included in this package."""
+        global PKG_FILES
+        if PKG_FILES is None:
+            PKG_FILES = []
+            for root, dirnames, filenames in os.walk(self.unpack_dir):
+                for f in filenames:
+                    PKG_FILES.append(os.path.join(root, f))
+
+        self.pkg_files = PKG_FILES
+
+    def _check_if_message_catalog(self, fn):
+        """Check if file is a message catalog (.mo file)."""
+        if fn.endswith(".mo"):
+            return True
+        return False
+
+    def _list_all_compiled_binaries(self):
+        """List all compiled binaries in this package."""
+        global PKG_BIN_FILES
+        if PKG_BIN_FILES is None:
+            self.mime = magic.open(magic.MAGIC_MIME)
+            self.mime.load()
+            PKG_BIN_FILES = []
+            for i in self.pkg_files:
+                try:
+                    res = self.mime.file(i)
+                except Exception:  # pragma: nocover
+                    # workaround for zesty python3-magic
+                    debug("could not detemine mime type of '%s'" % i)
+                    continue
+
+                if (
+                    res in self.magic_binary_file_descriptions
+                    and not self._check_if_message_catalog(i)
+                    and i not in PKG_BIN_FILES
+                ):
+                    PKG_BIN_FILES.append(i)
+
+        self.pkg_bin_files = PKG_BIN_FILES
+
+    def _verify_pkgversion(self, v):
+        """Verify package name"""
+        if not isinstance(v, (str, int, float)):
+            return False
+        re_valid_version = re.compile(
+            r"^((\d+):)?"  # epoch
+            "([A-Za-z0-9.+:~-]+?)"  # upstream
+            "(-([A-Za-z0-9+.~]+))?$"
+        )  # debian
+        if re_valid_version.match(str(v)):
+            return True
+        return False
 
 
 #
