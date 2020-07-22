@@ -159,3 +159,9 @@ security-snap-v2:squashfs_repack_checksum|https://forum.snapcraft.io/t/automated
 security-snap-v2:squashfs_resquash|
 security-snap-v2:squashfs_stat|
 security-snap-v2:squashfs_supports_fstime|
+snap-declaration-verify_v2:valid_dict|
+snap-declaration-verify_v2:valid_interface|
+snap-declaration-verify_v2:valid_key|
+snap-declaration-verify_v2:valid_plugs|
+snap-declaration-verify_v2:valid_plugs_dict|
+snap-declaration-verify_v2:valid_slots|

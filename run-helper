@@ -32,7 +32,8 @@ for i in ./reviewtools/*py \
          ./bin/get-base-declaration \
          ./bin/store-query \
          ./bin/snap-updates-available \
-         ./bin/snap-check-* ; do
+         ./bin/snap-check-* \
+         ./bin/snap-verify-* ; do
     if echo "$i" | grep -q 'snap-check-notices' ; then
         continue  # shell
     fi

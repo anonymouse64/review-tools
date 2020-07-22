@@ -1,0 +1,94 @@
+#!/usr/bin/python3
+"""snap-verify-declaration: verify --plugs and --slots"""
+#
+# Copyright (C) 2020 Canonical Ltd.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from __future__ import print_function
+
+import argparse
+import json
+import sys
+import textwrap
+
+from reviewtools.common import error
+import reviewtools.sr_declaration as sr_declaration
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        prog="snap-verify-declaration",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description="Check a snap declaration for errors",
+        epilog=textwrap.dedent(
+            """\
+            RETURN CODES
+              0     found no errors or warnings
+              1     checks not run due to fatal error
+              2     found only errors or errors and warnings
+              3     found only warnings
+        """
+        ),
+    )
+    parser.add_argument("--json", help="print json output", action="store_true")
+    parser.add_argument(
+        "--plugs", default=None, help="file specifying snap declaration for plugs"
+    )
+    parser.add_argument(
+        "--slots", default=None, help="file specifying snap declaration for slots"
+    )
+    args = parser.parse_args()
+
+    error_output_type = "console"
+    if args.json:
+        error_output_type = "json"
+
+    if not args.plugs and not args.slots:
+        error("Must specify --plugs and/or --slots", output_type=error_output_type)
+
+    # Read in the snap declaration
+    snap_decl = {"plugs": {}, "slots": {}}
+    if args.plugs:
+        try:
+            with open(args.plugs, "r") as plugs_file:
+                snap_decl["plugs"] = json.loads(plugs_file.read())
+        except Exception as e:
+            error("Could not read plugs: %s" % e, output_type=error_output_type)
+    if args.slots:
+        try:
+            with open(args.slots, "r") as slots_file:
+                snap_decl["slots"] = json.loads(slots_file.read())
+        except Exception as e:
+            error("Could not read slots: %s" % e, output_type=error_output_type)
+
+    try:
+        review = sr_declaration.verify_snap_declaration(snap_decl)
+    except Exception as e:
+        error(
+            "verify_snap_declaration() threw exception for snap decl: %s" % e,
+            output_type=error_output_type,
+        )
+    review.set_report_type(error_output_type)
+
+    return review.do_report()
+
+
+if __name__ == "__main__":
+    rc = 0
+    try:
+        rc = main()
+    except KeyboardInterrupt:
+        print("Aborted.")
+        rc = 1
+    sys.exit(rc)

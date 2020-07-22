@@ -14,8 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from reviewtools.sr_declaration import SnapReviewDeclaration, SnapDeclarationException
+from reviewtools.sr_declaration import (
+    SnapReviewDeclaration,
+    SnapDeclarationException,
+    verify_snap_declaration,
+)
 import reviewtools.sr_tests as sr_tests
+from unittest import TestCase
 import yaml
 
 
@@ -7043,3 +7048,63 @@ slots:
 
             r = c.review_report
             _check_r(r, exp, self.test_snap_yaml, overrides)
+
+
+class TestSnapDeclarationVerify(TestCase):
+    def test_verify_snap_declaration_empty(self):
+        def _check_r(r, exp):
+            if (
+                len(r["info"]) != exp[0]
+                or len(r["warn"]) != exp[1]
+                or len(r["error"]) != exp[2]
+            ):
+                if len(r["info"]) != exp[0]:
+                    raise Exception("%d != %d" % (len(r["info"]), exp[0]))
+                if len(r["warn"]) != exp[1]:
+                    raise Exception("%d != %d: %s" % (len(r["warn"]), exp[1], r))
+                if len(r["error"]) != exp[2]:
+                    raise Exception("%d != %d: %s" % (len(r["error"]), exp[2], r))
+
+        for decl, exp in [
+            # invalid
+            ({}, (0, 0, 1)),
+            ([], (0, 0, 1)),
+            ({"plgs": {}}, (0, 0, 1)),
+            ({"plugs": {}, "slts": {}}, (0, 0, 1)),
+            ({"plugs": {"nonexistent": {}}}, (0, 0, 1)),
+            ({"slots": {"nonexistent": {}}}, (0, 0, 1)),
+            ({"plugs": {"home": ""}}, (0, 0, 1)),
+            ({"plugs": {"home": {"alow-ato-conection": True}}}, (0, 0, 1)),
+            # ok
+            ({"plugs": {}}, (0, 0, 0)),
+            ({"slots": {}}, (0, 0, 0)),
+            ({"plugs": {}, "slots": {}}, (0, 0, 0)),
+            ({"plugs": {"home": {}}}, (0, 0, 0)),
+            ({"plugs": {"home": {"allow-auto-connection": True}}}, (1, 0, 0)),
+            ({"plugs": {"home": {"allow-connection": True}}}, (1, 0, 0)),
+            ({"plugs": {"home": {"allow-installation": True}}}, (1, 0, 0)),
+            ({"slots": {"mir": {"deny-auto-connection": True}}}, (1, 0, 0)),
+            ({"slots": {"mir": {"deny-connection": True}}}, (1, 0, 0)),
+            ({"slots": {"mir": {"deny-installation": True}}}, (1, 0, 0)),
+            (
+                {
+                    "plugs": {
+                        "home": {
+                            "allow-installation": True,
+                            "allow-connection": True,
+                            "allow-installation": True,
+                        }
+                    }
+                },
+                (2, 0, 0),
+            ),
+        ]:
+            c = verify_snap_declaration(decl)
+            r = c.review_report
+            try:
+                _check_r(r, exp)
+            except Exception:
+                import pprint
+
+                pprint.pprint(r)
+                raise

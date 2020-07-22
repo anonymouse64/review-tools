@@ -16,6 +16,7 @@
 
 from __future__ import print_function
 from reviewtools.sr_common import SnapReview, SnapReviewException
+from reviewtools.common import error, ReviewBase, read_snapd_base_declaration
 import copy
 import re
 
@@ -1329,3 +1330,47 @@ class SnapReviewDeclaration(SnapReview):
            plugs/slots
         """
         self._verify_declaration_apps_hooks("hooks")
+
+
+#
+# Helper functions
+#
+def verify_snap_declaration(snap_decl, base_decl=None):
+    """Perform a review on the snap declaration. Returns a Review object"""
+    review = ReviewBase("snap-declaration-verify_v2")
+
+    # Setup everything needed by _verify_declaration()
+    review.interfaces_attribs = SnapReview.interfaces_attribs
+    review.valid_snap_types = SnapReview.valid_snap_types
+
+    # Read in and verify the base declaration
+    if base_decl is None:
+        base_decl_series, base_decl = read_snapd_base_declaration()
+    try:
+        SnapReviewDeclaration._verify_declaration(review, base_decl, base=True)
+    except Exception as e:  # pragma: nocover
+        error("_verify_declaration() threw exception for base decl: %s" % e)
+
+    # First make sure that the interfaces in the snap declaration are known to
+    # the base declaration
+    for side in snap_decl:
+        for iface in snap_decl[side]:
+            found = False
+            for bside in base_decl:
+                if iface in base_decl[bside]:
+                    found = True
+                    break
+            if not found:
+                review._add_result(
+                    "error",
+                    review._get_check_name("valid_interface", app=iface),
+                    "interface '%s' not found in base declaration" % iface,
+                )
+
+    # Then verify the snap declaration for correctness
+    try:
+        SnapReviewDeclaration._verify_declaration(review, snap_decl, base=False)
+    except Exception as e:  # pragma: nocover
+        error("_verify_declaration() threw exception for snap decl: %s" % e)
+
+    return review
