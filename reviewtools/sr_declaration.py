@@ -156,18 +156,6 @@ class SnapReviewDeclaration(SnapReview):
             # _add_result() and we don't want that for our defaults
             self._ensure_snap_declaration_defaults()
 
-    def is_bool(self, item):
-        if isinstance(item, int) and (item is True or item is False):
-            return True
-        return False
-
-    def str2bool(self, s):
-        if s == "true" or s == "True":
-            return True
-        if s == "false" or s == "False":
-            return False
-        return s
-
     def _ensure_snap_declaration_defaults(self):
         """Ensure defaults are set for non-present keys in the snap
            declaration.
@@ -225,6 +213,18 @@ class SnapReviewDeclaration(SnapReview):
     def _verify_declaration(self, decl, base=False):
         """Verify declaration"""
 
+        def is_bool(item):
+            if isinstance(item, int) and (item is True or item is False):
+                return True
+            return False
+
+        def str2bool(s):
+            if s == "true" or s == "True":
+                return True
+            if s == "false" or s == "False":
+                return False
+            return s
+
         def malformed(name, s, base=False):
             pre = ""
             if base:
@@ -236,7 +236,7 @@ class SnapReviewDeclaration(SnapReview):
 
         def verify_constraint(cstr, decl, key, iface, index, allowed, has_alternates):
             found_errors = False
-            if self.is_bool(cstr):
+            if is_bool(cstr):
                 if not base:
                     self._add_result("info", n, s)
                 return False
@@ -279,14 +279,12 @@ class SnapReviewDeclaration(SnapReview):
                     # snap declarations from the store express bools as
                     # strings
                     if isinstance(cstr[cstr_key], str):
-                        cstr[cstr_key] = self.str2bool(cstr[cstr_key])
+                        cstr[cstr_key] = str2bool(cstr[cstr_key])
                         if has_alternates:
-                            decl[key][iface][constraint][index][
-                                cstr_key
-                            ] = self.str2bool(
+                            decl[key][iface][constraint][index][cstr_key] = str2bool(
                                 decl[key][iface][constraint][index][cstr_key]
                             )
-                    if not self.is_bool(cstr[cstr_key]):
+                    if not is_bool(cstr[cstr_key]):
                         malformed(badn, "'%s' not True or False" % cstr_key, base)
                         found_errors = True
                 elif cstr_key in cstr_strs:
@@ -335,13 +333,13 @@ class SnapReviewDeclaration(SnapReview):
                                 # snap declarations from the store express
                                 # bools as strings
                                 if isinstance(cstr[cstr_key][attrib], str):
-                                    cstr[cstr_key][attrib] = self.str2bool(
+                                    cstr[cstr_key][attrib] = str2bool(
                                         cstr[cstr_key][attrib]
                                     )
                                     if has_alternates:
                                         decl[key][iface][constraint][index][cstr_key][
                                             attrib
-                                        ] = self.str2bool(
+                                        ] = str2bool(
                                             decl[key][iface][constraint][index][
                                                 cstr_key
                                             ][attrib]
@@ -473,9 +471,9 @@ class SnapReviewDeclaration(SnapReview):
             for iface in decl[key]:
                 # snap declarations from the store express bools as strings
                 if isinstance(decl[key][iface], str):
-                    decl[key][iface] = self.str2bool(decl[key][iface])
+                    decl[key][iface] = str2bool(decl[key][iface])
                 # iface may be bool or dict
-                if self.is_bool(decl[key][iface]):
+                if is_bool(decl[key][iface]):
                     n = self._get_check_name("valid_%s_bool" % key, app=iface)
                     self._add_result("info", n, "OK")
                     continue
@@ -490,7 +488,7 @@ class SnapReviewDeclaration(SnapReview):
                 for constraint in decl[key][iface]:
                     # snap declarations from the store express bools as strings
                     if isinstance(decl[key][iface][constraint], str):
-                        decl[key][iface][constraint] = self.str2bool(
+                        decl[key][iface][constraint] = str2bool(
                             decl[key][iface][constraint]
                         )
 
