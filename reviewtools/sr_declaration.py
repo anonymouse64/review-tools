@@ -1349,7 +1349,7 @@ def verify_snap_declaration(snap_decl, base_decl=None):
     try:
         SnapReviewDeclaration._verify_declaration(review, base_decl, base=True)
     except Exception as e:  # pragma: nocover
-        error("_verify_declaration() threw exception for base decl: %s" % e)
+        error("_verify_declaration() raised exception for base decl: %s" % e)
 
     # First make sure that the interfaces in the snap declaration are known to
     # the base declaration
@@ -1371,6 +1371,6 @@ def verify_snap_declaration(snap_decl, base_decl=None):
     try:
         SnapReviewDeclaration._verify_declaration(review, snap_decl, base=False)
     except Exception as e:  # pragma: nocover
-        error("_verify_declaration() threw exception for snap decl: %s" % e)
+        error("_verify_declaration() raised exception for snap decl: %s" % e)
 
     return review

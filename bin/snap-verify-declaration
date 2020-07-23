@@ -76,7 +76,7 @@ def main():
         review = sr_declaration.verify_snap_declaration(snap_decl)
     except Exception as e:
         error(
-            "verify_snap_declaration() threw exception for snap decl: %s" % e,
+            "verify_snap_declaration() raised exception for snap decl: %s" % e,
             output_type=error_output_type,
         )
     review.set_report_type(error_output_type)
