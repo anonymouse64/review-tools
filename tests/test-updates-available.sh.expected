@@ -3,7 +3,7 @@ Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-1.db' --store-db='./tests/test-store-1.db'...
 From: Snap Store <noreply@canonical.com>
 To: olivier.tilloy@canonical.com
-Bcc: jamie@canonical.com, alex.murray@canonical.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
@@ -44,7 +44,7 @@ Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-1.db'...
 From: Snap Store <noreply@canonical.com>
 To: olivier.tilloy@canonical.com
-Bcc: jamie@canonical.com, alex.murray@canonical.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
@@ -86,7 +86,7 @@ Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-2.db'...
 From: Snap Store <noreply@canonical.com>
 To: olivier.tilloy@canonical.com
-Bcc: jamie@canonical.com, alex.murray@canonical.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
@@ -129,7 +129,7 @@ Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-1.db' --store-db='./tests/test-store-1.db'...
 From: Snap Store <noreply@canonical.com>
 To: olivier.tilloy@canonical.com
-Bcc: jamie@canonical.com, alex.murray@canonical.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
@@ -169,7 +169,7 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-1.db'...
 From: Snap Store <noreply@canonical.com>
 To: olivier.tilloy@canonical.com
-Bcc: jamie@canonical.com, alex.murray@canonical.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
@@ -209,7 +209,7 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-1.db'...
 From: Snap Store <noreply@canonical.com>
 To: olivier.tilloy@canonical.com
-Bcc: jamie@canonical.com, alex.murray@canonical.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
@@ -256,7 +256,7 @@ Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-budgie-1.db' --store-db='./tests/test-store-budgie.db'...
 From: Snap Store <noreply@canonical.com>
 To: packaging@ubuntubudgie.org
-Bcc: jamie@canonical.com, alex.murray@canonical.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: ubuntu-budgie-welcome contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
@@ -314,7 +314,7 @@ References:
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-budgie-2.db' --store-db='./tests/test-store-budgie.db'...
 From: Snap Store <noreply@canonical.com>
 To: packaging@ubuntubudgie.org
-Bcc: jamie@canonical.com, alex.murray@canonical.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: ubuntu-budgie-welcome contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
@@ -348,7 +348,7 @@ Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-os-release.db' --store-db='./tests/test-store-os-release.db'...
 From: Snap Store <noreply@canonical.com>
 To: foo@example.com
-Bcc: jamie@canonical.com, alex.murray@canonical.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: test-xenial contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
@@ -369,7 +369,7 @@ References:
 
 From: Snap Store <noreply@canonical.com>
 To: foo@example.com
-Bcc: jamie@canonical.com, alex.murray@canonical.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: test-bionic contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
@@ -396,7 +396,7 @@ Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel.db' --store-db='./tests/test-store-kernel.db'...
 From: Snap Store <noreply@canonical.com>
 To: foo@example.com
-Bcc: jamie@canonical.com, alex.murray@canonical.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: linux-generic-bbb built from outdated Ubuntu kernel
 
 A scan of this snap shows that it was built using sources based on a kernel
@@ -593,7 +593,7 @@ WARN: 1ad: required field 'revisions' not found
 ERROR: Errors encountered when scanning store entries
 From: Snap Store <noreply@canonical.com>
 To: olivier.tilloy@canonical.com
-Bcc: jamie@canonical.com, alex.murray@canonical.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
@@ -665,7 +665,7 @@ Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841
 Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db' --store-db='./tests/test-store-unittest-lp1841848-needed.db'
 From: Snap Store <noreply@canonical.com>
 To: test.me@example.com
-Bcc: jamie@canonical.com, alex.murray@canonical.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: test-snap contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
@@ -689,7 +689,7 @@ References:
 Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-1.db' --store-db='./tests/test-store-collaborators.db'
 From: Snap Store <noreply@canonical.com>
 To: olivier.tilloy@canonical.com, test.collaborator@example.com
-Bcc: jamie@canonical.com, alex.murray@canonical.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
