@@ -18,6 +18,33 @@ RT_EMAIL_NOPROMPT=1       - force sending of email without prompting
 For extra tests:
 RT_EXTRAS_PATH=/path/to/extras
 
+
+# Contributing
+
+ 1. Clone locally (create origin with master branch)
+    $ git clone git+ssh://<lpid>@git.launchpad.net/review-tools
+    $ git branch
+    * master
+
+ 2. Add personal repo/fork remote in LP
+    $ git remote add <lpid> git+ssh://<lpid>@git.launchpad.net/~<lpid>/review-tools
+
+ 3. Branch and submit
+    $ git fetch
+    $ git checkout -b mything origin/master
+    $ git push <lpid> mything
+
+ 4. Propose for merging via:
+    https://code.launchpad.net/~<lpid>/review-tools/+git/review-tools/+ref/mything
+
+ 5. If a committer, once approved can commit to master with:
+    $ git checkout master
+    $ git fetch && git pull --ff-only
+    $ git merge mything
+    $ git branch -D mything
+    $ git push --delete <lpid> mything  # optional
+
+
 # Tests
 
 Runnable snap v2 tests:
