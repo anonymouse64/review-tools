@@ -4,6 +4,7 @@ review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
   * sr_declaration.py: refactor is_bool and str2bool into
     _verify_declaration()
   * add bin/snap-verify-declaration
+  * README: update for coverage
 
  -- Jamie Strandboge <jamie@ubuntu.com>  Thu, 23 Jul 2020 12:11:56 -0500
 
