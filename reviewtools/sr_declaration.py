@@ -1072,8 +1072,17 @@ class SnapReviewDeclaration(SnapReview):
         if "snap" in whence and num_checked == 0 and cstr.startswith("deny"):
             return "human review required due to '%s' constraint (scoped bool)" % cstr
 
-        # If multiple constraints are specified, they all must match
-        if num_checked > 0 and len(tmp) == num_checked:
+        # If multiple constraints are specified, they all must match.
+        # Specifically, since tmp contains the error strings for this
+        # alternation, when checks were performed we return an error if:
+        # - at least one check errored with 'allow' since not fully matching
+        #   the allow means means we should display an error (not allowed)
+        # - all checks errored with 'deny' since not fully matching the
+        #   deny means we should pass (allowed)
+        if num_checked > 0 and (
+            (cstr.startswith("deny") and len(tmp) == num_checked)
+            or (cstr.startswith("allow") and len(tmp) > 0)
+        ):
             # FIXME: perhaps allow showing more than just the first
             return tmp[0]
 

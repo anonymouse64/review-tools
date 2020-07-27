@@ -2915,6 +2915,100 @@ slots:
         expected["info"][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
+    def test_check_declaration_personal_files_regex_match_matching_plug_names(self):
+        """Test check_declaration - personal-files - regex match (matching plug-names)"""
+        plugs = {
+            "iface": {
+                "interface": "personal-files",
+                "read": ["$HOME/.foo"],
+                "write": ["$HOME/.norf"],
+            }
+        }
+        self.set_test_snap_yaml("plugs", plugs)
+        overrides = {
+            "snap_decl_plugs": {
+                "personal-files": {
+                    "allow-installation": {
+                        "plug-attributes": {
+                            "read": "(\\$HOME/\\.foo|\\$HOME/\\.bar)",
+                            "write": "(\\$HOME/\\.baz|\\$HOME/\\.norf)",
+                        },
+                        "plug-names": ["iface"],
+                    }
+                }
+            }
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        base = {
+            "plugs": {
+                "personal-files": {
+                    "allow-installation": False,
+                    "allow-auto-connection": False,
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.review_report
+        expected_counts = {"info": 2, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:plugs:iface:personal-files"
+        expected["info"][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_personal_files_regex_match_unmatching_plug_names(self):
+        """Test check_declaration - personal-files - regex match (unmatching plug-names)"""
+        plugs = {
+            "iface": {
+                "interface": "personal-files",
+                "read": ["$HOME/.foo"],
+                "write": ["$HOME/.norf"],
+            }
+        }
+        self.set_test_snap_yaml("plugs", plugs)
+        overrides = {
+            "snap_decl_plugs": {
+                "personal-files": {
+                    "allow-installation": {
+                        "plug-attributes": {
+                            "read": "(\\$HOME/\\.foo|\\$HOME/\\.bar)",
+                            "write": "(\\$HOME/\\.baz|\\$HOME/\\.norf)",
+                        },
+                        "plug-names": ["other-ref"],
+                    }
+                }
+            }
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        base = {
+            "plugs": {
+                "personal-files": {
+                    "allow-installation": False,
+                    "allow-auto-connection": False,
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:plugs_installation:iface:personal-files"
+        expected["error"][name] = {
+            "text": "human review required due to 'allow-installation' constraint (plug-names)"
+        }
+        self.check_results(r, expected=expected)
+
     def test_check_declaration_personal_files_regex_nomatch(self):
         """Test check_declaration - personal-files - regex no match"""
         plugs = {
@@ -2961,6 +3055,106 @@ slots:
         name = "declaration-snap-v2:plugs_installation:iface:personal-files"
         expected["error"][name] = {
             "text": "human review required due to 'allow-installation' constraint (interface attributes)"
+        }
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_personal_files_regex_nomatch_matching_plug_names(self):
+        """Test check_declaration - personal-files - regex no match (matching plug-names)"""
+        plugs = {
+            "iface": {
+                "interface": "personal-files",
+                "read": ["$HOME/.nomatch"],
+                "write": ["$HOME/.bar"],
+            }
+        }
+        self.set_test_snap_yaml("plugs", plugs)
+        overrides = {
+            "snap_decl_plugs": {
+                "personal-files": {
+                    "allow-installation": {
+                        "plug-attributes": {
+                            "read": "(\\$HOME/\\.foo|\\$HOME/\\.bar)",
+                            "write": "(\\$HOME/\\.baz|\\$HOME/\\.norf)",
+                        },
+                        "plug-names": ["iface"],
+                    }
+                }
+            }
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        base = {
+            "plugs": {
+                "personal-files": {
+                    "allow-installation": False,
+                    "allow-auto-connection": False,
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:valid_plugs:personal-files:allow-installation"
+        expected["info"][name] = {"text": "OK"}
+        name = "declaration-snap-v2:plugs_installation:iface:personal-files"
+        expected["error"][name] = {
+            "text": "human review required due to 'allow-installation' constraint (interface attributes)"
+        }
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_personal_files_regex_nomatch_unmatching_plug_names(self):
+        """Test check_declaration - personal-files - regex no match (unmatching plug-names)"""
+        plugs = {
+            "iface": {
+                "interface": "personal-files",
+                "read": ["$HOME/.nomatch"],
+                "write": ["$HOME/.bar"],
+            }
+        }
+        self.set_test_snap_yaml("plugs", plugs)
+        overrides = {
+            "snap_decl_plugs": {
+                "personal-files": {
+                    "allow-installation": {
+                        "plug-attributes": {
+                            "read": "(\\$HOME/\\.foo|\\$HOME/\\.bar)",
+                            "write": "(\\$HOME/\\.baz|\\$HOME/\\.norf)",
+                        },
+                        "plug-names": ["other-ref"],
+                    }
+                }
+            }
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        base = {
+            "plugs": {
+                "personal-files": {
+                    "allow-installation": False,
+                    "allow-auto-connection": False,
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:valid_plugs:personal-files:allow-installation"
+        expected["info"][name] = {"text": "OK"}
+        name = "declaration-snap-v2:plugs_installation:iface:personal-files"
+        expected["error"][name] = {
+            "text": "human review required due to 'allow-installation' constraint (plug-names)"
         }
         self.check_results(r, expected=expected)
 
@@ -3017,7 +3211,121 @@ slots:
         expected["info"][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
-    def test_check_declaration_personal_files_alt_nomatch(self):
+    def test_check_declaration_personal_files_alt_regex_match_matching_plug_names(self):
+        """Test check_declaration - personal-files - alternates regex match (matching plug-names)"""
+        plugs = {
+            "iface": {
+                "interface": "personal-files",
+                "read": ["$HOME/.foo"],
+                "write": ["$HOME/.match2"],
+            }
+        }
+        self.set_test_snap_yaml("plugs", plugs)
+        overrides = {
+            "snap_decl_plugs": {
+                "personal-files": {
+                    "allow-installation": [
+                        {
+                            "plug-attributes": {
+                                "read": "\\$HOME/\\.(foo|bar)",
+                                "write": "\\$HOME/\\.match[0-9]+",
+                            },
+                            "plug-names": ["iface"],
+                        },
+                        {
+                            "plug-attributes": {
+                                "read": "\\$HOME/\\.foo",
+                                "write": "\\$HOME/\\.(baz|norf)",
+                            },
+                            "plug-names": ["iface"],
+                        },
+                    ]
+                }
+            }
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        base = {
+            "plugs": {
+                "personal-files": {
+                    "allow-installation": False,
+                    "allow-auto-connection": False,
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.review_report
+        expected_counts = {"info": 2, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:plugs:iface:personal-files"
+        expected["info"][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_personal_files_alt_regex_match_unmatching_plug_names(
+        self
+    ):
+        """Test check_declaration - personal-files - alternates regex match (unmatching plug-names)"""
+        plugs = {
+            "iface": {
+                "interface": "personal-files",
+                "read": ["$HOME/.foo"],
+                "write": ["$HOME/.match2"],
+            }
+        }
+        self.set_test_snap_yaml("plugs", plugs)
+        overrides = {
+            "snap_decl_plugs": {
+                "personal-files": {
+                    "allow-installation": [
+                        {
+                            "plug-attributes": {
+                                "read": "\\$HOME/\\.(foo|bar)",
+                                "write": "\\$HOME/\\.match[0-9]+",
+                            },
+                            "plug-names": ["other-ref"],
+                        },
+                        {
+                            "plug-attributes": {
+                                "read": "\\$HOME/\\.foo",
+                                "write": "\\$HOME/\\.(baz|norf)",
+                            },
+                            "plug-names": ["iface"],
+                        },
+                    ]
+                }
+            }
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        base = {
+            "plugs": {
+                "personal-files": {
+                    "allow-installation": False,
+                    "allow-auto-connection": False,
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:plugs_installation:iface:personal-files"
+        expected["error"][name] = {
+            "text": "human review required due to 'allow-installation' constraint (plug-names)"
+        }
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_personal_files_alt_match(self):
         """Test check_declaration - personal-files - alternates match"""
         plugs = {
             "iface": {
@@ -3068,6 +3376,118 @@ slots:
         expected["info"] = dict()
         name = "declaration-snap-v2:plugs:iface:personal-files"
         expected["info"][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_personal_files_alt_match_matching_plug_names(self):
+        """Test check_declaration - personal-files - alternates match (matching plug-names)"""
+        plugs = {
+            "iface": {
+                "interface": "personal-files",
+                "read": ["$HOME/.foo"],
+                "write": ["$HOME/.match2"],
+            }
+        }
+        self.set_test_snap_yaml("plugs", plugs)
+        overrides = {
+            "snap_decl_plugs": {
+                "personal-files": {
+                    "allow-installation": [
+                        {
+                            "plug-attributes": {
+                                "read": "\\$HOME/\\.(foo|bar)",
+                                "write": "\\$HOME/\\.(baz|norf)",
+                            },
+                            "plug-names": ["iface"],
+                        },
+                        {
+                            "plug-attributes": {
+                                "read": "\\$HOME/\\.foo",
+                                "write": "\\$HOME/\\.match[0-9]+",
+                            },
+                            "plug-names": ["iface"],
+                        },
+                    ]
+                }
+            }
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        base = {
+            "plugs": {
+                "personal-files": {
+                    "allow-installation": False,
+                    "allow-auto-connection": False,
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.review_report
+        expected_counts = {"info": 2, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:plugs:iface:personal-files"
+        expected["info"][name] = {"text": "OK"}
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_personal_files_alt_match_unmatching_plug_names(self):
+        """Test check_declaration - personal-files - alternates match (unmatching plug-names)"""
+        plugs = {
+            "iface": {
+                "interface": "personal-files",
+                "read": ["$HOME/.foo"],
+                "write": ["$HOME/.match2"],
+            }
+        }
+        self.set_test_snap_yaml("plugs", plugs)
+        overrides = {
+            "snap_decl_plugs": {
+                "personal-files": {
+                    "allow-installation": [
+                        {
+                            "plug-attributes": {
+                                "read": "\\$HOME/\\.(foo|bar)",
+                                "write": "\\$HOME/\\.(baz|norf)",
+                            },
+                            "plug-names": ["iface"],
+                        },
+                        {
+                            "plug-attributes": {
+                                "read": "\\$HOME/\\.foo",
+                                "write": "\\$HOME/\\.match[0-9]+",
+                            },
+                            "plug-names": ["other-ref"],
+                        },
+                    ]
+                }
+            }
+        }
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        base = {
+            "plugs": {
+                "personal-files": {
+                    "allow-installation": False,
+                    "allow-auto-connection": False,
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:plugs_installation:iface:personal-files"
+        expected["error"][name] = {
+            "text": "human review required due to 'allow-installation' constraint (interface attributes)"
+        }
         self.check_results(r, expected=expected)
 
     def test_check_declaration_personal_files_alt_regex_nomatch(self):
@@ -3152,6 +3572,70 @@ slots:
         expected["error"][name] = {
             "text": "human review required due to 'deny-connection' constraint (interface attributes)"
         }
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_slots_deny_connection_attrib_list_match_matching_plug_names(
+        self
+    ):
+        """Test check_declaration - slots/deny-connection/attrib - list match snap attribute str in decl list (matching plug-names)"""
+        slots = {"iface-foo": {"interface": "foo", "attrib1": "b"}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            "slots": {
+                "foo": {
+                    "deny-connection": {
+                        "slot-attributes": {"attrib1": ["a", "b"]},
+                        "slot-names": ["iface-foo"],
+                    }
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.review_report
+        expected_counts = {"info": 0, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:slots_connection:iface-foo:foo"
+        expected["error"][name] = {
+            "text": "human review required due to 'deny-connection' constraint (slot-names)"
+        }
+        self.check_results(r, expected=expected)
+
+    def test_check_declaration_slots_deny_connection_attrib_list_match_unmatching_plug_names(
+        self
+    ):
+        """Test check_declaration - slots/deny-connection/attrib - list match snap attribute str in decl list (unmatching plug-names)"""
+        slots = {"iface-foo": {"interface": "foo", "attrib1": "b"}}
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewDeclaration(self.test_name)
+        base = {
+            "slots": {
+                "foo": {
+                    "deny-connection": {
+                        "slot-attributes": {"attrib1": ["a", "b"]},
+                        "slot-names": ["other-ref"],
+                    }
+                }
+            }
+        }
+        self._set_base_declaration(c, base)
+        c.check_declaration()
+        r = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:slots:iface-foo:foo"
+        expected["info"][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_deny_connection_attrib_list_nomatch(self):
