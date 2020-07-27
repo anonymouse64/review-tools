@@ -754,7 +754,7 @@ sec_iface_ref_overrides = {
         "aws-cli": ["dot-aws"],
         "aws-sam-cli": ["config-aws"],
         "autotrash-unofficial": ["dot-local-share-trash"],
-        "charmcraft": ["dot-hgrc"],
+        "charmcraft": ["dot-hgrc", "gitconfig"],
         "chromium": ["chromium-config"],
         "cloudscale-cli": ["dot-cloudscale-ini"],
         "cw-sh": ["dot-aws-config-credentials"],
