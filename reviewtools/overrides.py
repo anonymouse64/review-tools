@@ -754,6 +754,7 @@ sec_iface_ref_overrides = {
         "aws-cli": ["dot-aws"],
         "aws-sam-cli": ["config-aws"],
         "autotrash-unofficial": ["dot-local-share-trash"],
+        "charmcraft": ["dot-hgrc"],
         "chromium": ["chromium-config"],
         "cloudscale-cli": ["dot-cloudscale-ini"],
         "cw-sh": ["dot-aws-config-credentials"],
@@ -798,6 +799,7 @@ sec_iface_ref_overrides = {
         "wtf-tui": ["dot-config-wtf-config-yml"],
     },
     "system-files": {
+        "charmcraft": ["etc-hgrc"],
         "cvescan": ["apt-dpkg-db", "hostfs-var-lib-ubuntu-advantage-status-json"],
         "gallery-dl": ["etc-gallery-dl"],
         "get-iplayer": ["etc-get-iplayer-options"],
