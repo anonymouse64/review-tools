@@ -737,17 +737,18 @@ sec_resquashfs_overrides = [
 # Snaps allowed to use a non-default compression
 sec_compression_overrides = {"chromium": ["lzo"], "test-snapd-sh-lzo": ["lzo"]}
 
-# https://forum.snapcraft.io/t/requesting-auto-connection-of-personal-files-to-sam-cli/10641/10
-# Until snapd has better controls on what the interface reference must be in
-# the snap declaration, we will have a cheap test to ensure that the interface
-# reference is in the list of allowed references. We don't want to encode the
-# snap declaration here too, which means a snap can use any of these with the
-# passing snap declaration constraint.
 #
-# XXX: eventually, this will go away. snapd 2.44 adds plug-names/slot-names
-# that should be used instead for personal-files, system-files, etc. We don't
-# want to do this just yet though. See:
+# HISTORICAL
+#
+# Before snapd 2.44, snapd did not have proper controls on what the interface
+# reference must be in the snap declaration, so we had a cheap test to ensure
+# that the interface reference is in the list of allowed references. Older
+# snaps with existing overrides will remain here, but new ones should use the
+# 'plug-names' mechanism.
+#
+# https://forum.snapcraft.io/t/requesting-auto-connection-of-personal-files-to-sam-cli/10641/10
 # https://wiki.canonical.com/AppStore/Reviews#Snap_declaration_assertion_versions
+#
 sec_iface_ref_overrides = {
     "personal-files": {
         "amass": ["dot-amass"],

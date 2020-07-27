@@ -1,6 +1,6 @@
 """test_sr_declaration.py: tests for the sr_declaration module"""
 #
-# Copyright (C) 2014-2016 Canonical Ltd.
+# Copyright (C) 2014-2020 Canonical Ltd.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -2901,6 +2901,8 @@ slots:
                 }
             }
         }
+        # we'll test this elsewhere
+        c.interfaces_needing_reference_checks = []
         self._set_base_declaration(c, base)
         c.check_declaration()
         r = c.review_report
@@ -3041,6 +3043,8 @@ slots:
             }
         }
         self._set_base_declaration(c, base)
+        # we'll test this elsewhere
+        c.interfaces_needing_reference_checks = []
         c.check_declaration()
         r = c.review_report
         expected_counts = {"info": 1, "warn": 0, "error": 1}
@@ -3198,6 +3202,8 @@ slots:
             }
         }
         self._set_base_declaration(c, base)
+        # we'll test this elsewhere
+        c.interfaces_needing_reference_checks = []
         c.check_declaration()
         r = c.review_report
         expected_counts = {"info": 2, "warn": 0, "error": 0}
@@ -3365,6 +3371,8 @@ slots:
             }
         }
         self._set_base_declaration(c, base)
+        # we'll test this elsewhere
+        c.interfaces_needing_reference_checks = []
         c.check_declaration()
         r = c.review_report
         expected_counts = {"info": 2, "warn": 0, "error": 0}
@@ -3531,6 +3539,8 @@ slots:
             }
         }
         self._set_base_declaration(c, base)
+        # we'll test this elsewhere
+        c.interfaces_needing_reference_checks = []
         c.check_declaration()
         r = c.review_report
         expected_counts = {"info": 1, "warn": 0, "error": 1}
@@ -7356,6 +7366,8 @@ slots:
             self.set_test_snap_yaml("plugs", plugs)
             c = SnapReviewDeclaration(self.test_name, overrides=overrides)
             self._set_base_declaration(c, baseDecl)
+            # we'll test this elsewhere
+            c.interfaces_needing_reference_checks = []
             c.check_declaration()
 
             r = c.review_report
@@ -7528,6 +7540,8 @@ slots:
             self.set_test_snap_yaml("plugs", plugs)
             c = SnapReviewDeclaration(self.test_name, overrides=overrides)
             self._set_base_declaration(c, baseDecl)
+            # we'll test this elsewhere
+            c.interfaces_needing_reference_checks = []
             c.check_declaration()
 
             r = c.review_report
@@ -7657,8 +7671,53 @@ slots:
         }
         self.check_results(report, expected=expected)
 
-    def test_check_personal_files_interface_reference_known(self):
-        """Test check_personal_files_interface_reference() - known"""
+    def test__allowed_iface_reference_other_implied(self):
+        """Test check__allowed_iface_reference() - other implied reference"""
+        plugs = {"other": {}}
+        self.set_test_snap_yaml("plugs", plugs)
+        self.set_test_snap_yaml("name", "test-app")
+        # add this snap to the override
+        from reviewtools.overrides import sec_iface_ref_overrides
+
+        sec_iface_ref_overrides["test-iface"] = {"test-app": ["known-ref"]}
+        c = SnapReviewDeclaration(self.test_name)
+        c._allowed_iface_reference("plugs", "test-iface")
+        # then clean up
+        del sec_iface_ref_overrides["test-iface"]
+        report = c.review_report
+
+        # nothing to check
+        expected_counts = {"info": 0, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+
+    def test__allowed_iface_reference_wrong_side(self):
+        """Test check__allowed_iface_reference() - wrong side"""
+        slots = {"test-iface": {"interface": "test-iface"}}
+        self.set_test_snap_yaml("slots", slots)
+        self.set_test_snap_yaml("name", "test-app")
+        c = SnapReviewDeclaration(self.test_name)
+        c._allowed_iface_reference("plugs", "test-iface")
+        report = c.review_report
+
+        # nothing to check
+        expected_counts = {"info": 0, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+
+    def test__allowed_iface_reference_bad_side(self):
+        """Test check__allowed_iface_reference() - side side"""
+        plugs = []
+        self.set_test_snap_yaml("plugs", plugs)
+        self.set_test_snap_yaml("name", "test-app")
+        c = SnapReviewDeclaration(self.test_name)
+        c._allowed_iface_reference("plugs", "test-iface")
+        report = c.review_report
+
+        # nothing to check
+        expected_counts = {"info": 0, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+
+    def test_check_declaration_reference_known_no_snap_decl(self):
+        """Test check_declaration() - reference known (no snap decl)"""
         plugs = {"known-ref": {"interface": "personal-files"}}
         self.set_test_snap_yaml("plugs", plugs)
         self.set_test_snap_yaml("name", "test-app")
@@ -7666,12 +7725,89 @@ slots:
         from reviewtools.overrides import sec_iface_ref_overrides
 
         sec_iface_ref_overrides["personal-files"]["test-app"] = ["known-ref"]
+
         c = SnapReviewDeclaration(self.test_name)
-        c.check_personal_files_iface_reference()
+        c.check_declaration()
         # then clean up
         del sec_iface_ref_overrides["personal-files"]["test-app"]
         report = c.review_report
-        expected_counts = {"info": 1, "warn": 0, "error": 0}
+
+        # no snap declaration, just error on allow-installation
+        expected_counts = {"info": 0, "warn": 0, "error": 1}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:plugs_installation:known-ref:personal-files"
+        expected["error"][name] = {
+            "text": "human review required due to 'allow-installation' constraint (bool)"
+        }
+        self.check_results(report, expected=expected)
+
+    def test_check_declaration_reference_known_snap_decl(self):
+        """Test check_declaration() - reference known (snap decl)"""
+        plugs = {"known-ref": {"interface": "personal-files"}}
+        self.set_test_snap_yaml("plugs", plugs)
+        self.set_test_snap_yaml("name", "test-app")
+        overrides = {
+            "snap_decl_plugs": {"personal-files": {"allow-installation": True}}
+        }
+        # add this snap to the override
+        from reviewtools.overrides import sec_iface_ref_overrides
+
+        sec_iface_ref_overrides["personal-files"]["test-app"] = ["known-ref"]
+
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        c.check_declaration()
+        # then clean up
+        del sec_iface_ref_overrides["personal-files"]["test-app"]
+        report = c.review_report
+
+        # with snap declaration for blanket install, no fallback (allows
+        # reference without looking at override)
+        expected_counts = {"info": 2, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:valid_plugs:personal-files:allow-installation"
+        expected["info"][name] = {"text": "OK"}
+        name = "declaration-snap-v2:plugs:known-ref:personal-files"
+        expected["info"][name] = {"text": "OK"}
+        self.check_results(report, expected=expected)
+
+    def test_check_declaration_reference_known_snap_decl_no_plug_names(self):
+        """Test check_declaration() - reference known (snap decl with no plug-names)"""
+        plugs = {"known-ref": {"interface": "personal-files", "read": ["$HOME/.foo"]}}
+        self.set_test_snap_yaml("plugs", plugs)
+        self.set_test_snap_yaml("name", "test-app")
+        overrides = {
+            "snap_decl_plugs": {
+                "personal-files": {
+                    "allow-installation": {
+                        "plug-attributes": {"read": "\\$HOME/\\.foo"}
+                    }
+                }
+            }
+        }
+        # add this snap to the override
+        from reviewtools.overrides import sec_iface_ref_overrides
+
+        sec_iface_ref_overrides["personal-files"]["test-app"] = ["known-ref"]
+
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        c.check_declaration()
+        # then clean up
+        del sec_iface_ref_overrides["personal-files"]["test-app"]
+        report = c.review_report
+
+        # with more specific snap declaration without plug-names, fallback is
+        # verified
+        expected_counts = {"info": 3, "warn": 0, "error": 0}
         self.check_results(report, expected_counts)
 
         expected = dict()
@@ -7682,8 +7818,49 @@ slots:
         expected["info"][name] = {"text": "OK"}
         self.check_results(report, expected=expected)
 
-    def test_check_system_files_interface_reference_disallowed(self):
-        """Test check_system_files_interface_reference() - disallowed"""
+    def test_check_declaration_reference_known_snap_decl_plug_names(self):
+        """Test check_declaration() - reference known (snap decl with plug-names)"""
+        plugs = {"known-ref": {"interface": "personal-files", "read": ["$HOME/.foo"]}}
+        self.set_test_snap_yaml("plugs", plugs)
+        self.set_test_snap_yaml("name", "test-app")
+        overrides = {
+            "snap_decl_plugs": {
+                "personal-files": {
+                    "allow-installation": {
+                        "plug-attributes": {"read": "\\$HOME/\\.foo"},
+                        "plug-names": ["known-ref"],
+                    }
+                }
+            }
+        }
+        # add this snap to the override
+        from reviewtools.overrides import sec_iface_ref_overrides
+
+        sec_iface_ref_overrides["personal-files"]["test-app"] = ["known-ref"]
+
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        c.check_declaration()
+        # then clean up
+        del sec_iface_ref_overrides["personal-files"]["test-app"]
+        report = c.review_report
+
+        # with more specific snap declaration with plug-names, fallback is not
+        # used
+        expected_counts = {"info": 2, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:valid_plugs:personal-files:allow-installation"
+        expected["info"][name] = {"text": "OK"}
+        name = "declaration-snap-v2:plugs:known-ref:personal-files"
+        expected["info"][name] = {"text": "OK"}
+        self.check_results(report, expected=expected)
+
+    def test_check_declaration_reference_disallowed_no_snap_decl(self):
+        """Test check_declaration() - reference disallowed (no snap decl)"""
         plugs = {"disallowed": {"interface": "system-files"}}
         self.set_test_snap_yaml("plugs", plugs)
         self.set_test_snap_yaml("name", "test-app")
@@ -7692,11 +7869,82 @@ slots:
 
         sec_iface_ref_overrides["system-files"]["test-app"] = ["known-ref"]
         c = SnapReviewDeclaration(self.test_name)
-        c.check_system_files_iface_reference()
+        c.check_declaration()
         # then clean up
         del sec_iface_ref_overrides["system-files"]["test-app"]
         report = c.review_report
+
+        # no snap declaration, just error on allow-installation
         expected_counts = {"info": 0, "warn": 0, "error": 1}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        # no snap declaration, just error on allow-installation
+        name = "declaration-snap-v2:plugs_installation:disallowed:system-files"
+        expected["error"][name] = {
+            "text": "human review required due to 'allow-installation' constraint (bool)"
+        }
+        self.check_results(report, expected=expected)
+
+    def test_check_declaration_reference_disallowed_snap_decl(self):
+        """Test check_declaration() - reference disallowed (snap decl)"""
+        plugs = {"disallowed": {"interface": "system-files"}}
+        self.set_test_snap_yaml("plugs", plugs)
+        self.set_test_snap_yaml("name", "test-app")
+        overrides = {"snap_decl_plugs": {"system-files": {"allow-installation": True}}}
+        # add this snap to the override
+        from reviewtools.overrides import sec_iface_ref_overrides
+
+        sec_iface_ref_overrides["system-files"]["test-app"] = ["known-ref"]
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        c.check_declaration()
+        # then clean up
+        del sec_iface_ref_overrides["system-files"]["test-app"]
+        report = c.review_report
+
+        # with snap declaration for blanket install, no fallback (allows
+        # different reference from what is in override)
+        expected_counts = {"info": 2, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:valid_plugs:system-files:allow-installation"
+        expected["info"][name] = {"text": "OK"}
+        name = "declaration-snap-v2:plugs:disallowed:system-files"
+        expected["info"][name] = {"text": "OK"}
+        self.check_results(report, expected=expected)
+
+    def test_check_declaration_reference_disallowed_snap_decl_no_plug_names(self):
+        """Test check_declaration() - reference disallowed (snap decl with no plug-names)"""
+        plugs = {"disallowed": {"interface": "system-files", "write": ["/etc/foo"]}}
+        self.set_test_snap_yaml("plugs", plugs)
+        self.set_test_snap_yaml("name", "test-app")
+        overrides = {
+            "snap_decl_plugs": {
+                "system-files": {
+                    "allow-installation": {"plug-attributes": {"write": "/etc/foo"}}
+                }
+            }
+        }
+        # add this snap to the override
+        from reviewtools.overrides import sec_iface_ref_overrides
+
+        sec_iface_ref_overrides["system-files"]["test-app"] = ["known-ref"]
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        c.check_declaration()
+        # then clean up
+        del sec_iface_ref_overrides["system-files"]["test-app"]
+        report = c.review_report
+
+        # with more specific snap declaration without plug-names, fallback is
+        # verified
+        expected_counts = {"info": 2, "warn": 0, "error": 1}
         self.check_results(report, expected_counts)
 
         expected = dict()
@@ -7709,14 +7957,64 @@ slots:
         }
         self.check_results(report, expected=expected)
 
-    def test_check_personal_files_interface_references_known(self):
-        """Test check_personal_files_interface_reference() - two known"""
+    def test_check_declaration_reference_disallowed_snap_decl_plug_names(self):
+        """Test check_declaration() - reference disallowed (snap decl with plug-names)"""
+        plugs = {"disallowed": {"interface": "system-files", "write": ["/etc/foo"]}}
+        self.set_test_snap_yaml("plugs", plugs)
+        self.set_test_snap_yaml("name", "test-app")
+        overrides = {
+            "snap_decl_plugs": {
+                "system-files": {
+                    "allow-installation": {
+                        "plug-attributes": {"write": "/etc/foo"},
+                        "plug-names": ["known-ref"],
+                    }
+                }
+            }
+        }
+        # add this snap to the override
+        from reviewtools.overrides import sec_iface_ref_overrides
+
+        sec_iface_ref_overrides["system-files"]["test-app"] = ["known-ref"]
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        c.check_declaration()
+        # then clean up
+        del sec_iface_ref_overrides["system-files"]["test-app"]
+        report = c.review_report
+
+        # with more specific snap declaration with plug-names, fallback is
+        # not used
+        expected_counts = {"info": 1, "warn": 0, "error": 1}
+        self.check_results(report, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:plugs_installation:disallowed:system-files"
+        expected["error"][name] = {
+            "text": "human review required due to 'allow-installation' constraint (plug-names)"
+        }
+        self.check_results(report, expected=expected)
+
+    def test_check_declaration_override_two_references_known(self):
+        """Test check_declaration() - two allowed by override"""
         plugs = {
-            "known-ref": {"interface": "personal-files"},
-            "known-ref2": {"interface": "personal-files"},
+            "known-ref": {"interface": "personal-files", "read": ["$HOME/.foo"]},
+            "known-ref2": {"interface": "personal-files", "read": ["$HOME/.bar"]},
         }
         self.set_test_snap_yaml("plugs", plugs)
         self.set_test_snap_yaml("name", "test-app")
+        overrides = {
+            "snap_decl_plugs": {
+                "personal-files": {
+                    "allow-installation": [
+                        {"plug-attributes": {"read": "\\$HOME/\\.foo"}},
+                        {"plug-attributes": {"read": "\\$HOME/\\.bar"}},
+                    ]
+                }
+            }
+        }
         # add this snap to the override
         from reviewtools.overrides import sec_iface_ref_overrides
 
@@ -7724,12 +8022,15 @@ slots:
             "known-ref",
             "known-ref2",
         ]
-        c = SnapReviewDeclaration(self.test_name)
-        c.check_personal_files_iface_reference()
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        c.check_declaration()
         # then clean up
         del sec_iface_ref_overrides["personal-files"]["test-app"]
         report = c.review_report
-        expected_counts = {"info": 2, "warn": 0, "error": 0}
+
+        # with more specific snap declaration without plug-names, fallback is
+        # used
+        expected_counts = {"info": 5, "warn": 0, "error": 0}
         self.check_results(report, expected_counts)
 
         expected = dict()
@@ -7743,24 +8044,37 @@ slots:
         expected["info"][name] = {"text": "OK"}
         self.check_results(report, expected=expected)
 
-    def test_check_system_files_interface_references_one_disallowed(self):
-        """Test check_system_files_interface_reference() - one disallowed"""
+    def test_check_declaration_override_references_one_disallowed(self):
+        """Test check_declaration() - one disallowed by override"""
         plugs = {
-            "known-ref": {"interface": "system-files"},
-            "disallowed": {"interface": "system-files"},
+            "known-ref": {"interface": "system-files", "write": ["/etc/foo"]},
+            "disallowed": {"interface": "system-files", "write": ["/etc/bar"]},
         }
         self.set_test_snap_yaml("plugs", plugs)
         self.set_test_snap_yaml("name", "test-app")
+        overrides = {
+            "snap_decl_plugs": {
+                "system-files": {
+                    "allow-installation": [
+                        {"plug-attributes": {"write": "/etc/foo"}},
+                        {"plug-attributes": {"write": "/etc/bar"}},
+                    ]
+                }
+            }
+        }
         # add this snap to the override
         from reviewtools.overrides import sec_iface_ref_overrides
 
         sec_iface_ref_overrides["system-files"]["test-app"] = ["known-ref"]
-        c = SnapReviewDeclaration(self.test_name)
-        c.check_system_files_iface_reference()
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        c.check_declaration()
         # then clean up
         del sec_iface_ref_overrides["system-files"]["test-app"]
         report = c.review_report
-        expected_counts = {"info": 1, "warn": 0, "error": 1}
+
+        # with more specific snap declaration without plug-names, fallback is
+        # used
+        expected_counts = {"info": 4, "warn": 0, "error": 1}
         self.check_results(report, expected_counts)
 
         expected = dict()
@@ -7776,24 +8090,37 @@ slots:
         }
         self.check_results(report, expected=expected)
 
-    def test_check_system_files_interface_references_both_disallowed(self):
-        """Test check_system_files_interface_reference() - both disallowed"""
+    def test_check_declaration_override_references_both_disallowed(self):
+        """Test check_declaration() - both disallowed by override"""
         plugs = {
-            "disallowed": {"interface": "system-files"},
-            "disallowed2": {"interface": "system-files"},
+            "disallowed": {"interface": "system-files", "write": ["/etc/foo"]},
+            "disallowed2": {"interface": "system-files", "write": ["/etc/bar"]},
         }
         self.set_test_snap_yaml("plugs", plugs)
         self.set_test_snap_yaml("name", "test-app")
+        overrides = {
+            "snap_decl_plugs": {
+                "system-files": {
+                    "allow-installation": [
+                        {"plug-attributes": {"write": "/etc/foo"}},
+                        {"plug-attributes": {"write": "/etc/bar"}},
+                    ]
+                }
+            }
+        }
         # add this snap to the override
         from reviewtools.overrides import sec_iface_ref_overrides
 
         sec_iface_ref_overrides["system-files"]["test-app"] = ["known-ref"]
-        c = SnapReviewDeclaration(self.test_name)
-        c.check_system_files_iface_reference()
+        c = SnapReviewDeclaration(self.test_name, overrides=overrides)
+        c.check_declaration()
         # then clean up
         del sec_iface_ref_overrides["system-files"]["test-app"]
         report = c.review_report
-        expected_counts = {"info": 0, "warn": 0, "error": 2}
+
+        # with more specific snap declaration without plug-names, fallback is
+        # used
+        expected_counts = {"info": 3, "warn": 0, "error": 2}
         self.check_results(report, expected_counts)
 
         expected = dict()

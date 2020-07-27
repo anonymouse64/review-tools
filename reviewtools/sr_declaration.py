@@ -158,6 +158,9 @@ class SnapReviewDeclaration(SnapReview):
             # _add_result() and we don't want that for our defaults
             self._ensure_snap_declaration_defaults()
 
+        # filled in during check_constraints
+        self.plug_slot_names_checked = {}
+
     def _ensure_snap_declaration_defaults(self):
         """Ensure defaults are set for non-present keys in the snap
            declaration.
@@ -659,6 +662,68 @@ class SnapReviewDeclaration(SnapReview):
 
         return (rules, scoped)
 
+    def _allowed_iface_reference(self, side, interface):
+        """Fallback check to see if the interface reference for the interface
+           is allowed via the override. This is skipped when plug-names is
+           specified for the interface.
+        """
+        if side not in self.snap_yaml:
+            return
+
+        # verified elsewhere
+        if not isinstance(self.snap_yaml[side], dict):
+            return
+
+        # no overrides to check
+        if interface not in sec_iface_ref_overrides:
+            return
+
+        refname = None
+        for ref in self.snap_yaml[side]:
+            if ref == interface:
+                refname = ref
+            elif (
+                isinstance(self.snap_yaml[side][ref], dict)
+                and "interface" in self.snap_yaml[side][ref]
+                and self.snap_yaml[side][ref]["interface"] == interface
+            ):
+                refname = ref
+            if refname is None:
+                continue  # nothing to check
+
+            t = "info"
+            n = self._get_check_name(
+                "interface-reference", app=refname, extra=interface
+            )
+            s = "OK"
+            if self.snap_yaml["name"] not in sec_iface_ref_overrides[interface]:
+                t = "warn"
+                s = (
+                    "override not found for '%s/%s'. " % (side, refname)
+                    + "Use of the %s interface is reserved for " % interface
+                    + "vetted publishers. If your snap legitimately "
+                    + "requires this access, please make a request in "
+                    + "the forum using the 'store-requests' category ("
+                    + "https://forum.snapcraft.io/c/store-requests), or if "
+                    + "you would prefer to keep this private, the 'sensitive' "
+                    + "category."
+                )
+                self._add_result(t, n, s)
+            elif (
+                refname
+                not in sec_iface_ref_overrides[interface][self.snap_yaml["name"]]
+            ):
+                t = "error"
+                s = (
+                    "interface reference '%s' not allowed. " % refname
+                    + "Please use one of: %s"
+                    % ", ".join(
+                        sec_iface_ref_overrides[interface][self.snap_yaml["name"]]
+                    )
+                )
+
+            self._add_result(t, n, s)
+
     # func checkNameConstraints() in interfaces/policy/helpers.go and
     # func compileNameConstraints() in asserts/ifacedecls.go
     def _check_names(self, side, iref, iface, rules, cstr):
@@ -1030,6 +1095,16 @@ class SnapReviewDeclaration(SnapReview):
         (checked, res) = self._check_names(side, iref, iface, rules, cstr)
         if checked:
             num_checked += 1
+        else:
+            # if we didn't check plug-names, fallback to our old override
+            # mechanism for plugs
+            if (
+                "installation" in cstr
+                and side == "plugs"
+                and "interface" in iface
+                and iface["interface"] in self.interfaces_needing_reference_checks
+            ):
+                self._allowed_iface_reference(side, iface["interface"])
         if res is not None:
             tmp.append(res)
 
@@ -1340,66 +1415,6 @@ class SnapReviewDeclaration(SnapReview):
            plugs/slots
         """
         self._verify_declaration_apps_hooks("hooks")
-
-    def _allowed_iface_reference(self, side, interface):
-        if side not in self.snap_yaml:
-            return
-
-        # no overrides to check
-        if interface not in sec_iface_ref_overrides:
-            return
-
-        refname = None
-        for ref in self.snap_yaml[side]:
-            if ref == interface:
-                refname = ref
-            elif (
-                "interface" in self.snap_yaml[side][ref]
-                and self.snap_yaml[side][ref]["interface"] == interface
-            ):
-                refname = ref
-            if refname is None:
-                continue  # nothing to check
-
-            t = "info"
-            n = self._get_check_name(
-                "interface-reference", app=refname, extra=interface
-            )
-            s = "OK"
-            if self.snap_yaml["name"] not in sec_iface_ref_overrides[interface]:
-                t = "warn"
-                s = (
-                    "override not found for '%s/%s'. " % (side, refname)
-                    + "Use of the %s interface is reserved for " % interface
-                    + "vetted publishers. If your snap legitimately "
-                    + "requires this access, please make a request in "
-                    + "the forum using the 'store-requests' category ("
-                    + "https://forum.snapcraft.io/c/store-requests), or if "
-                    + "you would prefer to keep this private, the 'sensitive' "
-                    + "category."
-                )
-                self._add_result(t, n, s)
-            elif (
-                refname
-                not in sec_iface_ref_overrides[interface][self.snap_yaml["name"]]
-            ):
-                t = "error"
-                s = (
-                    "interface reference '%s' not allowed. " % refname
-                    + "Please use one of: %s"
-                    % ", ".join(
-                        sec_iface_ref_overrides[interface][self.snap_yaml["name"]]
-                    )
-                )
-            self._add_result(t, n, s)
-
-    def check_personal_files_iface_reference(self):
-        """Check personal-files interface references"""
-        self._allowed_iface_reference("plugs", "personal-files")
-
-    def check_system_files_iface_reference(self):
-        """Check system-files interface references"""
-        self._allowed_iface_reference("plugs", "system-files")
 
 
 #

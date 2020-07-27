@@ -302,6 +302,11 @@ class SnapReview(Review):
         }
     }
 
+    interfaces_needing_reference_checks = [
+        'personal-files',
+        'system-files',
+    ]
+
     # most are from cmd/snap-confine/mount-support.c:sc_populate_mount_ns()
     # Must be absolute paths
     base_required_dirs = [
