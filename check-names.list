@@ -1,4 +1,5 @@
 declaration-snap-v2:app_slot_known|
+declaration-snap-v2:interface-reference|
 declaration-snap-v2:plugs|
 declaration-snap-v2:plugs_connection|
 declaration-snap-v2:plugs_installation|
@@ -149,7 +150,6 @@ lint-snap-v2:version_valid|
 lint-snap-v2:watchdog-timeout|
 lint-snap-v2:watchdog-timeout_range|
 security-snap-v2:daemon_with_browser-support|
-security-snap-v2:interface-reference|
 security-snap-v2:interface-reference-matches-base-decl|
 security-snap-v2:profile_name_length|
 security-snap-v2:squashfs_compression|
