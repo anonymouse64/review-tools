@@ -41,6 +41,7 @@ RT_EXTRAS_PATH=/path/to/extras
     $ git checkout master
     $ git fetch && git pull --ff-only
     $ git merge mything
+    $ git push origin master
     $ git branch -D mything
     $ git push --delete <lpid> mything  # optional
 
