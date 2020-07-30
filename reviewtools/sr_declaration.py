@@ -688,8 +688,8 @@ class SnapReviewDeclaration(SnapReview):
                 and self.snap_yaml[side][ref]["interface"] == interface
             ):
                 refname = ref
-            if refname is None:
-                continue  # nothing to check
+            else:  # nothing to check
+                continue
 
             t = "info"
             n = self._get_check_name(
