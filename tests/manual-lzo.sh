@@ -107,7 +107,7 @@ function is_core_snap {
 
 # step 0. ensure pre-reqs are available
 #         * snap is to download the snap
-#         * unsquahfs is to unpack the snap
+#         * unsquashfs is to unpack the snap
 #         * mksquashfs is to re-pack the snap
 #         * lxc is to create a xenial/bionic container to check the re-packed snap for
 #           deterministic repacking - the review-tools used in there does NOT is not
