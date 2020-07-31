@@ -10,6 +10,7 @@ debian/click-reviewers-tools.substvars
 debian/files
 debian/tmp
 .coverage
+.idea/*
 check-names.list.orig
 snap/.snapcraft
 parts

@@ -12,6 +12,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import copy
 import pprint
 import re
 import yaml
@@ -86,28 +87,66 @@ def get_faked_stage_packages(m):
     if key not in update_stage_packages:
         key = m["name"]
 
+    # Performing a deepcopy of m as we are adding side-effects to the
+    # original manifest dict otherwise
+    manifest_with_faked_packages = copy.deepcopy(m)
     if key in update_stage_packages:
-        fake_key = "faked-by-review-tools"
-        if "parts" in m and fake_key not in m["parts"]:
-            m["parts"][fake_key] = {}
-            m["parts"][fake_key]["plugin"] = "null"
-            for i in ["build-packages", "prime", "stage", "stage-packages"]:
-                m["parts"][fake_key][i] = []
-            # The override is:
-            #   update_stage_packages = {'<snap>': {'<deb>': '<version>|auto*'}}
-            for pkg in update_stage_packages[key]:
-                version = update_stage_packages[key][pkg]
-                if version == "auto":
-                    version = convert_canonical_app_version(m["version"])
-                elif version == "auto-kernel":
-                    version = convert_canonical_kernel_version(m["version"])
-                elif version == "auto-kernelabi":
-                    version = convert_canonical_kernel_version(
-                        m["version"], only_abi=True
-                    )
-                m["parts"][fake_key]["stage-packages"].append("%s=%s" % (pkg, version))
+        if (
+            "primed-stage-packages" in manifest_with_faked_packages
+            and manifest_with_faked_packages["primed-stage-packages"] is not None
+        ):
+            append_fake_packages_to_manifest(key, manifest_with_faked_packages, True)
+        else:
+            append_fake_packages_to_manifest(key, manifest_with_faked_packages, False)
+    return manifest_with_faked_packages
 
-    return m
+
+# append_fake_packages_to_manifest() will append packages from the
+# update_stage_packages override to primed-stage-packages in the manifest
+# when primed-stage-packages is present, otherwise it will insert those
+# packages into the 'faked-by-review-tools' part.
+def append_fake_packages_to_manifest(
+    key, manifest_with_faked_packages, is_primed_stage_present
+):
+    fake_key = "faked-by-review-tools"
+    if (
+        "parts" in manifest_with_faked_packages
+        and fake_key not in manifest_with_faked_packages["parts"]
+    ):
+        # fake the stage-packages part if primed-stage-packages not present
+        if not is_primed_stage_present:
+            manifest_with_faked_packages["parts"][fake_key] = {}
+            manifest_with_faked_packages["parts"][fake_key]["plugin"] = "null"
+
+            for i in ["build-packages", "prime", "stage", "stage-packages"]:
+                manifest_with_faked_packages["parts"][fake_key][i] = []
+
+        # The override is:
+        #   update_stage_packages = {'<snap>': {'<deb>': '<version>|auto*'}}
+        for pkg in update_stage_packages[key]:
+            version = update_stage_packages[key][pkg]
+            if version == "auto":
+                version = convert_canonical_app_version(
+                    manifest_with_faked_packages["version"]
+                )
+            elif version == "auto-kernel":
+                version = convert_canonical_kernel_version(
+                    manifest_with_faked_packages["version"]
+                )
+            elif version == "auto-kernelabi":
+                version = convert_canonical_kernel_version(
+                    manifest_with_faked_packages["version"], only_abi=True
+                )
+            # append to prime-stage-packages if present, else insert into the
+            # stage-packages of our faked part
+            if is_primed_stage_present:
+                manifest_with_faked_packages["primed-stage-packages"].append(
+                    "%s=%s" % (pkg, version)
+                )
+            else:
+                manifest_with_faked_packages["parts"][fake_key][
+                    "stage-packages"
+                ].append("%s=%s" % (pkg, version))
 
 
 def get_pkg_revisions(item, secnot_db, errors):
@@ -241,35 +280,64 @@ def get_shared_snap_without_override(store_db):
     return missing
 
 
+# Since Snapcraft 3.10, the manifest includes a 'primed-stage-packages'
+# section aiming to reduce the number of false positive alerts that are
+# caused by staged-packages listing packages that are not eventually
+# present in the snap. https://snapcraft.io/docs/release-notes-snapcraft-3-10.
 def get_staged_packages_from_manifest(m):
-    """Obtain list of packages in stage-packages for various parts"""
+    """Obtain list of packages in primed-stage-packages if section is present.
+       If not, obtain it from stage-packages for various parts instead
+    """
     if "parts" not in m:
         debug("Could not find 'parts' in manifest")
         return None
 
+    if not m["parts"]:
+        debug("'parts' exists in manifest but it is empty")
+        return None
+
     d = {}
-    for part in m["parts"]:
-        if "stage-packages" in m["parts"][part]:
-            for entry in m["parts"][part]["stage-packages"]:
-                if "=" not in entry:
-                    warn("'%s' not properly formatted. Skipping" % entry)
-                    continue
-                pkg, ver = entry.split("=")
+    if "primed-stage-packages" in m and m["primed-stage-packages"] is not None:
+        if m["primed-stage-packages"]:
+            get_packages_from_manifest_section(d, m["primed-stage-packages"])
+        else:
+            return None
 
-                if pkg in update_binaries_ignore:
-                    debug("Skipping ignored binary: '%s'" % pkg)
-                    continue
-
-                if pkg not in d:
-                    d[pkg] = []
-                if ver not in d[pkg]:
-                    d[pkg].append(ver)
+    else:
+        for part in m["parts"]:
+            if (
+                "stage-packages" in m["parts"][part]
+                and m["parts"][part]["stage-packages"] is not None
+            ):
+                get_packages_from_manifest_section(
+                    d, m["parts"][part]["stage-packages"]
+                )
 
     if len(d) == 0:
         return None
 
     debug("\n" + pprint.pformat(d))
     return d
+
+
+def get_packages_from_manifest_section(d, manifest_section):
+    """Obtain packages from a given manifest section (primed-stage-packages
+       or stage-packages for a given part)
+    """
+    for entry in manifest_section:
+        if "=" not in entry:
+            warn("'%s' not properly formatted. Skipping" % entry)
+            continue
+        pkg, ver = entry.split("=")
+
+        if pkg in update_binaries_ignore:
+            debug("Skipping ignored binary: '%s'" % pkg)
+            continue
+
+        if pkg not in d:
+            d[pkg] = []
+        if ver not in d[pkg]:
+            d[pkg].append(ver)
 
 
 def normalize_and_verify_snap_manifest(m):

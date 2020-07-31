@@ -144,7 +144,7 @@ PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-1
 echo "" | tee -a "$tmp"
 
 ## LP: #1841848
-for i in test-check-notices_0.1_amd64.snap test-check-notices-needed_0.1_amd64.snap ; do
+for i in test-check-notices_0.1_amd64.snap test-check-notices-needed_0.1_amd64.snap test-check-notices-primed-stage-packages_0.1_amd64.snap test-check-notices-primed-stage-packages-needed_0.1_amd64.snap test-check-notices-primed-stage-packages-needed_0.2_amd64.snap; do
     echo "Running: snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/$i'" | tee -a "$tmp"
     PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap="./tests/$i" 2>&1 | tee -a "$tmp"
     echo "" | tee -a "$tmp"
@@ -191,7 +191,7 @@ for i in gke-kernel_4.15.0-1027.28~16.04.1_amd64.snap linux-generic-bbb_4.4.0-14
 done
 
 ## LP: #1841848
-for i in test-check-notices_0.1_amd64.snap test-check-notices-needed_0.1_amd64.snap ; do
+for i in test-check-notices_0.1_amd64.snap test-check-notices-needed_0.1_amd64.snap test-check-notices-primed-stage-packages_0.1_amd64.snap test-check-notices-primed-stage-packages-needed_0.1_amd64.snap test-check-notices-primed-stage-packages-needed_0.2_amd64.snap ; do
     echo "Running: snap-check-notices --no-fetch ./tests/$i" | tee -a "$tmp"
     PYTHONPATH=./ SNAP=./ SNAP_USER_COMMON=./ USNDB='./tests/test-usn-unittest-lp1841848.db' ./bin/snap-check-notices --no-fetch "./tests/$i" 2>&1 | tee -a "$tmp"
     echo "" | tee -a "$tmp"

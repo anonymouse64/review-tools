@@ -660,6 +660,56 @@ Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-unittest-
   }
 }
 
+Running: snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/test-check-notices-primed-stage-packages_0.1_amd64.snap'
+
+Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/test-check-notices-primed-stage-packages_0.1_amd64.snap'
+
+Running: snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/test-check-notices-primed-stage-packages-needed_0.1_amd64.snap'
+{
+  "libreoffice-style-tango": [
+    "4102-1"
+  ],
+  "uno-libs3": [
+    "4102-1"
+  ]
+}
+
+Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/test-check-notices-primed-stage-packages-needed_0.1_amd64.snap'
+{
+  "libreoffice-style-tango": {
+    "4102-1": [
+      "CVE-2019-9850",
+      "CVE-2019-9851",
+      "CVE-2019-9852"
+    ]
+  },
+  "uno-libs3": {
+    "4102-1": [
+      "CVE-2019-9850",
+      "CVE-2019-9851",
+      "CVE-2019-9852"
+    ]
+  }
+}
+
+Running: snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/test-check-notices-primed-stage-packages-needed_0.2_amd64.snap'
+{
+  "uno-libs3": [
+    "4102-1"
+  ]
+}
+
+Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/test-check-notices-primed-stage-packages-needed_0.2_amd64.snap'
+{
+  "uno-libs3": {
+    "4102-1": [
+      "CVE-2019-9850",
+      "CVE-2019-9851",
+      "CVE-2019-9852"
+    ]
+  }
+}
+
 Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db' --store-db='./tests/test-store-unittest-lp1841848.db'
 
 Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db' --store-db='./tests/test-store-unittest-lp1841848-needed.db'
@@ -967,6 +1017,82 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/test-check-notices-ne
           "CVE-2019-9852"
         ]
       },
+      "uno-libs3": {
+        "4102-1": [
+          "CVE-2019-9850",
+          "CVE-2019-9851",
+          "CVE-2019-9852"
+        ]
+      }
+    }
+  }
+}
+
+Running: snap-check-notices --no-fetch ./tests/test-check-notices-primed-stage-packages_0.1_amd64.snap
+{
+  "test-check-notices-primed-stage-packages": {
+    "0.1": {}
+  }
+}
+
+Running: snap-check-notices --no-fetch --with-cves ./tests/test-check-notices-primed-stage-packages_0.1_amd64.snap
+{
+  "test-check-notices-primed-stage-packages": {
+    "0.1": {}
+  }
+}
+
+Running: snap-check-notices --no-fetch ./tests/test-check-notices-primed-stage-packages-needed_0.1_amd64.snap
+{
+  "test-check-notices-primed-stage-packages-needed": {
+    "0.1": {
+      "libreoffice-style-tango": [
+        "4102-1"
+      ],
+      "uno-libs3": [
+        "4102-1"
+      ]
+    }
+  }
+}
+
+Running: snap-check-notices --no-fetch --with-cves ./tests/test-check-notices-primed-stage-packages-needed_0.1_amd64.snap
+{
+  "test-check-notices-primed-stage-packages-needed": {
+    "0.1": {
+      "libreoffice-style-tango": {
+        "4102-1": [
+          "CVE-2019-9850",
+          "CVE-2019-9851",
+          "CVE-2019-9852"
+        ]
+      },
+      "uno-libs3": {
+        "4102-1": [
+          "CVE-2019-9850",
+          "CVE-2019-9851",
+          "CVE-2019-9852"
+        ]
+      }
+    }
+  }
+}
+
+Running: snap-check-notices --no-fetch ./tests/test-check-notices-primed-stage-packages-needed_0.2_amd64.snap
+{
+  "test-check-notices-primed-stage-packages-needed": {
+    "0.2": {
+      "uno-libs3": [
+        "4102-1"
+      ]
+    }
+  }
+}
+
+Running: snap-check-notices --no-fetch --with-cves ./tests/test-check-notices-primed-stage-packages-needed_0.2_amd64.snap
+{
+  "test-check-notices-primed-stage-packages-needed": {
+    "0.2": {
       "uno-libs3": {
         "4102-1": [
           "CVE-2019-9850",
