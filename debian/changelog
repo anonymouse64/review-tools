@@ -1,12 +1,29 @@
-review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
+review-tools (0.48+20200807-1) RELEASED; urgency=medium
 
-  * common.py: refactor tests into ReviewBase and have Review derive from it
-  * sr_declaration.py: refactor is_bool and str2bool into
-    _verify_declaration()
+  [ Ian Johnson ]
+  * tests/manual-lzo-part2.sh: verify lzo snaps on foreign arches
+
+  [ Emilia Torino ]
+  * reviewtools/store.py:
+    - prefer primed-stage-packages new manifest section if present
+      when retrieving snap staged packages
+    - append faked packages from the update_stage_packages override to
+      primed-stage-packages manifest section if present
+
+  [ Jamie Strandboge ]
+  * reviewtools/common.py: refactor tests into ReviewBase and have Review
+    derive from it
+  * reviewtools/sr_declaration.py:
+    - refactor is_bool and str2bool into _verify_declaration()
+    - fix matching for allow with multiple constraints
+    - move check_{personal,system}files_iface_reference checks to
+      sr_declaration.py
   * add bin/snap-verify-declaration
-  * README: update for coverage
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Thu, 23 Jul 2020 12:11:56 -0500
+  [ Alex Murray]
+  * reviewtools/overrides.py: Add charmcraft to sec_iface_ref_overrides
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Fri, 07 Aug 2020 16:37:22 -0300
 
 review-tools (0.48+20200706-1) RELEASED; urgency=medium
 
