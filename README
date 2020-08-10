@@ -203,6 +203,18 @@ procedure for creating a new tag is:
 3. Create a tag with: git tag $(date --utc "+%Y%m%d-%H%MUTC")
 4. Push the tag with: git push origin $(git tag | tail -1)
 
+These steps will result in a new version of the review-tools snap available in
+the --edge channel. Before promoting to --beta, make sure further validations
+are run on the new version:
+
+1. Force the review-tools snap refresh with: 'snap refresh review-tools --edge'
+2. Connect to $HOME interface if not connected already: 'sudo snap connect review-tools:home'
+3. Run the extensive set of available automated tests with 'make check' and
+'make functest-system' (the last one tests the installed snap)
+4. Run any other manual test as needed
+
+Whenever confident with validations, promote to --beta channel with:
+'snapcraft promote --from-channel edge --to-channel beta review-tools'
 
 # Helpful commands
 
