@@ -1306,7 +1306,7 @@ slots:
         self.check_results(r, expected=expected)
 
     def test__verify_declaration_invalid_slots_iface_constraint_slot_names_value_auto(
-        self
+        self,
     ):
         """Test _verify_declaration - invalid interface constraint slot-names
            (auto-connection)"""
@@ -1356,7 +1356,7 @@ slots:
         self.check_results(r, expected_counts)
 
     def test__verify_declaration_valid_plugs_iface_constraint_plug_names_value_auto(
-        self
+        self,
     ):
         """Test _verify_declaration - valid interface constraint plug-names
            (auto-connection)"""
@@ -1453,7 +1453,7 @@ slots:
         self.check_results(r, expected=expected)
 
     def test__verify_declaration_invalid_slots_plug_attribs_browser_support_nonexistent(
-        self
+        self,
     ):
         """Test _verify_declaration - invalid interface constraint attrib
            nonexistent"""
@@ -3273,7 +3273,7 @@ slots:
         self.check_results(r, expected=expected)
 
     def test_check_declaration_personal_files_alt_regex_match_unmatching_plug_names(
-        self
+        self,
     ):
         """Test check_declaration - personal-files - alternates regex match (unmatching plug-names)"""
         plugs = {
@@ -3585,7 +3585,7 @@ slots:
         self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_deny_connection_attrib_list_match_matching_plug_names(
-        self
+        self,
     ):
         """Test check_declaration - slots/deny-connection/attrib - list match snap attribute str in decl list (matching plug-names)"""
         slots = {"iface-foo": {"interface": "foo", "attrib1": "b"}}
@@ -3618,7 +3618,7 @@ slots:
         self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_deny_connection_attrib_list_match_unmatching_plug_names(
-        self
+        self,
     ):
         """Test check_declaration - slots/deny-connection/attrib - list match snap attribute str in decl list (unmatching plug-names)"""
         slots = {"iface-foo": {"interface": "foo", "attrib1": "b"}}

@@ -303,8 +303,8 @@ class SnapReview(Review):
     }
 
     interfaces_needing_reference_checks = [
-        'personal-files',
-        'system-files',
+        "personal-files",
+        "system-files",
     ]
 
     # most are from cmd/snap-confine/mount-support.c:sc_populate_mount_ns()
@@ -365,9 +365,10 @@ class SnapReview(Review):
             except Exception:  # pragma: nocover
                 error("Could not load snap/manifest.yaml. Is it properly " "formatted?")
 
-        self.base_declaration_series, self.base_declaration = (
-            read_snapd_base_declaration()
-        )
+        (
+            self.base_declaration_series,
+            self.base_declaration,
+        ) = read_snapd_base_declaration()
 
         # Add in-progress interfaces
         if self.base_declaration_series in self.inprogress_interfaces:
