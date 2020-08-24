@@ -6479,6 +6479,29 @@ architectures: [ amd64 ]
         expected_counts = {"info": None, "warn": 1, "error": 0}
         self.check_results(r, expected_counts)
 
+    def test_check_valid_hook_check_health(self):
+        """Test check_valid_hook() - check_health"""
+        output_dir = self.mkdtemp()
+        package = utils.make_snap2(
+            output_dir=output_dir, extra_files=["meta/hooks/check-health?755"]
+        )
+        c = SnapReviewLint(package)
+        c.check_valid_hook()
+        r = c.review_report
+        expected_counts = {"info": 2, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_valid_hook_check_health_nonexecutable(self):
+        """Test check_valid_hook() - check-health not executable"""
+        package = utils.make_snap2(
+            output_dir=self.mkdtemp(), extra_files=["meta/hooks/check-health"]
+        )
+        c = SnapReviewLint(package)
+        c.check_valid_hook()
+        r = c.review_report
+        expected_counts = {"info": None, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
     def test_check_valid_hook_configure(self):
         """Test check_valid_hook() - configure"""
         output_dir = self.mkdtemp()

@@ -145,6 +145,7 @@ class SnapReview(Review):
 
     # snap/hooktypes.go
     valid_hook_types = [
+        "check-health",
         "configure",
         "connect-plug-",
         "connect-slot-",
