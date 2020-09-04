@@ -1,3 +1,15 @@
+review-tools (0.48+20200904-1) RELEASED; urgency=medium
+
+  [ Jamie Strandboge ]
+  * reviewtools/data/snapd-base-declaration.yaml: update reviewtools snapd
+    base declaration for snapd 2.46
+  * Makefile: update check-deps to require black as a snap
+
+  [ Emilia Torino ]
+  * reviewtools/sr_common.py: add support for check-health hook
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Fri, 04 Sep 2020 10:22:41 -0300
+
 review-tools (0.48+20200807-1) RELEASED; urgency=medium
 
   [ Ian Johnson ]
