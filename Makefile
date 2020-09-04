@@ -4,8 +4,7 @@ all:
 
 install: all
 
-DEPENDENCIES := \
-	black \
+DEB_DEPENDENCIES := \
 	binutils \
 	execstack \
 	fakeroot \
@@ -21,8 +20,16 @@ DEPENDENCIES := \
 	python3-yaml \
 	squashfs-tools
 
-check-deps:
-	@for dep in $(DEPENDENCIES); do if ! dpkg -l $$dep 1>/dev/null 2>&1; then echo "Please apt install $$dep"; exit 1; fi; done
+SNAP_DEPENDENCIES := \
+	black
+
+check-deb-deps:
+	@for dep in $(DEB_DEPENDENCIES); do if ! dpkg -l $$dep 1>/dev/null 2>&1; then echo "Please apt install $$dep"; exit 1; fi; done
+
+check-snap-deps:
+	@for dep in $(SNAP_DEPENDENCIES); do if ! snap list $$dep 1>/dev/null 2>&1; then echo "Please snap install $$dep"; exit 1; fi; done
+
+check-deps: check-deb-deps check-snap-deps
 
 test:
 	./run-tests
