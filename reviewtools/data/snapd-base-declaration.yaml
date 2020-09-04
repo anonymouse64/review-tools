@@ -46,6 +46,9 @@
   system-files:
     allow-installation: false
     deny-auto-connection: true
+  uinput:
+    allow-installation: false
+    deny-auto-connection: true
   unity8:
     allow-installation: false
  slots:
@@ -202,6 +205,12 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  cups:
+    allow-installation:
+      slot-snap-type:
+        - app
+    deny-connection: true
+    deny-auto-connection: true
   cups-control:
     allow-installation:
       slot-snap-type:
@@ -278,6 +287,11 @@
         - app
         - core
     deny-connection: true
+    deny-auto-connection: true
+  gconf:
+    allow-installation:
+      slot-snap-type:
+        - core
     deny-auto-connection: true
   gpg-keys:
     allow-installation:
@@ -391,6 +405,11 @@
         - core
     deny-auto-connection: true
   juju-client-observe:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
+  kernel-crypto-api:
     allow-installation:
       slot-snap-type:
         - core
@@ -791,6 +810,11 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  uinput:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   uio:
     allow-installation:
       slot-snap-type:
@@ -825,6 +849,11 @@
         - app
     deny-connection:
       on-classic: false
+  vcio:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   wayland:
     allow-installation:
       slot-snap-type:
