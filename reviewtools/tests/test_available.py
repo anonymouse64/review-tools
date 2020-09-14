@@ -366,7 +366,9 @@ Revision r12 (i386; channels: candidate, beta)
         res = available.scan_snap(secnot_fn, snap_fn)
         self.assertTrue(len(res) == 0)
 
-    def test_check_scan_snap_kernel_keeping_potentially_outdated_linux_image_generic_version_format(self):
+    def test_check_scan_snap_kernel_keeping_potentially_outdated_linux_image_generic_version_format(
+        self,
+    ):
         """Test scan_snap() - kernel abi, keeping MAJ.MIN.MIC-ABI-NNN support in case needed"""
         from reviewtools.overrides import update_stage_packages
 
