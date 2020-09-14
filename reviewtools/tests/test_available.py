@@ -360,7 +360,7 @@ Revision r12 (i386; channels: candidate, beta)
         """Test scan_snap() - kernel - ignoring NNN, considering ABI only always"""
         from reviewtools.overrides import update_stage_packages
 
-        update_stage_packages["pc-kernel"] = {"linux-image-generic": "auto-kernel"}
+        update_stage_packages["gke-kernel"] = {"linux-image-gke": "auto-kernel"}
         secnot_fn = "./tests/test-usn-kernel.db"
         snap_fn = "./tests/gke-kernel_174.snap"
         res = available.scan_snap(secnot_fn, snap_fn)
