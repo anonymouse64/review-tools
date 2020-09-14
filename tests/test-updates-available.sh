@@ -181,7 +181,7 @@ PYTHONPATH=./ SNAP=./ SNAP_USER_COMMON=./ USNDB='./tests/test-usn-core-with-dpkg
 echo "" | tee -a "$tmp"
 
 ## kernel
-for i in gke-kernel_4.15.0-1027.28~16.04.1_amd64.snap linux-generic-bbb_4.4.0-140-1_armhf.snap pc-kernel_4.15.0-44.46_i386.snap pc-kernel_4.4.0-141.167_amd64.snap ; do
+for i in gke-kernel_4.15.0-1027.28~16.04.1_amd64.snap linux-generic-bbb_4.4.0-140-1_armhf.snap pc-kernel_4.15.0-44.46_i386.snap pc-kernel_4.4.0-141.167_amd64.snap gke-kernel_174.snap; do
     echo "Running: snap-check-notices --no-fetch ./tests/$i" | tee -a "$tmp"
     PYTHONPATH=./ SNAP=./ SNAP_USER_COMMON=./ USNDB='./tests/test-usn-kernel.db' ./bin/snap-check-notices --no-fetch "./tests/$i" 2>&1 | tee -a "$tmp"
     echo "" | tee -a "$tmp"

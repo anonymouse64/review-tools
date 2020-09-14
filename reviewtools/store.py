@@ -44,21 +44,41 @@ snap_to_release = {
 
 
 # Used with auto-kernel. Assumes the binary is the meta-package with versions
-# MAJ.MIN.MIC.ABI.NNN where the snap version is MAJ.MIN.MIC-ABI.NNN. Since
-# some snap versions use ~16.04.1, discard that
-def convert_canonical_kernel_version(s, only_abi=False):
-    # discard trailing ~YY.MM.X
-    v = s.split("~")[0]
+# MAJ.MIN.MIC.ABI.NNN where the snap version is MAJ.MIN.MIC-ABI.NNN.
+# The first three numbers for either package is the upstream kernel version
+# (MAJ.MIN.MIC). Always end in 0, we don’t adjust for upstream stable version
+# bumps e.g. 4.15.4
+# ABI is what matches between the meta package and the binary kernel package
+# in each kernel update.
+# NNN can drift as packaging fixes are made to each source package
+# independently of each other.
+def convert_canonical_kernel_version(s):
+    # Since some snap versions use ~16.04.1, discard that part before analyzing the need for conversion as are
+    # backports from earlier Ubuntu releases;
+    v = s.split("~")
 
-    if not only_abi and not re.search(r"^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+\.[0-9]+$", v):
+    # If version does not match MAJ.MIN.MIC-ABI.NNN or MAJ.MIN.MIC-ABI-NNN there is no need for conversion
+    if not re.search(r"^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+\.*", v[0]) and not re.search(
+        r"^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+-.*", v[0]
+    ):
         return s
-    elif only_abi and not re.search(r"^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+-.*", v):
-        return s
-
-    # if only care about abi, then mock up a build NNN this is very high
-    if only_abi:
-        v = s.rsplit("-", 1)[0]
-        v += ".999999"
+    else:
+        # Discard trailing ~YY.MM.X if exists
+        # ~ makes the version sort be less than what precedes it (e.g. 5.4~9 will sort less than all of 5.4, 5.4.0,
+        # 5.4.9, etc.). If ~ is present, return version as given
+        if len(v) > 1:
+            v = v[0]
+        else:
+            # As we only care about abi, then mock up a build NNN that is very high
+            v = v[0]
+            # Some kernel could match the pattern MAJ.MIN.MIC-ABI (e.g. linux-generic-bbb=4.4.0-161), so we just add NNN
+            if re.search(r"^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+$", v):
+                v += ".999999"
+            else:
+                # We consider MAJ.MIN.MIC-ABI.NNN as well as MAJ.MIN.MIC-ABI-NNN (but the last one could be outdated)
+                v = re.split("([.|-])", v)
+                v[len(v) - 1] = "999999"
+                v = "".join(v)
 
     # convert from MAJ.MIN.MIC-ABI.NNN to MAJ.MIN.MIC.ABI.NNN
     v = v.replace("-", ".")
@@ -132,10 +152,6 @@ def append_fake_packages_to_manifest(
             elif version == "auto-kernel":
                 version = convert_canonical_kernel_version(
                     manifest_with_faked_packages["version"]
-                )
-            elif version == "auto-kernelabi":
-                version = convert_canonical_kernel_version(
-                    manifest_with_faked_packages["version"], only_abi=True
                 )
             # append to prime-stage-packages if present, else insert into the
             # stage-packages of our faked part
