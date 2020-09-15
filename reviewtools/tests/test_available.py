@@ -362,7 +362,7 @@ Revision r12 (i386; channels: candidate, beta)
 
         update_stage_packages["gke-kernel"] = {"linux-image-gke": "auto-kernel"}
         secnot_fn = "./tests/test-usn-kernel.db"
-        snap_fn = "./tests/gke-kernel_174.snap"
+        snap_fn = "./tests/gke-kernel_4.15.0-1069.72_amd64.snap"
         res = available.scan_snap(secnot_fn, snap_fn)
         self.assertTrue(len(res) == 0)
 

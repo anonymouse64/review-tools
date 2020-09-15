@@ -46,37 +46,34 @@ snap_to_release = {
 # Used with auto-kernel. Assumes the binary is the meta-package with versions
 # MAJ.MIN.MIC.ABI.NNN where the snap version is MAJ.MIN.MIC-ABI.NNN.
 # The first three numbers for either package is the upstream kernel version
-# (MAJ.MIN.MIC). Always end in 0, we don’t adjust for upstream stable version
+# (MAJ.MIN.MIC). MIC is always 0 since we don’t adjust for upstream stable version
 # bumps e.g. 4.15.4
 # ABI is what matches between the meta package and the binary kernel package
-# in each kernel update.
+# in each kernel update. For the purposes of snap USN notifications, we will
+# consider ABI without NNN since update practices dictate that ABI will change
+# as part of the Ubuntu SRU cycle. This simplifies the comparison but also
+# ensures that we don't notify when we shouldn't (eg, a packaging change revs
+# NNN and now the kernel is considered out of date).
 # NNN can drift as packaging fixes are made to each source package
 # independently of each other.
 def convert_canonical_kernel_version(s):
-    # Since some snap versions use ~16.04.1, discard that part before analyzing the need for conversion as are
-    # backports from earlier Ubuntu releases;
-    v = s.split("~")
-
-    # If version does not match MAJ.MIN.MIC-ABI.NNN or MAJ.MIN.MIC-ABI-NNN there is no need for
-    if not re.search(r"^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+[-.]?.*", v[0]):
+    v = s.split("~")[0]
+    if not re.search(r"^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+[-.]?.*", v):
+        # Don't do any kernel version mocking if the version isn't in the expected
+        # form
         return s
+
+    # As we only care about abi, then mock up a build NNN that is very high
+    if re.search(r"^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+$", v):
+        # Some kernels could match the pattern MAJ.MIN.MIC-ABI (e.g.
+        # linux-generic-bbb=4.4.0-161), so we just append a high .NNN)
+        v += ".999999"
     else:
-        # Discard trailing ~YY.MM.X if exists
-        # ~ makes the version sort be less than what precedes it (e.g. 5.4~9 will sort less than all of 5.4, 5.4.0,
-        # 5.4.9, etc.). If ~ is present, return version as given
-        if len(v) > 1:
-            v = v[0]
-        else:
-            # As we only care about abi, then mock up a build NNN that is very high
-            v = v[0]
-            # Some kernel could match the pattern MAJ.MIN.MIC-ABI (e.g. linux-generic-bbb=4.4.0-161), so we just add NNN
-            if re.search(r"^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+$", v):
-                v += ".999999"
-            else:
-                # We consider MAJ.MIN.MIC-ABI.NNN as well as MAJ.MIN.MIC-ABI-NNN (but the last one could be outdated)
-                v = re.split("([.|-])", v)
-                v[len(v) - 1] = "999999"
-                v = "".join(v)
+        # We consider MAJ.MIN.MIC-ABI.NNN as well as MAJ.MIN.MIC-ABI-NNN,
+        # so mock up a high NNN in both cases
+        tmp = re.split("([.|-])", v)
+        tmp[len(tmp) - 1] = "999999"
+        v = "".join(tmp)
 
     # convert from MAJ.MIN.MIC-ABI.NNN to MAJ.MIN.MIC.ABI.NNN
     v = v.replace("-", ".")
