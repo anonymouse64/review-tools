@@ -57,10 +57,8 @@ def convert_canonical_kernel_version(s):
     # backports from earlier Ubuntu releases;
     v = s.split("~")
 
-    # If version does not match MAJ.MIN.MIC-ABI.NNN or MAJ.MIN.MIC-ABI-NNN there is no need for conversion
-    if not re.search(r"^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+\.*", v[0]) and not re.search(
-        r"^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+-.*", v[0]
-    ):
+    # If version does not match MAJ.MIN.MIC-ABI.NNN or MAJ.MIN.MIC-ABI-NNN there is no need for
+    if not re.search(r"^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+[-.]?.*", v[0]):
         return s
     else:
         # Discard trailing ~YY.MM.X if exists
