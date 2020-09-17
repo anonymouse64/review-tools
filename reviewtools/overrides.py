@@ -903,6 +903,13 @@ canonical_desktop = [
     "will.cooke@canonical.com",
 ]
 
+canonical_edgex = [
+    "tony.espy@canonical.com",
+    "espy@canonical.com",
+    "siggi.skulason@canonical.com",
+    "haresh.kainth@canonical.com",
+]
+
 canonical_enablement = [
     "snap-update-verification@lists.canonical.com",
     "pascal.morin@canonical.com",
@@ -946,7 +953,6 @@ canonical_multipass = canonical_mir
 canonical_openstack = ["ryan.beisner@canonical.com", "james.page@canonical.com"]
 
 canonical_security = [
-    "joe.mcmanus@canonical.com",
     "alex.murray@canonical.com",
     "jamie@canonical.com",
     "mike.salvatore@canonical.com",
@@ -994,6 +1000,12 @@ update_publisher_overrides = {
         "dragonboard": canonical_snapd,
         "dragonboard-kernel": canonical_kernel,
         "easy-openvpn": canonical_enablement,
+        "edgex-app-service-configurable": canonical_edgex,
+        "edgex-device-grove": canonical_edgex,
+        "edgex-device-mqtt": canonical_edgex,
+        "edgex-device-modbus": canonical_edgex,
+        "edgex-ui-go": canonical_edgex,
+        "edgexfoundry": canonical_edgex,
         "eog": canonical_desktop,
         "etcd": canonical_k8s,
         "gcp-kernel": canonical_kernel,
@@ -1104,6 +1116,7 @@ update_publisher_overrides = {
         "udisks2": canonical_enablement,
         "uefi-fw-tools": canonical_enablement,
         "ufw": canonical_security,
+        "vault": canonical_openstack,
         "wifi-ap": canonical_enablement,
         "wifi-connect": canonical_enablement,
         "wpa-supplicant": canonical_enablement,
