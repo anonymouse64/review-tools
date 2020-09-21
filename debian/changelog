@@ -1,3 +1,11 @@
+review-tools (0.48+20200921) RELEASED; urgency=medium
+
+  * reviewtools/overrides.py:
+    - Add vault and edgex snaps to update_publisher_overrides
+    - Add new canonical_edgex email group
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Mon, 21 Sep 2020 09:22:25 -0300
+
 review-tools (0.48+20200904-1) RELEASED; urgency=medium
 
   [ Jamie Strandboge ]
