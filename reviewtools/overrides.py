@@ -905,7 +905,6 @@ canonical_desktop = [
 
 canonical_edgex = [
     "tony.espy@canonical.com",
-    "espy@canonical.com",
     "siggi.skulason@canonical.com",
     "haresh.kainth@canonical.com",
 ]
