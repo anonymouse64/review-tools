@@ -21,9 +21,9 @@ import struct
 class DebVersion:
     valid_pat = re.compile(
         r"^((\d+):)?"  # epoch
-        "([A-Za-z0-9.+:~-]+?)"  # upstream
-        "(-([A-Za-z0-9+.~]+))?$"
-    )  # debian
+        "([A-Za-z0-9.+:~-]+?)"  # upstream version
+        "(-([A-Za-z0-9+.~]+))?$"  # debian revision
+    )
     epoch_pat = re.compile(r"^\d+:")
     revision_pat = re.compile(r"^[a-zA-Z0-9+.~]+$")
 
@@ -40,7 +40,8 @@ class DebVersion:
             self.epoch = int(tmp.split(":")[0])
             tmp = tmp.split(":", 1)[1]
 
-        # if version has a '-', then (the last) may be the revision
+        # if version has a '-', then after the (last) dash may be the debian
+        # revision
         self.revision = "0"
         if tmp.count("-") > 0:
             poss_revision = tmp.split("-")[-1]
@@ -100,9 +101,9 @@ def _order(c):
 
 # Compares two Debian versions.
 #
-# retval 0 If a and b are equal.
-# retval <0 If a is smaller than b.
-# retval >0 If a is greater than b.
+# retval  0 if a and b are equal.
+# retval <0 if a is smaller than b.
+# retval >0 if a is greater than b.
 def _verrevcomp(a, b):
     aidx = 0
     bidx = 0
