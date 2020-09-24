@@ -735,7 +735,11 @@ sec_resquashfs_overrides = [
 ]
 
 # Snaps allowed to use a non-default compression
-sec_compression_overrides = {"chromium": ["lzo"], "test-snapd-sh-lzo": ["lzo"]}
+sec_compression_overrides = {
+    "chromium": ["lzo"],
+    "firefox": ["lzo"],
+    "test-snapd-sh-lzo": ["lzo"],
+}
 
 #
 # HISTORICAL
