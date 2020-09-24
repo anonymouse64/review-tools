@@ -118,8 +118,10 @@ for series in 16 18 20; do
 
     sudo "$LXC" file push review-tools.tgz "${cont_name}/root/review-tools.tgz"
 
-    sudo "$LXC" exec "${cont_name}" -- apt update
-    sudo "$LXC" exec "${cont_name}" -- apt upgrade -y
+    # sometimes apt operations fail due to apt parsing, probably a race 
+    # condition, but keep trying
+    sudo "$LXC" exec "${cont_name}" -- /bin/bash -c 'until apt update; do sleep 0.1; done'
+    sudo "$LXC" exec "${cont_name}" -- /bin/bash -c 'until apt upgrade -y; do sleep 0.1; done'
 
     # dependencies for review-tools as per the snapcraft.yaml
     sudo "$LXC" exec "${cont_name}" -- apt install -y binutils fakeroot file libdb5.3 libmagic1 python3-magic python3-requests python3-simplejson python3-yaml squashfs-tools
