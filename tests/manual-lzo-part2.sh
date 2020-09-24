@@ -207,7 +207,7 @@ done
 
 popd
 
-echo "test done, results in $TARBALL"
+echo "test done"
 
 # reset the cleanup so we don't unnecessarily run it and exit with non-zero status
 trap - EXIT SIGINT SIGTERM
