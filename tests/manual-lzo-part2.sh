@@ -31,7 +31,7 @@ if [ "$#" != 1 ]; then
     exit 1
 fi
 
-TARBALL="$1"
+TARBALL=$(readlink -f "$1")
 
 # TODO: share common snippets of this script with manual-lzo.sh ?
 function is_core_snap {
