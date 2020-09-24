@@ -1,3 +1,10 @@
+review-tools (0.48+20200921ubuntu1) RELEASED; urgency=medium
+
+  [ Jamie Strandboge ]
+  * reviewtools/overrides.py: allow firefox to use lzo as well
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Thu, 24 Sep 2020 13:33:32 -0300
+
 review-tools (0.48+20200921) RELEASED; urgency=medium
 
   * reviewtools/overrides.py:
