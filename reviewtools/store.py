@@ -46,8 +46,9 @@ snap_to_release = {
 # Used with auto-kernel. Assumes the binary is the meta-package with versions
 # MAJ.MIN.MIC.ABI.NNN where the snap version is MAJ.MIN.MIC-ABI.NNN.
 # The first three numbers for either package is the upstream kernel version
-# (MAJ.MIN.MIC). MIC is always 0 since we don’t adjust for upstream stable version
-# bumps e.g. 4.15.4
+# (MAJ.MIN.MIC). MIC is always 0 since we don’t adjust for upstream stable
+# version bumps e.g. 4.15.4
+#
 # ABI is what matches between the meta package and the binary kernel package
 # in each kernel update. For the purposes of snap USN notifications, we will
 # consider ABI without NNN since update practices dictate that ABI will change
@@ -59,8 +60,8 @@ snap_to_release = {
 def convert_canonical_kernel_version(s):
     v = s.split("~")[0]
     if not re.search(r"^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+[-.]?.*", v):
-        # Don't do any kernel version mocking if the version isn't in the expected
-        # form
+        # Don't do any kernel version mocking if the version isn't in the
+        # expected form
         return s
 
     # As we only care about abi, then mock up a build NNN that is very high
