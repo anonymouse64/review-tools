@@ -738,6 +738,7 @@ sec_resquashfs_overrides = [
 sec_compression_overrides = {
     "chromium": ["lzo"],
     "firefox": ["lzo"],
+    "libreoffice": ["lzo"],
     "test-snapd-sh-lzo": ["lzo"],
 }
 
