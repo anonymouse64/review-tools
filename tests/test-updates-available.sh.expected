@@ -528,20 +528,8 @@ Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-core-with
 Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./tests/gke-kernel_4.15.0-1027.28~16.04.1_amd64.snap'
 {
   "linux-image-gke": {
-    "3871-4": [
-      "CVE-2018-10876",
-      "CVE-2018-10877",
-      "CVE-2018-10878",
-      "CVE-2018-10879",
-      "CVE-2018-10880",
-      "CVE-2018-10882",
-      "CVE-2018-10883",
-      "CVE-2018-14625",
-      "CVE-2018-16882",
-      "CVE-2018-17972",
-      "CVE-2018-18281",
-      "CVE-2018-19407",
-      "CVE-2018-9516"
+    "4489-1": [
+      "CVE-2020-14386"
     ]
   }
 }
@@ -571,6 +559,9 @@ Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./
     "3871-2": [
       "https://launchpad.net/bugs/1813663",
       "https://launchpad.net/bugs/1813727"
+    ],
+    "4489-1": [
+      "CVE-2020-14386"
     ]
   }
 }
@@ -859,7 +850,7 @@ Running: snap-check-notices --no-fetch ./tests/gke-kernel_4.15.0-1027.28~16.04.1
   "gke-kernel": {
     "4.15.0-1027.28~16.04.1": {
       "linux-image-gke": [
-        "3871-4"
+        "4489-1"
       ]
     }
   }
@@ -870,20 +861,8 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/gke-kernel_4.15.0-102
   "gke-kernel": {
     "4.15.0-1027.28~16.04.1": {
       "linux-image-gke": {
-        "3871-4": [
-          "CVE-2018-10876",
-          "CVE-2018-10877",
-          "CVE-2018-10878",
-          "CVE-2018-10879",
-          "CVE-2018-10880",
-          "CVE-2018-10882",
-          "CVE-2018-10883",
-          "CVE-2018-14625",
-          "CVE-2018-16882",
-          "CVE-2018-17972",
-          "CVE-2018-18281",
-          "CVE-2018-19407",
-          "CVE-2018-9516"
+        "4489-1": [
+          "CVE-2020-14386"
         ]
       }
     }
@@ -930,7 +909,8 @@ Running: snap-check-notices --no-fetch ./tests/pc-kernel_4.15.0-44.46_i386.snap
   "pc-kernel": {
     "4.15.0-44.46": {
       "linux-image-generic": [
-        "3871-2"
+        "3871-2",
+        "4489-1"
       ]
     }
   }
@@ -944,6 +924,9 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/pc-kernel_4.15.0-44.4
         "3871-2": [
           "https://launchpad.net/bugs/1813663",
           "https://launchpad.net/bugs/1813727"
+        ],
+        "4489-1": [
+          "CVE-2020-14386"
         ]
       }
     }
@@ -975,6 +958,20 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/pc-kernel_4.4.0-141.1
         ]
       }
     }
+  }
+}
+
+Running: snap-check-notices --no-fetch ./tests/gke-kernel_4.15.0-1069.72_amd64.snap
+{
+  "gke-kernel": {
+    "4.15.0-1069.72": {}
+  }
+}
+
+Running: snap-check-notices --no-fetch --with-cves ./tests/gke-kernel_4.15.0-1069.72_amd64.snap
+{
+  "gke-kernel": {
+    "4.15.0-1069.72": {}
   }
 }
 

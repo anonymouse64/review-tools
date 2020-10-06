@@ -1159,7 +1159,7 @@ update_stage_packages = {
     "dragonboard-kernel": {"linux-image-snapdragon": "auto-kernel"},
     "gcp-kernel": {"linux-image-gcp": "auto-kernel"},
     "gke-kernel": {"linux-image-gke": "auto-kernel"},
-    "linux-generic-bbb": {"linux-image-generic": "auto-kernelabi"},
+    "linux-generic-bbb": {"linux-image-generic": "auto-kernel"},
     # 'network-manager': {'network-manager': 'auto'},  # eventually
     "pc-kernel": {"linux-image-generic": "auto-kernel"},
     "pc-lowlatency-kernel": {"linux-image-generic": "auto-kernel"},

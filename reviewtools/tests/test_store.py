@@ -1027,20 +1027,20 @@ class TestStore(TestCase):
 
     def test_convert_canonical_kernel_version(self):
         """Test convert_canonical_kernel_version()"""
-        # (version, expected, only_abi)
+        # (version, expected)
         tests = [
-            ("1.2", "1.2", False),
-            ("1.3", "1.3", True),
-            ("1.2~", "1.2~", False),
-            ("1.3~", "1.3~", True),
-            ("1.2.3-4.5", "1.2.3.4.5", False),
-            ("1.2.3-4.5~16.04.1", "1.2.3.4.5", False),
-            ("1.2.3-4.6", "1.2.3-4.6", True),
-            ("1.2.3-4-6", "1.2.3.4.999999", True),
-            ("1.2.3-4-6~16.04.1", "1.2.3.4.999999", True),
+            ("1.2", "1.2"),
+            ("1.3", "1.3"),
+            ("1.2~", "1.2~"),
+            ("1.3~", "1.3~"),
+            ("1.2.3-4.5~16.04.1", "1.2.3.4.999999"),
+            ("1.2.3-4.6", "1.2.3.4.999999"),
+            ("1.2.3-4-6~16.04.1", "1.2.3.4.999999"),
+            ("4.4.0-161", "4.4.0.161.999999"),
+            ("4.4.0-140-1", "4.4.0.140.999999"),
         ]
-        for (v, expected, only_abi) in tests:
-            res = store.convert_canonical_kernel_version(v, only_abi)
+        for (v, expected) in tests:
+            res = store.convert_canonical_kernel_version(v)
             self.assertEqual(res, expected)
 
     def test_convert_canonical_app_version(self):
@@ -1193,7 +1193,7 @@ class TestStore(TestCase):
         self.assertTrue("faked-by-review-tools" in res["parts"])
         self.assertTrue("stage-packages" in res["parts"]["faked-by-review-tools"])
         self.assertTrue(
-            "linux-image-generic=4.4.0.140.141"
+            "linux-image-generic=4.4.0.140.999999"
             in res["parts"]["faked-by-review-tools"]["stage-packages"]
         )
 
@@ -1207,42 +1207,6 @@ class TestStore(TestCase):
         m["version"] = "4.4.0-140.141"
         m["parts"] = {}
 
-        m["primed-stage-packages"] = ["libxcursor1=1:1.1.14-1"]
-
-        res = store.get_faked_stage_packages(m)
-        self.assertFalse("faked-by-review-tools" in res["parts"])
-        self.assertTrue(
-            "linux-image-generic=4.4.0.140.141" in res["primed-stage-packages"]
-        )
-        self.assertTrue("libxcursor1=1:1.1.14-1" in res["primed-stage-packages"])
-
-    def test_get_faked_stage_packages_auto_kernelabi(self):
-        """Test get_faked_stage_packages"""
-        from reviewtools.overrides import update_stage_packages
-
-        update_stage_packages["foo"] = {"linux-image-generic": "auto-kernelabi"}
-        m = {}
-        m["name"] = "foo"
-        m["version"] = "4.4.0-140-1"
-        m["parts"] = {}
-
-        res = store.get_faked_stage_packages(m)
-        self.assertTrue("faked-by-review-tools" in res["parts"])
-        self.assertTrue("stage-packages" in res["parts"]["faked-by-review-tools"])
-        self.assertTrue(
-            "linux-image-generic=4.4.0.140.999999"
-            in res["parts"]["faked-by-review-tools"]["stage-packages"]
-        )
-
-    def test_get_faked_stage_packages_with_primed_stage_auto_kernelabi(self):
-        """Test get_faked_stage_packages, primed-stage exists"""
-        from reviewtools.overrides import update_stage_packages
-
-        update_stage_packages["foo"] = {"linux-image-generic": "auto-kernelabi"}
-        m = {}
-        m["name"] = "foo"
-        m["version"] = "4.4.0-140-1"
-        m["parts"] = {}
         m["primed-stage-packages"] = ["libxcursor1=1:1.1.14-1"]
 
         res = store.get_faked_stage_packages(m)

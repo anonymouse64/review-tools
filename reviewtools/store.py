@@ -44,21 +44,36 @@ snap_to_release = {
 
 
 # Used with auto-kernel. Assumes the binary is the meta-package with versions
-# MAJ.MIN.MIC.ABI.NNN where the snap version is MAJ.MIN.MIC-ABI.NNN. Since
-# some snap versions use ~16.04.1, discard that
-def convert_canonical_kernel_version(s, only_abi=False):
-    # discard trailing ~YY.MM.X
+# MAJ.MIN.MIC.ABI.NNN where the snap version is MAJ.MIN.MIC-ABI.NNN.
+# The first three numbers for either package is the upstream kernel version
+# (MAJ.MIN.MIC). MIC is always 0 since we don’t adjust for upstream stable version
+# bumps e.g. 4.15.4
+# ABI is what matches between the meta package and the binary kernel package
+# in each kernel update. For the purposes of snap USN notifications, we will
+# consider ABI without NNN since update practices dictate that ABI will change
+# as part of the Ubuntu SRU cycle. This simplifies the comparison but also
+# ensures that we don't notify when we shouldn't (eg, a packaging change revs
+# NNN and now the kernel is considered out of date).
+# NNN can drift as packaging fixes are made to each source package
+# independently of each other.
+def convert_canonical_kernel_version(s):
     v = s.split("~")[0]
-
-    if not only_abi and not re.search(r"^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+\.[0-9]+$", v):
+    if not re.search(r"^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+[-.]?.*", v):
+        # Don't do any kernel version mocking if the version isn't in the expected
+        # form
         return s
-    elif only_abi and not re.search(r"^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+-.*", v):
-        return s
 
-    # if only care about abi, then mock up a build NNN this is very high
-    if only_abi:
-        v = s.rsplit("-", 1)[0]
+    # As we only care about abi, then mock up a build NNN that is very high
+    if re.search(r"^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+$", v):
+        # Some kernels could match the pattern MAJ.MIN.MIC-ABI (e.g.
+        # linux-generic-bbb=4.4.0-161), so we just append a high .NNN)
         v += ".999999"
+    else:
+        # We consider MAJ.MIN.MIC-ABI.NNN as well as MAJ.MIN.MIC-ABI-NNN,
+        # so mock up a high NNN in both cases
+        tmp = re.split("([.|-])", v)
+        tmp[len(tmp) - 1] = "999999"
+        v = "".join(tmp)
 
     # convert from MAJ.MIN.MIC-ABI.NNN to MAJ.MIN.MIC.ABI.NNN
     v = v.replace("-", ".")
@@ -132,10 +147,6 @@ def append_fake_packages_to_manifest(
             elif version == "auto-kernel":
                 version = convert_canonical_kernel_version(
                     manifest_with_faked_packages["version"]
-                )
-            elif version == "auto-kernelabi":
-                version = convert_canonical_kernel_version(
-                    manifest_with_faked_packages["version"], only_abi=True
                 )
             # append to prime-stage-packages if present, else insert into the
             # stage-packages of our faked part
