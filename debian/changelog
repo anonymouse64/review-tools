@@ -1,3 +1,9 @@
+review-tools (0.48+20201006-1) RELEASED; urgency=medium
+
+  * overrides.py: add/update for public snaps
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Tue, 06 Oct 2020 09:17:34 -0300
+
 review-tools (0.48+20200921ubuntu1) RELEASED; urgency=medium
 
   [ Jamie Strandboge ]
