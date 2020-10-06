@@ -1,6 +1,11 @@
 review-tools (0.48+YYYYMMDD) UNRELEASED; urgency=medium
 
+  [ Ian Johnson ]
   * overrides.py: libreoffice can use lzo
+
+  [ Emilia Torino ]
+  * only consider ABI when converting kernel version formats for kernel USN
+    notifications
 
  -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 06 Oct 2020 08:49:54 -0500
 
