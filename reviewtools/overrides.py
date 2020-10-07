@@ -113,6 +113,7 @@ redflagged_snap_types_overrides = {
         "core16",
         "core18",
         "core20",
+        "core22",
         "test-snapd-base",
         "test-snapd-core18",
         "fedora29",  # Community base snaps
@@ -301,6 +302,26 @@ sec_mode_overrides = {
         "./var/local": "rwxrwsr-x",
         "./var/mail": "rwxrwsr-x",
         "./var/tmp": "rwxrwxrwt",
+    },
+    "core22": {
+        "./usr/bin/chage": "rwxr-sr-x",
+        "./usr/bin/chfn": "rwsr-xr-x",
+        "./usr/bin/chsh": "rwsr-xr-x",
+        "./usr/bin/expiry": "rwxr-sr-x",
+        "./usr/bin/gpasswd": "rwsr-xr-x",
+        "./usr/bin/mount": "rwsr-xr-x",
+        "./usr/bin/newgrp": "rwsr-xr-x",
+        "./usr/bin/passwd": "rwsr-xr-x",
+        "./usr/bin/ssh-agent": "rwxr-sr-x",
+        "./usr/bin/su": "rwsr-xr-x",
+        "./usr/bin/sudo": "rwsr-xr-x",
+        "./usr/bin/umount": "rwsr-xr-x",
+        "./usr/bin/wall": "rwxr-sr-x",
+        "./usr/lib/dbus-1.0/dbus-daemon-launch-helper": "rwsr-xr--",
+        "./usr/lib/openssh/ssh-keysign": "rwsr-xr-x",
+        "./usr/sbin/pam_extrausers_chkpwd": "rwxr-sr-x",
+        "./usr/sbin/unix_chkpwd": "rwxr-sr-x",
+        "./var/mail": "rwxrwsr-x",
     },
     "openwrt": {"./rootfs/tmp": "rwxrwxrwt"},  # demo from Canonical
     "opera": {  # official Opera snap
@@ -561,6 +582,12 @@ sec_mode_dev_overrides = {
         "./dev/zero": ("crw-rw-rw-", "root/root"),
     },
     "core20": {
+        "./dev/null": ("crw-rw-rw-", "root/root"),
+        "./dev/random": ("crw-rw-rw-", "root/root"),
+        "./dev/urandom": ("crw-rw-rw-", "root/root"),
+        "./dev/zero": ("crw-rw-rw-", "root/root"),
+    },
+    "core22": {
         "./dev/null": ("crw-rw-rw-", "root/root"),
         "./dev/random": ("crw-rw-rw-", "root/root"),
         "./dev/urandom": ("crw-rw-rw-", "root/root"),
