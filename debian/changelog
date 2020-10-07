@@ -1,4 +1,4 @@
-review-tools (0.48+YYYYMMDD) UNRELEASED; urgency=medium
+review-tools (0.48+20201007-1) RELEASED; urgency=medium
 
   [ Ian Johnson ]
   * overrides.py: libreoffice can use lzo
@@ -6,8 +6,9 @@ review-tools (0.48+YYYYMMDD) UNRELEASED; urgency=medium
   [ Emilia Torino ]
   * only consider ABI when converting kernel version formats for kernel USN
     notifications
+  * overrides.py: add support for core22 base snap
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 06 Oct 2020 08:49:54 -0500
+ -- Emilia Torino <emilia.torino@canonical.com>  Wed, 07 Oct 2020 18:54:28 -0300
 
 review-tools (0.48+20201006-1) RELEASED; urgency=medium
 
