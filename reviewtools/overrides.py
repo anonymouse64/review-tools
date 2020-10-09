@@ -1025,6 +1025,7 @@ update_publisher_overrides = {
         "core16": canonical_snapd,
         "core18": canonical_snapd,
         "core20": canonical_snapd,
+        "core22": canonical_snapd,
         "cvescan": canonical_security,
         "dell-edge-iot-kernel": canonical_kernel,
         "docker": canonical_enablement,
