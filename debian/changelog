@@ -1,3 +1,9 @@
+review-tools (0.48+20201013-1) RELEASED; urgency=medium
+
+  * overrides.py: add core22 base snap to update_publisher_overrides
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Tue, 13 Oct 2020 16:41:21 -0300
+
 review-tools (0.48+20201007-1) RELEASED; urgency=medium
 
   [ Ian Johnson ]
