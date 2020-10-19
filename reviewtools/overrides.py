@@ -1145,6 +1145,7 @@ update_publisher_overrides = {
         "test-snapd-system-observe-consumer": canonical_snapd,
         "test-snapd-uhid": canonical_snapd,
         "test-snapd-upower-observe-consumer": canonical_snapd,
+        "thunderbird": canonical_desktop,
         "tpm": canonical_enablement,
         "tpm2": canonical_enablement,
         "ubuntu-image": canonical_foundations,
