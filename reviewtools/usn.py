@@ -19,7 +19,7 @@ from pkg_resources import resource_filename
 import reviewtools.common as common
 import reviewtools.debversion as debversion
 
-tracked_releases = ["xenial", "bionic"]
+tracked_releases = ["xenial", "bionic", "focal"]
 epoch_pat = re.compile(r"^[0-9]+:")
 
 
