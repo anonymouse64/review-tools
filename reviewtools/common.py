@@ -132,6 +132,7 @@ OS_RELEASE_MAP = {
         "19.10": "eoan",
         "20.04": "focal",
         "20.10": "groovy",
+        "21.04": "hirsute",
     }
 }
 
