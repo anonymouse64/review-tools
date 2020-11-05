@@ -48,7 +48,8 @@ MKDTEMP_PREFIX = "review-tools-"
 MKDTEMP_DIR = None
 VALID_SYSCALL = r"^[a-z0-9_]{2,64}$"
 # This needs to match up with snapcraft. Note, 'xz' is still the default
-# compression algorithm, but others may be supported
+# compression algorithm, and support for lzo has been added, but others
+# may be supported
 MKSQUASHFS_DEFAULT_COMPRESSION = "xz"
 MKSQUASHFS_OPTS = [
     "-noappend",
