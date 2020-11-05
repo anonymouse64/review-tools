@@ -1,3 +1,14 @@
+review-tools (0.48+20201105-1) RELEASED; urgency=medium
+
+  [ Emilia Torino ]
+  * reviewtools/sr_security.py: allow snaps to use lzo
+
+  [ Alex Murray]
+  * reviewtools/common.py: add hirsute to OS_RELEASE_MAP
+  * reviewtools/usn.py: add focal to tracked_releases
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Thu, 05 Nov 2020 19:30:51 -0300
+
 review-tools (0.48+20201013-1) RELEASED; urgency=medium
 
   * overrides.py: add/update for public snaps
