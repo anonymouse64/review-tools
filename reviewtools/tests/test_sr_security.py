@@ -1133,54 +1133,6 @@ class TestSnapReviewSecurityNoMock(TestCase):
         expected["error"][name] = {"text": "compression algorithm 'lzo' not allowed"}
         self.check_results(report, expected=expected)
 
-    def test_check_squashfs_resquash_lzo_override(self):
-        """Test check_squashfs_resquash() - lzo override"""
-        package = utils.make_snap2(output_dir=self.mkdtemp(), compression="lzo")
-        c = SnapReviewSecurity(package)
-        # update the overrides with our snap
-        from reviewtools.overrides import sec_compression_overrides
-
-        sec_compression_overrides["test"] = ["lzo"]
-        # run the test
-        c.check_squashfs_resquash()
-        # then cleanup the overrides
-        del sec_compression_overrides["test"]
-
-        report = c.review_report
-        expected_counts = {"info": 1, "warn": 0, "error": 0}
-        self.check_results(report, expected_counts)
-        expected = dict()
-        expected["error"] = dict()
-        expected["warn"] = dict()
-        expected["info"] = dict()
-        name = "security-snap-v2:squashfs_repack_checksum"
-        expected["info"][name] = {"text": "OK"}
-        self.check_results(report, expected=expected)
-
-    def test_check_squashfs_resquash_lzo_override_wrong(self):
-        """Test check_squashfs_resquash() - lzo override"""
-        package = utils.make_snap2(output_dir=self.mkdtemp(), compression="lzo")
-        c = SnapReviewSecurity(package)
-        # update the overrides with our snap
-        from reviewtools.overrides import sec_compression_overrides
-
-        sec_compression_overrides["test"] = ["xz"]
-        # run the test
-        c.check_squashfs_resquash()
-        # then cleanup the overrides
-        del sec_compression_overrides["test"]
-
-        report = c.review_report
-        expected_counts = {"info": 0, "warn": 0, "error": 1}
-        self.check_results(report, expected_counts)
-        expected = dict()
-        expected["error"] = dict()
-        expected["warn"] = dict()
-        expected["info"] = dict()
-        name = "security-snap-v2:squashfs_compression"
-        expected["error"][name] = {"text": "compression algorithm 'lzo' not allowed"}
-        self.check_results(report, expected=expected)
-
     def test_check_squashfs_resquash_gzip(self):
         """Test check_squashfs_resquash() - gzip"""
         package = utils.make_snap2(output_dir=self.mkdtemp(), compression="gzip")

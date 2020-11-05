@@ -762,14 +762,6 @@ sec_resquashfs_overrides = [
     "webstorm",  # end jetbrains
 ]
 
-# Snaps allowed to use a non-default compression
-sec_compression_overrides = {
-    "chromium": ["lzo"],
-    "firefox": ["lzo"],
-    "libreoffice": ["lzo"],
-    "test-snapd-sh-lzo": ["lzo"],
-}
-
 #
 # HISTORICAL
 #

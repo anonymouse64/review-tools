@@ -39,7 +39,6 @@ from reviewtools.overrides import (
     sec_mode_overrides,
     sec_mode_dev_overrides,
     sec_resquashfs_overrides,
-    sec_compression_overrides,
 )
 import copy
 import os
@@ -214,10 +213,6 @@ class SnapReviewSecurity(SnapReview):
             return
         elif (
             comp != MKSQUASHFS_DEFAULT_COMPRESSION
-            and (
-                self.snap_yaml["name"] not in sec_compression_overrides
-                or comp not in sec_compression_overrides[self.snap_yaml["name"]]
-            )
             and (
                 "SNAP_ENFORCE_RESQUASHFS_COMP" not in os.environ
                 or os.environ["SNAP_ENFORCE_RESQUASHFS_COMP"] != "0"
