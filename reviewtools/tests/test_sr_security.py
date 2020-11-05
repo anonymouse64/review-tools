@@ -1123,14 +1123,14 @@ class TestSnapReviewSecurityNoMock(TestCase):
         c = SnapReviewSecurity(package)
         c.check_squashfs_resquash()
         report = c.review_report
-        expected_counts = {"info": 0, "warn": 0, "error": 1}
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
         self.check_results(report, expected_counts)
         expected = dict()
         expected["error"] = dict()
         expected["warn"] = dict()
         expected["info"] = dict()
-        name = "security-snap-v2:squashfs_compression"
-        expected["error"][name] = {"text": "compression algorithm 'lzo' not allowed"}
+        name = "security-snap-v2:squashfs_repack_checksum"
+        expected["info"][name] = {"text": "OK"}
         self.check_results(report, expected=expected)
 
     def test_check_squashfs_resquash_gzip(self):

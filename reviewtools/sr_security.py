@@ -26,6 +26,7 @@ from reviewtools.common import (
     AA_PROFILE_NAME_MAXLEN,
     AA_PROFILE_NAME_ADVLEN,
     MKSQUASHFS_DEFAULT_COMPRESSION,
+    MKSQUASHFS_ALT_SUPPORTED_COMPRESSION_ALGORITHMS,
     MKSQUASHFS_OPTS,
     UNSQUASHFS_IGNORED_ERRORS,
     unsquashfs_supports_ignore_errors,
@@ -213,6 +214,7 @@ class SnapReviewSecurity(SnapReview):
             return
         elif (
             comp != MKSQUASHFS_DEFAULT_COMPRESSION
+            and comp not in MKSQUASHFS_ALT_SUPPORTED_COMPRESSION_ALGORITHMS
             and (
                 "SNAP_ENFORCE_RESQUASHFS_COMP" not in os.environ
                 or os.environ["SNAP_ENFORCE_RESQUASHFS_COMP"] != "0"
