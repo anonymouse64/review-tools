@@ -50,7 +50,6 @@ VALID_SYSCALL = r"^[a-z0-9_]{2,64}$"
 # This needs to match up with snapcraft. Note, 'xz' is still the default
 # compression algorithm, but others may be supported
 MKSQUASHFS_DEFAULT_COMPRESSION = "xz"
-MKSQUASHFS_ALT_SUPPORTED_COMPRESSION_ALGORITHMS = ["lzo"]
 MKSQUASHFS_OPTS = [
     "-noappend",
     "-comp",
