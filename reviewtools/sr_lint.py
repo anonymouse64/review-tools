@@ -2921,32 +2921,34 @@ class SnapReviewLint(SnapReview):
         supported_scopes = ["shared"]
         unsupported_scopes = ["external", "private"]
         snap_name = self.snap_yaml["name"]
-        for name in self.snap_yaml["system-usernames"]:
+        for username in self.snap_yaml["system-usernames"]:
             t = "info"
-            n = self._get_check_name("system-usernames", app=name)
+            n = self._get_check_name("system-usernames", app=username)
             s = "OK"
-            if name not in self.valid_system_usernames:
+            if username not in self.valid_system_usernames:
                 t = "error"
-                s = "unsupported system-username: %s" % name
+                s = "unsupported system-username: %s" % username
                 self._add_result(t, n, s)
                 continue
-            elif name in lint_system_usernames_override:
-                if snap_name in lint_system_usernames_override[name]:
-                    s = "OK (override %s for snap: %s)" % (name, snap_name)
+            elif username in lint_system_usernames_override:
+                # If the specified username is in the override file, ensure
+                # this snap can use it.
+                if snap_name in lint_system_usernames_override[username]:
+                    s = "OK (override %s for snap: %s)" % (username, snap_name)
                 else:
                     t = "error"
                     s = "unsupported system-username: %s for snap %s" % (
-                        name,
+                        username,
                         snap_name,
                     )
                     self._add_result(t, n, s)
                     continue
 
-            entry = self.snap_yaml["system-usernames"][name]
+            entry = self.snap_yaml["system-usernames"][username]
             if not isinstance(entry, str) and not isinstance(entry, dict):
                 t = "error"
                 s = (
-                    "malformed entry 'system-usernames[%s]': " % name
+                    "malformed entry 'system-usernames[%s]': " % username
                     + "(should be string or dict)"
                 )
                 self._add_result(t, n, s)
@@ -2959,7 +2961,7 @@ class SnapReviewLint(SnapReview):
                         unknown_keys.append(i)
                 if len(unknown_keys) > 0:
                     t = "error"
-                    s = "unknown keys for system-username '%s': " % name + ", ".join(
+                    s = "unknown keys for system-username '%s': " % username + ", ".join(
                         unknown_keys
                     )
                     self._add_result(t, n, s)
@@ -2971,17 +2973,17 @@ class SnapReviewLint(SnapReview):
             else:
                 if "scope" not in entry:
                     t = "error"
-                    s = "required scope missing for system-username " + "'%s'" % name
+                    s = "required scope missing for system-username " + "'%s'" % username
                     self._add_result(t, n, s)
                     continue
                 scope = entry["scope"]
 
             if scope not in supported_scopes + unsupported_scopes:
                 t = "error"
-                s = "unknown scope '%s' for system-username '%s'" % (scope, name)
+                s = "unknown scope '%s' for system-username '%s'" % (scope, username)
             elif scope in unsupported_scopes:
                 t = "error"
-                s = "unsupported scope '%s' for system-username '%s'" % (scope, name)
+                s = "unsupported scope '%s' for system-username '%s'" % (scope, username)
             self._add_result(t, n, s)
 
     def check_valid_icon_sets(self):

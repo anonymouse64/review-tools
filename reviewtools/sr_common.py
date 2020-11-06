@@ -178,6 +178,9 @@ class SnapReview(Review):
     ]
 
     # overlord/snapstate/check_snap.go (but eventually store side)
+    # IMPORTANT: anything listed here is assumed to be usable by all
+    # snaps. If use of the username should be limited to specific
+    # snaps, also adjust overrides.py:lint_system_usernames_override.
     valid_system_usernames = ["snap_daemon", "snap_docker"]
 
     valid_compiled_architectures = [
