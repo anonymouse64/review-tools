@@ -5782,12 +5782,13 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.set_test_snap_yaml("system-usernames", {"snap_docker": "shared"})
         c = SnapReviewLint(self.test_name)
         c.check_system_usernames()
-        r = c.review_report
-        expected_counts = {"info": 2, "warn": 0, "error": 0}
-        self.check_results(r, expected_counts)
 
         # then cleanup the overrides
         lint_system_usernames_override["snap_docker"].remove("foo")
+
+        r = c.review_report
+        expected_counts = {"info": 2, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
 
         expected = {
             "error": {},
