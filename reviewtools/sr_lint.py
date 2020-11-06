@@ -2961,8 +2961,9 @@ class SnapReviewLint(SnapReview):
                         unknown_keys.append(i)
                 if len(unknown_keys) > 0:
                     t = "error"
-                    s = "unknown keys for system-username '%s': " % username + ", ".join(
-                        unknown_keys
+                    s = (
+                        "unknown keys for system-username '%s': " % username
+                        + ", ".join(unknown_keys)
                     )
                     self._add_result(t, n, s)
                     continue
@@ -2973,7 +2974,10 @@ class SnapReviewLint(SnapReview):
             else:
                 if "scope" not in entry:
                     t = "error"
-                    s = "required scope missing for system-username " + "'%s'" % username
+                    s = (
+                        "required scope missing for system-username "
+                        + "'%s'" % username
+                    )
                     self._add_result(t, n, s)
                     continue
                 scope = entry["scope"]
@@ -2983,7 +2987,10 @@ class SnapReviewLint(SnapReview):
                 s = "unknown scope '%s' for system-username '%s'" % (scope, username)
             elif scope in unsupported_scopes:
                 t = "error"
-                s = "unsupported scope '%s' for system-username '%s'" % (scope, username)
+                s = "unsupported scope '%s' for system-username '%s'" % (
+                    scope,
+                    username,
+                )
             self._add_result(t, n, s)
 
     def check_valid_icon_sets(self):
