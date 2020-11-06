@@ -1,3 +1,13 @@
+review-tools (0.48+20201106-1) RELEASED; urgency=medium
+
+  * sr_common.py: add snap_docker to valid_system_usernames
+  * overrides.py: add lint_system_usernames_override to list snaps
+    allowed to use given snapd_<username>
+  * sr_lint.py: limit use of usernames based on
+    lint_system_usernames_override when applicable (LP: #1896788)
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Fri, 06 Nov 2020 18:48:45 -0300
+
 review-tools (0.48+20201105-1) RELEASED; urgency=medium
 
   [ Emilia Torino ]
