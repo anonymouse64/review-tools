@@ -5667,24 +5667,22 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
     def test_check_system_usernames(self):
         """Test check_system_usernames"""
-        supported_system_usernames = ["snap_daemon", "snap_docker"]
-        for system_username in supported_system_usernames:
-            self.set_test_snap_yaml("system-usernames", {system_username: "shared"})
-            c = SnapReviewLint(self.test_name)
-            c.check_system_usernames()
-            r = c.review_report
-            expected_counts = {"info": 2, "warn": 0, "error": 0}
-            self.check_results(r, expected_counts)
+        self.set_test_snap_yaml("system-usernames", {"snap_daemon": "shared"})
+        c = SnapReviewLint(self.test_name)
+        c.check_system_usernames()
+        r = c.review_report
+        expected_counts = {"info": 2, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
 
-            expected = {
-                "error": {},
-                "warn": {},
-                "info": {
-                    "lint-snap-v2:system-usernames_valid": {"text": "OK"},
-                    "lint-snap-v2:system-usernames:" + system_username: {"text": "OK"},
-                },
-            }
-            self.check_results(r, expected=expected)
+        expected = {
+            "error": {},
+            "warn": {},
+            "info": {
+                "lint-snap-v2:system-usernames_valid": {"text": "OK"},
+                "lint-snap-v2:system-usernames:snap_daemon": {"text": "OK"},
+            },
+        }
+        self.check_results(r, expected=expected)
 
     def test_check_system_usernames_bad(self):
         """Test check_system_usernames - bad values"""
@@ -5751,6 +5749,55 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             },
             "warn": {},
             "info": {"lint-snap-v2:system-usernames_valid": {"text": "OK"}},
+        }
+        self.check_results(r, expected=expected)
+
+    def test_check_system_usernames_unsupported_snap_docker_user_for_generic_snap(self):
+        """Test check_system_usernames - unsupported user"""
+        d = {"snap_docker": "shared"}
+        self.set_test_snap_yaml("system-usernames", d)
+        c = SnapReviewLint(self.test_name)
+        c.check_system_usernames()
+        r = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+        expected = {
+            "error": {
+                "lint-snap-v2:system-usernames:snap_docker": {
+                    "text": "unsupported system-username: snap_docker for snap foo"
+                }
+            },
+            "warn": {},
+            "info": {"lint-snap-v2:system-usernames_valid": {"text": "OK"}},
+        }
+        self.check_results(r, expected=expected)
+
+    def test_check_system_usernames_overrides(self):
+        """Test check_system_usernames overrides"""
+        from reviewtools.overrides import lint_system_usernames_override
+
+        lint_system_usernames_override["snap_docker"].append("foo")
+
+        self.set_test_snap_yaml("name", "foo")
+        self.set_test_snap_yaml("system-usernames", {"snap_docker": "shared"})
+        c = SnapReviewLint(self.test_name)
+        c.check_system_usernames()
+        r = c.review_report
+        expected_counts = {"info": 2, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
+
+        # then cleanup the overrides
+        lint_system_usernames_override["snap_docker"].remove("foo")
+
+        expected = {
+            "error": {},
+            "warn": {},
+            "info": {
+                "lint-snap-v2:system-usernames_valid": {"text": "OK"},
+                "lint-snap-v2:system-usernames:snap_docker": {
+                    "text": "OK (override snap_docker for snap: foo)"
+                },
+            },
         }
         self.check_results(r, expected=expected)
 
@@ -5835,64 +5882,6 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
                 "info": {"lint-snap-v2:system-usernames_valid": {"text": "OK"}},
             }
             self.check_results(r, expected=expected)
-
-    def test_check_system_usernames_overrides(self):
-        """Test check_system_usernames overrides"""
-        from reviewtools.overrides import lint_system_usernames_override
-
-        lint_system_usernames_override["foo"] = "snap_docker"
-
-        self.set_test_snap_yaml("name", "foo")
-        self.set_test_snap_yaml("system-usernames", {"snap_docker": "shared"})
-        c = SnapReviewLint(self.test_name)
-        c.check_system_usernames()
-        r = c.review_report
-        expected_counts = {"info": 2, "warn": 0, "error": 0}
-        self.check_results(r, expected_counts)
-
-        # then cleanup the overrides
-        del lint_system_usernames_override["foo"]
-
-        expected = {
-            "error": {},
-            "warn": {},
-            "info": {
-                "lint-snap-v2:system-usernames_valid": {"text": "OK"},
-                "lint-snap-v2:system-usernames:snap_docker": {
-                    "text": "OK (override snap_docker for snap: foo)"
-                },
-            },
-        }
-        self.check_results(r, expected=expected)
-
-    def test_check_system_usernames_overrides_unsupported_snap_username_override(self):
-        """Test check_system_usernames overrides unsupported username"""
-
-        from reviewtools.overrides import lint_system_usernames_override
-
-        lint_system_usernames_override["foo"] = "snap_docker"
-        self.set_test_snap_yaml("name", "foo")
-        self.set_test_snap_yaml("system-usernames", {"snap_daemon": "shared"})
-        c = SnapReviewLint(self.test_name)
-        c.check_system_usernames()
-        r = c.review_report
-
-        # then cleanup the overrides
-        del lint_system_usernames_override["foo"]
-
-        expected_counts = {"info": 1, "warn": 0, "error": 1}
-        self.check_results(r, expected_counts)
-
-        expected = {
-            "info": {"lint-snap-v2:system-usernames_valid": {"text": "OK"}},
-            "warn": {},
-            "error": {
-                "lint-snap-v2:system-usernames:snap_daemon": {
-                    "text": "unsupported system-username: snap_daemon for snap foo"
-                }
-            },
-        }
-        self.check_results(r, expected=expected)
 
     def test__verify_icon_path(self):
         """Test _verify_icon_path()"""

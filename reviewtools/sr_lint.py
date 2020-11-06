@@ -2930,8 +2930,8 @@ class SnapReviewLint(SnapReview):
                 s = "unsupported system-username: %s" % name
                 self._add_result(t, n, s)
                 continue
-            elif snap_name in lint_system_usernames_override:
-                if name in lint_system_usernames_override[snap_name]:
+            elif name in lint_system_usernames_override:
+                if snap_name in lint_system_usernames_override[name]:
                     s = "OK (override %s for snap: %s)" % (name, snap_name)
                 else:
                     t = "error"

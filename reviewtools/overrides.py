@@ -912,7 +912,7 @@ lint_redflagged_base_dep_override = {
     "solus-runtime-gaming": ["linux-steam-integration"]
 }
 
-lint_system_usernames_override = {"docker": "snap_docker"}
+lint_system_usernames_override = {"snap_docker": ["docker"]}
 
 # Some publisher_emails represent a shared account. For snaps with a shared
 # email, also send to other addresses.
