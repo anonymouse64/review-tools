@@ -178,7 +178,7 @@ class SnapReview(Review):
     ]
 
     # overlord/snapstate/check_snap.go (but eventually store side)
-    valid_system_usernames = ["snap_daemon"]
+    valid_system_usernames = ["snap_daemon", "snap_docker"]
 
     valid_compiled_architectures = [
         "amd64",

@@ -912,6 +912,8 @@ lint_redflagged_base_dep_override = {
     "solus-runtime-gaming": ["linux-steam-integration"]
 }
 
+lint_system_usernames_override = {"docker": "snap_docker"}
+
 # Some publisher_emails represent a shared account. For snaps with a shared
 # email, also send to other addresses.
 canonical_anbox = ["stephane.graber@canonical.com", "simon.fels@canonical.com"]

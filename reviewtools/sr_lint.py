@@ -26,6 +26,7 @@ from reviewtools.overrides import (
     desktop_file_exception,
     lint_redflagged_base_dep_override,
     classic_interfaces_exception,
+    lint_system_usernames_override,
 )
 import glob
 import os
@@ -2919,6 +2920,7 @@ class SnapReviewLint(SnapReview):
 
         supported_scopes = ["shared"]
         unsupported_scopes = ["external", "private"]
+        snap_name = self.snap_yaml["name"]
         for name in self.snap_yaml["system-usernames"]:
             t = "info"
             n = self._get_check_name("system-usernames", app=name)
@@ -2928,6 +2930,17 @@ class SnapReviewLint(SnapReview):
                 s = "unsupported system-username: %s" % name
                 self._add_result(t, n, s)
                 continue
+            elif snap_name in lint_system_usernames_override:
+                if name in lint_system_usernames_override[snap_name]:
+                    s = "OK (override %s for snap: %s)" % (name, snap_name)
+                else:
+                    t = "error"
+                    s = "unsupported system-username: %s for snap %s" % (
+                        name,
+                        snap_name,
+                    )
+                    self._add_result(t, n, s)
+                    continue
 
             entry = self.snap_yaml["system-usernames"][name]
             if not isinstance(entry, str) and not isinstance(entry, dict):
