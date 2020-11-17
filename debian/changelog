@@ -1,6 +1,7 @@
-review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
+review-tools (0.48+20201117-1) RELEASED; urgency=medium
 
   [ Jamie Strandboge ]
+  * sr_common.py: add 'flavor' attribute for greengrass-support
   * reviewtools/data/snapd-base-declaration.yaml: update reviewtools snapd
     base declaration for snapd 2.47.1 and the ptp interface from 2.48
 
