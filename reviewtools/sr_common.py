@@ -234,6 +234,7 @@ class SnapReview(Review):
         },
         "docker-support": {"privileged-containers/plugs": False},
         "gpio": {"number/slots": 0},
+        "greengrass-support": {"flavor/plugs": ""},
         "hidraw": {"path/slots": "", "usb-vendor/slots": 0, "usb-product/slots": 0},
         "home": {"read/plugs": ""},
         "i2c": {"path/slots": ""},
