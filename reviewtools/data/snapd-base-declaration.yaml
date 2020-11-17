@@ -214,8 +214,11 @@
   cups-control:
     allow-installation:
       slot-snap-type:
+        - app
         - core
     deny-auto-connection: true
+    deny-connection:
+      on-classic: false
   daemon-notify:
     allow-installation:
       slot-snap-type:
@@ -845,8 +848,8 @@
   upower-observe:
     allow-installation:
       slot-snap-type:
-        - core
         - app
+        - core
     deny-connection:
       on-classic: false
   vcio:
