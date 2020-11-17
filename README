@@ -216,6 +216,31 @@ are run on the new version:
 Whenever confident with validations, promote to --beta channel with:
 'snapcraft promote --from-channel edge --to-channel beta review-tools'
 
+
+# Updating reviewtools/data/snapd-base-declaration.yaml
+
+Keeping reviewtools/data/snapd-base-declaration.yaml up to date is important
+for certain tests. At a high level, run 'snap debug get-base-declaration' and
+then pull those changes into reviewtools/data/snapd-base-declaration.yaml. The
+format of snapd-base-declaration.yaml is generally the same as what 'snap debug
+get-base-declaration', except for the following:
+
+* there is a preamble (comments) in snapd-base-declaration.yaml
+* the 'plugs' and 'slots' in snapd-base-declaration.yaml should be keys in the
+  "16" dictionary (for historical reasons)
+* snapd-base-declaration.yaml should not contain the "dummy" test interface
+* snapd-base-declaration.yaml should not contain the newline and '$builtin'
+  line from the end of 'snap debug get-base-declaration'
+
+In general can do on a system with the current stable release of snapd:
+* sudo snap debug get-base-declaration > /path/bd
+* format /path/bd based on the above
+* cp /path/bd reviewtools/data/snapd-base-declaration.yaml
+* review the change with 'git diff'
+
+(TODO: a tool could mostly automate this)
+
+
 # Helpful commands
 
 Install the required snaps for the below commands:
