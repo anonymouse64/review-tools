@@ -1,3 +1,11 @@
+review-tools (0.48+YYYYMMDD-1) UNRELEASED; urgency=medium
+
+  [ Jamie Strandboge ]
+  * reviewtools/data/snapd-base-declaration.yaml: update reviewtools snapd
+    base declaration for snapd 2.47.1 and the ptp interface from 2.48
+
+ -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 17 Nov 2020 10:47:40 -0600
+
 review-tools (0.48+20201106-1) RELEASED; urgency=medium
 
   * sr_common.py: add snap_docker to valid_system_usernames
