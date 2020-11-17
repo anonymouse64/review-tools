@@ -662,6 +662,11 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  ptp:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   pulseaudio:
     allow-installation:
       slot-snap-type:
