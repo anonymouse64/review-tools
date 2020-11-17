@@ -1214,6 +1214,16 @@ update_stage_packages = {
     "wpa-supplicant": {"wpa": "2.4-0ubuntu6"},
 }
 
+# For all/certain snaps, add to build-parts. This is a special case and we are
+# only considering snapcraft as a build-part for every snap. Since manifest is
+# present it means the snap was built using snapcraft.
+# Format:
+#   update_stage_packages = {'<snap>': {'<deb>': '<version>'}
+#
+# where <snap> is currently ignored, <deb> is always snapcraft and
+# <version>=auto will use the 'snapcraft-version' field from the snap
+# manifest.
+update_build_packages = {"faked-by-review-tools": {"snapcraft": "auto"}}
 
 # Some binary packages aren't worth alerting on since they don't contain
 # affected binaries (eg, a package with only header files)

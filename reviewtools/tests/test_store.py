@@ -137,10 +137,15 @@ class TestStore(TestCase):
         self.assertTrue("i386" in res["revisions"]["12"]["architectures"])
 
         self.assertTrue("secnot-report" in res["revisions"]["12"])
-        self.assertTrue("libxcursor1" in res["revisions"]["12"]["secnot-report"])
+        self.assertTrue("stage-packages" in res["revisions"]["12"]["secnot-report"])
         self.assertTrue(
-            "3501-1" in res["revisions"]["12"]["secnot-report"]["libxcursor1"]
+            "libxcursor1" in res["revisions"]["12"]["secnot-report"]["stage-packages"]
         )
+        self.assertTrue(
+            "3501-1"
+            in res["revisions"]["12"]["secnot-report"]["stage-packages"]["libxcursor1"]
+        )
+        self.assertFalse("build-packages" in res["revisions"]["12"]["secnot-report"])
 
     def test_check_get_package_revisions_valid_with_snap_type(self):
         """Test get_package_revisions() - valid (snap type)"""
@@ -152,9 +157,12 @@ class TestStore(TestCase):
         errors = {}
         res = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
         self.assertEqual(len(errors), 0)
+        self.assertTrue("stage-packages" in res["revisions"]["12"]["secnot-report"])
         self.assertTrue(
-            "3501-1" in res["revisions"]["12"]["secnot-report"]["libxcursor1"]
+            "3501-1"
+            in res["revisions"]["12"]["secnot-report"]["stage-packages"]["libxcursor1"]
         )
+        self.assertFalse("build-packages" in res["revisions"]["12"]["secnot-report"])
 
     def test_check_get_package_revisions_missing_publisher(self):
         """Test get_package_revisions() - missing publisher"""
@@ -303,7 +311,7 @@ class TestStore(TestCase):
         self,
     ):
         """Test get_package_revisions() - parts/stage-packages and
-           primed-stage-packages are None has no security notices"""
+           primed-stage-packages are None has no security notices if no usn for build-pkgs"""
         for i in range(len(self.store_db[0]["revisions"])):
             m = yaml.load(
                 self.store_db[0]["revisions"][i]["manifest_yaml"],
@@ -318,6 +326,97 @@ class TestStore(TestCase):
         pkg_db = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
         # empty parts/stage-packages has no security notices
         self.assertEqual(len(errors), 0)
+        for rev in pkg_db["revisions"]:
+            self.assertEqual(len(pkg_db["revisions"][rev]["secnot-report"]), 0)
+
+    def test_check_get_package_revisions_parts_stage_packages_and_primed_stage_packages_are_none_but_usn_for_build_pkgs(
+        self,
+    ):
+        """Test get_package_revisions() - parts/stage-packages and
+           primed-stage-packages are None but USN for build-packages has
+           security notices"""
+        for i in range(len(self.store_db[0]["revisions"])):
+            m = yaml.load(
+                self.store_db[0]["revisions"][i]["manifest_yaml"],
+                Loader=yaml.SafeLoader,
+            )
+            for p in m["parts"]:
+                if "stage-packages" in m["parts"][p]:
+                    m["parts"][p]["stage-packages"] = None
+            m["primed-stage-packages"] = None
+            m["snapcraft-version"] = "1.1.1"
+            self.store_db[0]["revisions"][i]["manifest_yaml"] = yaml.dump(m)
+        secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pgks.db")
+        errors = {}
+        pkg_db = store.get_pkg_revisions(self.store_db[0], secnot_db, errors)
+        # empty parts/stage-packages has no security notices
+        for rev in pkg_db["revisions"]:
+            self.assertFalse("stage-packages" in rev)
+            self.assertEqual(
+                len(pkg_db["revisions"][rev]["secnot-report"]["build-packages"]), 1
+            )
+            self.assertTrue(
+                "snapcraft"
+                in pkg_db["revisions"][rev]["secnot-report"]["build-packages"]
+            )
+            self.assertTrue(
+                "5501-1"
+                in pkg_db["revisions"][rev]["secnot-report"]["build-packages"][
+                    "snapcraft"
+                ]
+            )
+
+    def test_check_get_package_revisions_primed_and_staged_none_and_usn_for_build_but_no_affected_snapcraft_version_in_manifest(
+        self,
+    ):
+        """Test get_package_revisions() - parts/stage-packages and
+           primed-stage-packages are None and no snapcraft version or
+           higher has no security notices"""
+        snapcraft_version_value = [
+            None,
+            "",
+            "6",
+        ]  # snacraft version in USN is 5.0.0 so version 6 should not get secnot
+        for snapcraft_version in snapcraft_version_value:
+            for i in range(len(self.store_db[0]["revisions"])):
+                m = yaml.load(
+                    self.store_db[0]["revisions"][i]["manifest_yaml"],
+                    Loader=yaml.SafeLoader,
+                )
+                for p in m["parts"]:
+                    if "stage-packages" in m["parts"][p]:
+                        m["parts"][p]["stage-packages"] = None
+                m["primed-stage-packages"] = None
+                m["snapcraft-version"] = snapcraft_version
+                self.store_db[0]["revisions"][i]["manifest_yaml"] = yaml.dump(m)
+            secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pgks.db")
+            errors = {}
+            pkg_db = store.get_pkg_revisions(self.store_db[0], secnot_db, errors)
+            # empty parts/stage-packages has no security notices
+            for rev in pkg_db["revisions"]:
+                self.assertEqual(len(pkg_db["revisions"][rev]["secnot-report"]), 0)
+
+    def test_check_get_package_revisions_primed_and_staged_none_and_usn_for_build_but_no_snapcraft_version_in_manifest(
+        self,
+    ):
+        """Test get_package_revisions() - parts/stage-packages and
+           primed-stage-packages are None and no snapcraft version in
+           manifest has no security notices"""
+        for i in range(len(self.store_db[0]["revisions"])):
+            m = yaml.load(
+                self.store_db[0]["revisions"][i]["manifest_yaml"],
+                Loader=yaml.SafeLoader,
+            )
+            for p in m["parts"]:
+                if "stage-packages" in m["parts"][p]:
+                    m["parts"][p]["stage-packages"] = None
+            m["primed-stage-packages"] = None
+            del m["snapcraft-version"]
+            self.store_db[0]["revisions"][i]["manifest_yaml"] = yaml.dump(m)
+        secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pgks.db")
+        errors = {}
+        pkg_db = store.get_pkg_revisions(self.store_db[0], secnot_db, errors)
+        # empty parts/stage-packages has no security notices
         for rev in pkg_db["revisions"]:
             self.assertEqual(len(pkg_db["revisions"][rev]["secnot-report"]), 0)
 
@@ -403,11 +502,13 @@ class TestStore(TestCase):
             Loader=yaml.SafeLoader,
         )
 
-        res = store.get_staged_packages_from_manifest(m)
+        res = store.get_staged_and_build_packages_from_manifest(m)
         self.assertTrue(isinstance(res, dict))
         self.assertTrue(len(res) > 0)
-        self.assertTrue("libxcursor1" in res)
-        self.assertTrue("1:1.1.14-1" in res["libxcursor1"])
+        self.assertTrue("stage-packages" in res)
+        self.assertTrue("libxcursor1" in res["stage-packages"])
+        self.assertTrue("1:1.1.14-1" in res["stage-packages"]["libxcursor1"])
+        self.assertFalse("build-packages" in res)
 
     def test_check_get_staged_packages_from_manifest_with_primed_stage_packages(self):
         """Test get_staged_packages_from_manifest(), primed-stage exists"""
@@ -417,11 +518,13 @@ class TestStore(TestCase):
             ],
             Loader=yaml.SafeLoader,
         )
-        res = store.get_staged_packages_from_manifest(m)
+        res = store.get_staged_and_build_packages_from_manifest(m)
         self.assertTrue(isinstance(res, dict))
         self.assertTrue(len(res) > 0)
-        self.assertTrue("libxcursor1" in res)
-        self.assertTrue("1:1.1.14-1" in res["libxcursor1"])
+        self.assertTrue("stage-packages" in res)
+        self.assertTrue("libxcursor1" in res["stage-packages"])
+        self.assertTrue("1:1.1.14-1" in res["stage-packages"]["libxcursor1"])
+        self.assertFalse("build-packages" in res)
 
     def test_check_get_staged_packages_from_manifest_missing_parts(self):
         """Test get_staged_packages_from_manifest() - missing parts"""
@@ -431,7 +534,7 @@ class TestStore(TestCase):
         )
         del m["parts"]
 
-        res = store.get_staged_packages_from_manifest(m)
+        res = store.get_staged_and_build_packages_from_manifest(m)
         self.assertEqual(res, None)
 
     def test_check_get_staged_packages_from_manifest_bad_staged_and_no_primed_stage(
@@ -444,12 +547,14 @@ class TestStore(TestCase):
         )
         m["parts"]["0ad-launcher"]["stage-packages"].append("foo")
 
-        res = store.get_staged_packages_from_manifest(m)
+        res = store.get_staged_and_build_packages_from_manifest(m)
         self.assertTrue(isinstance(res, dict))
         self.assertTrue(len(res) > 0)
-        self.assertFalse("foo" in res)
-        self.assertTrue("libxcursor1" in res)
-        self.assertTrue("1:1.1.14-1" in res["libxcursor1"])
+        self.assertTrue("stage-packages" in res)
+        self.assertFalse("foo" in res["stage-packages"])
+        self.assertTrue("libxcursor1" in res["stage-packages"])
+        self.assertTrue("1:1.1.14-1" in res["stage-packages"]["libxcursor1"])
+        self.assertFalse("build-packages" in res)
 
     def test_check_get_staged_packages_from_manifest_bad_primed_staged(self,):
         """Test get_staged_packages_from_manifest() - only one
@@ -460,7 +565,7 @@ class TestStore(TestCase):
         )
         m["primed-stage-packages"] = ["foo"]
 
-        res = store.get_staged_packages_from_manifest(m)
+        res = store.get_staged_and_build_packages_from_manifest(m)
         self.assertEqual(res, None)
 
     def test_check_get_staged_packages_from_manifest_partially_bad_primed_staged(self,):
@@ -475,12 +580,14 @@ class TestStore(TestCase):
         )
         m["primed-stage-packages"].append("foo")
 
-        res = store.get_staged_packages_from_manifest(m)
+        res = store.get_staged_and_build_packages_from_manifest(m)
         self.assertTrue(isinstance(res, dict))
         self.assertTrue(len(res) > 0)
         self.assertFalse("foo" in res)
-        self.assertTrue("libxcursor1" in res)
-        self.assertTrue("1:1.1.14-1" in res["libxcursor1"])
+        self.assertTrue("stage-packages" in res)
+        self.assertTrue("libxcursor1" in res["stage-packages"])
+        self.assertTrue("1:1.1.14-1" in res["stage-packages"]["libxcursor1"])
+        self.assertFalse("build-packages" in res)
 
     def test_check_get_staged_packages_from_manifest_primed_staged_and_staged_packages_are_none(
         self,
@@ -495,7 +602,7 @@ class TestStore(TestCase):
             if "stage-packages" in m["parts"][p]:
                 m["parts"][p]["stage-packages"] = None
 
-        res = store.get_staged_packages_from_manifest(m)
+        res = store.get_staged_and_build_packages_from_manifest(m)
         self.assertEqual(res, None)
 
     def test_check_get_staged_packages_from_manifest_primed_staged_is_none_and_staged_packages_are_empty(
@@ -511,7 +618,7 @@ class TestStore(TestCase):
             if "stage-packages" in m["parts"][p]:
                 m["parts"][p]["stage-packages"] = []
 
-        res = store.get_staged_packages_from_manifest(m)
+        res = store.get_staged_and_build_packages_from_manifest(m)
         self.assertEqual(res, None)
 
     def test_check_get_staged_packages_from_manifest_bad_primed_stage_and_no_staged_packages(
@@ -527,7 +634,7 @@ class TestStore(TestCase):
             m["parts"][part]["stage-packages"] = []
         m["primed-stage-packages"] = ["foo"]
 
-        res = store.get_staged_packages_from_manifest(m)
+        res = store.get_staged_and_build_packages_from_manifest(m)
         self.assertEqual(res, None)
 
     def test_check_get_staged_packages_from_manifest_empty_staged_and_no_primed_stage(
@@ -540,7 +647,7 @@ class TestStore(TestCase):
         )
         m["parts"]["0ad-launcher"]["stage-packages"] = []
 
-        res = store.get_staged_packages_from_manifest(m)
+        res = store.get_staged_and_build_packages_from_manifest(m)
         self.assertEqual(res, None)
 
     def test_check_get_staged_packages_from_manifest_binary_ignored_and_no_primed_stage(
@@ -556,13 +663,15 @@ class TestStore(TestCase):
             "linux-libc-dev=4.4.0-104.127"
         )
 
-        res = store.get_staged_packages_from_manifest(m)
+        res = store.get_staged_and_build_packages_from_manifest(m)
         self.assertTrue(isinstance(res, dict))
         self.assertTrue(len(res) > 0)
-        self.assertTrue("libxcursor1" in res)
-        self.assertTrue("1:1.1.14-1" in res["libxcursor1"])
+        self.assertTrue("stage-packages" in res)
+        self.assertTrue("libxcursor1" in res["stage-packages"])
+        self.assertTrue("1:1.1.14-1" in res["stage-packages"]["libxcursor1"])
         # make sure the ignored package is not present
-        self.assertFalse("linux-libc-dev" in res)
+        self.assertFalse("linux-libc-dev" in res["stage-packages"])
+        self.assertFalse("build-packages" in res)
 
     def test_check_get_staged_packages_from_manifest_with_primed_stage_binary_ignored(
         self,
@@ -577,13 +686,15 @@ class TestStore(TestCase):
         )
         m["primed-stage-packages"].append("linux-libc-dev=4.4.0-104.127")
 
-        res = store.get_staged_packages_from_manifest(m)
+        res = store.get_staged_and_build_packages_from_manifest(m)
         self.assertTrue(isinstance(res, dict))
         self.assertTrue(len(res) > 0)
-        self.assertTrue("libxcursor1" in res)
-        self.assertTrue("1:1.1.14-1" in res["libxcursor1"])
+        self.assertTrue("stage-packages" in res)
+        self.assertTrue("libxcursor1" in res["stage-packages"])
+        self.assertTrue("1:1.1.14-1" in res["stage-packages"]["libxcursor1"])
         # make sure the ignored package is not present
         self.assertFalse("linux-libc-dev" in res)
+        self.assertFalse("build-packages" in res)
 
     def test_check_get_secnots_for_manifest_with_no_primed_stage_packages(self):
         """Test get_secnots_for_manifest()"""
@@ -594,14 +705,16 @@ class TestStore(TestCase):
 
         res = store.get_secnots_for_manifest(m, self.secnot_db)
         self.assertTrue(isinstance(res, dict))
-        self.assertEqual(len(res), 2)
-        self.assertTrue("libxcursor1" in res)
-        self.assertEqual(len(res["libxcursor1"]), 1)
-        self.assertEqual(res["libxcursor1"][0], "3501-1")
-        self.assertTrue("libtiff5" in res)
-        self.assertEqual(len(res["libtiff5"]), 2)
-        self.assertTrue("3602-1" in res["libtiff5"])
-        self.assertTrue("3606-1" in res["libtiff5"])
+        self.assertTrue("stage-packages" in res)
+        self.assertEqual(len(res["stage-packages"]), 2)
+        self.assertTrue("libxcursor1" in res["stage-packages"])
+        self.assertEqual(len(res["stage-packages"]["libxcursor1"]), 1)
+        self.assertEqual(res["stage-packages"]["libxcursor1"][0], "3501-1")
+        self.assertTrue("libtiff5" in res["stage-packages"])
+        self.assertEqual(len(res["stage-packages"]["libtiff5"]), 2)
+        self.assertTrue("3602-1" in res["stage-packages"]["libtiff5"])
+        self.assertTrue("3606-1" in res["stage-packages"]["libtiff5"])
+        self.assertFalse("build-packages" in res)
 
     def test_check_get_secnots_for_manifest_with_empty_primed_stage_list(self):
         """Test get_secnots_for_manifest() - primed-stage-packages empty"""
@@ -629,14 +742,16 @@ class TestStore(TestCase):
         m["primed-stage-packages"] = None
         res = store.get_secnots_for_manifest(m, self.secnot_db)
         self.assertTrue(isinstance(res, dict))
-        self.assertEqual(len(res), 2)
-        self.assertTrue("libxcursor1" in res)
-        self.assertEqual(len(res["libxcursor1"]), 1)
-        self.assertEqual(res["libxcursor1"][0], "3501-1")
-        self.assertTrue("libtiff5" in res)
-        self.assertEqual(len(res["libtiff5"]), 2)
-        self.assertTrue("3602-1" in res["libtiff5"])
-        self.assertTrue("3606-1" in res["libtiff5"])
+        self.assertTrue("stage-packages" in res)
+        self.assertEqual(len(res["stage-packages"]), 2)
+        self.assertTrue("libxcursor1" in res["stage-packages"])
+        self.assertEqual(len(res["stage-packages"]["libxcursor1"]), 1)
+        self.assertEqual(res["stage-packages"]["libxcursor1"][0], "3501-1")
+        self.assertTrue("libtiff5" in res["stage-packages"])
+        self.assertEqual(len(res["stage-packages"]["libtiff5"]), 2)
+        self.assertTrue("3602-1" in res["stage-packages"]["libtiff5"])
+        self.assertTrue("3606-1" in res["stage-packages"]["libtiff5"])
+        self.assertFalse("build-packages" in res)
 
     def test_check_get_secnots_for_manifest_with_primed_stage_list_equal_to_staged_packages_list(
         self,
@@ -652,14 +767,16 @@ class TestStore(TestCase):
 
         res = store.get_secnots_for_manifest(m, self.secnot_db)
         self.assertTrue(isinstance(res, dict))
-        self.assertEqual(len(res), 2)
-        self.assertTrue("libxcursor1" in res)
-        self.assertEqual(len(res["libxcursor1"]), 1)
-        self.assertEqual(res["libxcursor1"][0], "3501-1")
-        self.assertTrue("libtiff5" in res)
-        self.assertEqual(len(res["libtiff5"]), 2)
-        self.assertTrue("3602-1" in res["libtiff5"])
-        self.assertTrue("3606-1" in res["libtiff5"])
+        self.assertTrue("stage-packages" in res)
+        self.assertEqual(len(res["stage-packages"]), 2)
+        self.assertTrue("libxcursor1" in res["stage-packages"])
+        self.assertEqual(len(res["stage-packages"]["libxcursor1"]), 1)
+        self.assertEqual(res["stage-packages"]["libxcursor1"][0], "3501-1")
+        self.assertTrue("libtiff5" in res["stage-packages"])
+        self.assertEqual(len(res["stage-packages"]["libtiff5"]), 2)
+        self.assertTrue("3602-1" in res["stage-packages"]["libtiff5"])
+        self.assertTrue("3606-1" in res["stage-packages"]["libtiff5"])
+        self.assertFalse("build-packages" in res)
 
     def test_check_get_secnots_for_manifest_with_primed_stage_list_smaller_than_staged_packages_list(
         self,
@@ -678,13 +795,15 @@ class TestStore(TestCase):
         res = store.get_secnots_for_manifest(m, self.secnot_db)
         self.assertTrue(isinstance(res, dict))
         self.assertEqual(len(res), 1)
-        self.assertTrue("libtiff5" in res)
-        self.assertEqual(len(res["libtiff5"]), 2)
-        self.assertTrue("3602-1" in res["libtiff5"])
-        self.assertTrue("3606-1" in res["libtiff5"])
+        self.assertTrue("stage-packages" in res)
+        self.assertTrue("libtiff5" in res["stage-packages"])
+        self.assertEqual(len(res["stage-packages"]["libtiff5"]), 2)
+        self.assertTrue("3602-1" in res["stage-packages"]["libtiff5"])
+        self.assertTrue("3606-1" in res["stage-packages"]["libtiff5"])
         # since it was removed from primed-stage-packages, we shouldn't have a
         # notice
         self.assertFalse("libxcursor1" in res)
+        self.assertFalse("build-packages" in res)
 
     def test_check_get_secnots_for_manifest_empty_staged(self):
         """Test get_secnots_for_manifest() - empty staged"""
@@ -750,19 +869,70 @@ class TestStore(TestCase):
 
         res = store.get_secnots_for_manifest(m, self.secnot_db, with_cves=True)
         self.assertTrue(isinstance(res, dict))
-        self.assertEqual(len(res), 2)
-        self.assertTrue("libxcursor1" in res)
-        self.assertEqual(len(res["libxcursor1"]), 1)
-        self.assertTrue("3501-1" in res["libxcursor1"])
-        self.assertTrue(isinstance(res["libxcursor1"]["3501-1"], list))
-        self.assertEqual(len(res["libxcursor1"]["3501-1"]), 1)
-        self.assertTrue("CVE-2017-16612" in res["libxcursor1"]["3501-1"])
-        self.assertTrue("libtiff5" in res)
-        self.assertEqual(len(res["libtiff5"]), 2)
-        self.assertTrue(isinstance(res["libtiff5"]["3602-1"], list))
-        self.assertEqual(len(res["libtiff5"]["3602-1"]), 27)
-        self.assertTrue(isinstance(res["libtiff5"]["3606-1"], list))
-        self.assertEqual(len(res["libtiff5"]["3606-1"]), 12)
+        self.assertTrue("stage-packages" in res)
+        self.assertEqual(len(res["stage-packages"]), 2)
+        self.assertTrue("libxcursor1" in res["stage-packages"])
+        self.assertEqual(len(res["stage-packages"]["libxcursor1"]), 1)
+        self.assertTrue("3501-1" in res["stage-packages"]["libxcursor1"])
+        self.assertTrue(
+            isinstance(res["stage-packages"]["libxcursor1"]["3501-1"], list)
+        )
+        self.assertEqual(len(res["stage-packages"]["libxcursor1"]["3501-1"]), 1)
+        self.assertTrue(
+            "CVE-2017-16612" in res["stage-packages"]["libxcursor1"]["3501-1"]
+        )
+        self.assertTrue("libtiff5" in res["stage-packages"])
+        self.assertEqual(len(res["stage-packages"]["libtiff5"]), 2)
+        self.assertTrue(isinstance(res["stage-packages"]["libtiff5"]["3602-1"], list))
+        self.assertEqual(len(res["stage-packages"]["libtiff5"]["3602-1"]), 27)
+        self.assertTrue(isinstance(res["stage-packages"]["libtiff5"]["3606-1"], list))
+        self.assertEqual(len(res["stage-packages"]["libtiff5"]["3606-1"]), 12)
+        self.assertFalse("build-packages" in res)
+
+    def test_check_get_secnots_for_manifest_with_primed_stage_list_equal_to_staged_packages_and_build_packages_list_with_cves(
+        self,
+    ):
+        """Test get_secnots_for_manifest() - cves, primed-stage same as staged"""
+        m = yaml.load(
+            self.store_db[0]["revisions"][self.first_revision_with_primed_stage][
+                "manifest_yaml"
+            ],
+            Loader=yaml.SafeLoader,
+        )
+        m["snapcraft-version"] = "1.1.1"
+        # Assuming faked
+        m["parts"]["faked-by-review-tools"] = {}
+        m["parts"]["faked-by-review-tools"]["build-packages"] = ["snapcraft=1.1"]
+        secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pgks.db")
+        res = store.get_secnots_for_manifest(m, secnot_db, with_cves=True)
+        self.assertTrue(isinstance(res, dict))
+        self.assertTrue("stage-packages" in res)
+        self.assertEqual(len(res["stage-packages"]), 2)
+        self.assertTrue("libxcursor1" in res["stage-packages"])
+        self.assertEqual(len(res["stage-packages"]["libxcursor1"]), 1)
+        self.assertTrue("3501-1" in res["stage-packages"]["libxcursor1"])
+        self.assertTrue(
+            isinstance(res["stage-packages"]["libxcursor1"]["3501-1"], list)
+        )
+        self.assertEqual(len(res["stage-packages"]["libxcursor1"]["3501-1"]), 1)
+        self.assertTrue(
+            "CVE-2017-16612" in res["stage-packages"]["libxcursor1"]["3501-1"]
+        )
+        self.assertTrue("libtiff5" in res["stage-packages"])
+        self.assertEqual(len(res["stage-packages"]["libtiff5"]), 2)
+        self.assertTrue(isinstance(res["stage-packages"]["libtiff5"]["3602-1"], list))
+        self.assertEqual(len(res["stage-packages"]["libtiff5"]["3602-1"]), 27)
+        self.assertTrue(isinstance(res["stage-packages"]["libtiff5"]["3606-1"], list))
+        self.assertEqual(len(res["stage-packages"]["libtiff5"]["3606-1"]), 12)
+
+        self.assertTrue("build-packages" in res)
+        self.assertEqual(len(res["build-packages"]), 1)
+        self.assertTrue("snapcraft" in res["build-packages"])
+        self.assertEqual(len(res["build-packages"]["snapcraft"]), 1)
+        self.assertTrue("5501-1" in res["build-packages"]["snapcraft"])
+        self.assertTrue(isinstance(res["build-packages"]["snapcraft"]["5501-1"], list))
+        self.assertEqual(len(res["build-packages"]["snapcraft"]["5501-1"]), 1)
+        self.assertTrue("CVE-2020-9999" in res["build-packages"]["snapcraft"]["5501-1"])
 
     def test_check_get_secnots_for_manifest_with_primed_stage_list_smaller_than_staged_packages_list_with_cves(
         self,
@@ -781,12 +951,15 @@ class TestStore(TestCase):
         res = store.get_secnots_for_manifest(m, self.secnot_db, with_cves=True)
         self.assertTrue(isinstance(res, dict))
         self.assertEqual(len(res), 1)
-        self.assertTrue("libtiff5" in res)
-        self.assertEqual(len(res["libtiff5"]), 2)
-        self.assertTrue(isinstance(res["libtiff5"]["3602-1"], list))
-        self.assertEqual(len(res["libtiff5"]["3602-1"]), 27)
-        self.assertTrue(isinstance(res["libtiff5"]["3606-1"], list))
-        self.assertEqual(len(res["libtiff5"]["3606-1"]), 12)
+        self.assertTrue("libtiff5" in res["stage-packages"])
+        self.assertTrue("stage-packages" in res)
+        self.assertEqual(len(res["stage-packages"]["libtiff5"]), 2)
+        self.assertTrue(isinstance(res["stage-packages"]["libtiff5"]["3602-1"], list))
+        self.assertEqual(len(res["stage-packages"]["libtiff5"]["3602-1"]), 27)
+        self.assertTrue(isinstance(res["stage-packages"]["libtiff5"]["3606-1"], list))
+        self.assertEqual(len(res["stage-packages"]["libtiff5"]["3606-1"]), 12)
+        self.assertFalse("build-packages" in res)
+
         # since it was removed from primed-stage-packages, we shouldn't have a
         # notice
         self.assertFalse("libxcursor1" in res)
@@ -1059,7 +1232,9 @@ class TestStore(TestCase):
             res = store.convert_canonical_app_version(v)
             self.assertEqual(res, expected)
 
-    def test_get_faked_stage_packages_with_no_primed_stage_version(self):
+    def test_get_faked_stage_packages_with_no_primed_stage_version_and_no_snapcraft_version(
+        self,
+    ):
         """Test get_faked_stage_packages - no primed-stage - version"""
         from reviewtools.overrides import update_stage_packages
 
@@ -1067,13 +1242,65 @@ class TestStore(TestCase):
         m = {}
         m["name"] = "foo"
         m["version"] = "1.2~"
-        m["parts"] = {}
-
-        res = store.get_faked_stage_packages(m)
+        m["parts"] = {"foo-part": {}}
+        res = store.get_faked_build_and_stage_packages(m)
         self.assertTrue("faked-by-review-tools" in res["parts"])
         self.assertTrue("stage-packages" in res["parts"]["faked-by-review-tools"])
         self.assertTrue(
             "bar=1.2~" in res["parts"]["faked-by-review-tools"]["stage-packages"]
+        )
+        self.assertTrue("build-packages" in res["parts"]["faked-by-review-tools"])
+        self.assertEqual(
+            len(res["parts"]["faked-by-review-tools"]["build-packages"]), 0
+        )
+
+    def test_get_faked_stage_packages_with_no_primed_stage_version_and_no_valid_snapcraft_version(
+        self,
+    ):
+        """Test get_faked_stage_packages - no primed-stage - version"""
+        from reviewtools.overrides import update_stage_packages
+
+        update_stage_packages["foo"] = {"bar": "1.2~"}
+        m = {}
+        m["name"] = "foo"
+        m["version"] = "1.2~"
+        m["parts"] = {"foo-part": {}}
+        snapcraft_version_value = [None, ""]
+        for snapcraft_version in snapcraft_version_value:
+            m["snapcraft-version"] = snapcraft_version
+            res = store.get_faked_build_and_stage_packages(m)
+            self.assertTrue("faked-by-review-tools" in res["parts"])
+            self.assertTrue("stage-packages" in res["parts"]["faked-by-review-tools"])
+            self.assertTrue(
+                "bar=1.2~" in res["parts"]["faked-by-review-tools"]["stage-packages"]
+            )
+            self.assertTrue("build-packages" in res["parts"]["faked-by-review-tools"])
+            self.assertEqual(
+                len(res["parts"]["faked-by-review-tools"]["build-packages"]), 0
+            )
+
+    def test_get_faked_stage_packages_with_no_primed_stage_version_and_snapcraft_version(
+        self,
+    ):
+        """Test get_faked_stage_packages - no primed-stage - version"""
+        from reviewtools.overrides import update_stage_packages
+
+        update_stage_packages["foo"] = {"bar": "1.2~"}
+        m = {}
+        m["name"] = "foo"
+        m["version"] = "1.2~"
+        m["parts"] = {"foo-part": {}}
+        m["snapcraft-version"] = "1.1.1"
+
+        res = store.get_faked_build_and_stage_packages(m)
+        self.assertTrue("faked-by-review-tools" in res["parts"])
+        self.assertTrue("stage-packages" in res["parts"]["faked-by-review-tools"])
+        self.assertTrue(
+            "bar=1.2~" in res["parts"]["faked-by-review-tools"]["stage-packages"]
+        )
+        self.assertTrue("build-packages" in res["parts"]["faked-by-review-tools"])
+        self.assertTrue(
+            "snapcraft=1.1.1" in res["parts"]["faked-by-review-tools"]["build-packages"]
         )
 
     def test_get_faked_stage_packages_has_no_side_effect_on_original_manifest(self):
@@ -1084,9 +1311,9 @@ class TestStore(TestCase):
         m = {}
         m["name"] = "foo"
         m["version"] = "1.2~"
-        m["parts"] = {}
+        m["parts"] = {"foo-part": {}}
 
-        res = store.get_faked_stage_packages(m)
+        res = store.get_faked_build_and_stage_packages(m)
         self.assertTrue("faked-by-review-tools" in res["parts"])
         self.assertTrue("stage-packages" in res["parts"]["faked-by-review-tools"])
         self.assertTrue(
@@ -1094,7 +1321,9 @@ class TestStore(TestCase):
         )
         self.assertFalse("faked-by-review-tools" in m["parts"])
 
-    def test_get_faked_stage_packages_with_none_primed_stage_version(self):
+    def test_get_faked_stage_packages_with_none_primed_stage_version_and_no_snapcraft_version(
+        self,
+    ):
         """Test get_faked_stage_packages - None primed-stage - version"""
         from reviewtools.overrides import update_stage_packages
 
@@ -1102,17 +1331,76 @@ class TestStore(TestCase):
         m = {}
         m["name"] = "foo"
         m["version"] = "1.2~"
-        m["parts"] = {}
+        m["parts"] = {"foo-part": {}}
         m["primed-stage-packages"] = None
 
-        res = store.get_faked_stage_packages(m)
+        res = store.get_faked_build_and_stage_packages(m)
         self.assertTrue("faked-by-review-tools" in res["parts"])
         self.assertTrue("stage-packages" in res["parts"]["faked-by-review-tools"])
         self.assertTrue(
             "bar=1.2~" in res["parts"]["faked-by-review-tools"]["stage-packages"]
         )
+        self.assertTrue("build-packages" in res["parts"]["faked-by-review-tools"])
+        self.assertEqual(
+            len(res["parts"]["faked-by-review-tools"]["build-packages"]), 0
+        )
 
-    def test_get_faked_stage_packages_with_empty_primed_stage_version(self):
+    def test_get_faked_stage_packages_with_none_primed_stage_version_and_no_valid_snapcraft_version(
+        self,
+    ):
+        """Test get_faked_stage_packages - None primed-stage - non affected snapcraft version"""
+        from reviewtools.overrides import update_stage_packages
+
+        update_stage_packages["foo"] = {"bar": "1.2~"}
+        m = {}
+        m["name"] = "foo"
+        m["version"] = "1.2~"
+        m["parts"] = {"foo-part": {}}
+        m["primed-stage-packages"] = None
+
+        snapcraft_version_value = [None, ""]
+        for snapcraft_version in snapcraft_version_value:
+            m["snapcraft-version"] = snapcraft_version
+
+            res = store.get_faked_build_and_stage_packages(m)
+            self.assertTrue("faked-by-review-tools" in res["parts"])
+            self.assertTrue("stage-packages" in res["parts"]["faked-by-review-tools"])
+            self.assertTrue(
+                "bar=1.2~" in res["parts"]["faked-by-review-tools"]["stage-packages"]
+            )
+            self.assertTrue("build-packages" in res["parts"]["faked-by-review-tools"])
+            self.assertEqual(
+                len(res["parts"]["faked-by-review-tools"]["build-packages"]), 0
+            )
+
+    def test_get_faked_stage_packages_with_none_primed_stage_version_and_snapcraft_version(
+        self,
+    ):
+        """Test get_faked_stage_packages - None primed-stage - version"""
+        from reviewtools.overrides import update_stage_packages
+
+        update_stage_packages["foo"] = {"bar": "1.2~"}
+        m = {}
+        m["name"] = "foo"
+        m["version"] = "1.2~"
+        m["parts"] = {"foo-part": {}}
+        m["primed-stage-packages"] = None
+        m["snapcraft-version"] = "1.1.1"
+
+        res = store.get_faked_build_and_stage_packages(m)
+        self.assertTrue("faked-by-review-tools" in res["parts"])
+        self.assertTrue("stage-packages" in res["parts"]["faked-by-review-tools"])
+        self.assertTrue(
+            "bar=1.2~" in res["parts"]["faked-by-review-tools"]["stage-packages"]
+        )
+        self.assertTrue("build-packages" in res["parts"]["faked-by-review-tools"])
+        self.assertTrue(
+            "snapcraft=1.1.1" in res["parts"]["faked-by-review-tools"]["build-packages"]
+        )
+
+    def test_get_faked_stage_packages_with_empty_primed_stage_version_and_no_snapcraft_version(
+        self,
+    ):
         """Test get_faked_stage_packages - empty primed-stage - version"""
         from reviewtools.overrides import update_stage_packages
 
@@ -1120,15 +1408,72 @@ class TestStore(TestCase):
         m = {}
         m["name"] = "foo"
         m["version"] = "1.2~"
-        m["parts"] = {}
+        m["parts"] = {"foo-part": {}}
 
         m["primed-stage-packages"] = []
 
-        res = store.get_faked_stage_packages(m)
-        self.assertFalse("faked-by-review-tools" in res["parts"])
+        res = store.get_faked_build_and_stage_packages(m)
+        self.assertTrue("faked-by-review-tools" in res["parts"])
         self.assertTrue("bar=1.2~" in res["primed-stage-packages"])
+        self.assertTrue("build-packages" in res["parts"]["faked-by-review-tools"])
+        self.assertEqual(
+            len(res["parts"]["faked-by-review-tools"]["build-packages"]), 0
+        )
 
-    def test_get_faked_stage_packages_with_primed_stage_version(self):
+    def test_get_faked_stage_packages_with_empty_primed_stage_version_and_no_valid_snapcraft_version(
+        self,
+    ):
+        """Test get_faked_stage_packages - empty primed-stage - version"""
+        from reviewtools.overrides import update_stage_packages
+
+        update_stage_packages["foo"] = {"bar": "1.2~"}
+        m = {}
+        m["name"] = "foo"
+        m["version"] = "1.2~"
+        m["parts"] = {"foo-part": {}}
+
+        m["primed-stage-packages"] = []
+
+        snapcraft_version_value = [None, ""]
+        for snapcraft_version in snapcraft_version_value:
+            m["snapcraft-version"] = snapcraft_version
+            res = store.get_faked_build_and_stage_packages(m)
+            self.assertTrue("faked-by-review-tools" in res["parts"])
+            self.assertTrue("bar=1.2~" in res["primed-stage-packages"])
+            self.assertTrue("build-packages" in res["parts"]["faked-by-review-tools"])
+            self.assertEqual(
+                len(res["parts"]["faked-by-review-tools"]["build-packages"]), 0
+            )
+
+    def test_get_faked_stage_packages_with_empty_primed_stage_version_and_snapcraft_version(
+        self,
+    ):
+        """Test get_faked_stage_packages - empty primed-stage - version"""
+        from reviewtools.overrides import update_stage_packages
+
+        update_stage_packages["foo"] = {"bar": "1.2~"}
+        m = {}
+        m["name"] = "foo"
+        m["version"] = "1.2~"
+        m["parts"] = {"foo-part": {}}
+
+        m["primed-stage-packages"] = []
+        m["snapcraft-version"] = "1.1.1"
+
+        res = store.get_faked_build_and_stage_packages(m)
+        self.assertTrue("faked-by-review-tools" in res["parts"])
+        self.assertTrue("bar=1.2~" in res["primed-stage-packages"])
+        self.assertTrue("build-packages" in res["parts"]["faked-by-review-tools"])
+        self.assertEqual(
+            len(res["parts"]["faked-by-review-tools"]["build-packages"]), 1
+        )
+        self.assertTrue(
+            "snapcraft=1.1.1" in res["parts"]["faked-by-review-tools"]["build-packages"]
+        )
+
+    def test_get_faked_stage_packages_with_primed_stage_version_and_no_snapcraft_version(
+        self,
+    ):
         """Test get_faked_stage_packages - primed-stage exists - version"""
         from reviewtools.overrides import update_stage_packages
 
@@ -1136,14 +1481,76 @@ class TestStore(TestCase):
         m = {}
         m["name"] = "foo"
         m["version"] = "1.2~"
-        m["parts"] = {}
+        m["parts"] = {"foo-part": {}}
         m["primed-stage-packages"] = ["libxcursor1=1:1.1.14-1"]
 
-        res = store.get_faked_stage_packages(m)
-        self.assertFalse("faked-by-review-tools" in res["parts"])
+        res = store.get_faked_build_and_stage_packages(m)
+        self.assertTrue("faked-by-review-tools" in res["parts"])
         self.assertFalse("faked-by-review-tools" in m["parts"])
         self.assertTrue("bar=1.2~" in res["primed-stage-packages"])
         self.assertTrue("libxcursor1=1:1.1.14-1" in res["primed-stage-packages"])
+        self.assertTrue("build-packages" in res["parts"]["faked-by-review-tools"])
+        self.assertEqual(
+            len(res["parts"]["faked-by-review-tools"]["build-packages"]), 0
+        )
+
+    def test_get_faked_stage_packages_with_primed_stage_version_and_no_valid_snapcraft_version(
+        self,
+    ):
+        """Test get_faked_stage_packages - primed-stage exists - version"""
+        from reviewtools.overrides import update_stage_packages
+
+        update_stage_packages["foo"] = {"bar": "1.2~"}
+        m = {}
+        m["name"] = "foo"
+        m["version"] = "1.2~"
+        # iirc, manifest with no parts should not get seccnotes, so
+        # need to add foo-part otherwise this test did not pass
+        # after the validation added
+        m["parts"] = {"foo-part": {}}
+        m["primed-stage-packages"] = ["libxcursor1=1:1.1.14-1"]
+        snapcraft_version_value = [None, ""]
+        for snapcraft_version in snapcraft_version_value:
+            m["snapcraft-version"] = snapcraft_version
+            res = store.get_faked_build_and_stage_packages(m)
+            self.assertTrue("faked-by-review-tools" in res["parts"])
+            self.assertFalse("faked-by-review-tools" in m["parts"])
+            self.assertTrue("bar=1.2~" in res["primed-stage-packages"])
+            self.assertTrue("libxcursor1=1:1.1.14-1" in res["primed-stage-packages"])
+            self.assertTrue("build-packages" in res["parts"]["faked-by-review-tools"])
+            self.assertEqual(
+                len(res["parts"]["faked-by-review-tools"]["build-packages"]), 0
+            )
+
+    def test_get_faked_stage_packages_with_primed_stage_version_and_snapcraft_version(
+        self,
+    ):
+        """Test get_faked_stage_packages - primed-stage exists - version"""
+        from reviewtools.overrides import update_stage_packages
+
+        update_stage_packages["foo"] = {"bar": "1.2~"}
+        m = {}
+        m["name"] = "foo"
+        m["version"] = "1.2~"
+        # iirc, manifest with no parts should not get seccnotes, so
+        # need to add foo-part otherwise this test did not pass
+        # after the validation added
+        m["parts"] = {"foo-part": {}}
+        m["primed-stage-packages"] = ["libxcursor1=1:1.1.14-1"]
+        m["snapcraft-version"] = "1.1.1"
+
+        res = store.get_faked_build_and_stage_packages(m)
+        self.assertTrue("faked-by-review-tools" in res["parts"])
+        self.assertFalse("faked-by-review-tools" in m["parts"])
+        self.assertTrue("bar=1.2~" in res["primed-stage-packages"])
+        self.assertTrue("libxcursor1=1:1.1.14-1" in res["primed-stage-packages"])
+        self.assertTrue("build-packages" in res["parts"]["faked-by-review-tools"])
+        self.assertEqual(
+            len(res["parts"]["faked-by-review-tools"]["build-packages"]), 1
+        )
+        self.assertTrue(
+            "snapcraft=1.1.1" in res["parts"]["faked-by-review-tools"]["build-packages"]
+        )
 
     def test_get_faked_stage_packages_auto(self):
         """Test get_faked_stage_packages"""
@@ -1153,9 +1560,9 @@ class TestStore(TestCase):
         m = {}
         m["name"] = "foo"
         m["version"] = "1.2-3ubuntu0.4+gitdeadbeef"
-        m["parts"] = {}
+        m["parts"] = {"foo-part": {}}
 
-        res = store.get_faked_stage_packages(m)
+        res = store.get_faked_build_and_stage_packages(m)
         self.assertTrue("faked-by-review-tools" in res["parts"])
         self.assertTrue("stage-packages" in res["parts"]["faked-by-review-tools"])
         self.assertTrue(
@@ -1171,11 +1578,11 @@ class TestStore(TestCase):
         m = {}
         m["name"] = "foo"
         m["version"] = "1.2-3ubuntu0.4+gitdeadbeef"
-        m["parts"] = {}
+        m["parts"] = {"foo-part": {}}
         m["primed-stage-packages"] = ["libxcursor1=1:1.1.14-1"]
 
-        res = store.get_faked_stage_packages(m)
-        self.assertFalse("faked-by-review-tools" in res["parts"])
+        res = store.get_faked_build_and_stage_packages(m)
+        self.assertTrue("faked-by-review-tools" in res["parts"])
         self.assertTrue("bar=1.2-3ubuntu0.4" in res["primed-stage-packages"])
         self.assertTrue("libxcursor1=1:1.1.14-1" in res["primed-stage-packages"])
 
@@ -1187,9 +1594,9 @@ class TestStore(TestCase):
         m = {}
         m["name"] = "foo"
         m["version"] = "4.4.0-140.141"
-        m["parts"] = {}
+        m["parts"] = {"foo-part": {}}
 
-        res = store.get_faked_stage_packages(m)
+        res = store.get_faked_build_and_stage_packages(m)
         self.assertTrue("faked-by-review-tools" in res["parts"])
         self.assertTrue("stage-packages" in res["parts"]["faked-by-review-tools"])
         self.assertTrue(
@@ -1205,12 +1612,12 @@ class TestStore(TestCase):
         m = {}
         m["name"] = "foo"
         m["version"] = "4.4.0-140.141"
-        m["parts"] = {}
+        m["parts"] = {"foo-part": {}}
 
         m["primed-stage-packages"] = ["libxcursor1=1:1.1.14-1"]
 
-        res = store.get_faked_stage_packages(m)
-        self.assertFalse("faked-by-review-tools" in res["parts"])
+        res = store.get_faked_build_and_stage_packages(m)
+        self.assertTrue("faked-by-review-tools" in res["parts"])
         self.assertTrue(
             "linux-image-generic=4.4.0.140.999999" in res["primed-stage-packages"]
         )
@@ -1226,9 +1633,9 @@ class TestStore(TestCase):
         m["name"] = "foo"
         m["base"] = "core18"
         m["version"] = "1.2~"
-        m["parts"] = {}
+        m["parts"] = {"foo-part": {}}
 
-        res = store.get_faked_stage_packages(m)
+        res = store.get_faked_build_and_stage_packages(m)
         self.assertTrue("faked-by-review-tools" in res["parts"])
         self.assertTrue("stage-packages" in res["parts"]["faked-by-review-tools"])
         self.assertTrue(
@@ -1245,11 +1652,11 @@ class TestStore(TestCase):
         m["name"] = "foo"
         m["base"] = "core18"
         m["version"] = "1.2~"
-        m["parts"] = {}
+        m["parts"] = {"foo-part": {}}
         m["primed-stage-packages"] = ["libxcursor1=1:1.1.14-1"]
 
-        res = store.get_faked_stage_packages(m)
-        self.assertFalse("faked-by-review-tools" in res["parts"])
+        res = store.get_faked_build_and_stage_packages(m)
+        self.assertTrue("faked-by-review-tools" in res["parts"])
         self.assertTrue("bar=2.0" in res["primed-stage-packages"])
         self.assertTrue("libxcursor1=1:1.1.14-1" in res["primed-stage-packages"])
 
@@ -1262,9 +1669,9 @@ class TestStore(TestCase):
         m["name"] = "foo"
         m["base"] = "core18"
         m["version"] = "1.2~"
-        m["parts"] = {}
+        m["parts"] = {"foo-part": {}}
 
-        res = store.get_faked_stage_packages(m)
+        res = store.get_faked_build_and_stage_packages(m)
         self.assertTrue("faked-by-review-tools" in res["parts"])
         self.assertTrue("stage-packages" in res["parts"]["faked-by-review-tools"])
         self.assertTrue(
@@ -1280,13 +1687,43 @@ class TestStore(TestCase):
         m["name"] = "foo"
         m["base"] = "core18"
         m["version"] = "1.2~"
-        m["parts"] = {}
+        m["parts"] = {"foo-part": {}}
         m["primed-stage-packages"] = ["libxcursor1=1:1.1.14-1"]
 
-        res = store.get_faked_stage_packages(m)
-        self.assertFalse("faked-by-review-tools" in res["parts"])
+        res = store.get_faked_build_and_stage_packages(m)
+        self.assertTrue("faked-by-review-tools" in res["parts"])
         self.assertTrue("bar=1.2~" in res["primed-stage-packages"])
         self.assertTrue("libxcursor1=1:1.1.14-1" in res["primed-stage-packages"])
+
+    def test_get_faked_build_packages_with_snapcraft_version_has_no_side_effect_on_original_manifest(
+        self,
+    ):
+        """Test get_faked_stage_packages - no side effect on m"""
+        from reviewtools.overrides import update_build_packages
+
+        update_build_packages["foo"] = {"bar": "1.2~"}
+        m = {}
+        m["name"] = "foo"
+        m["version"] = "1.2~"
+        m["parts"] = {"foo-part": {}}
+        m["snapcraft-version"] = "1.1.1"
+
+        res = store.get_faked_build_and_stage_packages(m)
+        self.assertTrue("faked-by-review-tools" in res["parts"])
+        self.assertTrue("stage-packages" in res["parts"]["faked-by-review-tools"])
+        self.assertEqual(
+            len(res["parts"]["faked-by-review-tools"]["stage-packages"]), 0
+        )
+        self.assertEqual(
+            len(res["parts"]["faked-by-review-tools"]["build-packages"]), 1
+        )
+        self.assertTrue(
+            "snapcraft=1.1.1" in res["parts"]["faked-by-review-tools"]["build-packages"]
+        )
+        self.assertFalse(
+            "bar=1.2~" in res["parts"]["faked-by-review-tools"]["build-packages"]
+        )
+        self.assertFalse("faked-by-review-tools" in m["parts"])
 
     def test_check_get_package_revisions_empty_manifest(self):
         """Test get_package_revisions() - empty manifest"""

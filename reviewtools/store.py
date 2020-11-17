@@ -31,6 +31,7 @@ from reviewtools.overrides import (
     update_binaries_ignore,
     update_publisher_overrides,
     update_stage_packages,
+    update_build_packages,
 )
 from reviewtools.sr_common import SnapReview
 
@@ -91,8 +92,8 @@ def convert_canonical_app_version(s):
     return v
 
 
-def get_faked_stage_packages(m):
-    """fake up stage-packages from overrides"""
+def get_faked_build_and_stage_packages(m):
+    """fake up build and stage-packages from overrides"""
     # if the snap specifies a base, see if the override has a <snap>/<base>
     # key. If not, fallback to <snap>
     snapbase = ""
@@ -106,7 +107,13 @@ def get_faked_stage_packages(m):
     # Performing a deepcopy of m as we are adding side-effects to the
     # original manifest dict otherwise
     manifest_with_faked_packages = copy.deepcopy(m)
-    if key in update_stage_packages:
+
+    # Manifest will always have the fake section to support snapcraft
+    # secnotes, unless manifest has no parts.
+    if (
+        "parts" in manifest_with_faked_packages
+        and manifest_with_faked_packages["parts"]
+    ):
         if (
             "primed-stage-packages" in manifest_with_faked_packages
             and manifest_with_faked_packages["primed-stage-packages"] is not None
@@ -114,51 +121,69 @@ def get_faked_stage_packages(m):
             append_fake_packages_to_manifest(key, manifest_with_faked_packages, True)
         else:
             append_fake_packages_to_manifest(key, manifest_with_faked_packages, False)
+
     return manifest_with_faked_packages
 
 
 # append_fake_packages_to_manifest() will append packages from the
-# update_stage_packages override to primed-stage-packages in the manifest
-# when primed-stage-packages is present, otherwise it will insert those
-# packages into the 'faked-by-review-tools' part.
+# update_stage_packages and update_build_packages override in the manifest.
+# For update_stage_packages, will append to primed-stage-packages when
+# primed-stage-packages is present, otherwise it will insert those packages
+# into the 'faked-by-review-tools' part. For update_build_packages, will
+# insert those into the 'faked-by-review-tools' part always
 def append_fake_packages_to_manifest(
     key, manifest_with_faked_packages, is_primed_stage_present
 ):
     fake_key = "faked-by-review-tools"
     if (
         "parts" in manifest_with_faked_packages
+        and manifest_with_faked_packages["parts"] is not None
         and fake_key not in manifest_with_faked_packages["parts"]
     ):
-        # fake the stage-packages part if primed-stage-packages not present
-        if not is_primed_stage_present:
-            manifest_with_faked_packages["parts"][fake_key] = {}
-            manifest_with_faked_packages["parts"][fake_key]["plugin"] = "null"
+        manifest_with_faked_packages["parts"][fake_key] = {}
+        manifest_with_faked_packages["parts"][fake_key]["plugin"] = "null"
 
-            for i in ["build-packages", "prime", "stage", "stage-packages"]:
-                manifest_with_faked_packages["parts"][fake_key][i] = []
+        for i in ["build-packages", "prime", "stage", "stage-packages"]:
+            manifest_with_faked_packages["parts"][fake_key][i] = []
 
-        # The override is:
+        # The override for update_stage_packages is:
         #   update_stage_packages = {'<snap>': {'<deb>': '<version>|auto*'}}
-        for pkg in update_stage_packages[key]:
-            version = update_stage_packages[key][pkg]
-            if version == "auto":
-                version = convert_canonical_app_version(
-                    manifest_with_faked_packages["version"]
-                )
-            elif version == "auto-kernel":
-                version = convert_canonical_kernel_version(
-                    manifest_with_faked_packages["version"]
-                )
-            # append to prime-stage-packages if present, else insert into the
-            # stage-packages of our faked part
-            if is_primed_stage_present:
-                manifest_with_faked_packages["primed-stage-packages"].append(
-                    "%s=%s" % (pkg, version)
-                )
-            else:
-                manifest_with_faked_packages["parts"][fake_key][
-                    "stage-packages"
-                ].append("%s=%s" % (pkg, version))
+        if key in update_stage_packages:
+            for pkg in update_stage_packages[key]:
+                version = update_stage_packages[key][pkg]
+                if version == "auto":
+                    version = convert_canonical_app_version(
+                        manifest_with_faked_packages["version"]
+                    )
+                elif version == "auto-kernel":
+                    version = convert_canonical_kernel_version(
+                        manifest_with_faked_packages["version"]
+                    )
+                # append to prime-stage-packages if present, else insert into the
+                # stage-packages of our faked part
+                if is_primed_stage_present:
+                    manifest_with_faked_packages["primed-stage-packages"].append(
+                        "%s=%s" % (pkg, version)
+                    )
+                else:
+                    manifest_with_faked_packages["parts"][fake_key][
+                        "stage-packages"
+                    ].append("%s=%s" % (pkg, version))
+
+        # The override for update_build_packages is:
+        #   update_build_packages = {'<snap>': {'<deb>': ''}}
+        #   For this implementation we are only faking snapcraft for every snap
+        for build_packages in update_build_packages.values():
+            for pkg_name in build_packages:
+                version = build_packages[pkg_name]
+                if pkg_name == "snapcraft" and version == "auto":
+                    pkg_version = get_snapcraft_version_from_manifest(
+                        manifest_with_faked_packages
+                    )
+                    if pkg_version:
+                        manifest_with_faked_packages["parts"][fake_key][
+                            "build-packages"
+                        ].append("%s=%s" % (pkg_name, pkg_version))
 
 
 def get_pkg_revisions(item, secnot_db, errors):
@@ -212,7 +237,7 @@ def get_pkg_revisions(item, secnot_db, errors):
             m = yaml.load(rev["manifest_yaml"], Loader=yaml.SafeLoader)
             if m is None:
                 continue
-            m = get_faked_stage_packages(m)
+            m = get_faked_build_and_stage_packages(m)
             normalize_and_verify_snap_manifest(m)
         except Exception as e:
             _add_error(
@@ -296,7 +321,7 @@ def get_shared_snap_without_override(store_db):
 # section aiming to reduce the number of false positive alerts that are
 # caused by staged-packages listing packages that are not eventually
 # present in the snap. https://snapcraft.io/docs/release-notes-snapcraft-3-10.
-def get_staged_packages_from_manifest(m):
+def get_staged_and_build_packages_from_manifest(m):
     """Obtain list of packages in primed-stage-packages if section is present.
        If not, obtain it from stage-packages for various parts instead
     """
@@ -309,20 +334,37 @@ def get_staged_packages_from_manifest(m):
         return None
 
     d = {}
-    if "primed-stage-packages" in m and m["primed-stage-packages"] is not None:
-        if m["primed-stage-packages"]:
-            get_packages_from_manifest_section(d, m["primed-stage-packages"])
-        else:
-            return None
 
-    else:
-        for part in m["parts"]:
+    manifest_has_primed_staged_section = False
+
+    if "primed-stage-packages" in m and m["primed-stage-packages"] is not None:
+        manifest_has_primed_staged_section = True
+        if m["primed-stage-packages"]:
+            get_packages_from_manifest_section(
+                d, m["primed-stage-packages"], "stage-packages"
+            )
+
+    for part in m["parts"]:
+        # stage-packages part is only analyzed if primed-stage-packages is not
+        # present.
+        if not manifest_has_primed_staged_section:
             if (
                 "stage-packages" in m["parts"][part]
                 and m["parts"][part]["stage-packages"] is not None
             ):
                 get_packages_from_manifest_section(
-                    d, m["parts"][part]["stage-packages"]
+                    d, m["parts"][part]["stage-packages"], "stage-packages"
+                )
+
+        # Only adding build-packages if part is fake. This will be improved
+        # once the full support for build-packages is added
+        if part == "faked-by-review-tools":
+            if (
+                "build-packages" in m["parts"][part]
+                and m["parts"][part]["build-packages"] is not None
+            ):
+                get_packages_from_manifest_section(
+                    d, m["parts"][part]["build-packages"], "build-packages"
                 )
 
     if len(d) == 0:
@@ -332,24 +374,28 @@ def get_staged_packages_from_manifest(m):
     return d
 
 
-def get_packages_from_manifest_section(d, manifest_section):
+# package_type helps now to group the pkgs based on the manifest section:
+# primed-stage-packages and stage-packages from each part are grouped
+# into the stage-packages key. build-packages are added to the build-packages
+# key.
+def get_packages_from_manifest_section(d, manifest_section, package_type):
     """Obtain packages from a given manifest section (primed-stage-packages
-       or stage-packages for a given part)
+       or stage-packages and build-packages for a given part)
     """
     for entry in manifest_section:
         if "=" not in entry:
             warn("'%s' not properly formatted. Skipping" % entry)
             continue
         pkg, ver = entry.split("=")
-
         if pkg in update_binaries_ignore:
             debug("Skipping ignored binary: '%s'" % pkg)
             continue
-
-        if pkg not in d:
-            d[pkg] = []
-        if ver not in d[pkg]:
-            d[pkg].append(ver)
+        if package_type not in d:
+            d[package_type] = {}
+        if pkg not in d[package_type]:
+            d[package_type][pkg] = []
+        if ver not in d[package_type][pkg]:
+            d[package_type][pkg].append(ver)
 
 
 def normalize_and_verify_snap_manifest(m):
@@ -378,58 +424,67 @@ def get_secnots_for_manifest(m, secnot_db, with_cves=False):
     debug("snap/manifest.yaml:\n" + pprint.pformat(m))
 
     rel = get_ubuntu_release_from_manifest(m)  # can raise ValueError
-    pkgs = get_staged_packages_from_manifest(m)
+    stage_and_build_pkgs = get_staged_and_build_packages_from_manifest(m)
     if rel not in secnot_db:
         raise ValueError("'%s' not found in security notification database" % rel)
 
     pending_secnots = {}
 
-    if pkgs is None:
+    if stage_and_build_pkgs is None:
         debug("no stage-packages found")
         return pending_secnots
 
-    for pkg in pkgs:
-        if pkg in secnot_db[rel]:
-            for v in pkgs[pkg]:
-                pkgversion = debversion.DebVersion(v)
-                for secnot in secnot_db[rel][pkg]:
-                    secnotversion = secnot_db[rel][pkg][secnot]["version"]
-                    if debversion.compare(pkgversion, secnotversion) < 0:
-                        debug(
-                            "adding %s: %s (pkg:%s < secnot:%s)"
-                            % (
-                                pkg,
-                                secnot,
-                                pkgversion.full_version,
-                                secnotversion.full_version,
+    # Since now stage_and_build_pkgs can have stage-packages and build-packages
+    # keys, adding secnotes into each group
+    for pkg_type in stage_and_build_pkgs:
+        for pkg in stage_and_build_pkgs[pkg_type]:
+            if pkg in secnot_db[rel]:
+                for v in stage_and_build_pkgs[pkg_type][pkg]:
+                    pkgversion = debversion.DebVersion(v)
+                    for secnot in secnot_db[rel][pkg]:
+                        secnotversion = secnot_db[rel][pkg][secnot]["version"]
+                        if debversion.compare(pkgversion, secnotversion) < 0:
+                            debug(
+                                "adding %s: %s (pkg:%s < secnot:%s)"
+                                % (
+                                    pkg,
+                                    secnot,
+                                    pkgversion.full_version,
+                                    secnotversion.full_version,
+                                )
                             )
-                        )
-                        if pkg not in pending_secnots:
-                            if with_cves:
-                                pending_secnots[pkg] = {}
-                            else:
-                                pending_secnots[pkg] = []
-                        if secnot not in pending_secnots[pkg]:
-                            if with_cves:
-                                pending_secnots[pkg][secnot] = secnot_db[rel][pkg][
-                                    secnot
-                                ]["cves"]
-                            else:
-                                pending_secnots[pkg].append(secnot)
-                    else:
-                        debug(
-                            "skipping %s: %s (pkg:%s >= secnot:%s)"
-                            % (
-                                pkg,
-                                secnot,
-                                pkgversion.full_version,
-                                secnotversion.full_version,
+                            # Only adding pkg_type if there is a pending secnote
+                            if pkg_type not in pending_secnots:
+                                pending_secnots[pkg_type] = {}
+                            if pkg not in pending_secnots[pkg_type]:
+                                if with_cves:
+                                    pending_secnots[pkg_type][pkg] = {}
+                                else:
+                                    pending_secnots[pkg_type][pkg] = []
+                            if secnot not in pending_secnots[pkg_type][pkg]:
+                                if with_cves:
+                                    pending_secnots[pkg_type][pkg][secnot] = secnot_db[
+                                        rel
+                                    ][pkg][secnot]["cves"]
+                                else:
+                                    pending_secnots[pkg_type][pkg].append(secnot)
+                        else:
+                            debug(
+                                "skipping %s: %s (pkg:%s >= secnot:%s)"
+                                % (
+                                    pkg,
+                                    secnot,
+                                    pkgversion.full_version,
+                                    secnotversion.full_version,
+                                )
                             )
-                        )
 
-                    if pkg in pending_secnots and not with_cves:
-                        pending_secnots[pkg].sort()
-
+                        if (
+                            pkg_type in pending_secnots
+                            and pkg in pending_secnots[pkg_type]
+                            and not with_cves
+                        ):
+                            pending_secnots[pkg_type][pkg].sort()
     return pending_secnots
 
 
@@ -522,3 +577,8 @@ def get_ubuntu_release_from_manifest(m):
     debug("Ubuntu release=%s" % ubuntu_release)
 
     return ubuntu_release
+
+
+def get_snapcraft_version_from_manifest(m):
+    if "snapcraft-version" in m:
+        return m["snapcraft-version"]
