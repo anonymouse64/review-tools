@@ -101,7 +101,7 @@ def _secnot_report_for_pkg(pkg_db, seen_db):
 
     reference_urls = []
 
-    # Since now the report can contain USNs for stage -packages only,
+    # Since now the report can contain USNs for stage-packages only,
     # USNs for build-packages only, or both, then we prepare two reports
     # that will be joined later if needed
     stage_pkgs_report = ""

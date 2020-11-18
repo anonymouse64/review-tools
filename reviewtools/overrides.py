@@ -1218,7 +1218,7 @@ update_stage_packages = {
 # only considering snapcraft as a build-part for every snap. Since manifest is
 # present it means the snap was built using snapcraft.
 # Format:
-#   update_stage_packages = {'<snap>': {'<deb>': '<version>'}
+#   update_stage_packages = {'<snap>': {'<deb>': '<version>|auto'}
 #
 # where <snap> is currently ignored, <deb> is always snapcraft and
 # <version>=auto will use the 'snapcraft-version' field from the snap

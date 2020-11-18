@@ -171,7 +171,7 @@ def append_fake_packages_to_manifest(
                     ].append("%s=%s" % (pkg, version))
 
         # The override for update_build_packages is:
-        #   update_build_packages = {'<snap>': {'<deb>': ''}}
+        #   update_build_packages = {'<snap>': {'<deb>': '<version>|auto'}}
         #   For this implementation we are only faking snapcraft for every snap
         for build_packages in update_build_packages.values():
             for pkg_name in build_packages:
@@ -321,6 +321,7 @@ def get_shared_snap_without_override(store_db):
 # section aiming to reduce the number of false positive alerts that are
 # caused by staged-packages listing packages that are not eventually
 # present in the snap. https://snapcraft.io/docs/release-notes-snapcraft-3-10.
+# Support for build-packages is not fully implemented yet.
 def get_staged_and_build_packages_from_manifest(m):
     """Obtain list of packages in primed-stage-packages if section is present.
        If not, obtain it from stage-packages for various parts instead
@@ -374,7 +375,7 @@ def get_staged_and_build_packages_from_manifest(m):
     return d
 
 
-# package_type helps now to group the pkgs based on the manifest section:
+# package_type helps to group the pkgs based on the manifest section:
 # primed-stage-packages and stage-packages from each part are grouped
 # into the stage-packages key. build-packages are added to the build-packages
 # key.
@@ -434,8 +435,8 @@ def get_secnots_for_manifest(m, secnot_db, with_cves=False):
         debug("no stage-packages found")
         return pending_secnots
 
-    # Since now stage_and_build_pkgs can have stage-packages and build-packages
-    # keys, adding secnotes into each group
+    # Since stage_and_build_pkgs can have stage-packages and build-packages
+    # keys, adding secnots into each group
     for pkg_type in stage_and_build_pkgs:
         for pkg in stage_and_build_pkgs[pkg_type]:
             if pkg in secnot_db[rel]:
@@ -580,5 +581,9 @@ def get_ubuntu_release_from_manifest(m):
 
 
 def get_snapcraft_version_from_manifest(m):
-    if "snapcraft-version" in m:
+    if (
+        "snapcraft-version" in m
+        and m["snapcraft-version"] is not None
+        and m["snapcraft-version"]
+    ):
         return m["snapcraft-version"]
