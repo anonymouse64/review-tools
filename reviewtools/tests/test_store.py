@@ -137,15 +137,14 @@ class TestStore(TestCase):
         self.assertTrue("i386" in res["revisions"]["12"]["architectures"])
 
         self.assertTrue("secnot-report" in res["revisions"]["12"])
-        self.assertTrue("stage-packages" in res["revisions"]["12"]["secnot-report"])
+        self.assertTrue("staged" in res["revisions"]["12"]["secnot-report"])
         self.assertTrue(
-            "libxcursor1" in res["revisions"]["12"]["secnot-report"]["stage-packages"]
+            "libxcursor1" in res["revisions"]["12"]["secnot-report"]["staged"]
         )
         self.assertTrue(
-            "3501-1"
-            in res["revisions"]["12"]["secnot-report"]["stage-packages"]["libxcursor1"]
+            "3501-1" in res["revisions"]["12"]["secnot-report"]["staged"]["libxcursor1"]
         )
-        self.assertFalse("build-packages" in res["revisions"]["12"]["secnot-report"])
+        self.assertFalse("build" in res["revisions"]["12"]["secnot-report"])
 
     def test_check_get_package_revisions_valid_with_snap_type(self):
         """Test get_package_revisions() - valid (snap type)"""
@@ -157,12 +156,11 @@ class TestStore(TestCase):
         errors = {}
         res = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
         self.assertEqual(len(errors), 0)
-        self.assertTrue("stage-packages" in res["revisions"]["12"]["secnot-report"])
+        self.assertTrue("staged" in res["revisions"]["12"]["secnot-report"])
         self.assertTrue(
-            "3501-1"
-            in res["revisions"]["12"]["secnot-report"]["stage-packages"]["libxcursor1"]
+            "3501-1" in res["revisions"]["12"]["secnot-report"]["staged"]["libxcursor1"]
         )
-        self.assertFalse("build-packages" in res["revisions"]["12"]["secnot-report"])
+        self.assertFalse("build" in res["revisions"]["12"]["secnot-report"])
 
     def test_check_get_package_revisions_missing_publisher(self):
         """Test get_package_revisions() - missing publisher"""
@@ -389,18 +387,13 @@ class TestStore(TestCase):
         pkg_db = store.get_pkg_revisions(self.store_db[0], secnot_db, errors)
         for rev in pkg_db["revisions"]:
             self.assertFalse("stage-packages" in rev)
-            self.assertEqual(
-                len(pkg_db["revisions"][rev]["secnot-report"]["build-packages"]), 1
-            )
+            self.assertEqual(len(pkg_db["revisions"][rev]["secnot-report"]["build"]), 1)
             self.assertTrue(
-                "snapcraft"
-                in pkg_db["revisions"][rev]["secnot-report"]["build-packages"]
+                "snapcraft" in pkg_db["revisions"][rev]["secnot-report"]["build"]
             )
             self.assertTrue(
                 "5501-1"
-                in pkg_db["revisions"][rev]["secnot-report"]["build-packages"][
-                    "snapcraft"
-                ]
+                in pkg_db["revisions"][rev]["secnot-report"]["build"]["snapcraft"]
             )
 
     def test_check_get_package_revisions_primed_and_staged_none_and_usn_for_build_but_no_affected_snapcraft_version_in_manifest(
@@ -531,10 +524,10 @@ class TestStore(TestCase):
             res = store.get_staged_and_build_packages_from_manifest(m)
             self.assertTrue(isinstance(res, dict))
             self.assertTrue(len(res) > 0)
-            self.assertTrue("stage-packages" in res)
-            self.assertTrue("libxcursor1" in res["stage-packages"])
-            self.assertTrue("1:1.1.14-1" in res["stage-packages"]["libxcursor1"])
-            self.assertFalse("build-packages" in res)
+            self.assertTrue("staged" in res)
+            self.assertTrue("libxcursor1" in res["staged"])
+            self.assertTrue("1:1.1.14-1" in res["staged"]["libxcursor1"])
+            self.assertFalse("build" in res)
 
     def test_check_get_staged_packages_from_manifest_with_primed_stage_packages(self):
         """Test get_staged_packages_from_manifest(), primed-stage exists"""
@@ -547,10 +540,10 @@ class TestStore(TestCase):
         res = store.get_staged_and_build_packages_from_manifest(m)
         self.assertTrue(isinstance(res, dict))
         self.assertTrue(len(res) > 0)
-        self.assertTrue("stage-packages" in res)
-        self.assertTrue("libxcursor1" in res["stage-packages"])
-        self.assertTrue("1:1.1.14-1" in res["stage-packages"]["libxcursor1"])
-        self.assertFalse("build-packages" in res)
+        self.assertTrue("staged" in res)
+        self.assertTrue("libxcursor1" in res["staged"])
+        self.assertTrue("1:1.1.14-1" in res["staged"]["libxcursor1"])
+        self.assertFalse("build" in res)
 
     def test_check_get_staged_packages_from_manifest_missing_parts(self):
         """Test get_staged_packages_from_manifest() - missing parts"""
@@ -576,11 +569,11 @@ class TestStore(TestCase):
         res = store.get_staged_and_build_packages_from_manifest(m)
         self.assertTrue(isinstance(res, dict))
         self.assertTrue(len(res) > 0)
-        self.assertTrue("stage-packages" in res)
-        self.assertFalse("foo" in res["stage-packages"])
-        self.assertTrue("libxcursor1" in res["stage-packages"])
-        self.assertTrue("1:1.1.14-1" in res["stage-packages"]["libxcursor1"])
-        self.assertFalse("build-packages" in res)
+        self.assertTrue("staged" in res)
+        self.assertFalse("foo" in res["staged"])
+        self.assertTrue("libxcursor1" in res["staged"])
+        self.assertTrue("1:1.1.14-1" in res["staged"]["libxcursor1"])
+        self.assertFalse("build" in res)
 
     def test_check_get_staged_packages_from_manifest_bad_primed_staged(self,):
         """Test get_staged_packages_from_manifest() - only one
@@ -610,10 +603,10 @@ class TestStore(TestCase):
         self.assertTrue(isinstance(res, dict))
         self.assertTrue(len(res) > 0)
         self.assertFalse("foo" in res)
-        self.assertTrue("stage-packages" in res)
-        self.assertTrue("libxcursor1" in res["stage-packages"])
-        self.assertTrue("1:1.1.14-1" in res["stage-packages"]["libxcursor1"])
-        self.assertFalse("build-packages" in res)
+        self.assertTrue("staged" in res)
+        self.assertTrue("libxcursor1" in res["staged"])
+        self.assertTrue("1:1.1.14-1" in res["staged"]["libxcursor1"])
+        self.assertFalse("build" in res)
 
     def test_check_get_staged_packages_from_manifest_primed_staged_and_staged_packages_are_none(
         self,
@@ -692,12 +685,12 @@ class TestStore(TestCase):
         res = store.get_staged_and_build_packages_from_manifest(m)
         self.assertTrue(isinstance(res, dict))
         self.assertTrue(len(res) > 0)
-        self.assertTrue("stage-packages" in res)
-        self.assertTrue("libxcursor1" in res["stage-packages"])
-        self.assertTrue("1:1.1.14-1" in res["stage-packages"]["libxcursor1"])
+        self.assertTrue("staged" in res)
+        self.assertTrue("libxcursor1" in res["staged"])
+        self.assertTrue("1:1.1.14-1" in res["staged"]["libxcursor1"])
         # make sure the ignored package is not present
-        self.assertFalse("linux-libc-dev" in res["stage-packages"])
-        self.assertFalse("build-packages" in res)
+        self.assertFalse("linux-libc-dev" in res["staged"])
+        self.assertFalse("build" in res)
 
     def test_check_get_staged_packages_from_manifest_with_primed_stage_binary_ignored(
         self,
@@ -715,12 +708,12 @@ class TestStore(TestCase):
         res = store.get_staged_and_build_packages_from_manifest(m)
         self.assertTrue(isinstance(res, dict))
         self.assertTrue(len(res) > 0)
-        self.assertTrue("stage-packages" in res)
-        self.assertTrue("libxcursor1" in res["stage-packages"])
-        self.assertTrue("1:1.1.14-1" in res["stage-packages"]["libxcursor1"])
+        self.assertTrue("staged" in res)
+        self.assertTrue("libxcursor1" in res["staged"])
+        self.assertTrue("1:1.1.14-1" in res["staged"]["libxcursor1"])
         # make sure the ignored package is not present
         self.assertFalse("linux-libc-dev" in res)
-        self.assertFalse("build-packages" in res)
+        self.assertFalse("build" in res)
 
     def test_check_get_secnots_for_manifest_with_no_primed_stage_packages(self):
         """Test get_secnots_for_manifest()"""
@@ -750,25 +743,25 @@ class TestStore(TestCase):
 
                 self.assertTrue(isinstance(res, dict))
                 if build_packages and sec_not_for_build_packages:
-                    self.assertTrue("build-packages" in res)
-                    self.assertEqual(len(res["build-packages"]), 1)
-                    self.assertTrue("snapcraft" in res["build-packages"])
-                    self.assertEqual(len(res["build-packages"]["snapcraft"]), 1)
-                    self.assertTrue("5501-1" in res["build-packages"]["snapcraft"])
+                    self.assertTrue("build" in res)
+                    self.assertEqual(len(res["build"]), 1)
+                    self.assertTrue("snapcraft" in res["build"])
+                    self.assertEqual(len(res["build"]["snapcraft"]), 1)
+                    self.assertTrue("5501-1" in res["build"]["snapcraft"])
                     self.assertEqual(len(res), 2)
                 else:
-                    self.assertFalse("build-packages" in res)
+                    self.assertFalse("build" in res)
                     self.assertEqual(len(res), 1)
 
-                self.assertTrue("stage-packages" in res)
-                self.assertEqual(len(res["stage-packages"]), 2)
-                self.assertTrue("libxcursor1" in res["stage-packages"])
-                self.assertEqual(len(res["stage-packages"]["libxcursor1"]), 1)
-                self.assertEqual(res["stage-packages"]["libxcursor1"][0], "3501-1")
-                self.assertTrue("libtiff5" in res["stage-packages"])
-                self.assertEqual(len(res["stage-packages"]["libtiff5"]), 2)
-                self.assertTrue("3602-1" in res["stage-packages"]["libtiff5"])
-                self.assertTrue("3606-1" in res["stage-packages"]["libtiff5"])
+                self.assertTrue("staged" in res)
+                self.assertEqual(len(res["staged"]), 2)
+                self.assertTrue("libxcursor1" in res["staged"])
+                self.assertEqual(len(res["staged"]["libxcursor1"]), 1)
+                self.assertEqual(res["staged"]["libxcursor1"][0], "3501-1")
+                self.assertTrue("libtiff5" in res["staged"])
+                self.assertEqual(len(res["staged"]["libtiff5"]), 2)
+                self.assertTrue("3602-1" in res["staged"]["libtiff5"])
+                self.assertTrue("3606-1" in res["staged"]["libtiff5"])
 
     def test_check_get_secnots_for_manifest_with_empty_primed_stage_list(self):
         """Test get_secnots_for_manifest() - primed-stage-packages empty"""
@@ -802,14 +795,14 @@ class TestStore(TestCase):
 
                 self.assertTrue(isinstance(res, dict))
                 if build_packages and sec_not_for_build_packages:
-                    self.assertTrue("build-packages" in res)
-                    self.assertEqual(len(res["build-packages"]), 1)
-                    self.assertTrue("snapcraft" in res["build-packages"])
-                    self.assertEqual(len(res["build-packages"]["snapcraft"]), 1)
-                    self.assertTrue("5501-1" in res["build-packages"]["snapcraft"])
+                    self.assertTrue("build" in res)
+                    self.assertEqual(len(res["build"]), 1)
+                    self.assertTrue("snapcraft" in res["build"])
+                    self.assertEqual(len(res["build"]["snapcraft"]), 1)
+                    self.assertTrue("5501-1" in res["build"]["snapcraft"])
                     self.assertEqual(len(res), 1)
                 else:
-                    self.assertFalse("build-packages" in res)
+                    self.assertFalse("build" in res)
                     self.assertEqual(len(res), 0)
 
                 self.assertFalse("stage-packages" in res)
@@ -845,25 +838,25 @@ class TestStore(TestCase):
                     res = store.get_secnots_for_manifest(m, self.secnot_db)
                 self.assertTrue(isinstance(res, dict))
                 if build_packages and sec_not_for_build_packages:
-                    self.assertTrue("build-packages" in res)
-                    self.assertEqual(len(res["build-packages"]), 1)
-                    self.assertTrue("snapcraft" in res["build-packages"])
-                    self.assertEqual(len(res["build-packages"]["snapcraft"]), 1)
-                    self.assertTrue("5501-1" in res["build-packages"]["snapcraft"])
+                    self.assertTrue("build" in res)
+                    self.assertEqual(len(res["build"]), 1)
+                    self.assertTrue("snapcraft" in res["build"])
+                    self.assertEqual(len(res["build"]["snapcraft"]), 1)
+                    self.assertTrue("5501-1" in res["build"]["snapcraft"])
                     self.assertEqual(len(res), 2)
                 else:
-                    self.assertFalse("build-packages" in res)
+                    self.assertFalse("build" in res)
                     self.assertEqual(len(res), 1)
 
-                self.assertTrue("stage-packages" in res)
-                self.assertEqual(len(res["stage-packages"]), 2)
-                self.assertTrue("libxcursor1" in res["stage-packages"])
-                self.assertEqual(len(res["stage-packages"]["libxcursor1"]), 1)
-                self.assertEqual(res["stage-packages"]["libxcursor1"][0], "3501-1")
-                self.assertTrue("libtiff5" in res["stage-packages"])
-                self.assertEqual(len(res["stage-packages"]["libtiff5"]), 2)
-                self.assertTrue("3602-1" in res["stage-packages"]["libtiff5"])
-                self.assertTrue("3606-1" in res["stage-packages"]["libtiff5"])
+                self.assertTrue("staged" in res)
+                self.assertEqual(len(res["staged"]), 2)
+                self.assertTrue("libxcursor1" in res["staged"])
+                self.assertEqual(len(res["staged"]["libxcursor1"]), 1)
+                self.assertEqual(res["staged"]["libxcursor1"][0], "3501-1")
+                self.assertTrue("libtiff5" in res["staged"])
+                self.assertEqual(len(res["staged"]["libtiff5"]), 2)
+                self.assertTrue("3602-1" in res["staged"]["libtiff5"])
+                self.assertTrue("3606-1" in res["staged"]["libtiff5"])
 
     def test_check_get_secnots_for_manifest_with_primed_stage_list_equal_to_staged_packages_list(
         self,
@@ -897,26 +890,26 @@ class TestStore(TestCase):
                     res = store.get_secnots_for_manifest(m, self.secnot_db)
                 self.assertTrue(isinstance(res, dict))
                 if build_packages and sec_not_for_build_packages:
-                    self.assertTrue("build-packages" in res)
-                    self.assertEqual(len(res["build-packages"]), 1)
-                    self.assertTrue("snapcraft" in res["build-packages"])
-                    self.assertEqual(len(res["build-packages"]["snapcraft"]), 1)
-                    self.assertTrue("5501-1" in res["build-packages"]["snapcraft"])
+                    self.assertTrue("build" in res)
+                    self.assertEqual(len(res["build"]), 1)
+                    self.assertTrue("snapcraft" in res["build"])
+                    self.assertEqual(len(res["build"]["snapcraft"]), 1)
+                    self.assertTrue("5501-1" in res["build"]["snapcraft"])
                     self.assertEqual(len(res), 2)
                 else:
-                    self.assertFalse("build-packages" in res)
+                    self.assertFalse("build" in res)
                     self.assertEqual(len(res), 1)
 
                 self.assertTrue(isinstance(res, dict))
-                self.assertTrue("stage-packages" in res)
-                self.assertEqual(len(res["stage-packages"]), 2)
-                self.assertTrue("libxcursor1" in res["stage-packages"])
-                self.assertEqual(len(res["stage-packages"]["libxcursor1"]), 1)
-                self.assertEqual(res["stage-packages"]["libxcursor1"][0], "3501-1")
-                self.assertTrue("libtiff5" in res["stage-packages"])
-                self.assertEqual(len(res["stage-packages"]["libtiff5"]), 2)
-                self.assertTrue("3602-1" in res["stage-packages"]["libtiff5"])
-                self.assertTrue("3606-1" in res["stage-packages"]["libtiff5"])
+                self.assertTrue("staged" in res)
+                self.assertEqual(len(res["staged"]), 2)
+                self.assertTrue("libxcursor1" in res["staged"])
+                self.assertEqual(len(res["staged"]["libxcursor1"]), 1)
+                self.assertEqual(res["staged"]["libxcursor1"][0], "3501-1")
+                self.assertTrue("libtiff5" in res["staged"])
+                self.assertEqual(len(res["staged"]["libtiff5"]), 2)
+                self.assertTrue("3602-1" in res["staged"]["libtiff5"])
+                self.assertTrue("3606-1" in res["staged"]["libtiff5"])
 
     def test_check_get_secnots_for_manifest_with_primed_stage_list_smaller_than_staged_packages_list(
         self,
@@ -952,23 +945,23 @@ class TestStore(TestCase):
                     res = store.get_secnots_for_manifest(m, self.secnot_db)
                 self.assertTrue(isinstance(res, dict))
                 if build_packages and sec_not_for_build_packages:
-                    self.assertTrue("build-packages" in res)
-                    self.assertEqual(len(res["build-packages"]), 1)
-                    self.assertTrue("snapcraft" in res["build-packages"])
-                    self.assertEqual(len(res["build-packages"]["snapcraft"]), 1)
-                    self.assertTrue("5501-1" in res["build-packages"]["snapcraft"])
+                    self.assertTrue("build" in res)
+                    self.assertEqual(len(res["build"]), 1)
+                    self.assertTrue("snapcraft" in res["build"])
+                    self.assertEqual(len(res["build"]["snapcraft"]), 1)
+                    self.assertTrue("5501-1" in res["build"]["snapcraft"])
                     self.assertEqual(len(res), 2)
                 else:
-                    self.assertFalse("build-packages" in res)
+                    self.assertFalse("build" in res)
                     self.assertEqual(len(res), 1)
 
-                self.assertTrue("stage-packages" in res)
-                self.assertTrue("libtiff5" in res["stage-packages"])
-                self.assertEqual(len(res["stage-packages"]["libtiff5"]), 2)
-                self.assertTrue("3602-1" in res["stage-packages"]["libtiff5"])
-                self.assertTrue("3606-1" in res["stage-packages"]["libtiff5"])
-                # since it was removed from primed-stage-packages, we shouldn't have a
-                # notice
+                self.assertTrue("staged" in res)
+                self.assertTrue("libtiff5" in res["staged"])
+                self.assertEqual(len(res["staged"]["libtiff5"]), 2)
+                self.assertTrue("3602-1" in res["staged"]["libtiff5"])
+                self.assertTrue("3606-1" in res["staged"]["libtiff5"])
+                # since it was removed from primed-stage-packages, we
+                # shouldn't have a notice
                 self.assertFalse("libxcursor1" in res)
 
     def test_check_get_secnots_for_manifest_empty_staged(self):
@@ -998,16 +991,16 @@ class TestStore(TestCase):
                 else:
                     res = store.get_secnots_for_manifest(m, self.secnot_db)
                 self.assertTrue(isinstance(res, dict))
-                self.assertFalse("stage-packages" in res)
+                self.assertFalse("staged" in res)
                 if build_packages and sec_not_for_build_packages:
-                    self.assertTrue("build-packages" in res)
-                    self.assertEqual(len(res["build-packages"]), 1)
-                    self.assertTrue("snapcraft" in res["build-packages"])
-                    self.assertEqual(len(res["build-packages"]["snapcraft"]), 1)
-                    self.assertTrue("5501-1" in res["build-packages"]["snapcraft"])
+                    self.assertTrue("build" in res)
+                    self.assertEqual(len(res["build"]), 1)
+                    self.assertTrue("snapcraft" in res["build"])
+                    self.assertEqual(len(res["build"]["snapcraft"]), 1)
+                    self.assertTrue("5501-1" in res["build"]["snapcraft"])
                     self.assertEqual(len(res), 1)
                 else:
-                    self.assertFalse("build-packages" in res)
+                    self.assertFalse("build" in res)
                     self.assertEqual(len(res), 0)
 
     def test_check_get_secnots_for_manifest_empty_primed_stage_and_staged(self):
@@ -1039,16 +1032,16 @@ class TestStore(TestCase):
                 else:
                     res = store.get_secnots_for_manifest(m, self.secnot_db)
                 self.assertTrue(isinstance(res, dict))
-                self.assertFalse("stage-packages" in res)
+                self.assertFalse("staged" in res)
                 if build_packages and sec_not_for_build_packages:
-                    self.assertTrue("build-packages" in res)
-                    self.assertEqual(len(res["build-packages"]), 1)
-                    self.assertTrue("snapcraft" in res["build-packages"])
-                    self.assertEqual(len(res["build-packages"]["snapcraft"]), 1)
-                    self.assertTrue("5501-1" in res["build-packages"]["snapcraft"])
+                    self.assertTrue("build" in res)
+                    self.assertEqual(len(res["build"]), 1)
+                    self.assertTrue("snapcraft" in res["build"])
+                    self.assertEqual(len(res["build"]["snapcraft"]), 1)
+                    self.assertTrue("5501-1" in res["build"]["snapcraft"])
                     self.assertEqual(len(res), 1)
                 else:
-                    self.assertFalse("build-packages" in res)
+                    self.assertFalse("build" in res)
                     self.assertEqual(len(res), 0)
 
     def test_check_get_secnots_for_manifest_empty_staged_with_cves(self,):
@@ -1080,19 +1073,19 @@ class TestStore(TestCase):
                         m, self.secnot_db, with_cves=True
                     )
                 self.assertTrue(isinstance(res, dict))
-                self.assertFalse("stage-packages" in res)
+                self.assertFalse("staged" in res)
                 if build_packages and sec_not_for_build_packages:
-                    self.assertTrue("build-packages" in res)
-                    self.assertEqual(len(res["build-packages"]), 1)
-                    self.assertTrue("snapcraft" in res["build-packages"])
-                    self.assertEqual(len(res["build-packages"]["snapcraft"]), 1)
-                    self.assertTrue("5501-1" in res["build-packages"]["snapcraft"])
+                    self.assertTrue("build" in res)
+                    self.assertEqual(len(res["build"]), 1)
+                    self.assertTrue("snapcraft" in res["build"])
+                    self.assertEqual(len(res["build"]["snapcraft"]), 1)
+                    self.assertTrue("5501-1" in res["build"]["snapcraft"])
                     self.assertTrue(
-                        "CVE-2020-9999" in res["build-packages"]["snapcraft"]["5501-1"]
+                        "CVE-2020-9999" in res["build"]["snapcraft"]["5501-1"]
                     )
                     self.assertEqual(len(res), 1)
                 else:
-                    self.assertFalse("build-packages" in res)
+                    self.assertFalse("build" in res)
                     self.assertEqual(len(res), 0)
 
     def test_check_get_secnots_for_manifest_empty_primed_stage_and_staged_with_cves(
@@ -1126,19 +1119,19 @@ class TestStore(TestCase):
                         m, self.secnot_db, with_cves=True
                     )
                 self.assertTrue(isinstance(res, dict))
-                self.assertFalse("stage-packages" in res)
+                self.assertFalse("staged" in res)
                 if build_packages and sec_not_for_build_packages:
-                    self.assertTrue("build-packages" in res)
-                    self.assertEqual(len(res["build-packages"]), 1)
-                    self.assertTrue("snapcraft" in res["build-packages"])
-                    self.assertEqual(len(res["build-packages"]["snapcraft"]), 1)
-                    self.assertTrue("5501-1" in res["build-packages"]["snapcraft"])
+                    self.assertTrue("build" in res)
+                    self.assertEqual(len(res["build"]), 1)
+                    self.assertTrue("snapcraft" in res["build"])
+                    self.assertEqual(len(res["build"]["snapcraft"]), 1)
+                    self.assertTrue("5501-1" in res["build"]["snapcraft"])
                     self.assertTrue(
-                        "CVE-2020-9999" in res["build-packages"]["snapcraft"]["5501-1"]
+                        "CVE-2020-9999" in res["build"]["snapcraft"]["5501-1"]
                     )
                     self.assertEqual(len(res), 1)
                 else:
-                    self.assertFalse("build-packages" in res)
+                    self.assertFalse("build" in res)
                     self.assertEqual(len(res), 0)
 
     def test_check_get_secnots_for_manifest_with_primed_stage_list_equal_to_staged_packages_list_with_cves(
@@ -1175,41 +1168,37 @@ class TestStore(TestCase):
                     )
                 self.assertTrue(isinstance(res, dict))
                 if build_packages and sec_not_for_build_packages:
-                    self.assertTrue("build-packages" in res)
-                    self.assertEqual(len(res["build-packages"]), 1)
-                    self.assertTrue("snapcraft" in res["build-packages"])
-                    self.assertEqual(len(res["build-packages"]["snapcraft"]), 1)
-                    self.assertTrue("5501-1" in res["build-packages"]["snapcraft"])
+                    self.assertTrue("build" in res)
+                    self.assertEqual(len(res["build"]), 1)
+                    self.assertTrue("snapcraft" in res["build"])
+                    self.assertEqual(len(res["build"]["snapcraft"]), 1)
+                    self.assertTrue("5501-1" in res["build"]["snapcraft"])
                     self.assertTrue(
-                        "CVE-2020-9999" in res["build-packages"]["snapcraft"]["5501-1"]
+                        "CVE-2020-9999" in res["build"]["snapcraft"]["5501-1"]
                     )
                     self.assertEqual(len(res), 2)
                 else:
-                    self.assertFalse("build-packages" in res)
+                    self.assertFalse("build" in res)
                     self.assertEqual(len(res), 1)
 
-                self.assertTrue("stage-packages" in res)
-                self.assertEqual(len(res["stage-packages"]), 2)
-                self.assertTrue("libxcursor1" in res["stage-packages"])
-                self.assertEqual(len(res["stage-packages"]["libxcursor1"]), 1)
-                self.assertTrue("3501-1" in res["stage-packages"]["libxcursor1"])
+                self.assertTrue("staged" in res)
+                self.assertEqual(len(res["staged"]), 2)
+                self.assertTrue("libxcursor1" in res["staged"])
+                self.assertEqual(len(res["staged"]["libxcursor1"]), 1)
+                self.assertTrue("3501-1" in res["staged"]["libxcursor1"])
                 self.assertTrue(
-                    isinstance(res["stage-packages"]["libxcursor1"]["3501-1"], list)
+                    isinstance(res["staged"]["libxcursor1"]["3501-1"], list)
                 )
-                self.assertEqual(len(res["stage-packages"]["libxcursor1"]["3501-1"]), 1)
+                self.assertEqual(len(res["staged"]["libxcursor1"]["3501-1"]), 1)
                 self.assertTrue(
-                    "CVE-2017-16612" in res["stage-packages"]["libxcursor1"]["3501-1"]
+                    "CVE-2017-16612" in res["staged"]["libxcursor1"]["3501-1"]
                 )
-                self.assertTrue("libtiff5" in res["stage-packages"])
-                self.assertEqual(len(res["stage-packages"]["libtiff5"]), 2)
-                self.assertTrue(
-                    isinstance(res["stage-packages"]["libtiff5"]["3602-1"], list)
-                )
-                self.assertEqual(len(res["stage-packages"]["libtiff5"]["3602-1"]), 27)
-                self.assertTrue(
-                    isinstance(res["stage-packages"]["libtiff5"]["3606-1"], list)
-                )
-                self.assertEqual(len(res["stage-packages"]["libtiff5"]["3606-1"]), 12)
+                self.assertTrue("libtiff5" in res["staged"])
+                self.assertEqual(len(res["staged"]["libtiff5"]), 2)
+                self.assertTrue(isinstance(res["staged"]["libtiff5"]["3602-1"], list))
+                self.assertEqual(len(res["staged"]["libtiff5"]["3602-1"]), 27)
+                self.assertTrue(isinstance(res["staged"]["libtiff5"]["3606-1"], list))
+                self.assertEqual(len(res["staged"]["libtiff5"]["3606-1"]), 12)
 
     def test_check_get_secnots_for_manifest_with_primed_stage_list_smaller_than_staged_packages_list_with_cves(
         self,
@@ -1248,33 +1237,29 @@ class TestStore(TestCase):
                     )
                 self.assertTrue(isinstance(res, dict))
                 if build_packages and sec_not_for_build_packages:
-                    self.assertTrue("build-packages" in res)
-                    self.assertEqual(len(res["build-packages"]), 1)
-                    self.assertTrue("snapcraft" in res["build-packages"])
-                    self.assertEqual(len(res["build-packages"]["snapcraft"]), 1)
-                    self.assertTrue("5501-1" in res["build-packages"]["snapcraft"])
+                    self.assertTrue("build" in res)
+                    self.assertEqual(len(res["build"]), 1)
+                    self.assertTrue("snapcraft" in res["build"])
+                    self.assertEqual(len(res["build"]["snapcraft"]), 1)
+                    self.assertTrue("5501-1" in res["build"]["snapcraft"])
                     self.assertTrue(
-                        "CVE-2020-9999" in res["build-packages"]["snapcraft"]["5501-1"]
+                        "CVE-2020-9999" in res["build"]["snapcraft"]["5501-1"]
                     )
                     self.assertEqual(len(res), 2)
                 else:
-                    self.assertFalse("build-packages" in res)
+                    self.assertFalse("build" in res)
                     self.assertEqual(len(res), 1)
 
-                self.assertTrue("libtiff5" in res["stage-packages"])
-                self.assertTrue("stage-packages" in res)
-                self.assertEqual(len(res["stage-packages"]["libtiff5"]), 2)
-                self.assertTrue(
-                    isinstance(res["stage-packages"]["libtiff5"]["3602-1"], list)
-                )
-                self.assertEqual(len(res["stage-packages"]["libtiff5"]["3602-1"]), 27)
-                self.assertTrue(
-                    isinstance(res["stage-packages"]["libtiff5"]["3606-1"], list)
-                )
-                self.assertEqual(len(res["stage-packages"]["libtiff5"]["3606-1"]), 12)
+                self.assertTrue("libtiff5" in res["staged"])
+                self.assertTrue("staged" in res)
+                self.assertEqual(len(res["staged"]["libtiff5"]), 2)
+                self.assertTrue(isinstance(res["staged"]["libtiff5"]["3602-1"], list))
+                self.assertEqual(len(res["staged"]["libtiff5"]["3602-1"]), 27)
+                self.assertTrue(isinstance(res["staged"]["libtiff5"]["3606-1"], list))
+                self.assertEqual(len(res["staged"]["libtiff5"]["3606-1"]), 12)
 
-                # since it was removed from primed-stage-packages, we shouldn't have a
-                # notice
+                # since it was removed from primed-stage-packages, we
+                # shouldn't have a notice
                 self.assertFalse("libxcursor1" in res)
 
     def test_check_get_secnots_for_manifest_missing_primed_stage_packages_has_newer(
@@ -1316,14 +1301,14 @@ class TestStore(TestCase):
                     res = store.get_secnots_for_manifest(m, self.secnot_db)
                 self.assertTrue(isinstance(res, dict))
                 if build_packages and sec_not_for_build_packages:
-                    self.assertTrue("build-packages" in res)
-                    self.assertEqual(len(res["build-packages"]), 1)
-                    self.assertTrue("snapcraft" in res["build-packages"])
-                    self.assertEqual(len(res["build-packages"]["snapcraft"]), 1)
-                    self.assertTrue("5501-1" in res["build-packages"]["snapcraft"])
+                    self.assertTrue("build" in res)
+                    self.assertEqual(len(res["build"]), 1)
+                    self.assertTrue("snapcraft" in res["build"])
+                    self.assertEqual(len(res["build"]["snapcraft"]), 1)
+                    self.assertTrue("5501-1" in res["build"]["snapcraft"])
                     self.assertEqual(len(res), 1)
                 else:
-                    self.assertFalse("build-packages" in res)
+                    self.assertFalse("build" in res)
                     self.assertEqual(len(res), 0)
 
     def test_check_get_secnots_for_manifest_primed_staged_list_equal_to_staged_list_has_newer(
@@ -1370,14 +1355,14 @@ class TestStore(TestCase):
                     res = store.get_secnots_for_manifest(m, self.secnot_db)
                 self.assertTrue(isinstance(res, dict))
                 if build_packages and sec_not_for_build_packages:
-                    self.assertTrue("build-packages" in res)
-                    self.assertEqual(len(res["build-packages"]), 1)
-                    self.assertTrue("snapcraft" in res["build-packages"])
-                    self.assertEqual(len(res["build-packages"]["snapcraft"]), 1)
-                    self.assertTrue("5501-1" in res["build-packages"]["snapcraft"])
+                    self.assertTrue("build" in res)
+                    self.assertEqual(len(res["build"]), 1)
+                    self.assertTrue("snapcraft" in res["build"])
+                    self.assertEqual(len(res["build"]["snapcraft"]), 1)
+                    self.assertTrue("5501-1" in res["build"]["snapcraft"])
                     self.assertEqual(len(res), 1)
                 else:
-                    self.assertFalse("build-packages" in res)
+                    self.assertFalse("build" in res)
                     self.assertEqual(len(res), 0)
 
     def test_check_get_secnots_for_manifest_primed_staged_list_smaller_than_staged_list_has_newer(
@@ -1425,14 +1410,14 @@ class TestStore(TestCase):
                     res = store.get_secnots_for_manifest(m, self.secnot_db)
                 self.assertTrue(isinstance(res, dict))
                 if build_packages and sec_not_for_build_packages:
-                    self.assertTrue("build-packages" in res)
-                    self.assertEqual(len(res["build-packages"]), 1)
-                    self.assertTrue("snapcraft" in res["build-packages"])
-                    self.assertEqual(len(res["build-packages"]["snapcraft"]), 1)
-                    self.assertTrue("5501-1" in res["build-packages"]["snapcraft"])
+                    self.assertTrue("build" in res)
+                    self.assertEqual(len(res["build"]), 1)
+                    self.assertTrue("snapcraft" in res["build"])
+                    self.assertEqual(len(res["build"]["snapcraft"]), 1)
+                    self.assertTrue("5501-1" in res["build"]["snapcraft"])
                     self.assertEqual(len(res), 1)
                 else:
-                    self.assertFalse("build-packages" in res)
+                    self.assertFalse("build" in res)
                     self.assertEqual(len(res), 0)
 
     def test_check_get_ubuntu_release_from_manifest_store_db(self):

@@ -1218,11 +1218,13 @@ update_stage_packages = {
 # only considering snapcraft as a build-part for every snap. Since manifest is
 # present it means the snap was built using snapcraft.
 # Format:
-#   update_stage_packages = {'<snap>': {'<deb>': '<version>|auto'}
+#   update_build_packages = {'<snap>': {'<deb>': '<version>|auto'}
 #
-# where <snap> is currently ignored, <deb> is always snapcraft and
-# <version>=auto will use the 'snapcraft-version' field from the snap
-# manifest.
+# where <snap> is currently ignored, <deb> is the Ubuntu binary and <version>
+# is the deb version. The special case of 'auto' will use the
+# 'snapcraft-version' field from the snap. For now, only 'snapcraft' is
+# supported for the '<deb>' and 'auto' for the version.
+# TODO: update when fully support build-packages
 update_build_packages = {"faked-by-review-tools": {"snapcraft": "auto"}}
 
 # Some binary packages aren't worth alerting on since they don't contain

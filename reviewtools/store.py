@@ -108,8 +108,10 @@ def get_faked_build_and_stage_packages(m):
     # original manifest dict otherwise
     manifest_with_faked_packages = copy.deepcopy(m)
 
-    # Manifest will always have the fake section to support snapcraft
-    # secnotes, unless manifest has no parts.
+    # Always append faked staged packages if there are any parts since for now
+    # we are unconditionally faking 'snapcraft' in all snaps with a manifest to
+    # the faked part.
+    # TODO: perhaps clean this up when implementing build-packages fully.
     if (
         "parts" in manifest_with_faked_packages
         and manifest_with_faked_packages["parts"]
@@ -121,7 +123,6 @@ def get_faked_build_and_stage_packages(m):
             append_fake_packages_to_manifest(key, manifest_with_faked_packages, True)
         else:
             append_fake_packages_to_manifest(key, manifest_with_faked_packages, False)
-
     return manifest_with_faked_packages
 
 
@@ -134,6 +135,8 @@ def get_faked_build_and_stage_packages(m):
 def append_fake_packages_to_manifest(
     key, manifest_with_faked_packages, is_primed_stage_present
 ):
+    # TODO: consider using differently faked parts for stage and build when
+    #  implementing build-packages fully.
     fake_key = "faked-by-review-tools"
     if (
         "parts" in manifest_with_faked_packages
@@ -173,6 +176,7 @@ def append_fake_packages_to_manifest(
         # The override for update_build_packages is:
         #   update_build_packages = {'<snap>': {'<deb>': '<version>|auto'}}
         #   For this implementation we are only faking snapcraft for every snap
+        # TODO: update when fully support build-packages
         for build_packages in update_build_packages.values():
             for pkg_name in build_packages:
                 version = build_packages[pkg_name]
@@ -321,7 +325,7 @@ def get_shared_snap_without_override(store_db):
 # section aiming to reduce the number of false positive alerts that are
 # caused by staged-packages listing packages that are not eventually
 # present in the snap. https://snapcraft.io/docs/release-notes-snapcraft-3-10.
-# Support for build-packages is not fully implemented yet.
+# TODO: support for build-packages is not fully implemented yet.
 def get_staged_and_build_packages_from_manifest(m):
     """Obtain list of packages in primed-stage-packages if section is present.
        If not, obtain it from stage-packages for various parts instead
@@ -340,10 +344,8 @@ def get_staged_and_build_packages_from_manifest(m):
 
     if "primed-stage-packages" in m and m["primed-stage-packages"] is not None:
         manifest_has_primed_staged_section = True
-        if m["primed-stage-packages"]:
-            get_packages_from_manifest_section(
-                d, m["primed-stage-packages"], "stage-packages"
-            )
+        # Note, prime-stage-packages is grouped with stage-packages
+        get_packages_from_manifest_section(d, m["primed-stage-packages"], "staged")
 
     for part in m["parts"]:
         # stage-packages part is only analyzed if primed-stage-packages is not
@@ -354,7 +356,7 @@ def get_staged_and_build_packages_from_manifest(m):
                 and m["parts"][part]["stage-packages"] is not None
             ):
                 get_packages_from_manifest_section(
-                    d, m["parts"][part]["stage-packages"], "stage-packages"
+                    d, m["parts"][part]["stage-packages"], "staged"
                 )
 
         # Only adding build-packages if part is fake. This will be improved
@@ -365,7 +367,7 @@ def get_staged_and_build_packages_from_manifest(m):
                 and m["parts"][part]["build-packages"] is not None
             ):
                 get_packages_from_manifest_section(
-                    d, m["parts"][part]["build-packages"], "build-packages"
+                    d, m["parts"][part]["build-packages"], "build"
                 )
 
     if len(d) == 0:
@@ -381,7 +383,7 @@ def get_staged_and_build_packages_from_manifest(m):
 # key.
 def get_packages_from_manifest_section(d, manifest_section, package_type):
     """Obtain packages from a given manifest section (primed-stage-packages
-       or stage-packages and build-packages for a given part)
+       or stage-packages along with any build-packages for a given part)
     """
     for entry in manifest_section:
         if "=" not in entry:

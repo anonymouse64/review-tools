@@ -84,8 +84,8 @@ Revision r16 (i386; channels: edge)
  * libtiff5: 3602-1, 3606-1
  * libxcursor1: 3501-1
 
-In addition, the following lists new USNs for affected build packages in each
-snap revision:
+In addition, the following lists new USNs for affected build packages in
+each snap revision:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
  * snapcraft: 5501-1
@@ -107,6 +107,9 @@ Revision r16 (i386; channels: edge)
 
 """
         self.assertTrue(needle in res)
+        for line in res.splitlines():
+            # text width of emails should not exceed 75
+            self.assertTrue(len(line) <= 75)
         self.assertTrue(contains_stage_pkgs)
         self.assertTrue(contains_build_pkgs)
 
@@ -122,8 +125,8 @@ Revision r16 (i386; channels: edge)
             contains_build_pkgs,
         ) = available._secnot_report_for_pkg(pkg_db, {})
         needle = """A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected build packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected build packages in each snap revision:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
  * snapcraft: 5501-1
@@ -148,6 +151,9 @@ In addition, the following lists new USNs for affected build packages in each
 snap revision:
 """
         self.assertTrue(needle in res)
+        for line in res.splitlines():
+            # text width of emails should not exceed 75
+            self.assertTrue(len(line) <= 75)
         self.assertFalse(needle_for_template in res)
         self.assertFalse(contains_stage_pkgs)
         self.assertTrue(contains_build_pkgs)
@@ -160,8 +166,8 @@ snap revision:
             contains_build_pkgs,
         ) = available._secnot_report_for_pkg(self.pkg_db, {})
         needle_for_revisions = """A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
  * libtiff5: 3602-1, 3606-1
@@ -184,6 +190,9 @@ In addition, the following lists new USNs for affected build packages in each
 snap revision:
             """
         self.assertTrue(needle_for_revisions in res)
+        for line in res.splitlines():
+            # text width of emails should not exceed 75
+            self.assertTrue(len(line) <= 75)
         self.assertFalse(needle_for_template in res)
         self.assertTrue(contains_stage_pkgs)
         self.assertFalse(contains_build_pkgs)
@@ -502,11 +511,11 @@ Revision r12 (i386; channels: candidate, beta)
         snap_fn = "./tests/test-check-notices_0.1_amd64.snap"
         res = available.scan_snap(secnot_fn, snap_fn, True)
         self.assertTrue(len(res), 1)
-        self.assertTrue("build-packages" in res)
+        self.assertTrue("build" in res)
         self.assertTrue("snapcraft" in res)
         self.assertTrue("5501-1" in res)
         self.assertTrue("CVE-2020-9999" in res)
-        self.assertFalse("stage-packages" in res)
+        self.assertFalse("staged" in res)
 
     def test_check_scan_snap_core(self):
         """Test scan_snap() - core"""
@@ -639,7 +648,9 @@ Revision r12 (i386; channels: candidate, beta)
             self.assertTrue(eml in to_addr)
         self.assertTrue("using sources based on a kernel" in body)
         self.assertTrue("linux-image-generic" in body)
-
+        for line in body.splitlines():
+            # text width of emails should not exceed 75
+            self.assertTrue(len(line) <= 75)
         self.assertTrue("linux-generic-bbb built from outdated Ubuntu kernel" in subj)
 
         for sn in ["3848-1", "3879-1"]:

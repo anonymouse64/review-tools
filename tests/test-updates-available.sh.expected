@@ -7,8 +7,8 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
  * libtiff5: 3602-1
@@ -26,9 +26,9 @@ Revision r14 (i386; channels: edge)
  * libtiff5: 3602-1
  * libxcursor1: 3501-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
@@ -48,8 +48,8 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
  * libtiff5: 3602-1, 3606-1
@@ -67,9 +67,9 @@ Revision r14 (i386; channels: edge)
  * libtiff5: 3602-1, 3606-1
  * libxcursor1: 3501-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
@@ -90,8 +90,8 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r21 (amd64; channels: stable, candidate, beta)
  * libtiff5: 3606-1
@@ -105,9 +105,9 @@ Revision r23 (amd64; channels: edge)
 Revision r24 (i386; channels: edge)
  * libtiff5: 3606-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
@@ -133,8 +133,8 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
  * libtiff5: 3602-1
@@ -152,9 +152,9 @@ Revision r14 (i386; channels: edge)
  * libtiff5: 3602-1
  * libxcursor1: 3501-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
@@ -173,8 +173,8 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
  * libtiff5: 3606-1
@@ -188,9 +188,9 @@ Revision r13 (amd64; channels: edge)
 Revision r14 (i386; channels: edge)
  * libtiff5: 3606-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
@@ -213,8 +213,8 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
  * libtiff5: 3602-1, 3606-1
@@ -232,9 +232,9 @@ Revision r14 (i386; channels: edge)
  * libtiff5: 3602-1, 3606-1
  * libxcursor1: 3501-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
@@ -260,8 +260,8 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: ubuntu-budgie-welcome contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r11 (amd64; channels: candidate, beta)
  * curl: 3598-1
@@ -295,9 +295,9 @@ Revision r45 (amd64; channels: edge)
 Revision r46 (i386; channels: edge)
  * libssl1.0.0: 3628-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
@@ -318,8 +318,8 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: ubuntu-budgie-welcome contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r11 (amd64; channels: candidate, beta)
  * gir1.2-javascriptcoregtk-4.0: 3635-1
@@ -333,9 +333,9 @@ Revision r12 (i386; channels: candidate, beta)
  * libjavascriptcoregtk-4.0-18: 3635-1
  * libwebkit2gtk-4.0-37: 3635-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
@@ -352,15 +352,15 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: test-xenial contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r12 (i386; channels: stable, beta)
  * python-requests: 3790-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
@@ -373,15 +373,15 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: test-bionic contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r12 (i386; channels: stable, beta)
  * python-requests: 3790-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
@@ -400,16 +400,16 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: linux-generic-bbb built from outdated Ubuntu kernel
 
 A scan of this snap shows that it was built using sources based on a kernel
-from the Ubuntu archive that has since received security updates. The following
-lists new USNs for the Ubuntu kernel that the snap is based on in each snap
-revision:
+from the Ubuntu archive that has since received security updates. The
+following lists new USNs for the Ubuntu kernel that the snap is based on in
+each snap revision:
 
 Revision r12 (armhf; channels: stable, beta)
  * linux-image-generic: 3848-1, 3879-1
 
-Updating the snap's git tree, adjusting the version in the snapcraft.yaml to
-match that of the Ubuntu kernel this snap is based on and rebuilding the snap
-should pull in the new security updates and resolve this.
+Updating the snap's git tree, adjusting the version in the snapcraft.yaml
+to match that of the Ubuntu kernel this snap is based on and rebuilding the
+snap should pull in the new security updates and resolve this.
 
 Thank you for your snap and for attending to this matter.
 
@@ -427,7 +427,7 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 Emptying seen.db
 Running: snap-updates-available --usn-db='./tests/test-usn-budgie-2.db' --snap='./tests/test-snapcraft-manifest_0_amd64.snap'
 {
-  "stage-packages": {
+  "staged": {
     "libssl1.0.0": [
       "3611-1",
       "3628-1"
@@ -441,7 +441,7 @@ Running: snap-updates-available --usn-db='./tests/test-usn-budgie-2.db' --snap='
 
 Running: snap-updates-available --usn-db='./tests/test-usn-core-with-dpkg-list.db' --snap='./tests/test-core_16-2.37.2_amd64.snap'
 {
-  "stage-packages": {
+  "staged": {
     "libc-bin": [
       "3323-1",
       "3534-1"
@@ -455,7 +455,7 @@ Running: snap-updates-available --usn-db='./tests/test-usn-core-with-dpkg-list.d
 
 Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-core-with-dpkg-list.db' --snap='./tests/test-core_16-2.37.2_amd64.snap'
 {
-  "stage-packages": {
+  "staged": {
     "libc-bin": {
       "3323-1": [
         "CVE-2017-1000366"
@@ -489,7 +489,7 @@ Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-core-with
 
 Running: snap-updates-available --usn-db='./tests/test-usn-core-with-dpkg-list.db' --snap='./tests/test-dpkg-list-app_1.0_amd64.snap'
 {
-  "stage-packages": {
+  "staged": {
     "libc-bin": [
       "3323-1",
       "3534-1"
@@ -503,7 +503,7 @@ Running: snap-updates-available --usn-db='./tests/test-usn-core-with-dpkg-list.d
 
 Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-core-with-dpkg-list.db' --snap='./tests/test-dpkg-list-app_1.0_amd64.snap'
 {
-  "stage-packages": {
+  "staged": {
     "libc-bin": {
       "3323-1": [
         "CVE-2017-1000366"
@@ -537,7 +537,7 @@ Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-core-with
 
 Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./tests/gke-kernel_4.15.0-1027.28~16.04.1_amd64.snap'
 {
-  "stage-packages": {
+  "staged": {
     "linux-image-gke": {
       "4489-1": [
         "CVE-2020-14386"
@@ -548,7 +548,7 @@ Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./
 
 Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./tests/linux-generic-bbb_4.4.0-140-1_armhf.snap'
 {
-  "stage-packages": {
+  "staged": {
     "linux-image-generic": {
       "3848-1": [
         "CVE-2017-18174",
@@ -569,7 +569,7 @@ Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./
 
 Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./tests/pc-kernel_4.15.0-44.46_i386.snap'
 {
-  "stage-packages": {
+  "staged": {
     "linux-image-generic": {
       "3871-2": [
         "https://launchpad.net/bugs/1813663",
@@ -584,7 +584,7 @@ Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./
 
 Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./tests/pc-kernel_4.4.0-141.167_amd64.snap'
 {
-  "stage-packages": {
+  "staged": {
     "linux-image-generic": {
       "3879-1": [
         "CVE-2018-10883",
@@ -606,8 +606,8 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
  * libtiff5: 3602-1, 3606-1
@@ -625,9 +625,9 @@ Revision r14 (i386; channels: edge)
  * libtiff5: 3602-1, 3606-1
  * libxcursor1: 3501-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
@@ -671,8 +671,8 @@ Revision r16 (i386; channels: edge)
  * libtiff5: 3602-1, 3606-1
  * libxcursor1: 3501-1
 
-In addition, the following lists new USNs for affected build packages in each
-snap revision:
+In addition, the following lists new USNs for affected build packages in
+each snap revision:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
  * snapcraft: 5501-1
@@ -692,9 +692,9 @@ Revision r15 (amd64; channels: edge)
 Revision r16 (i386; channels: edge)
  * snapcraft: 5501-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
@@ -712,8 +712,8 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad was built with outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected build packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected build packages in each snap revision:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
  * snapcraft: 5501-1
@@ -733,9 +733,9 @@ Revision r15 (amd64; channels: edge)
 Revision r16 (i386; channels: edge)
  * snapcraft: 5501-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
@@ -749,7 +749,7 @@ Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-unittest-
 
 Running: snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/test-check-notices-needed_0.1_amd64.snap'
 {
-  "stage-packages": {
+  "staged": {
     "libreoffice-style-tango": [
       "4102-1"
     ],
@@ -761,7 +761,7 @@ Running: snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db
 
 Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/test-check-notices-needed_0.1_amd64.snap'
 {
-  "stage-packages": {
+  "staged": {
     "libreoffice-style-tango": {
       "4102-1": [
         "CVE-2019-9850",
@@ -785,7 +785,7 @@ Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-unittest-
 
 Running: snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/test-check-notices-primed-stage-packages-needed_0.1_amd64.snap'
 {
-  "stage-packages": {
+  "staged": {
     "libreoffice-style-tango": [
       "4102-1"
     ],
@@ -797,7 +797,7 @@ Running: snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db
 
 Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/test-check-notices-primed-stage-packages-needed_0.1_amd64.snap'
 {
-  "stage-packages": {
+  "staged": {
     "libreoffice-style-tango": {
       "4102-1": [
         "CVE-2019-9850",
@@ -817,7 +817,7 @@ Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-unittest-
 
 Running: snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/test-check-notices-primed-stage-packages-needed_0.2_amd64.snap'
 {
-  "stage-packages": {
+  "staged": {
     "uno-libs3": [
       "4102-1"
     ]
@@ -826,7 +826,7 @@ Running: snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db
 
 Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/test-check-notices-primed-stage-packages-needed_0.2_amd64.snap'
 {
-  "stage-packages": {
+  "staged": {
     "uno-libs3": {
       "4102-1": [
         "CVE-2019-9850",
@@ -846,16 +846,16 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: test-snap contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r1 (amd64; channels: stable, edge)
  * libreoffice-style-tango: 4102-1
  * uno-libs3: 4102-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
@@ -870,16 +870,16 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r12 (i386; channels: stable, candidate, beta)
  * libtiff5: 3602-1, 3606-1
  * libxcursor1: 3501-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
@@ -893,7 +893,7 @@ Running: snap-check-notices --no-fetch ./tests/test-snapcraft-manifest_0_amd64.s
 {
   "test-snapcraft-manifest": {
     "0": {
-      "stage-packages": {
+      "staged": {
         "libssl1.0.0": [
           "3611-1",
           "3628-1"
@@ -911,7 +911,7 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manife
 {
   "test-snapcraft-manifest": {
     "0": {
-      "stage-packages": {
+      "staged": {
         "libssl1.0.0": {
           "3611-1": [
             "CVE-2018-0739"
@@ -937,14 +937,14 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manife
 {
   "test-snapcraft-manifest-snapcraft-version": {
     "0": {
-      "build-packages": {
+      "build": {
         "snapcraft": {
           "5501-1": [
             "CVE-2020-9999"
           ]
         }
       },
-      "stage-packages": {
+      "staged": {
         "libssl1.0.0": {
           "3611-1": [
             "CVE-2018-0739"
@@ -964,7 +964,7 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manife
 {
   "test-snapcraft-manifest-snapcraft-version": {
     "0": {
-      "build-packages": {
+      "build": {
         "snapcraft": {
           "5501-1": [
             "CVE-2020-9999"
@@ -979,7 +979,7 @@ Running: snap-check-notices --no-fetch ./tests/test-core_16-2.37.2_amd64.snap
 {
   "test-core": {
     "16-2.37.2": {
-      "stage-packages": {
+      "staged": {
         "libc-bin": [
           "3323-1",
           "3534-1"
@@ -997,7 +997,7 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/test-core_16-2.37.2_a
 {
   "test-core": {
     "16-2.37.2": {
-      "stage-packages": {
+      "staged": {
         "libc-bin": {
           "3323-1": [
             "CVE-2017-1000366"
@@ -1035,7 +1035,7 @@ Running: snap-check-notices --no-fetch ./tests/gke-kernel_4.15.0-1027.28~16.04.1
 {
   "gke-kernel": {
     "4.15.0-1027.28~16.04.1": {
-      "stage-packages": {
+      "staged": {
         "linux-image-gke": [
           "4489-1"
         ]
@@ -1048,7 +1048,7 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/gke-kernel_4.15.0-102
 {
   "gke-kernel": {
     "4.15.0-1027.28~16.04.1": {
-      "stage-packages": {
+      "staged": {
         "linux-image-gke": {
           "4489-1": [
             "CVE-2020-14386"
@@ -1063,7 +1063,7 @@ Running: snap-check-notices --no-fetch ./tests/linux-generic-bbb_4.4.0-140-1_arm
 {
   "linux-generic-bbb": {
     "4.4.0-140-1": {
-      "stage-packages": {
+      "staged": {
         "linux-image-generic": [
           "3848-1",
           "3879-1"
@@ -1077,7 +1077,7 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/linux-generic-bbb_4.4
 {
   "linux-generic-bbb": {
     "4.4.0-140-1": {
-      "stage-packages": {
+      "staged": {
         "linux-image-generic": {
           "3848-1": [
             "CVE-2017-18174",
@@ -1102,7 +1102,7 @@ Running: snap-check-notices --no-fetch ./tests/pc-kernel_4.15.0-44.46_i386.snap
 {
   "pc-kernel": {
     "4.15.0-44.46": {
-      "stage-packages": {
+      "staged": {
         "linux-image-generic": [
           "3871-2",
           "4489-1"
@@ -1116,7 +1116,7 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/pc-kernel_4.15.0-44.4
 {
   "pc-kernel": {
     "4.15.0-44.46": {
-      "stage-packages": {
+      "staged": {
         "linux-image-generic": {
           "3871-2": [
             "https://launchpad.net/bugs/1813663",
@@ -1135,7 +1135,7 @@ Running: snap-check-notices --no-fetch ./tests/pc-kernel_4.4.0-141.167_amd64.sna
 {
   "pc-kernel": {
     "4.4.0-141.167": {
-      "stage-packages": {
+      "staged": {
         "linux-image-generic": [
           "3879-1"
         ]
@@ -1148,7 +1148,7 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/pc-kernel_4.4.0-141.1
 {
   "pc-kernel": {
     "4.4.0-141.167": {
-      "stage-packages": {
+      "staged": {
         "linux-image-generic": {
           "3879-1": [
             "CVE-2018-10883",
@@ -1195,7 +1195,7 @@ Running: snap-check-notices --no-fetch ./tests/test-check-notices-needed_0.1_amd
 {
   "test-check-notices-needed": {
     "0.1": {
-      "stage-packages": {
+      "staged": {
         "libreoffice-style-tango": [
           "4102-1"
         ],
@@ -1211,7 +1211,7 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/test-check-notices-ne
 {
   "test-check-notices-needed": {
     "0.1": {
-      "stage-packages": {
+      "staged": {
         "libreoffice-style-tango": {
           "4102-1": [
             "CVE-2019-9850",
@@ -1249,7 +1249,7 @@ Running: snap-check-notices --no-fetch ./tests/test-check-notices-primed-stage-p
 {
   "test-check-notices-primed-stage-packages-needed": {
     "0.1": {
-      "stage-packages": {
+      "staged": {
         "libreoffice-style-tango": [
           "4102-1"
         ],
@@ -1265,7 +1265,7 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/test-check-notices-pr
 {
   "test-check-notices-primed-stage-packages-needed": {
     "0.1": {
-      "stage-packages": {
+      "staged": {
         "libreoffice-style-tango": {
           "4102-1": [
             "CVE-2019-9850",
@@ -1289,7 +1289,7 @@ Running: snap-check-notices --no-fetch ./tests/test-check-notices-primed-stage-p
 {
   "test-check-notices-primed-stage-packages-needed": {
     "0.2": {
-      "stage-packages": {
+      "staged": {
         "uno-libs3": [
           "4102-1"
         ]
@@ -1302,7 +1302,7 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/test-check-notices-pr
 {
   "test-check-notices-primed-stage-packages-needed": {
     "0.2": {
-      "stage-packages": {
+      "staged": {
         "uno-libs3": {
           "4102-1": [
             "CVE-2019-9850",
