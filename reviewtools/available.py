@@ -175,7 +175,7 @@ def _secnot_report_for_pkg(pkg_db, seen_db):
                         build_pkgs_report += "\n * %s: %s" % (p, ", ".join(secnots))
 
                 for secnot in secnots:
-                    url = "https://usn.ubuntu.com/%s/" % secnot
+                    url = "https://ubuntu.com/security/notices/USN-%s/" % secnot
                     if url not in reference_urls:
                         reference_urls.append(url)
         if shown_rev_header_for_stage_pkgs and report_contains_stage_pkgs:
@@ -185,7 +185,7 @@ def _secnot_report_for_pkg(pkg_db, seen_db):
 
     if len(reference_urls) == 0:
         # nothing to report
-        return "", False, False
+        return "", "", False, False
 
     reference_urls.sort()
     template = "default"
@@ -193,8 +193,10 @@ def _secnot_report_for_pkg(pkg_db, seen_db):
         # Since we are not fully supporting notifications for build-packages
         # just yet, is the standard kernel template that omits them for now.
         # TODO: update when fully support build-packages
+        subj = "%s built from outdated Ubuntu kernel" % pkgname
         template = "kernel"
         return (
+            subj,
             email_templates[template]
             % (stage_pkgs_report, "\n * ".join(reference_urls)),
             report_contains_stage_pkgs,
@@ -202,8 +204,10 @@ def _secnot_report_for_pkg(pkg_db, seen_db):
         )
     elif report_contains_stage_pkgs and report_contains_build_pkgs:
         # Template text containing updates for staged and build packages
+        subj = "%s contains and was built with outdated Ubuntu packages" % pkgname
         template = "build-and-stage-pkgs"
         return (
+            subj,
             email_templates[template]
             % (stage_pkgs_report, build_pkgs_report, "\n * ".join(reference_urls)),
             report_contains_stage_pkgs,
@@ -211,8 +215,10 @@ def _secnot_report_for_pkg(pkg_db, seen_db):
         )
     elif report_contains_build_pkgs and not report_contains_stage_pkgs:
         # Template text containing updates for build packages only
+        subj = "%s was built with outdated Ubuntu packages" % pkgname
         template = "build-pkgs-only"
         return (
+            subj,
             email_templates[template]
             % (build_pkgs_report, "\n * ".join(reference_urls)),
             False,
@@ -220,7 +226,9 @@ def _secnot_report_for_pkg(pkg_db, seen_db):
         )
     else:
         # Template text containing updates for staged packages only (default)
+        subj = "%s contains outdated Ubuntu packages" % pkgname
         return (
+            subj,
             email_templates[template]
             % (stage_pkgs_report, "\n * ".join(reference_urls)),
             report_contains_stage_pkgs,
@@ -232,24 +240,13 @@ def _email_report_for_pkg(pkg_db, seen_db):
     """Send email report for this pkgname"""
     pkgname = pkg_db["name"]
     (
+        subj,
         body,
         report_contains_stage_pks,
         report_contains_build_pks,
     ) = _secnot_report_for_pkg(pkg_db, seen_db)
     if body == "":
         return (None, None, None)
-
-    # Default, updates for staged packages only
-    subj = "%s contains outdated Ubuntu packages" % pkgname
-    # Updates for kernel snap type
-    if "snap_type" in pkg_db and pkg_db["snap_type"] == "kernel":
-        subj = "%s built from outdated Ubuntu kernel" % pkgname
-    # Updates for staged and build packages
-    elif report_contains_stage_pks and report_contains_build_pks:
-        subj = "%s contains and was built with outdated Ubuntu packages" % pkgname
-    # Updates for build packages only
-    elif report_contains_build_pks and not report_contains_stage_pks:
-        subj = "%s was built with outdated Ubuntu packages" % pkgname
 
     # Send to the publisher and any collaborators. If no collaborators,
     # fallback to any uploaders for the revision
