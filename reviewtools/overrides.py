@@ -1031,6 +1031,7 @@ update_publisher_overrides = {
         "dragonboard-kernel": canonical_kernel,
         "easy-openvpn": canonical_enablement,
         "edgex-app-service-configurable": canonical_edgex,
+        "edgex-cli": canonical_edgex,
         "edgex-device-camera": canonical_edgex,
         "edgex-device-grove": canonical_edgex,
         "edgex-device-modbus": canonical_edgex,
