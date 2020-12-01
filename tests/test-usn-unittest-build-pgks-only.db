@@ -5,31 +5,31 @@
       "xenial": {
         "sources": {
           "snapcraft": {
-            "version": "5.0.0",
+            "version": "2.43.1+16.04.1",
             "description": "Delightful packaging tool"
           }
         },
         "binaries": {
           "snapcraft": {
-            "version": "5.0.0"
+            "version": "2.43.1+16.04.1"
           }
         },
         "archs": {
           "amd64": {
             "urls": {
-              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-dbg_5.0.0_amd64.deb": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-dbg_2.43.1+16.04.1_amd64.deb": {
                 "size": 49606,
                 "md5": "06387ded89bdea2580e8a536907d59ad"
               },
-              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-dev_5.0.0_amd64.deb": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-dev_2.43.1+16.04.1_amd64.deb": {
                 "size": 26300,
                 "md5": "53dc59b8cccaf0256937b4b40826f39b"
               },
-              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-udeb_5.0.0_amd64.udeb": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-udeb_2.43.1+16.04.1_amd64.udeb": {
                 "size": 17048,
                 "md5": "d8d53ddb4a2f65cbd2f95e519ba7fafe"
               },
-              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft_5.0.0_amd64.deb": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft_2.43.1+16.04.1_amd64.deb": {
                 "size": 20218,
                 "md5": "a491acc85b299afe25a10855fc0b6059"
               }
@@ -37,19 +37,19 @@
           },
           "ppc64el": {
             "urls": {
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-udeb_5.0.0_ppc64el.udeb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-udeb_2.43.1+16.04.1_ppc64el.udeb": {
                 "size": 18198,
                 "md5": "80119d88679b572f1ff6586e34e972a2"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft_5.0.0_ppc64el.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft_2.43.1+16.04.1_ppc64el.deb": {
                 "size": 21440,
                 "md5": "5f092adef9fc8298eb28dc2c769ed313"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dev_5.0.0_ppc64el.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dev_2.43.1+16.04.1_ppc64el.deb": {
                 "size": 30412,
                 "md5": "8d1fbb906b30b5e9299d817387871e2b"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dbg_5.0.0_ppc64el.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dbg_2.43.1+16.04.1_ppc64el.deb": {
                 "size": 56350,
                 "md5": "e8c923933697ecca748a92fceff7e571"
               }
@@ -57,19 +57,19 @@
           },
           "s390x": {
             "urls": {
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dbg_5.0.0_s390x.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dbg_2.43.1+16.04.1_s390x.deb": {
                 "size": 45798,
                 "md5": "20674c8245918ed8c53fbe399edf5809"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft_5.0.0_s390x.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft_2.43.1+16.04.1_s390x.deb": {
                 "size": 20152,
                 "md5": "610228f6fd08edc3983aeee83bb6fca0"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dev_5.0.0_s390x.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dev_2.43.1+16.04.1_s390x.deb": {
                 "size": 26728,
                 "md5": "6f9d02de3dac51f15c45e000e2f0a6c7"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-udeb_5.0.0_s390x.udeb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-udeb_2.43.1+16.04.1_s390x.udeb": {
                 "size": 16860,
                 "md5": "595dce810a82460cb29fba61c5973dfc"
               }
@@ -77,19 +77,19 @@
           },
           "powerpc": {
             "urls": {
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dbg_5.0.0_powerpc.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dbg_2.43.1+16.04.1_powerpc.deb": {
                 "size": 47688,
                 "md5": "72a5e50b944ff932bd3ad135cbcf9749"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dev_5.0.0_powerpc.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dev_2.43.1+16.04.1_powerpc.deb": {
                 "size": 24490,
                 "md5": "1a79f2729563f5875deefd4eb2984ea8"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft_5.0.0_powerpc.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft_2.43.1+16.04.1_powerpc.deb": {
                 "size": 18456,
                 "md5": "f67ac914734d63de3d72bdb7048a5268"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-udeb_5.0.0_powerpc.udeb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-udeb_2.43.1+16.04.1_powerpc.udeb": {
                 "size": 15208,
                 "md5": "c5f7944b7f7c677f8edc6dcc8f2f232b"
               }
@@ -97,15 +97,15 @@
           },
           "source": {
             "urls": {
-              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft_5.0.0.diff.gz": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft_2.43.1+16.04.1.diff.gz": {
                 "size": 19323,
                 "md5": "dbb397c5e667546a5e30aee69d0c880b"
               },
-              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft_5.0.0.orig.tar.gz": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft_2.43.1+16.04.1.orig.tar.gz": {
                 "size": 374910,
                 "md5": "39c8423de190d64f1c52fbc00022e52c"
               },
-              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft_5.0.0.dsc": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft_2.43.1+16.04.1.dsc": {
                 "size": 2431,
                 "md5": "4217ab16e242c4afb2061d7de506a702"
               }
@@ -113,19 +113,19 @@
           },
           "i386": {
             "urls": {
-              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-dev_5.0.0_i386.deb": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-dev_2.43.1+16.04.1_i386.deb": {
                 "size": 26942,
                 "md5": "9bf4172082990e2eaab07cf92ae9b19e"
               },
-              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-udeb_5.0.0_i386.udeb": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-udeb_2.43.1+16.04.1_i386.udeb": {
                 "size": 18660,
                 "md5": "021edff8cf247ae398f168d3d70b71a7"
               },
-              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft_5.0.0_i386.deb": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft_2.43.1+16.04.1_i386.deb": {
                 "size": 21898,
                 "md5": "845410baae84aaf197029c2d5ec448a3"
               },
-              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-dbg_5.0.0_i386.deb": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-dbg_2.43.1+16.04.1_i386.deb": {
                 "size": 45816,
                 "md5": "f8b0056ab71b3b883e181fb3eb0c620c"
               }
@@ -133,19 +133,19 @@
           },
           "armhf": {
             "urls": {
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft_5.0.0_armhf.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft_2.43.1+16.04.1_armhf.deb": {
                 "size": 17226,
                 "md5": "f370b9dc47565ab56d28acb462e8bc08"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-udeb_5.0.0_armhf.udeb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-udeb_2.43.1+16.04.1_armhf.udeb": {
                 "size": 13988,
                 "md5": "b2f27fc0ed1b074f135e9dbb75fe910b"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dev_5.0.0_armhf.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dev_2.43.1+16.04.1_armhf.deb": {
                 "size": 23528,
                 "md5": "18010654e33f3b4bc6c5a21ddee7fe19"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dbg_5.0.0_armhf.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dbg_2.43.1+16.04.1_armhf.deb": {
                 "size": 48662,
                 "md5": "420917dd75d8a11e9b5fa3cbf722c9b2"
               }
@@ -153,19 +153,19 @@
           },
           "arm64": {
             "urls": {
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dev_5.0.0_arm64.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dev_2.43.1+16.04.1_arm64.deb": {
                 "size": 24456,
                 "md5": "1027057302f24ed7dc3f4c982d80b7ef"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-udeb_5.0.0_arm64.udeb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-udeb_2.43.1+16.04.1_arm64.udeb": {
                 "size": 14202,
                 "md5": "8f16677d1426d8b1b566fe8e991c1e5f"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft_5.0.0_arm64.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft_2.43.1+16.04.1_arm64.deb": {
                 "size": 17422,
                 "md5": "6921dff5180819c6e707b7694c7421f6"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dbg_5.0.0_arm64.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dbg_2.43.1+16.04.1_arm64.deb": {
                 "size": 50828,
                 "md5": "ddc4e146af0cf3ec98e2aa87a763911c"
               }
@@ -176,31 +176,31 @@
       "bionic": {
         "sources": {
           "snapcraft": {
-            "version": "5.0.0",
+            "version": "2.43.1+18.04.1",
             "description": "Delightful packaging tool"
           }
         },
         "binaries": {
           "snapcraft": {
-            "version": "5.0.0"
+            "version": "2.43.1+18.04.1"
           }
         },
         "archs": {
           "amd64": {
             "urls": {
-              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-dbg_5.0.0_amd64.deb": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-dbg_2.43.1+18.04.1_amd64.deb": {
                 "size": 49606,
                 "md5": "06387ded89bdea2580e8a536907d59ad"
               },
-              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-dev_5.0.0_amd64.deb": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-dev_2.43.1+18.04.1_amd64.deb": {
                 "size": 26300,
                 "md5": "53dc59b8cccaf0256937b4b40826f39b"
               },
-              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-udeb_5.0.0_amd64.udeb": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-udeb_2.43.1+18.04.1_amd64.udeb": {
                 "size": 17048,
                 "md5": "d8d53ddb4a2f65cbd2f95e519ba7fafe"
               },
-              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft_5.0.0_amd64.deb": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft_2.43.1+18.04.1_amd64.deb": {
                 "size": 20218,
                 "md5": "a491acc85b299afe25a10855fc0b6059"
               }
@@ -208,19 +208,19 @@
           },
           "ppc64el": {
             "urls": {
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-udeb_5.0.0_ppc64el.udeb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-udeb_2.43.1+18.04.1_ppc64el.udeb": {
                 "size": 18198,
                 "md5": "80119d88679b572f1ff6586e34e972a2"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft_5.0.0_ppc64el.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft_2.43.1+18.04.1_ppc64el.deb": {
                 "size": 21440,
                 "md5": "5f092adef9fc8298eb28dc2c769ed313"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dev_5.0.0_ppc64el.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dev_2.43.1+18.04.1_ppc64el.deb": {
                 "size": 30412,
                 "md5": "8d1fbb906b30b5e9299d817387871e2b"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dbg_5.0.0_ppc64el.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dbg_2.43.1+18.04.1_ppc64el.deb": {
                 "size": 56350,
                 "md5": "e8c923933697ecca748a92fceff7e571"
               }
@@ -228,19 +228,19 @@
           },
           "s390x": {
             "urls": {
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dbg_5.0.0_s390x.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dbg_2.43.1+18.04.1_s390x.deb": {
                 "size": 45798,
                 "md5": "20674c8245918ed8c53fbe399edf5809"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft_5.0.0_s390x.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft_2.43.1+18.04.1_s390x.deb": {
                 "size": 20152,
                 "md5": "610228f6fd08edc3983aeee83bb6fca0"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dev_5.0.0_s390x.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dev_2.43.1+18.04.1_s390x.deb": {
                 "size": 26728,
                 "md5": "6f9d02de3dac51f15c45e000e2f0a6c7"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-udeb_5.0.0_s390x.udeb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-udeb_2.43.1+18.04.1_s390x.udeb": {
                 "size": 16860,
                 "md5": "595dce810a82460cb29fba61c5973dfc"
               }
@@ -248,19 +248,19 @@
           },
           "powerpc": {
             "urls": {
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dbg_5.0.0_powerpc.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dbg_2.43.1+18.04.1_powerpc.deb": {
                 "size": 47688,
                 "md5": "72a5e50b944ff932bd3ad135cbcf9749"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dev_5.0.0_powerpc.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dev_2.43.1+18.04.1_powerpc.deb": {
                 "size": 24490,
                 "md5": "1a79f2729563f5875deefd4eb2984ea8"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft_5.0.0_powerpc.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft_2.43.1+18.04.1_powerpc.deb": {
                 "size": 18456,
                 "md5": "f67ac914734d63de3d72bdb7048a5268"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-udeb_5.0.0_powerpc.udeb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-udeb_2.43.1+18.04.1_powerpc.udeb": {
                 "size": 15208,
                 "md5": "c5f7944b7f7c677f8edc6dcc8f2f232b"
               }
@@ -268,15 +268,15 @@
           },
           "source": {
             "urls": {
-              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft_5.0.0.diff.gz": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft_2.43.1+18.04.1.diff.gz": {
                 "size": 19323,
                 "md5": "dbb397c5e667546a5e30aee69d0c880b"
               },
-              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft_5.0.0.orig.tar.gz": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft_2.43.1+18.04.1.orig.tar.gz": {
                 "size": 374910,
                 "md5": "39c8423de190d64f1c52fbc00022e52c"
               },
-              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft_5.0.0.dsc": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft_2.43.1+18.04.1.dsc": {
                 "size": 2431,
                 "md5": "4217ab16e242c4afb2061d7de506a702"
               }
@@ -284,19 +284,19 @@
           },
           "i386": {
             "urls": {
-              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-dev_5.0.0_i386.deb": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-dev_2.43.1+18.04.1_i386.deb": {
                 "size": 26942,
                 "md5": "9bf4172082990e2eaab07cf92ae9b19e"
               },
-              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-udeb_5.0.0_i386.udeb": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-udeb_2.43.1+18.04.1_i386.udeb": {
                 "size": 18660,
                 "md5": "021edff8cf247ae398f168d3d70b71a7"
               },
-              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft_5.0.0_i386.deb": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft_2.43.1+18.04.1_i386.deb": {
                 "size": 21898,
                 "md5": "845410baae84aaf197029c2d5ec448a3"
               },
-              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-dbg_5.0.0_i386.deb": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-dbg_2.43.1+18.04.1_i386.deb": {
                 "size": 45816,
                 "md5": "f8b0056ab71b3b883e181fb3eb0c620c"
               }
@@ -304,19 +304,19 @@
           },
           "armhf": {
             "urls": {
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft_5.0.0_armhf.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft_2.43.1+18.04.1_armhf.deb": {
                 "size": 17226,
                 "md5": "f370b9dc47565ab56d28acb462e8bc08"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-udeb_5.0.0_armhf.udeb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-udeb_2.43.1+18.04.1_armhf.udeb": {
                 "size": 13988,
                 "md5": "b2f27fc0ed1b074f135e9dbb75fe910b"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dev_5.0.0_armhf.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dev_2.43.1+18.04.1_armhf.deb": {
                 "size": 23528,
                 "md5": "18010654e33f3b4bc6c5a21ddee7fe19"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dbg_5.0.0_armhf.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dbg_2.43.1+18.04.1_armhf.deb": {
                 "size": 48662,
                 "md5": "420917dd75d8a11e9b5fa3cbf722c9b2"
               }
@@ -324,19 +324,19 @@
           },
           "arm64": {
             "urls": {
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dev_5.0.0_arm64.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dev_2.43.1+18.04.1_arm64.deb": {
                 "size": 24456,
                 "md5": "1027057302f24ed7dc3f4c982d80b7ef"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-udeb_5.0.0_arm64.udeb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-udeb_2.43.1+18.04.1_arm64.udeb": {
                 "size": 14202,
                 "md5": "8f16677d1426d8b1b566fe8e991c1e5f"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft_5.0.0_arm64.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft_2.43.1+18.04.1_arm64.deb": {
                 "size": 17422,
                 "md5": "6921dff5180819c6e707b7694c7421f6"
               },
-              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dbg_5.0.0_arm64.deb": {
+              "http://ports.ubuntu.com/pool/main/libx/snapcraft/snapcraft-dbg_2.43.1+18.04.1_arm64.deb": {
                 "size": 50828,
                 "md5": "ddc4e146af0cf3ec98e2aa87a763911c"
               }

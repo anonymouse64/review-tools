@@ -526,7 +526,9 @@ Revision r12 (i386; channels: candidate, beta)
     def test_check_scan_snap_with_cves(self):
         """Test scan_snap() with cves"""
         secnot_fn = "./tests/test-usn-unittest-build-pgks.db"
-        snap_fn = "./tests/test-check-notices_0.1_amd64.snap"
+        snap_fn = (
+            "./tests/test-snapcraft-manifest-snapcraft-version-needed_0_amd64.snap"
+        )
         res = available.scan_snap(secnot_fn, snap_fn, True)
         self.assertTrue(len(res), 1)
         self.assertTrue("build" in res)
