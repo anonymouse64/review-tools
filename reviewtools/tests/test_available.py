@@ -536,11 +536,9 @@ Revision r12 (i386; channels: candidate, beta)
         )
         res = available.scan_snap(secnot_fn, snap_fn, True)
         self.assertTrue(len(res), 1)
-        self.assertTrue("build" in res)
         self.assertTrue("snapcraft" in res)
         self.assertTrue("5501-1" in res)
         self.assertTrue("CVE-2020-9999" in res)
-        self.assertFalse("staged" in res)
 
     def test_check_scan_snap_core(self):
         """Test scan_snap() - core"""

@@ -393,7 +393,13 @@ def scan_snap(secnot_db_fn, snap_fn, with_cves=False):
                 )
 
     secnot_db = read_usn_db(secnot_db_fn)
-    report = get_secnots_for_manifest(man, secnot_db, with_cves)
+    original_report = get_secnots_for_manifest(man, secnot_db, with_cves)
+    # removing package types separation for json output to no break
+    # existing API
+    report = {}
+    for pkg_type in original_report:
+        report.update(original_report[pkg_type])
+
     if len(report) != 0:
         # needs to be json since snap-check-notices parses this output
         out += json.dumps(report, indent=2, sort_keys=True)
