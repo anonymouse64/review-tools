@@ -427,173 +427,155 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 Emptying seen.db
 Running: snap-updates-available --usn-db='./tests/test-usn-budgie-2.db' --snap='./tests/test-snapcraft-manifest_0_amd64.snap'
 {
-  "staged": {
-    "libssl1.0.0": [
-      "3611-1",
-      "3628-1"
-    ],
-    "openssl": [
-      "3611-1",
-      "3628-1"
-    ]
-  }
+  "libssl1.0.0": [
+    "3611-1",
+    "3628-1"
+  ],
+  "openssl": [
+    "3611-1",
+    "3628-1"
+  ]
 }
 
 Running: snap-updates-available --usn-db='./tests/test-usn-core-with-dpkg-list.db' --snap='./tests/test-core_16-2.37.2_amd64.snap'
 {
-  "staged": {
-    "libc-bin": [
-      "3323-1",
-      "3534-1"
-    ],
-    "multiarch-support": [
-      "3323-1",
-      "3534-1"
-    ]
-  }
+  "libc-bin": [
+    "3323-1",
+    "3534-1"
+  ],
+  "multiarch-support": [
+    "3323-1",
+    "3534-1"
+  ]
 }
 
 Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-core-with-dpkg-list.db' --snap='./tests/test-core_16-2.37.2_amd64.snap'
 {
-  "staged": {
-    "libc-bin": {
-      "3323-1": [
-        "CVE-2017-1000366"
-      ],
-      "3534-1": [
-        "CVE-2017-1000408",
-        "CVE-2017-1000409",
-        "CVE-2017-15670",
-        "CVE-2017-15804",
-        "CVE-2017-16997",
-        "CVE-2017-17426",
-        "CVE-2018-1000001"
-      ]
-    },
-    "multiarch-support": {
-      "3323-1": [
-        "CVE-2017-1000366"
-      ],
-      "3534-1": [
-        "CVE-2017-1000408",
-        "CVE-2017-1000409",
-        "CVE-2017-15670",
-        "CVE-2017-15804",
-        "CVE-2017-16997",
-        "CVE-2017-17426",
-        "CVE-2018-1000001"
-      ]
-    }
+  "libc-bin": {
+    "3323-1": [
+      "CVE-2017-1000366"
+    ],
+    "3534-1": [
+      "CVE-2017-1000408",
+      "CVE-2017-1000409",
+      "CVE-2017-15670",
+      "CVE-2017-15804",
+      "CVE-2017-16997",
+      "CVE-2017-17426",
+      "CVE-2018-1000001"
+    ]
+  },
+  "multiarch-support": {
+    "3323-1": [
+      "CVE-2017-1000366"
+    ],
+    "3534-1": [
+      "CVE-2017-1000408",
+      "CVE-2017-1000409",
+      "CVE-2017-15670",
+      "CVE-2017-15804",
+      "CVE-2017-16997",
+      "CVE-2017-17426",
+      "CVE-2018-1000001"
+    ]
   }
 }
 
 Running: snap-updates-available --usn-db='./tests/test-usn-core-with-dpkg-list.db' --snap='./tests/test-dpkg-list-app_1.0_amd64.snap'
 {
-  "staged": {
-    "libc-bin": [
-      "3323-1",
-      "3534-1"
-    ],
-    "multiarch-support": [
-      "3323-1",
-      "3534-1"
-    ]
-  }
+  "libc-bin": [
+    "3323-1",
+    "3534-1"
+  ],
+  "multiarch-support": [
+    "3323-1",
+    "3534-1"
+  ]
 }
 
 Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-core-with-dpkg-list.db' --snap='./tests/test-dpkg-list-app_1.0_amd64.snap'
 {
-  "staged": {
-    "libc-bin": {
-      "3323-1": [
-        "CVE-2017-1000366"
-      ],
-      "3534-1": [
-        "CVE-2017-1000408",
-        "CVE-2017-1000409",
-        "CVE-2017-15670",
-        "CVE-2017-15804",
-        "CVE-2017-16997",
-        "CVE-2017-17426",
-        "CVE-2018-1000001"
-      ]
-    },
-    "multiarch-support": {
-      "3323-1": [
-        "CVE-2017-1000366"
-      ],
-      "3534-1": [
-        "CVE-2017-1000408",
-        "CVE-2017-1000409",
-        "CVE-2017-15670",
-        "CVE-2017-15804",
-        "CVE-2017-16997",
-        "CVE-2017-17426",
-        "CVE-2018-1000001"
-      ]
-    }
+  "libc-bin": {
+    "3323-1": [
+      "CVE-2017-1000366"
+    ],
+    "3534-1": [
+      "CVE-2017-1000408",
+      "CVE-2017-1000409",
+      "CVE-2017-15670",
+      "CVE-2017-15804",
+      "CVE-2017-16997",
+      "CVE-2017-17426",
+      "CVE-2018-1000001"
+    ]
+  },
+  "multiarch-support": {
+    "3323-1": [
+      "CVE-2017-1000366"
+    ],
+    "3534-1": [
+      "CVE-2017-1000408",
+      "CVE-2017-1000409",
+      "CVE-2017-15670",
+      "CVE-2017-15804",
+      "CVE-2017-16997",
+      "CVE-2017-17426",
+      "CVE-2018-1000001"
+    ]
   }
 }
 
 Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./tests/gke-kernel_4.15.0-1027.28~16.04.1_amd64.snap'
 {
-  "staged": {
-    "linux-image-gke": {
-      "4489-1": [
-        "CVE-2020-14386"
-      ]
-    }
+  "linux-image-gke": {
+    "4489-1": [
+      "CVE-2020-14386"
+    ]
   }
 }
 
 Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./tests/linux-generic-bbb_4.4.0-140-1_armhf.snap'
 {
-  "staged": {
-    "linux-image-generic": {
-      "3848-1": [
-        "CVE-2017-18174",
-        "CVE-2018-12896",
-        "CVE-2018-18690",
-        "CVE-2018-18710"
-      ],
-      "3879-1": [
-        "CVE-2018-10883",
-        "CVE-2018-16862",
-        "CVE-2018-19407",
-        "CVE-2018-19824",
-        "CVE-2018-20169"
-      ]
-    }
+  "linux-image-generic": {
+    "3848-1": [
+      "CVE-2017-18174",
+      "CVE-2018-12896",
+      "CVE-2018-18690",
+      "CVE-2018-18710"
+    ],
+    "3879-1": [
+      "CVE-2018-10883",
+      "CVE-2018-16862",
+      "CVE-2018-19407",
+      "CVE-2018-19824",
+      "CVE-2018-20169"
+    ]
   }
 }
 
 Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./tests/pc-kernel_4.15.0-44.46_i386.snap'
 {
-  "staged": {
-    "linux-image-generic": {
-      "3871-2": [
-        "https://launchpad.net/bugs/1813663",
-        "https://launchpad.net/bugs/1813727"
-      ],
-      "4489-1": [
-        "CVE-2020-14386"
-      ]
-    }
+  "linux-image-generic": {
+    "3871-2": [
+      "https://launchpad.net/bugs/1813663",
+      "https://launchpad.net/bugs/1813727"
+    ],
+    "4489-1": [
+      "CVE-2020-14386"
+    ]
   }
 }
 
 Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./tests/pc-kernel_4.4.0-141.167_amd64.snap'
 {
-  "staged": {
-    "linux-image-generic": {
-      "3879-1": [
-        "CVE-2018-10883",
-        "CVE-2018-16862",
-        "CVE-2018-19407",
-        "CVE-2018-19824",
-        "CVE-2018-20169"
-      ]
-    }
+  "linux-image-generic": {
+    "3879-1": [
+      "CVE-2018-10883",
+      "CVE-2018-16862",
+      "CVE-2018-19407",
+      "CVE-2018-19824",
+      "CVE-2018-20169"
+    ]
   }
 }
 
@@ -839,33 +821,29 @@ Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-unittest-
 
 Running: snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/test-check-notices-needed_0.1_amd64.snap'
 {
-  "staged": {
-    "libreoffice-style-tango": [
-      "4102-1"
-    ],
-    "uno-libs3": [
-      "4102-1"
-    ]
-  }
+  "libreoffice-style-tango": [
+    "4102-1"
+  ],
+  "uno-libs3": [
+    "4102-1"
+  ]
 }
 
 Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/test-check-notices-needed_0.1_amd64.snap'
 {
-  "staged": {
-    "libreoffice-style-tango": {
-      "4102-1": [
-        "CVE-2019-9850",
-        "CVE-2019-9851",
-        "CVE-2019-9852"
-      ]
-    },
-    "uno-libs3": {
-      "4102-1": [
-        "CVE-2019-9850",
-        "CVE-2019-9851",
-        "CVE-2019-9852"
-      ]
-    }
+  "libreoffice-style-tango": {
+    "4102-1": [
+      "CVE-2019-9850",
+      "CVE-2019-9851",
+      "CVE-2019-9852"
+    ]
+  },
+  "uno-libs3": {
+    "4102-1": [
+      "CVE-2019-9850",
+      "CVE-2019-9851",
+      "CVE-2019-9852"
+    ]
   }
 }
 
@@ -875,55 +853,47 @@ Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-unittest-
 
 Running: snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/test-check-notices-primed-stage-packages-needed_0.1_amd64.snap'
 {
-  "staged": {
-    "libreoffice-style-tango": [
-      "4102-1"
-    ],
-    "uno-libs3": [
-      "4102-1"
-    ]
-  }
+  "libreoffice-style-tango": [
+    "4102-1"
+  ],
+  "uno-libs3": [
+    "4102-1"
+  ]
 }
 
 Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/test-check-notices-primed-stage-packages-needed_0.1_amd64.snap'
 {
-  "staged": {
-    "libreoffice-style-tango": {
-      "4102-1": [
-        "CVE-2019-9850",
-        "CVE-2019-9851",
-        "CVE-2019-9852"
-      ]
-    },
-    "uno-libs3": {
-      "4102-1": [
-        "CVE-2019-9850",
-        "CVE-2019-9851",
-        "CVE-2019-9852"
-      ]
-    }
+  "libreoffice-style-tango": {
+    "4102-1": [
+      "CVE-2019-9850",
+      "CVE-2019-9851",
+      "CVE-2019-9852"
+    ]
+  },
+  "uno-libs3": {
+    "4102-1": [
+      "CVE-2019-9850",
+      "CVE-2019-9851",
+      "CVE-2019-9852"
+    ]
   }
 }
 
 Running: snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/test-check-notices-primed-stage-packages-needed_0.2_amd64.snap'
 {
-  "staged": {
-    "uno-libs3": [
-      "4102-1"
-    ]
-  }
+  "uno-libs3": [
+    "4102-1"
+  ]
 }
 
 Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/test-check-notices-primed-stage-packages-needed_0.2_amd64.snap'
 {
-  "staged": {
-    "uno-libs3": {
-      "4102-1": [
-        "CVE-2019-9850",
-        "CVE-2019-9851",
-        "CVE-2019-9852"
-      ]
-    }
+  "uno-libs3": {
+    "4102-1": [
+      "CVE-2019-9850",
+      "CVE-2019-9851",
+      "CVE-2019-9852"
+    ]
   }
 }
 
@@ -983,16 +953,14 @@ Running: snap-check-notices --no-fetch ./tests/test-snapcraft-manifest_0_amd64.s
 {
   "test-snapcraft-manifest": {
     "0": {
-      "staged": {
-        "libssl1.0.0": [
-          "3611-1",
-          "3628-1"
-        ],
-        "openssl": [
-          "3611-1",
-          "3628-1"
-        ]
-      }
+      "libssl1.0.0": [
+        "3611-1",
+        "3628-1"
+      ],
+      "openssl": [
+        "3611-1",
+        "3628-1"
+      ]
     }
   }
 }
@@ -1001,23 +969,21 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manife
 {
   "test-snapcraft-manifest": {
     "0": {
-      "staged": {
-        "libssl1.0.0": {
-          "3611-1": [
-            "CVE-2018-0739"
-          ],
-          "3628-1": [
-            "CVE-2018-0737"
-          ]
-        },
-        "openssl": {
-          "3611-1": [
-            "CVE-2018-0739"
-          ],
-          "3628-1": [
-            "CVE-2018-0737"
-          ]
-        }
+      "libssl1.0.0": {
+        "3611-1": [
+          "CVE-2018-0739"
+        ],
+        "3628-1": [
+          "CVE-2018-0737"
+        ]
+      },
+      "openssl": {
+        "3611-1": [
+          "CVE-2018-0739"
+        ],
+        "3628-1": [
+          "CVE-2018-0737"
+        ]
       }
     }
   }
@@ -1027,24 +993,20 @@ Running: USNDB='./tests/test-usn-budgie-3.db' snap-check-notices --no-fetch --wi
 {
   "test-snapcraft-manifest-snapcraft-version": {
     "0": {
-      "build": {
-        "snapcraft": {
-          "5501-1": [
-            "CVE-2020-9999"
-          ]
-        }
+      "libssl1.0.0": {
+        "3611-1": [
+          "CVE-2018-0739"
+        ]
       },
-      "staged": {
-        "libssl1.0.0": {
-          "3611-1": [
-            "CVE-2018-0739"
-          ]
-        },
-        "openssl": {
-          "3611-1": [
-            "CVE-2018-0739"
-          ]
-        }
+      "openssl": {
+        "3611-1": [
+          "CVE-2018-0739"
+        ]
+      },
+      "snapcraft": {
+        "5501-1": [
+          "CVE-2020-9999"
+        ]
       }
     }
   }
@@ -1054,12 +1016,10 @@ Running: USNDB='./tests/test-usn-unittest-build-pgks.db' snap-check-notices --no
 {
   "test-snapcraft-manifest-snapcraft-version-needed": {
     "0": {
-      "build": {
-        "snapcraft": {
-          "5501-1": [
-            "CVE-2020-9999"
-          ]
-        }
+      "snapcraft": {
+        "5501-1": [
+          "CVE-2020-9999"
+        ]
       }
     }
   }
@@ -1069,12 +1029,10 @@ Running: USNDB='./tests/test-usn-unittest-build-pgks.db' snap-check-notices --no
 {
   "test-snapcraft-manifest-package-in-installed-snaps": {
     "0": {
-      "build": {
-        "snapcraft": {
-          "5501-1": [
-            "CVE-2020-9999"
-          ]
-        }
+      "snapcraft": {
+        "5501-1": [
+          "CVE-2020-9999"
+        ]
       }
     }
   }
@@ -1091,16 +1049,14 @@ Running: snap-check-notices --no-fetch ./tests/test-core_16-2.37.2_amd64.snap
 {
   "test-core": {
     "16-2.37.2": {
-      "staged": {
-        "libc-bin": [
-          "3323-1",
-          "3534-1"
-        ],
-        "multiarch-support": [
-          "3323-1",
-          "3534-1"
-        ]
-      }
+      "libc-bin": [
+        "3323-1",
+        "3534-1"
+      ],
+      "multiarch-support": [
+        "3323-1",
+        "3534-1"
+      ]
     }
   }
 }
@@ -1109,35 +1065,33 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/test-core_16-2.37.2_a
 {
   "test-core": {
     "16-2.37.2": {
-      "staged": {
-        "libc-bin": {
-          "3323-1": [
-            "CVE-2017-1000366"
-          ],
-          "3534-1": [
-            "CVE-2017-1000408",
-            "CVE-2017-1000409",
-            "CVE-2017-15670",
-            "CVE-2017-15804",
-            "CVE-2017-16997",
-            "CVE-2017-17426",
-            "CVE-2018-1000001"
-          ]
-        },
-        "multiarch-support": {
-          "3323-1": [
-            "CVE-2017-1000366"
-          ],
-          "3534-1": [
-            "CVE-2017-1000408",
-            "CVE-2017-1000409",
-            "CVE-2017-15670",
-            "CVE-2017-15804",
-            "CVE-2017-16997",
-            "CVE-2017-17426",
-            "CVE-2018-1000001"
-          ]
-        }
+      "libc-bin": {
+        "3323-1": [
+          "CVE-2017-1000366"
+        ],
+        "3534-1": [
+          "CVE-2017-1000408",
+          "CVE-2017-1000409",
+          "CVE-2017-15670",
+          "CVE-2017-15804",
+          "CVE-2017-16997",
+          "CVE-2017-17426",
+          "CVE-2018-1000001"
+        ]
+      },
+      "multiarch-support": {
+        "3323-1": [
+          "CVE-2017-1000366"
+        ],
+        "3534-1": [
+          "CVE-2017-1000408",
+          "CVE-2017-1000409",
+          "CVE-2017-15670",
+          "CVE-2017-15804",
+          "CVE-2017-16997",
+          "CVE-2017-17426",
+          "CVE-2018-1000001"
+        ]
       }
     }
   }
@@ -1147,11 +1101,9 @@ Running: snap-check-notices --no-fetch ./tests/gke-kernel_4.15.0-1027.28~16.04.1
 {
   "gke-kernel": {
     "4.15.0-1027.28~16.04.1": {
-      "staged": {
-        "linux-image-gke": [
-          "4489-1"
-        ]
-      }
+      "linux-image-gke": [
+        "4489-1"
+      ]
     }
   }
 }
@@ -1160,12 +1112,10 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/gke-kernel_4.15.0-102
 {
   "gke-kernel": {
     "4.15.0-1027.28~16.04.1": {
-      "staged": {
-        "linux-image-gke": {
-          "4489-1": [
-            "CVE-2020-14386"
-          ]
-        }
+      "linux-image-gke": {
+        "4489-1": [
+          "CVE-2020-14386"
+        ]
       }
     }
   }
@@ -1175,12 +1125,10 @@ Running: snap-check-notices --no-fetch ./tests/linux-generic-bbb_4.4.0-140-1_arm
 {
   "linux-generic-bbb": {
     "4.4.0-140-1": {
-      "staged": {
-        "linux-image-generic": [
-          "3848-1",
-          "3879-1"
-        ]
-      }
+      "linux-image-generic": [
+        "3848-1",
+        "3879-1"
+      ]
     }
   }
 }
@@ -1189,22 +1137,20 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/linux-generic-bbb_4.4
 {
   "linux-generic-bbb": {
     "4.4.0-140-1": {
-      "staged": {
-        "linux-image-generic": {
-          "3848-1": [
-            "CVE-2017-18174",
-            "CVE-2018-12896",
-            "CVE-2018-18690",
-            "CVE-2018-18710"
-          ],
-          "3879-1": [
-            "CVE-2018-10883",
-            "CVE-2018-16862",
-            "CVE-2018-19407",
-            "CVE-2018-19824",
-            "CVE-2018-20169"
-          ]
-        }
+      "linux-image-generic": {
+        "3848-1": [
+          "CVE-2017-18174",
+          "CVE-2018-12896",
+          "CVE-2018-18690",
+          "CVE-2018-18710"
+        ],
+        "3879-1": [
+          "CVE-2018-10883",
+          "CVE-2018-16862",
+          "CVE-2018-19407",
+          "CVE-2018-19824",
+          "CVE-2018-20169"
+        ]
       }
     }
   }
@@ -1214,12 +1160,10 @@ Running: snap-check-notices --no-fetch ./tests/pc-kernel_4.15.0-44.46_i386.snap
 {
   "pc-kernel": {
     "4.15.0-44.46": {
-      "staged": {
-        "linux-image-generic": [
-          "3871-2",
-          "4489-1"
-        ]
-      }
+      "linux-image-generic": [
+        "3871-2",
+        "4489-1"
+      ]
     }
   }
 }
@@ -1228,16 +1172,14 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/pc-kernel_4.15.0-44.4
 {
   "pc-kernel": {
     "4.15.0-44.46": {
-      "staged": {
-        "linux-image-generic": {
-          "3871-2": [
-            "https://launchpad.net/bugs/1813663",
-            "https://launchpad.net/bugs/1813727"
-          ],
-          "4489-1": [
-            "CVE-2020-14386"
-          ]
-        }
+      "linux-image-generic": {
+        "3871-2": [
+          "https://launchpad.net/bugs/1813663",
+          "https://launchpad.net/bugs/1813727"
+        ],
+        "4489-1": [
+          "CVE-2020-14386"
+        ]
       }
     }
   }
@@ -1247,11 +1189,9 @@ Running: snap-check-notices --no-fetch ./tests/pc-kernel_4.4.0-141.167_amd64.sna
 {
   "pc-kernel": {
     "4.4.0-141.167": {
-      "staged": {
-        "linux-image-generic": [
-          "3879-1"
-        ]
-      }
+      "linux-image-generic": [
+        "3879-1"
+      ]
     }
   }
 }
@@ -1260,16 +1200,14 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/pc-kernel_4.4.0-141.1
 {
   "pc-kernel": {
     "4.4.0-141.167": {
-      "staged": {
-        "linux-image-generic": {
-          "3879-1": [
-            "CVE-2018-10883",
-            "CVE-2018-16862",
-            "CVE-2018-19407",
-            "CVE-2018-19824",
-            "CVE-2018-20169"
-          ]
-        }
+      "linux-image-generic": {
+        "3879-1": [
+          "CVE-2018-10883",
+          "CVE-2018-16862",
+          "CVE-2018-19407",
+          "CVE-2018-19824",
+          "CVE-2018-20169"
+        ]
       }
     }
   }
@@ -1307,14 +1245,12 @@ Running: snap-check-notices --no-fetch ./tests/test-check-notices-needed_0.1_amd
 {
   "test-check-notices-needed": {
     "0.1": {
-      "staged": {
-        "libreoffice-style-tango": [
-          "4102-1"
-        ],
-        "uno-libs3": [
-          "4102-1"
-        ]
-      }
+      "libreoffice-style-tango": [
+        "4102-1"
+      ],
+      "uno-libs3": [
+        "4102-1"
+      ]
     }
   }
 }
@@ -1323,21 +1259,19 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/test-check-notices-ne
 {
   "test-check-notices-needed": {
     "0.1": {
-      "staged": {
-        "libreoffice-style-tango": {
-          "4102-1": [
-            "CVE-2019-9850",
-            "CVE-2019-9851",
-            "CVE-2019-9852"
-          ]
-        },
-        "uno-libs3": {
-          "4102-1": [
-            "CVE-2019-9850",
-            "CVE-2019-9851",
-            "CVE-2019-9852"
-          ]
-        }
+      "libreoffice-style-tango": {
+        "4102-1": [
+          "CVE-2019-9850",
+          "CVE-2019-9851",
+          "CVE-2019-9852"
+        ]
+      },
+      "uno-libs3": {
+        "4102-1": [
+          "CVE-2019-9850",
+          "CVE-2019-9851",
+          "CVE-2019-9852"
+        ]
       }
     }
   }
@@ -1361,14 +1295,12 @@ Running: snap-check-notices --no-fetch ./tests/test-check-notices-primed-stage-p
 {
   "test-check-notices-primed-stage-packages-needed": {
     "0.1": {
-      "staged": {
-        "libreoffice-style-tango": [
-          "4102-1"
-        ],
-        "uno-libs3": [
-          "4102-1"
-        ]
-      }
+      "libreoffice-style-tango": [
+        "4102-1"
+      ],
+      "uno-libs3": [
+        "4102-1"
+      ]
     }
   }
 }
@@ -1377,21 +1309,19 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/test-check-notices-pr
 {
   "test-check-notices-primed-stage-packages-needed": {
     "0.1": {
-      "staged": {
-        "libreoffice-style-tango": {
-          "4102-1": [
-            "CVE-2019-9850",
-            "CVE-2019-9851",
-            "CVE-2019-9852"
-          ]
-        },
-        "uno-libs3": {
-          "4102-1": [
-            "CVE-2019-9850",
-            "CVE-2019-9851",
-            "CVE-2019-9852"
-          ]
-        }
+      "libreoffice-style-tango": {
+        "4102-1": [
+          "CVE-2019-9850",
+          "CVE-2019-9851",
+          "CVE-2019-9852"
+        ]
+      },
+      "uno-libs3": {
+        "4102-1": [
+          "CVE-2019-9850",
+          "CVE-2019-9851",
+          "CVE-2019-9852"
+        ]
       }
     }
   }
@@ -1401,11 +1331,9 @@ Running: snap-check-notices --no-fetch ./tests/test-check-notices-primed-stage-p
 {
   "test-check-notices-primed-stage-packages-needed": {
     "0.2": {
-      "staged": {
-        "uno-libs3": [
-          "4102-1"
-        ]
-      }
+      "uno-libs3": [
+        "4102-1"
+      ]
     }
   }
 }
@@ -1414,14 +1342,12 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/test-check-notices-pr
 {
   "test-check-notices-primed-stage-packages-needed": {
     "0.2": {
-      "staged": {
-        "uno-libs3": {
-          "4102-1": [
-            "CVE-2019-9850",
-            "CVE-2019-9851",
-            "CVE-2019-9852"
-          ]
-        }
+      "uno-libs3": {
+        "4102-1": [
+          "CVE-2019-9850",
+          "CVE-2019-9851",
+          "CVE-2019-9852"
+        ]
       }
     }
   }
