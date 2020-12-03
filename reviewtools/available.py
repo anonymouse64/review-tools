@@ -33,43 +33,66 @@ from reviewtools.store import (
     get_pkg_revisions,
     get_secnots_for_manifest,
     get_shared_snap_without_override,
-    get_faked_stage_packages,
+    get_faked_build_and_stage_packages,
 )
 from reviewtools.usn import read_usn_db
 
-
-email_templates = {}
-email_templates[
-    "default"
-] = """A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
-%s
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+email_update_required_text = """A scan of this snap shows that it was built with packages from the Ubuntu
+archive that have since received security updates. """
+email_thanks_and_references_text = """
 
 Thank you for your snap and for attending to this matter.
 
 References:
  * %s
 """
-email_templates[
-    "kernel"
-] = """A scan of this snap shows that it was built using sources based on a kernel
-from the Ubuntu archive that has since received security updates. The following
-lists new USNs for the Ubuntu kernel that the snap is based on in each snap
-revision:
+email_rebuild_snap_text = (
+    """Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates."""
+    + email_thanks_and_references_text
+)
+
+email_templates = {
+    "default": (
+        email_update_required_text
+        + """The following lists new
+USNs for affected binary packages in each snap revision:
 %s
-Updating the snap's git tree, adjusting the version in the snapcraft.yaml to
-match that of the Ubuntu kernel this snap is based on and rebuilding the snap
-should pull in the new security updates and resolve this.
-
-Thank you for your snap and for attending to this matter.
-
-References:
- * %s
 """
+        + email_rebuild_snap_text
+    ),
+    "build-pkgs-only": (
+        email_update_required_text
+        + """The following lists new
+USNs for affected build packages in each snap revision:
+%s
+"""
+        + email_rebuild_snap_text
+    ),
+    "build-and-stage-pkgs": (
+        email_update_required_text
+        + """The following lists new
+USNs for affected binary packages in each snap revision:
+%s
+In addition, the following lists new USNs for affected build packages in
+each snap revision:
+%s
+"""
+        + email_rebuild_snap_text
+    ),
+    "kernel": (
+        """A scan of this snap shows that it was built using sources based on a kernel
+from the Ubuntu archive that has since received security updates. The
+following lists new USNs for the Ubuntu kernel that the snap is based on in
+each snap revision:
+%s
+Updating the snap's git tree, adjusting the version in the snapcraft.yaml
+to match that of the Ubuntu kernel this snap is based on and rebuilding the
+snap should pull in the new security updates and resolve this."""
+        + email_thanks_and_references_text
+    ),
+}
 
 
 def _secnot_report_for_pkg(pkg_db, seen_db):
@@ -78,7 +101,15 @@ def _secnot_report_for_pkg(pkg_db, seen_db):
 
     reference_urls = []
 
-    report = ""
+    # Since now the report can contain USNs for stage-packages only,
+    # USNs for build-packages only, or both, then we prepare two reports
+    # that will be joined later if needed
+    stage_pkgs_report = ""
+    build_pkgs_report = ""
+
+    report_contains_build_pkgs = False
+    report_contains_stage_pkgs = False
+
     for r in sorted(pkg_db["revisions"]):
         if len(pkg_db["revisions"][r]["secnot-report"]) == 0:
             continue
@@ -93,58 +124,129 @@ def _secnot_report_for_pkg(pkg_db, seen_db):
             "s" if len(pkg_db["revisions"][r]["channels"]) > 0 else "",
             ", ".join(pkg_db["revisions"][r]["channels"]),
         )
-        shown_rev_header = False
+        shown_rev_header_for_stage_pkgs = False
+        shown_rev_header_for_build_pkgs = False
 
-        for p in sorted(pkg_db["revisions"][r]["secnot-report"]):
-            secnots = []
-            for secnot in pkg_db["revisions"][r]["secnot-report"][p]:
-                # only report new secnots, unless we don't know about this
-                # revision
-                if (
-                    pkgname in seen_db
-                    and r in seen_db[pkgname]
-                    and secnot in seen_db[pkgname][r]
-                ):
-                    continue
-                secnots.append(secnot)
-            secnots.sort()
+        if "staged" in pkg_db["revisions"][r]["secnot-report"]:
+            report_contains_stage_pkgs = True
 
-            if len(secnots) > 0:
-                if not shown_rev_header:
-                    report += rev_header
-                    shown_rev_header = True
-                report += "\n * %s: %s" % (p, ", ".join(secnots))
+        if "build" in pkg_db["revisions"][r]["secnot-report"]:
+            report_contains_build_pkgs = True
 
-            for secnot in secnots:
-                url = "https://usn.ubuntu.com/%s/" % secnot
-                if url not in reference_urls:
-                    reference_urls.append(url)
+        # secnot-report report has 2 sections: staged (for secnots related to
+        # primed-stage-packages and stage-packages) and build (for secnots
+        # related to build-packages)
+        for sec_note_per_pkg_type in pkg_db["revisions"][r]["secnot-report"]:
+            for p in sorted(
+                pkg_db["revisions"][r]["secnot-report"][sec_note_per_pkg_type]
+            ):
+                secnots = []
+                for secnot in pkg_db["revisions"][r]["secnot-report"][
+                    sec_note_per_pkg_type
+                ][p]:
+                    # only report new secnots, unless we don't know about this
+                    # revision
+                    if (
+                        pkgname in seen_db
+                        and r in seen_db[pkgname]
+                        and secnot in seen_db[pkgname][r]
+                    ):
+                        continue
+                    secnots.append(secnot)
+                secnots.sort()
 
-        if shown_rev_header:
-            report += "\n"
+                if len(secnots) > 0:
+                    if (
+                        sec_note_per_pkg_type == "staged"
+                        and not shown_rev_header_for_stage_pkgs
+                    ):
+                        stage_pkgs_report += rev_header
+                        shown_rev_header_for_stage_pkgs = True
+                    elif (
+                        sec_note_per_pkg_type == "build"
+                        and not shown_rev_header_for_build_pkgs
+                    ):
+                        build_pkgs_report += rev_header
+                        shown_rev_header_for_build_pkgs = True
+
+                    if sec_note_per_pkg_type == "staged":
+                        stage_pkgs_report += "\n * %s: %s" % (p, ", ".join(secnots))
+                    elif sec_note_per_pkg_type == "build":
+                        build_pkgs_report += "\n * %s: %s" % (p, ", ".join(secnots))
+
+                for secnot in secnots:
+                    url = "https://ubuntu.com/security/notices/USN-%s/" % secnot
+                    if url not in reference_urls:
+                        reference_urls.append(url)
+        if shown_rev_header_for_stage_pkgs and report_contains_stage_pkgs:
+            stage_pkgs_report += "\n"
+        if shown_rev_header_for_build_pkgs and report_contains_build_pkgs:
+            build_pkgs_report += "\n"
 
     if len(reference_urls) == 0:
         # nothing to report
-        return ""
+        return "", "", False, False
 
     reference_urls.sort()
     template = "default"
     if "snap_type" in pkg_db and pkg_db["snap_type"] == "kernel":
+        # Since we are not fully supporting notifications for build-packages
+        # just yet, is the standard kernel template that omits them for now.
+        # TODO: update when fully support build-packages
+        subj = "%s built from outdated Ubuntu kernel" % pkgname
         template = "kernel"
-    return email_templates[template] % (report, "\n * ".join(reference_urls))
+        return (
+            subj,
+            email_templates[template]
+            % (stage_pkgs_report, "\n * ".join(reference_urls)),
+            report_contains_stage_pkgs,
+            False,
+        )
+    elif report_contains_stage_pkgs and report_contains_build_pkgs:
+        # Template text containing updates for staged and build packages
+        subj = "%s contains and was built with outdated Ubuntu packages" % pkgname
+        template = "build-and-stage-pkgs"
+        return (
+            subj,
+            email_templates[template]
+            % (stage_pkgs_report, build_pkgs_report, "\n * ".join(reference_urls)),
+            report_contains_stage_pkgs,
+            report_contains_build_pkgs,
+        )
+    elif report_contains_build_pkgs and not report_contains_stage_pkgs:
+        # Template text containing updates for build packages only
+        subj = "%s was built with outdated Ubuntu packages" % pkgname
+        template = "build-pkgs-only"
+        return (
+            subj,
+            email_templates[template]
+            % (build_pkgs_report, "\n * ".join(reference_urls)),
+            False,
+            report_contains_build_pkgs,
+        )
+    else:
+        # Template text containing updates for staged packages only (default)
+        subj = "%s contains outdated Ubuntu packages" % pkgname
+        return (
+            subj,
+            email_templates[template]
+            % (stage_pkgs_report, "\n * ".join(reference_urls)),
+            report_contains_stage_pkgs,
+            False,  # TODO: eventually, report_contains_build_pks
+        )
 
 
 def _email_report_for_pkg(pkg_db, seen_db):
     """Send email report for this pkgname"""
     pkgname = pkg_db["name"]
-
-    body = _secnot_report_for_pkg(pkg_db, seen_db)
+    (
+        subj,
+        body,
+        report_contains_stage_pks,
+        report_contains_build_pks,
+    ) = _secnot_report_for_pkg(pkg_db, seen_db)
     if body == "":
         return (None, None, None)
-
-    subj = "%s contains outdated Ubuntu packages" % pkgname
-    if "snap_type" in pkg_db and pkg_db["snap_type"] == "kernel":
-        subj = "%s built from outdated Ubuntu kernel" % pkgname
 
     # Send to the publisher and any collaborators. If no collaborators,
     # fallback to any uploaders for the revision
@@ -187,10 +289,15 @@ def _update_seen(seen_fn, seen_db, pkg_db):
         if r not in seen_db[pkgname]:
             seen_db[pkgname][r] = []
 
-        for p in pkg_db["revisions"][r]["secnot-report"]:
-            for secnot in pkg_db["revisions"][r]["secnot-report"][p]:
-                if secnot not in seen_db[pkgname][r]:
-                    seen_db[pkgname][r].append(secnot)
+        # secnot-report can contain now stage-packages and build-packages
+        # sections
+        for sec_note_per_pkg_type in pkg_db["revisions"][r]["secnot-report"]:
+            for p in pkg_db["revisions"][r]["secnot-report"][sec_note_per_pkg_type]:
+                for secnot in pkg_db["revisions"][r]["secnot-report"][
+                    sec_note_per_pkg_type
+                ][p]:
+                    if secnot not in seen_db[pkgname][r]:
+                        seen_db[pkgname][r].append(secnot)
         seen_db[pkgname][r].sort()
 
     # remove old revisions
@@ -268,7 +375,7 @@ def scan_snap(secnot_db_fn, snap_fn, with_cves=False):
     """Scan snap for packages with security notices"""
     out = ""
     (man, dpkg) = get_snap_manifest(snap_fn)
-    man = get_faked_stage_packages(man)
+    man = get_faked_build_and_stage_packages(man)
 
     # Use dpkg.list when the snap ships it in a spot we honor. This is limited
     # to snap scans since dpkg.list doesn't exist in the store.
@@ -286,8 +393,13 @@ def scan_snap(secnot_db_fn, snap_fn, with_cves=False):
                 )
 
     secnot_db = read_usn_db(secnot_db_fn)
+    original_report = get_secnots_for_manifest(man, secnot_db, with_cves)
+    # removing package types separation for json output to no break
+    # existing API
+    report = {}
+    for pkg_type in original_report:
+        report.update(original_report[pkg_type])
 
-    report = get_secnots_for_manifest(man, secnot_db, with_cves)
     if len(report) != 0:
         # needs to be json since snap-check-notices parses this output
         out += json.dumps(report, indent=2, sort_keys=True)

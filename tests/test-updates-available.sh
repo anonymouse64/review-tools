@@ -15,6 +15,7 @@ fi
 tmp=$(mktemp)
 tmp_seen=$(mktemp)
 
+
 run() {
     seen="$1"
     usn="./tests/$2"
@@ -143,6 +144,27 @@ echo "Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-
 PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-1.db' --store-db='./tests/test-store-unittest-bad-1.db' 2>&1 | tee -a "$tmp"
 echo "" | tee -a "$tmp"
 
+# Test build and staged packages updates
+echo "Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pgks.db' --store-db='./tests/test-store-unittest-1.db'" | tee -a "$tmp"
+PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pgks.db' --store-db='./tests/test-store-unittest-1.db' 2>&1 | tee -a "$tmp"
+echo "" | tee -a "$tmp"
+
+# Test staged packages updates only - no updates for build packages
+echo "Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pgks.db' --store-db='./tests/test-store-unittest-2.db'" | tee -a "$tmp"
+PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pgks.db' --store-db='./tests/test-store-unittest-2.db' 2>&1 | tee -a "$tmp"
+echo "" | tee -a "$tmp"
+
+# Test build packages updates only
+echo "Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pgks-only.db' --store-db='./tests/test-store-unittest-1.db'" | tee -a "$tmp"
+PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pgks-only.db' --store-db='./tests/test-store-unittest-1.db' 2>&1 | tee -a "$tmp"
+echo "" | tee -a "$tmp"
+
+# Test build packages updates - update override
+echo "Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pgks.db' --store-db='./tests/test-store-unittest-3.db'" | tee -a "$tmp"
+PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pgks.db' --store-db='./tests/test-store-unittest-3.db' 2>&1 | tee -a "$tmp"
+echo "" | tee -a "$tmp"
+
+
 ## LP: #1841848
 for i in test-check-notices_0.1_amd64.snap test-check-notices-needed_0.1_amd64.snap test-check-notices-primed-stage-packages_0.1_amd64.snap test-check-notices-primed-stage-packages-needed_0.1_amd64.snap test-check-notices-primed-stage-packages-needed_0.2_amd64.snap; do
     echo "Running: snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/$i'" | tee -a "$tmp"
@@ -170,6 +192,18 @@ PYTHONPATH=./ SNAP=./ SNAP_USER_COMMON=./ USNDB='./tests/test-usn-budgie-2.db' .
 echo "" | tee -a "$tmp"
 echo "Running: snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manifest_0_amd64.snap" | tee -a "$tmp"
 PYTHONPATH=./ SNAP=./ SNAP_USER_COMMON=./ USNDB='./tests/test-usn-budgie-2.db' ./bin/snap-check-notices --no-fetch --with-cves "./tests/test-snapcraft-manifest_0_amd64.snap" 2>&1 | tee -a "$tmp"
+echo "" | tee -a "$tmp"
+echo "Running: USNDB='./tests/test-usn-budgie-3.db' snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manifest-snapcraft-version_0_amd64.snap" | tee -a "$tmp"
+PYTHONPATH=./ SNAP=./ SNAP_USER_COMMON=./ USNDB='./tests/test-usn-budgie-3.db' ./bin/snap-check-notices --no-fetch --with-cves "./tests/test-snapcraft-manifest-snapcraft-version_0_amd64.snap" 2>&1 | tee -a "$tmp"
+echo "" | tee -a "$tmp"
+echo "Running: USNDB='./tests/test-usn-unittest-build-pgks.db' snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manifest-snapcraft-version-needed_0_amd64.snap" | tee -a "$tmp"
+PYTHONPATH=./ SNAP=./ SNAP_USER_COMMON=./ USNDB='./tests/test-usn-unittest-build-pgks.db' ./bin/snap-check-notices --no-fetch --with-cves "./tests/test-snapcraft-manifest-snapcraft-version-needed_0_amd64.snap" 2>&1 | tee -a "$tmp"
+echo "" | tee -a "$tmp"
+echo "Running: USNDB='./tests/test-usn-unittest-build-pgks.db' snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manifest-package-in-installed-snaps_0_amd64.snap" | tee -a "$tmp"
+PYTHONPATH=./ SNAP=./ SNAP_USER_COMMON=./ USNDB='./tests/test-usn-unittest-build-pgks.db' ./bin/snap-check-notices --no-fetch --with-cves "./tests/test-snapcraft-manifest-package-in-installed-snaps_0_amd64.snap" 2>&1 | tee -a "$tmp"
+echo "" | tee -a "$tmp"
+echo "Running: USNDB='./tests/test-usn-unittest-build-pgks.db' snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manifest-snapcraft-updated_0_amd64.snap" | tee -a "$tmp"
+PYTHONPATH=./ SNAP=./ SNAP_USER_COMMON=./ USNDB='./tests/test-usn-unittest-build-pgks.db' ./bin/snap-check-notices --no-fetch --with-cves "./tests/test-snapcraft-manifest-snapcraft-updated_0_amd64.snap" 2>&1 | tee -a "$tmp"
 echo "" | tee -a "$tmp"
 
 ## core

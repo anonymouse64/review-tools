@@ -7,8 +7,8 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
  * libtiff5: 3602-1
@@ -26,15 +26,15 @@ Revision r14 (i386; channels: edge)
  * libtiff5: 3602-1
  * libxcursor1: 3501-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
 References:
- * https://usn.ubuntu.com/3501-1/
- * https://usn.ubuntu.com/3602-1/
+ * https://ubuntu.com/security/notices/USN-3501-1/
+ * https://ubuntu.com/security/notices/USN-3602-1/
 
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-1.db' --store-db='./tests/test-store-1.db'...
@@ -48,8 +48,8 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
  * libtiff5: 3602-1, 3606-1
@@ -67,16 +67,16 @@ Revision r14 (i386; channels: edge)
  * libtiff5: 3602-1, 3606-1
  * libxcursor1: 3501-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
 References:
- * https://usn.ubuntu.com/3501-1/
- * https://usn.ubuntu.com/3602-1/
- * https://usn.ubuntu.com/3606-1/
+ * https://ubuntu.com/security/notices/USN-3501-1/
+ * https://ubuntu.com/security/notices/USN-3602-1/
+ * https://ubuntu.com/security/notices/USN-3606-1/
 
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-1.db'...
@@ -90,8 +90,8 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r21 (amd64; channels: stable, candidate, beta)
  * libtiff5: 3606-1
@@ -105,14 +105,14 @@ Revision r23 (amd64; channels: edge)
 Revision r24 (i386; channels: edge)
  * libtiff5: 3606-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
 References:
- * https://usn.ubuntu.com/3606-1/
+ * https://ubuntu.com/security/notices/USN-3606-1/
 
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-2.db'...
@@ -133,8 +133,8 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
  * libtiff5: 3602-1
@@ -152,15 +152,15 @@ Revision r14 (i386; channels: edge)
  * libtiff5: 3602-1
  * libxcursor1: 3501-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
 References:
- * https://usn.ubuntu.com/3501-1/
- * https://usn.ubuntu.com/3602-1/
+ * https://ubuntu.com/security/notices/USN-3501-1/
+ * https://ubuntu.com/security/notices/USN-3602-1/
 
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-1.db' --store-db='./tests/test-store-1.db'...
@@ -173,8 +173,8 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
  * libtiff5: 3606-1
@@ -188,14 +188,14 @@ Revision r13 (amd64; channels: edge)
 Revision r14 (i386; channels: edge)
  * libtiff5: 3606-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
 References:
- * https://usn.ubuntu.com/3606-1/
+ * https://ubuntu.com/security/notices/USN-3606-1/
 
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-1.db'...
@@ -213,8 +213,8 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
  * libtiff5: 3602-1, 3606-1
@@ -232,16 +232,16 @@ Revision r14 (i386; channels: edge)
  * libtiff5: 3602-1, 3606-1
  * libxcursor1: 3501-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
 References:
- * https://usn.ubuntu.com/3501-1/
- * https://usn.ubuntu.com/3602-1/
- * https://usn.ubuntu.com/3606-1/
+ * https://ubuntu.com/security/notices/USN-3501-1/
+ * https://ubuntu.com/security/notices/USN-3602-1/
+ * https://ubuntu.com/security/notices/USN-3606-1/
 
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-1.db'...
@@ -260,8 +260,8 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: ubuntu-budgie-welcome contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r11 (amd64; channels: candidate, beta)
  * curl: 3598-1
@@ -295,20 +295,20 @@ Revision r45 (amd64; channels: edge)
 Revision r46 (i386; channels: edge)
  * libssl1.0.0: 3628-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
 References:
- * https://usn.ubuntu.com/3598-1/
- * https://usn.ubuntu.com/3602-1/
- * https://usn.ubuntu.com/3606-1/
- * https://usn.ubuntu.com/3610-1/
- * https://usn.ubuntu.com/3611-1/
- * https://usn.ubuntu.com/3622-1/
- * https://usn.ubuntu.com/3628-1/
+ * https://ubuntu.com/security/notices/USN-3598-1/
+ * https://ubuntu.com/security/notices/USN-3602-1/
+ * https://ubuntu.com/security/notices/USN-3606-1/
+ * https://ubuntu.com/security/notices/USN-3610-1/
+ * https://ubuntu.com/security/notices/USN-3611-1/
+ * https://ubuntu.com/security/notices/USN-3622-1/
+ * https://ubuntu.com/security/notices/USN-3628-1/
 
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-budgie-2.db' --store-db='./tests/test-store-budgie.db'...
@@ -318,8 +318,8 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: ubuntu-budgie-welcome contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r11 (amd64; channels: candidate, beta)
  * gir1.2-javascriptcoregtk-4.0: 3635-1
@@ -333,14 +333,14 @@ Revision r12 (i386; channels: candidate, beta)
  * libjavascriptcoregtk-4.0-18: 3635-1
  * libwebkit2gtk-4.0-37: 3635-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
 References:
- * https://usn.ubuntu.com/3635-1/
+ * https://ubuntu.com/security/notices/USN-3635-1/
 
 
 = Test --seen-db updated for test-xenial and test-bionic =
@@ -352,20 +352,20 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: test-xenial contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r12 (i386; channels: stable, beta)
  * python-requests: 3790-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
 References:
- * https://usn.ubuntu.com/3790-1/
+ * https://ubuntu.com/security/notices/USN-3790-1/
 
 From: Snap Store <noreply@canonical.com>
 To: foo@example.com
@@ -373,20 +373,20 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: test-bionic contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r12 (i386; channels: stable, beta)
  * python-requests: 3790-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
 References:
- * https://usn.ubuntu.com/3790-1/
+ * https://ubuntu.com/security/notices/USN-3790-1/
 
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-os-release.db' --store-db='./tests/test-store-os-release.db'...
@@ -400,22 +400,22 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: linux-generic-bbb built from outdated Ubuntu kernel
 
 A scan of this snap shows that it was built using sources based on a kernel
-from the Ubuntu archive that has since received security updates. The following
-lists new USNs for the Ubuntu kernel that the snap is based on in each snap
-revision:
+from the Ubuntu archive that has since received security updates. The
+following lists new USNs for the Ubuntu kernel that the snap is based on in
+each snap revision:
 
 Revision r12 (armhf; channels: stable, beta)
  * linux-image-generic: 3848-1, 3879-1
 
-Updating the snap's git tree, adjusting the version in the snapcraft.yaml to
-match that of the Ubuntu kernel this snap is based on and rebuilding the snap
-should pull in the new security updates and resolve this.
+Updating the snap's git tree, adjusting the version in the snapcraft.yaml
+to match that of the Ubuntu kernel this snap is based on and rebuilding the
+snap should pull in the new security updates and resolve this.
 
 Thank you for your snap and for attending to this matter.
 
 References:
- * https://usn.ubuntu.com/3848-1/
- * https://usn.ubuntu.com/3879-1/
+ * https://ubuntu.com/security/notices/USN-3848-1/
+ * https://ubuntu.com/security/notices/USN-3879-1/
 
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel.db' --store-db='./tests/test-store-kernel.db'...
@@ -588,8 +588,8 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r11 (amd64; channels: stable, candidate, beta)
  * libtiff5: 3602-1, 3606-1
@@ -607,16 +607,212 @@ Revision r14 (i386; channels: edge)
  * libtiff5: 3602-1, 3606-1
  * libxcursor1: 3501-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
 References:
- * https://usn.ubuntu.com/3501-1/
- * https://usn.ubuntu.com/3602-1/
- * https://usn.ubuntu.com/3606-1/
+ * https://ubuntu.com/security/notices/USN-3501-1/
+ * https://ubuntu.com/security/notices/USN-3602-1/
+ * https://ubuntu.com/security/notices/USN-3606-1/
+
+
+Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pgks.db' --store-db='./tests/test-store-unittest-1.db'
+From: Snap Store <noreply@canonical.com>
+To: olivier.tilloy@canonical.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
+Subject: 0ad contains and was built with outdated Ubuntu packages
+
+A scan of this snap shows that it was built with packages from the Ubuntu
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
+
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r13 (amd64; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r14 (i386; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r15 (amd64; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r16 (i386; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r17 (amd64; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+In addition, the following lists new USNs for affected build packages in
+each snap revision:
+
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * snapcraft: 5501-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * snapcraft: 5501-1
+
+Revision r13 (amd64; channels: edge)
+ * snapcraft: 5501-1
+
+Revision r14 (i386; channels: edge)
+ * snapcraft: 5501-1
+
+Revision r15 (amd64; channels: edge)
+ * snapcraft: 5501-1
+
+Revision r16 (i386; channels: edge)
+ * snapcraft: 5501-1
+
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://ubuntu.com/security/notices/USN-3501-1/
+ * https://ubuntu.com/security/notices/USN-3602-1/
+ * https://ubuntu.com/security/notices/USN-3606-1/
+ * https://ubuntu.com/security/notices/USN-5501-1/
+
+
+Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pgks.db' --store-db='./tests/test-store-unittest-2.db'
+From: Snap Store <noreply@canonical.com>
+To: olivier.tilloy@canonical.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
+Subject: 0ad contains outdated Ubuntu packages
+
+A scan of this snap shows that it was built with packages from the Ubuntu
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
+
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r13 (amd64; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r14 (i386; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r15 (amd64; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r16 (i386; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://ubuntu.com/security/notices/USN-3501-1/
+ * https://ubuntu.com/security/notices/USN-3602-1/
+ * https://ubuntu.com/security/notices/USN-3606-1/
+
+
+Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pgks-only.db' --store-db='./tests/test-store-unittest-1.db'
+From: Snap Store <noreply@canonical.com>
+To: olivier.tilloy@canonical.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
+Subject: 0ad was built with outdated Ubuntu packages
+
+A scan of this snap shows that it was built with packages from the Ubuntu
+archive that have since received security updates. The following lists new
+USNs for affected build packages in each snap revision:
+
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * snapcraft: 5501-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * snapcraft: 5501-1
+
+Revision r13 (amd64; channels: edge)
+ * snapcraft: 5501-1
+
+Revision r14 (i386; channels: edge)
+ * snapcraft: 5501-1
+
+Revision r15 (amd64; channels: edge)
+ * snapcraft: 5501-1
+
+Revision r16 (i386; channels: edge)
+ * snapcraft: 5501-1
+
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://ubuntu.com/security/notices/USN-5501-1/
+
+
+Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pgks.db' --store-db='./tests/test-store-unittest-3.db'
+From: Snap Store <noreply@canonical.com>
+To: olivier.tilloy@canonical.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
+Subject: 0ad contains and was built with outdated Ubuntu packages
+
+A scan of this snap shows that it was built with packages from the Ubuntu
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
+
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+In addition, the following lists new USNs for affected build packages in
+each snap revision:
+
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * snapcraft: 5501-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * snapcraft: 5501-1
+
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://ubuntu.com/security/notices/USN-3501-1/
+ * https://ubuntu.com/security/notices/USN-3602-1/
+ * https://ubuntu.com/security/notices/USN-3606-1/
+ * https://ubuntu.com/security/notices/USN-5501-1/
 
 
 Running: snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/test-check-notices_0.1_amd64.snap'
@@ -710,21 +906,21 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: test-snap contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r1 (amd64; channels: stable, edge)
  * libreoffice-style-tango: 4102-1
  * uno-libs3: 4102-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
 References:
- * https://usn.ubuntu.com/4102-1/
+ * https://ubuntu.com/security/notices/USN-4102-1/
 
 
 Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-1.db' --store-db='./tests/test-store-collaborators.db'
@@ -734,23 +930,23 @@ Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
 
 A scan of this snap shows that it was built with packages from the Ubuntu
-archive that have since received security updates. The following lists new USNs
-for affected binary packages in each snap revision:
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
 
 Revision r12 (i386; channels: stable, candidate, beta)
  * libtiff5: 3602-1, 3606-1
  * libxcursor1: 3501-1
 
-Simply rebuilding the snap will pull in the new security updates and resolve
-this. If your snap also contains vendored code, now might be a good time to
-review it for any needed updates.
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
 
 Thank you for your snap and for attending to this matter.
 
 References:
- * https://usn.ubuntu.com/3501-1/
- * https://usn.ubuntu.com/3602-1/
- * https://usn.ubuntu.com/3606-1/
+ * https://ubuntu.com/security/notices/USN-3501-1/
+ * https://ubuntu.com/security/notices/USN-3602-1/
+ * https://ubuntu.com/security/notices/USN-3606-1/
 
 
 Running: snap-check-notices --no-fetch ./tests/test-snapcraft-manifest_0_amd64.snap
@@ -790,6 +986,62 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manife
         ]
       }
     }
+  }
+}
+
+Running: USNDB='./tests/test-usn-budgie-3.db' snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manifest-snapcraft-version_0_amd64.snap
+{
+  "test-snapcraft-manifest-snapcraft-version": {
+    "0": {
+      "libssl1.0.0": {
+        "3611-1": [
+          "CVE-2018-0739"
+        ]
+      },
+      "openssl": {
+        "3611-1": [
+          "CVE-2018-0739"
+        ]
+      },
+      "snapcraft": {
+        "5501-1": [
+          "CVE-2020-9999"
+        ]
+      }
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-unittest-build-pgks.db' snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manifest-snapcraft-version-needed_0_amd64.snap
+{
+  "test-snapcraft-manifest-snapcraft-version-needed": {
+    "0": {
+      "snapcraft": {
+        "5501-1": [
+          "CVE-2020-9999"
+        ]
+      }
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-unittest-build-pgks.db' snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manifest-package-in-installed-snaps_0_amd64.snap
+{
+  "test-snapcraft-manifest-package-in-installed-snaps": {
+    "0": {
+      "snapcraft": {
+        "5501-1": [
+          "CVE-2020-9999"
+        ]
+      }
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-unittest-build-pgks.db' snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manifest-snapcraft-updated_0_amd64.snap
+{
+  "test-snapcraft-manifest-snapcraft-updated": {
+    "0": {}
   }
 }
 

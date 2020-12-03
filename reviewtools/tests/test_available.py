@@ -44,10 +44,142 @@ class TestAvailable(TestCase):
         if self.tmpdir is not None:
             recursive_rm(self.tmpdir)
 
+    def test_check__secnot_report_for_pkg_with_build_and_stage_pkgs(self):
+        """Test _secnot_report_for_pkg() - build and stage packages"""
+        secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pgks.db")
+        errors = {}
+        pkg_db = store.get_pkg_revisions(self.store_db[0], secnot_db, errors)
+        self.assertEqual(len(errors), 0)
+
+        (
+            subj,
+            body,
+            contains_stage_pkgs,
+            contains_build_pkgs,
+        ) = available._secnot_report_for_pkg(pkg_db, {})
+        needle = """A scan of this snap shows that it was built with packages from the Ubuntu
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
+
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r13 (amd64; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r14 (i386; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r15 (amd64; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r16 (i386; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r17 (amd64; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+In addition, the following lists new USNs for affected build packages in
+each snap revision:
+
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * snapcraft: 5501-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * snapcraft: 5501-1
+
+Revision r13 (amd64; channels: edge)
+ * snapcraft: 5501-1
+
+Revision r14 (i386; channels: edge)
+ * snapcraft: 5501-1
+
+Revision r15 (amd64; channels: edge)
+ * snapcraft: 5501-1
+
+Revision r16 (i386; channels: edge)
+ * snapcraft: 5501-1
+
+"""
+        self.assertTrue(needle in body)
+        for line in body.splitlines():
+            # text width of emails should not exceed 75
+            self.assertTrue(len(line) <= 75)
+        self.assertTrue(contains_stage_pkgs)
+        self.assertTrue(contains_build_pkgs)
+        self.assertEqual(
+            "0ad contains and was built with outdated Ubuntu packages", subj
+        )
+
+    def test_check__secnot_report_for_pkg_with_build_pkgs_only(self):
+        """Test _secnot_report_for_pkg() - only build packages"""
+        secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pgks-only.db")
+        errors = {}
+        pkg_db = store.get_pkg_revisions(self.store_db[0], secnot_db, errors)
+        self.assertEqual(len(errors), 0)
+        (
+            subj,
+            body,
+            contains_stage_pkgs,
+            contains_build_pkgs,
+        ) = available._secnot_report_for_pkg(pkg_db, {})
+        needle = """A scan of this snap shows that it was built with packages from the Ubuntu
+archive that have since received security updates. The following lists new
+USNs for affected build packages in each snap revision:
+
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * snapcraft: 5501-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * snapcraft: 5501-1
+
+Revision r13 (amd64; channels: edge)
+ * snapcraft: 5501-1
+
+Revision r14 (i386; channels: edge)
+ * snapcraft: 5501-1
+
+Revision r15 (amd64; channels: edge)
+ * snapcraft: 5501-1
+
+Revision r16 (i386; channels: edge)
+ * snapcraft: 5501-1
+"""
+        needle_for_template = """
+In addition, the following lists new USNs for affected build packages in each
+snap revision:
+"""
+        self.assertTrue(needle in body)
+        for line in body.splitlines():
+            # text width of emails should not exceed 75
+            self.assertTrue(len(line) <= 75)
+        self.assertFalse(needle_for_template in body)
+        self.assertFalse(contains_stage_pkgs)
+        self.assertTrue(contains_build_pkgs)
+        self.assertEqual("0ad was built with outdated Ubuntu packages", subj)
+
     def test_check__secnot_report_for_pkg(self):
-        """Test _secnot_report_for_pkg()"""
-        res = available._secnot_report_for_pkg(self.pkg_db, {})
-        needle = """
+        """Test _secnot_report_for_pkg() - only stage packages"""
+        (
+            subj,
+            body,
+            contains_stage_pkgs,
+            contains_build_pkgs,
+        ) = available._secnot_report_for_pkg(self.pkg_db, {})
+        needle_for_revisions = """A scan of this snap shows that it was built with packages from the Ubuntu
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
+
 Revision r11 (amd64; channels: stable, candidate, beta)
  * libtiff5: 3602-1, 3606-1
  * libxcursor1: 3501-1
@@ -64,20 +196,47 @@ Revision r14 (i386; channels: edge)
  * libtiff5: 3602-1, 3606-1
  * libxcursor1: 3501-1
 """
-        self.assertTrue(needle in res)
+        needle_for_template = """
+In addition, the following lists new USNs for affected build packages in each
+snap revision:
+            """
+        self.assertTrue(needle_for_revisions in body)
+        for line in body.splitlines():
+            # text width of emails should not exceed 75
+            self.assertTrue(len(line) <= 75)
+        self.assertFalse(needle_for_template in body)
+        self.assertTrue(contains_stage_pkgs)
+        self.assertFalse(contains_build_pkgs)
+        self.assertEqual("0ad contains outdated Ubuntu packages", subj)
 
     def test_check__secnot_report_for_pkg_rev_no_secnots(self):
         """Test _secnot_report_for_pkg() - rev no secnots"""
         self.pkg_db["revisions"]["11"]["secnot-report"] = {}
-        res = available._secnot_report_for_pkg(self.pkg_db, {})
-        self.assertFalse(" r11 " in res)
+        (
+            subj,
+            body,
+            contains_stage_pkgs,
+            contains_build_pkgs,
+        ) = available._secnot_report_for_pkg(self.pkg_db, {})
+        self.assertFalse("Revision r11" in body)
+        self.assertTrue(contains_stage_pkgs)
+        self.assertFalse(contains_build_pkgs)
+        self.assertEqual("0ad contains outdated Ubuntu packages", subj)
 
     def test_check__secnot_report_for_pkg_no_urls(self):
         """Test _secnot_report_for_pkg() - no urls"""
         for rev in self.pkg_db["revisions"]:
             self.pkg_db["revisions"][rev]["secnot-report"] = {}
-        res = available._secnot_report_for_pkg(self.pkg_db, {})
-        self.assertEqual(res, "")
+        (
+            subj,
+            body,
+            contains_stage_pkgs,
+            contains_build_pkgs,
+        ) = available._secnot_report_for_pkg(self.pkg_db, {})
+        self.assertEqual(body, "")
+        self.assertFalse(contains_stage_pkgs)
+        self.assertFalse(contains_build_pkgs)
+        self.assertEqual("", subj)
 
     def test_check__secnot_report_for_pkg_only_new_secnot(self):
         """Test _secnot_report_for_pkg() - only new secnot"""
@@ -89,7 +248,12 @@ Revision r14 (i386; channels: edge)
                 "14": ["3501-1", "3602-1"],
             }
         }
-        res = available._secnot_report_for_pkg(self.pkg_db, seen_db)
+        (
+            subj,
+            body,
+            contains_stage_pkgs,
+            contains_build_pkgs,
+        ) = available._secnot_report_for_pkg(self.pkg_db, seen_db)
         needle = """
 Revision r11 (amd64; channels: stable, candidate, beta)
  * libtiff5: 3606-1
@@ -103,7 +267,10 @@ Revision r13 (amd64; channels: edge)
 Revision r14 (i386; channels: edge)
  * libtiff5: 3606-1
 """
-        self.assertTrue(needle in res)
+        self.assertTrue(needle in body)
+        self.assertTrue(contains_stage_pkgs)
+        self.assertFalse(contains_build_pkgs)
+        self.assertEqual("0ad contains outdated Ubuntu packages", subj)
 
     def test_check__secnot_report_for_pkg_only_new_secnot_budgie(self):
         """Test _secnot_report_for_pkg() - only new secnot budgie"""
@@ -171,7 +338,12 @@ Revision r14 (i386; channels: edge)
                 ],
             }
         }
-        res = available._secnot_report_for_pkg(self.pkg_db, seen_db)
+        (
+            subj,
+            body,
+            contains_stage_pkgs,
+            contains_build_pkgs,
+        ) = available._secnot_report_for_pkg(self.pkg_db, seen_db)
         needle = """
 Revision r11 (amd64; channels: candidate, beta)
  * gir1.2-javascriptcoregtk-4.0: 3635-1
@@ -185,7 +357,12 @@ Revision r12 (i386; channels: candidate, beta)
  * libjavascriptcoregtk-4.0-18: 3635-1
  * libwebkit2gtk-4.0-37: 3635-1
 """
-        self.assertTrue(needle in res)
+        self.assertTrue(needle in body)
+        self.assertTrue(contains_stage_pkgs)
+        self.assertFalse(contains_build_pkgs)
+        self.assertEqual(
+            "ubuntu-budgie-welcome contains outdated Ubuntu packages", subj
+        )
 
     def test_check__email_report_for_pkg(self):
         """Test _email_report_for_pkg()"""
@@ -194,7 +371,7 @@ Revision r12 (i386; channels: candidate, beta)
         for eml in ["olivier.tilloy@canonical.com"]:
             self.assertTrue(eml in to_addr)
 
-        self.assertTrue("0ad" in subj)
+        self.assertEqual("0ad contains outdated Ubuntu packages", subj)
 
         for pkg in ["libtiff5", "libxcursor1"]:
             self.assertTrue(pkg in body)
@@ -216,6 +393,7 @@ Revision r12 (i386; channels: candidate, beta)
         self.pkg_db["uploaders"] = ["testme2@example.com"]
         (to_addr, subj, body) = available._email_report_for_pkg(self.pkg_db, {})
         self.assertTrue("testme@example.com" in to_addr)
+        self.assertEqual("0ad contains outdated Ubuntu packages", subj)
         # collaborators supercede uploaders
         self.assertFalse("testme2@example.com" in to_addr)
 
@@ -223,13 +401,33 @@ Revision r12 (i386; channels: candidate, beta)
         """Test _email_report_for_pkg() - with uploaders"""
         self.pkg_db["uploaders"] = ["testme@example.com"]
         (to_addr, subj, body) = available._email_report_for_pkg(self.pkg_db, {})
+        self.assertEqual("0ad contains outdated Ubuntu packages", subj)
         self.assertTrue("testme@example.com" in to_addr)
 
     def test_check__email_report_for_pkg_with_additional(self):
         """Test _email_report_for_pkg() - with additional"""
         self.pkg_db["additional"] = ["testme@example.com"]
         (to_addr, subj, body) = available._email_report_for_pkg(self.pkg_db, {})
+        self.assertEqual("0ad contains outdated Ubuntu packages", subj)
         self.assertTrue("testme@example.com" in to_addr)
+
+    def test_check__email_report_for_pkg_with_staged_and_build_pkgs(self):
+        """Test _email_report_for_pkg() - with staged and build_pks"""
+        secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pgks.db")
+        errors = {}
+        pkg_db = store.get_pkg_revisions(self.store_db[0], secnot_db, errors)
+        (to_addr, subj, body) = available._email_report_for_pkg(pkg_db, {})
+        self.assertEqual(
+            "0ad contains and was built with outdated Ubuntu packages", subj
+        )
+
+    def test_check__email_report_for_pkg_with_and_build_pkgs_only(self):
+        """Test _email_report_for_pkg() - with staged and build_pks"""
+        secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pgks-only.db")
+        errors = {}
+        pkg_db = store.get_pkg_revisions(self.store_db[0], secnot_db, errors)
+        (to_addr, subj, body) = available._email_report_for_pkg(pkg_db, {})
+        self.assertEqual("0ad was built with outdated Ubuntu packages", subj)
 
     def test_check_read_seen_db(self):
         """Test read_seen_db()"""
@@ -260,6 +458,7 @@ Revision r12 (i386; channels: candidate, beta)
                 "14": ["3501-1", "3602-1", "3606-1"],
                 "15": ["3501-1", "3602-1", "3606-1"],
                 "16": ["3501-1", "3602-1", "3606-1"],
+                "17": ["3501-1", "3602-1", "3606-1"],
             }
         }
         self.assertEqual(len(expected_db), len(res))
@@ -305,7 +504,7 @@ Revision r12 (i386; channels: candidate, beta)
         res = available.read_seen_db(tmp)
         self.assertEqual(len(res), 1)
         self.assertTrue("0ad" in res)
-        self.assertEqual(len(res["0ad"]), 6)
+        self.assertEqual(len(res["0ad"]), 7)
 
         for r in ["7", "8", "9", "10"]:
             self.assertFalse(r in seen_db["0ad"])
@@ -328,6 +527,18 @@ Revision r12 (i386; channels: candidate, beta)
         res = available.scan_snap(secnot_fn, snap_fn)
         self.assertTrue(len(res) > 0)
         self.assertTrue("3501-1" in res)
+
+    def test_check_scan_snap_with_cves(self):
+        """Test scan_snap() with cves"""
+        secnot_fn = "./tests/test-usn-unittest-build-pgks.db"
+        snap_fn = (
+            "./tests/test-snapcraft-manifest-snapcraft-version-needed_0_amd64.snap"
+        )
+        res = available.scan_snap(secnot_fn, snap_fn, True)
+        self.assertTrue(len(res), 1)
+        self.assertTrue("snapcraft" in res)
+        self.assertTrue("5501-1" in res)
+        self.assertTrue("CVE-2020-9999" in res)
 
     def test_check_scan_snap_core(self):
         """Test scan_snap() - core"""
@@ -404,7 +615,7 @@ Revision r12 (i386; channels: candidate, beta)
         for eml in ["olivier.tilloy@canonical.com"]:
             self.assertTrue(eml in to_addr)
 
-        self.assertTrue("0ad contains outdated Ubuntu packages" in subj)
+        self.assertEqual("0ad contains outdated Ubuntu packages", subj)
         self.assertTrue("built with packages from the Ubuntu" in body)
 
         for pkg in ["libtiff5", "libxcursor1"]:
@@ -425,7 +636,7 @@ Revision r12 (i386; channels: candidate, beta)
         for eml in ["olivier.tilloy@canonical.com"]:
             self.assertTrue(eml in to_addr)
 
-        self.assertTrue("0ad" in subj)
+        self.assertEqual("0ad contains outdated Ubuntu packages", subj)
 
         for pkg in ["libtiff5", "libxcursor1"]:
             self.assertTrue(pkg in body)
@@ -460,8 +671,10 @@ Revision r12 (i386; channels: candidate, beta)
             self.assertTrue(eml in to_addr)
         self.assertTrue("using sources based on a kernel" in body)
         self.assertTrue("linux-image-generic" in body)
-
-        self.assertTrue("linux-generic-bbb built from outdated Ubuntu kernel" in subj)
+        for line in body.splitlines():
+            # text width of emails should not exceed 75
+            self.assertTrue(len(line) <= 75)
+        self.assertEqual("linux-generic-bbb built from outdated Ubuntu kernel", subj)
 
         for sn in ["3848-1", "3879-1"]:
             self.assertTrue(sn in body)
@@ -490,6 +703,7 @@ Revision r12 (i386; channels: candidate, beta)
         self.assertTrue(eml in to_addr)
         self.assertTrue("libreoffice-style-tango: 4102-1" in body)
         self.assertTrue("uno-libs3: 4102-1" in body)
+        self.assertEqual("test-snap contains outdated Ubuntu packages", subj)
 
     def test_check_scan_store_lp1841848_allbinaries_bad_epoch(self):
         """Test scan_store() - lp1841848 (allbinaries with bad epoch)"""
@@ -516,6 +730,7 @@ Revision r12 (i386; channels: candidate, beta)
         self.assertTrue(eml in to_addr)
         self.assertTrue("libreoffice-style-tango: 4102-1" in body)
         self.assertTrue("uno-libs3: 4102-1" in body)
+        self.assertEqual("test-snap contains outdated Ubuntu packages", subj)
 
     def test_check_scan_store_lp1841848_allbinaries_bad_epoch2(self):
         """Test scan_store() - lp1841848 (allbinaries with bad epoch2)"""
@@ -567,6 +782,7 @@ Revision r12 (i386; channels: candidate, beta)
         self.assertTrue(eml in to_addr)
         self.assertTrue("libreoffice-style-tango: 4102-1" in body)
         self.assertTrue("uno-libs3: 4102-1" in body)
+        self.assertEqual("test-snap contains outdated Ubuntu packages", subj)
 
     def test_check_scan_store_lp1841848_unmatched_binver2(self):
         """Test scan_store() - lp1841848 (unmatched binary version no all binaries)"""

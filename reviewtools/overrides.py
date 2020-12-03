@@ -1215,6 +1215,31 @@ update_stage_packages = {
     "wpa-supplicant": {"wpa": "2.4-0ubuntu6"},
 }
 
+# For all/certain snaps, add to build-parts. This is a special case and we are
+# only considering snapcraft as a build-part for every snap. Since manifest is
+# present it means the snap was built using snapcraft.
+# Format:
+#   update_build_packages = {'<snap>': {'<deb>': '<version>|auto'}
+#
+# where <snap> is currently ignored, <deb> is the Ubuntu binary and <version>
+# is the deb version. The special case of 'auto' will use the
+# 'snapcraft-version' field from the snap. For now, only 'snapcraft' is
+# supported for the '<deb>' and 'auto' for the version.
+# TODO: update when fully support build-packages
+update_build_packages = {"faked-by-review-tools": {"snapcraft": "auto"}}
+
+# For certain packages, ignore USN secnotversion and use this override version
+# instead. This allows sending USN notification for snap updates since
+# snap's versions are not present in secnots.
+# Format:
+#   update_package_version = {'<pkg>': {'<part-key>': '<version>'}
+#
+# where <pkg> is the pkg to operate on during version comparison,
+# <part-key> is the key in the manifest part where to look for the presence of
+# <pkg> (i.e. only use this override if pkg in part-key for some part) and
+# <version> is the version to use instead of secnotversion.
+# TODO: update when fully support installed-snaps or further snapcraft updates
+update_package_version = {"snapcraft": {"installed-snaps": "4.4.4"}}
 
 # Some binary packages aren't worth alerting on since they don't contain
 # affected binaries (eg, a package with only header files)
