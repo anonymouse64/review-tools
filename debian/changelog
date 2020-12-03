@@ -1,3 +1,12 @@
+review-tools (0.48+20201203-1) RELEASED; urgency=medium
+
+  * available.py: initial support for build-packages USN notifications
+  * overrides.py: add override for build-packages. Add override for
+    secnotversion.
+  * store.py: add support for fake build-packages
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Thu, 03 Dec 2020 18:25:10 -0300
+
 review-tools (0.48+20201117-1) RELEASED; urgency=medium
 
   [ Jamie Strandboge ]
