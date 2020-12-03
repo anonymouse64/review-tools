@@ -85,6 +85,10 @@ Revision r16 (i386; channels: edge)
  * libtiff5: 3602-1, 3606-1
  * libxcursor1: 3501-1
 
+Revision r17 (amd64; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
 In addition, the following lists new USNs for affected build packages in
 each snap revision:
 
@@ -454,6 +458,7 @@ Revision r12 (i386; channels: candidate, beta)
                 "14": ["3501-1", "3602-1", "3606-1"],
                 "15": ["3501-1", "3602-1", "3606-1"],
                 "16": ["3501-1", "3602-1", "3606-1"],
+                "17": ["3501-1", "3602-1", "3606-1"],
             }
         }
         self.assertEqual(len(expected_db), len(res))
@@ -499,7 +504,7 @@ Revision r12 (i386; channels: candidate, beta)
         res = available.read_seen_db(tmp)
         self.assertEqual(len(res), 1)
         self.assertTrue("0ad" in res)
-        self.assertEqual(len(res["0ad"]), 6)
+        self.assertEqual(len(res["0ad"]), 7)
 
         for r in ["7", "8", "9", "10"]:
             self.assertFalse(r in seen_db["0ad"])

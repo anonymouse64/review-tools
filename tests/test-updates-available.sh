@@ -159,6 +159,11 @@ echo "Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-
 PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pgks-only.db' --store-db='./tests/test-store-unittest-1.db' 2>&1 | tee -a "$tmp"
 echo "" | tee -a "$tmp"
 
+# Test build packages updates - update override
+echo "Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pgks.db' --store-db='./tests/test-store-unittest-3.db'" | tee -a "$tmp"
+PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pgks.db' --store-db='./tests/test-store-unittest-3.db' 2>&1 | tee -a "$tmp"
+echo "" | tee -a "$tmp"
+
 
 ## LP: #1841848
 for i in test-check-notices_0.1_amd64.snap test-check-notices-needed_0.1_amd64.snap test-check-notices-primed-stage-packages_0.1_amd64.snap test-check-notices-primed-stage-packages-needed_0.1_amd64.snap test-check-notices-primed-stage-packages-needed_0.2_amd64.snap; do
@@ -194,8 +199,11 @@ echo "" | tee -a "$tmp"
 echo "Running: USNDB='./tests/test-usn-unittest-build-pgks.db' snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manifest-snapcraft-version-needed_0_amd64.snap" | tee -a "$tmp"
 PYTHONPATH=./ SNAP=./ SNAP_USER_COMMON=./ USNDB='./tests/test-usn-unittest-build-pgks.db' ./bin/snap-check-notices --no-fetch --with-cves "./tests/test-snapcraft-manifest-snapcraft-version-needed_0_amd64.snap" 2>&1 | tee -a "$tmp"
 echo "" | tee -a "$tmp"
-echo "Running: USNDB='./tests/test-usn-unittest-build-pgks.db' snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manifest-updated-snapcraft-version_0_amd64.snap" | tee -a "$tmp"
-PYTHONPATH=./ SNAP=./ SNAP_USER_COMMON=./ USNDB='./tests/test-usn-unittest-build-pgks.db' ./bin/snap-check-notices --no-fetch --with-cves "./tests/test-snapcraft-manifest-updated-snapcraft-version_0_amd64.snap" 2>&1 | tee -a "$tmp"
+echo "Running: USNDB='./tests/test-usn-unittest-build-pgks.db' snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manifest-package-in-installed-snaps_0_amd64.snap" | tee -a "$tmp"
+PYTHONPATH=./ SNAP=./ SNAP_USER_COMMON=./ USNDB='./tests/test-usn-unittest-build-pgks.db' ./bin/snap-check-notices --no-fetch --with-cves "./tests/test-snapcraft-manifest-package-in-installed-snaps_0_amd64.snap" 2>&1 | tee -a "$tmp"
+echo "" | tee -a "$tmp"
+echo "Running: USNDB='./tests/test-usn-unittest-build-pgks.db' snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manifest-snapcraft-updated_0_amd64.snap" | tee -a "$tmp"
+PYTHONPATH=./ SNAP=./ SNAP_USER_COMMON=./ USNDB='./tests/test-usn-unittest-build-pgks.db' ./bin/snap-check-notices --no-fetch --with-cves "./tests/test-snapcraft-manifest-snapcraft-updated_0_amd64.snap" 2>&1 | tee -a "$tmp"
 echo "" | tee -a "$tmp"
 
 ## core

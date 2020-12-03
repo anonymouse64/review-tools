@@ -34,6 +34,7 @@ class TestStore(TestCase):
         self.store_db = read_file_as_json_dict("./tests/test-store-unittest-1.db")
         self.first_revision = 0
         self.first_revision_with_primed_stage = 4
+        self.first_revision_with_installed_snap = 6
         # make sure primed-stage-packages section is present on
         # first_revision_with_primed_stage revision. Adding this assertion
         # here means we end up checking that in each test. Still, it is a
@@ -910,6 +911,106 @@ class TestStore(TestCase):
                 self.assertEqual(len(res["staged"]["libtiff5"]), 2)
                 self.assertTrue("3602-1" in res["staged"]["libtiff5"])
                 self.assertTrue("3606-1" in res["staged"]["libtiff5"])
+
+    def test_check_get_secnots_for_manifest_with_version_override_no_update(self,):
+        """Test get_secnots_for_manifest() primed-stage-packages same as
+           staged-packages and USN version override, snap updated"""
+
+        from reviewtools.overrides import update_package_version
+
+        update_package_version["libtiff5"] = {"stage-packages": "3.5"}
+        m = yaml.load(
+            self.store_db[0]["revisions"][self.first_revision_with_installed_snap][
+                "manifest_yaml"
+            ],
+            Loader=yaml.SafeLoader,
+        )
+        res = store.get_secnots_for_manifest(m, self.secnot_db)
+        self.assertTrue(isinstance(res, dict))
+
+        self.assertFalse("build" in res)
+        self.assertEqual(len(res), 1)
+
+        self.assertTrue(isinstance(res, dict))
+        self.assertTrue("staged" in res)
+        self.assertEqual(len(res["staged"]), 1)
+        self.assertTrue("libxcursor1" in res["staged"])
+        self.assertEqual(len(res["staged"]["libxcursor1"]), 1)
+        self.assertEqual(res["staged"]["libxcursor1"][0], "3501-1")
+
+        # Since the override includes a version smaller than the one in the USN
+        # libtiff5 should not be part of res
+        self.assertTrue("libtiff5" not in res["staged"])
+
+    def test_check_get_secnots_for_manifest_with_version_override_update(self,):
+        """Test get_secnots_for_manifest() primed-stage-packages same as
+           staged-packages and USN version override, needs update"""
+
+        from reviewtools.overrides import update_package_version
+
+        update_package_version["libtiff5"] = {"build-packages": "8.5"}
+        m = yaml.load(
+            self.store_db[0]["revisions"][self.first_revision_with_installed_snap][
+                "manifest_yaml"
+            ],
+            Loader=yaml.SafeLoader,
+        )
+
+        for part in m["parts"]:
+            # Valid format for entry should consider the override
+            m["parts"][part]["build-packages"] = ["libtiff5=999"]
+
+        res = store.get_secnots_for_manifest(m, self.secnot_db)
+        self.assertTrue(isinstance(res, dict))
+
+        self.assertFalse("build" in res)
+        self.assertEqual(len(res), 1)
+
+        self.assertTrue(isinstance(res, dict))
+        self.assertTrue("staged" in res)
+        self.assertEqual(len(res["staged"]), 2)
+        self.assertTrue("libxcursor1" in res["staged"])
+        self.assertEqual(len(res["staged"]["libxcursor1"]), 1)
+        self.assertEqual(res["staged"]["libxcursor1"][0], "3501-1")
+        self.assertTrue("libtiff5" in res["staged"])
+        self.assertEqual(len(res["staged"]["libtiff5"]), 2)
+        self.assertTrue("3602-1" in res["staged"]["libtiff5"])
+        self.assertTrue("3606-1" in res["staged"]["libtiff5"])
+
+    def test_check_get_secnots_for_manifest_with_version_override_invalid(self,):
+        """Test get_secnots_for_manifest() primed-stage-packages same as
+           staged-packages and USN version override"""
+
+        from reviewtools.overrides import update_package_version
+
+        update_package_version["libtiff5"] = {"build-packages": "3.5"}
+        m = yaml.load(
+            self.store_db[0]["revisions"][self.first_revision_with_installed_snap][
+                "manifest_yaml"
+            ],
+            Loader=yaml.SafeLoader,
+        )
+
+        for part in m["parts"]:
+            # Invalid format for entry should not consider the override
+            m["parts"][part]["build-packages"] = ["libtiff5:111"]
+
+        res = store.get_secnots_for_manifest(m, self.secnot_db)
+        self.assertTrue(isinstance(res, dict))
+
+        self.assertFalse("build" in res)
+        self.assertEqual(len(res), 1)
+
+        self.assertTrue(isinstance(res, dict))
+        self.assertTrue("staged" in res)
+        self.assertEqual(len(res["staged"]), 2)
+        self.assertTrue("libxcursor1" in res["staged"])
+        self.assertEqual(len(res["staged"]["libxcursor1"]), 1)
+        self.assertEqual(res["staged"]["libxcursor1"][0], "3501-1")
+        self.assertTrue("libtiff5" in res["staged"])
+        self.assertEqual(len(res["staged"]["libtiff5"]), 2)
+        self.assertTrue("3602-1" in res["staged"]["libtiff5"])
+        self.assertTrue("3606-1" in res["staged"]["libtiff5"])
 
     def test_check_get_secnots_for_manifest_with_primed_stage_list_smaller_than_staged_packages_list(
         self,

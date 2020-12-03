@@ -671,6 +671,10 @@ Revision r16 (i386; channels: edge)
  * libtiff5: 3602-1, 3606-1
  * libxcursor1: 3501-1
 
+Revision r17 (amd64; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
 In addition, the following lists new USNs for affected build packages in
 each snap revision:
 
@@ -786,6 +790,46 @@ good time to review it for any needed updates.
 Thank you for your snap and for attending to this matter.
 
 References:
+ * https://ubuntu.com/security/notices/USN-5501-1/
+
+
+Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pgks.db' --store-db='./tests/test-store-unittest-3.db'
+From: Snap Store <noreply@canonical.com>
+To: olivier.tilloy@canonical.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
+Subject: 0ad contains and was built with outdated Ubuntu packages
+
+A scan of this snap shows that it was built with packages from the Ubuntu
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
+
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+In addition, the following lists new USNs for affected build packages in
+each snap revision:
+
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * snapcraft: 5501-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * snapcraft: 5501-1
+
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://ubuntu.com/security/notices/USN-3501-1/
+ * https://ubuntu.com/security/notices/USN-3602-1/
+ * https://ubuntu.com/security/notices/USN-3606-1/
  * https://ubuntu.com/security/notices/USN-5501-1/
 
 
@@ -1021,9 +1065,24 @@ Running: USNDB='./tests/test-usn-unittest-build-pgks.db' snap-check-notices --no
   }
 }
 
-Running: USNDB='./tests/test-usn-unittest-build-pgks.db' snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manifest-updated-snapcraft-version_0_amd64.snap
+Running: USNDB='./tests/test-usn-unittest-build-pgks.db' snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manifest-package-in-installed-snaps_0_amd64.snap
 {
-  "test-snapcraft-manifest-updated-snapcraft-version": {
+  "test-snapcraft-manifest-package-in-installed-snaps": {
+    "0": {
+      "build": {
+        "snapcraft": {
+          "5501-1": [
+            "CVE-2020-9999"
+          ]
+        }
+      }
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-unittest-build-pgks.db' snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manifest-snapcraft-updated_0_amd64.snap
+{
+  "test-snapcraft-manifest-snapcraft-updated": {
     "0": {}
   }
 }

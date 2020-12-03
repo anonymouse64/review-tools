@@ -1227,6 +1227,19 @@ update_stage_packages = {
 # TODO: update when fully support build-packages
 update_build_packages = {"faked-by-review-tools": {"snapcraft": "auto"}}
 
+# For certain packages, ignore USN secnotversion and use this override version
+# instead. This allows sending USN notification for snap updates since
+# snap's versions are not present in secnots.
+# Format:
+#   update_package_version = {'<pkg>': {'<part-key>': '<version>'}
+#
+# where <pkg> is the pkg to operate on during version comparison,
+# <part-key> is the key in the manifest part where to look for the presence of
+# <pkg> (i.e. only use this override if pkg in part-key for some part) and
+# <version> is the version to use instead of secnotversion.
+# TODO: update when fully support installed-snaps or further snapcraft updates
+update_package_version = {"snapcraft": {"installed-snaps": "4.4.4"}}
+
 # Some binary packages aren't worth alerting on since they don't contain
 # affected binaries (eg, a package with only header files)
 update_binaries_ignore = ["linux-headers-generic", "linux-libc-dev"]

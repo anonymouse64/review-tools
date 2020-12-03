@@ -32,6 +32,7 @@ from reviewtools.overrides import (
     update_publisher_overrides,
     update_stage_packages,
     update_build_packages,
+    update_package_version,
 )
 from reviewtools.sr_common import SnapReview
 
@@ -436,7 +437,6 @@ def get_secnots_for_manifest(m, secnot_db, with_cves=False):
     if stage_and_build_pkgs is None:
         debug("no stage-packages found")
         return pending_secnots
-
     # Since stage_and_build_pkgs can have stage-packages and build-packages
     # keys, adding secnots into each group
     for pkg_type in stage_and_build_pkgs:
@@ -445,7 +445,35 @@ def get_secnots_for_manifest(m, secnot_db, with_cves=False):
                 for v in stage_and_build_pkgs[pkg_type][pkg]:
                     pkgversion = debversion.DebVersion(v)
                     for secnot in secnot_db[rel][pkg]:
-                        secnotversion = secnot_db[rel][pkg][secnot]["version"]
+                        # The override for update_package_version is:
+                        #   update_package_version = {'<pkg>': {'<part-key>':
+                        #   '<version>'}
+                        # TODO: update when fully support installed-snaps
+                        #  or further snapcraft updates
+                        secnotversion = None
+                        if pkg in update_package_version:
+                            for part in m["parts"]:
+                                for key in update_package_version[pkg]:
+                                    if key in m["parts"][part]:
+                                        for entry in m["parts"][part][key]:
+                                            if "=" not in entry:
+                                                warn(
+                                                    "'%s' not properly "
+                                                    "formatted. Skipping" % entry
+                                                )
+                                                continue
+                                            if pkg == entry.split("=")[0]:
+                                                secnotversion = debversion.DebVersion(
+                                                    update_package_version[pkg][key]
+                                                )
+                                                # For this situation is enough
+                                                # to find pkg in at least one
+                                                # part and break as the version
+                                                # will come from the override
+                                                break
+                        if secnotversion is None:
+                            secnotversion = secnot_db[rel][pkg][secnot]["version"]
+
                         if debversion.compare(pkgversion, secnotversion) < 0:
                             debug(
                                 "adding %s: %s (pkg:%s < secnot:%s)"
