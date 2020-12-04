@@ -403,7 +403,7 @@ Revision r16 (i386; channels: edge)
         self.store_db = read_file_as_json_dict("./tests/test-store-kernel.db")
         errors = {}
         self.pkg_db = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
-        seen_db = {"linux-generic-bbb": {"12": ["3848-1"],}}
+        seen_db = {"linux-generic-bbb": {"12": ["3848-1"]}}
         (
             subj,
             body,
@@ -426,7 +426,7 @@ Revision r12 (armhf; channels: stable, beta)
         errors = {}
         self.pkg_db = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
 
-        seen_db = {"linux-generic-bbb": {"12": ["3848-1"],}}
+        seen_db = {"linux-generic-bbb": {"12": ["3848-1"]}}
         (
             subj,
             body,
@@ -459,7 +459,7 @@ each snap revision
         errors = {}
         self.pkg_db = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
 
-        seen_db = {"linux-generic-bbb": {"12": ["3848-1", "3602-1"],}}
+        seen_db = {"linux-generic-bbb": {"12": ["3848-1", "3602-1"]}}
         (
             subj,
             body,
