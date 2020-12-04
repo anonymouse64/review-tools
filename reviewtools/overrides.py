@@ -1061,6 +1061,7 @@ update_publisher_overrides = {
         "gnome-sudoku": canonical_desktop,
         "gnome-system-monitor": canonical_desktop,
         "godd": canonical_snapd,
+        "governor-broker": canonical_k8s,
         "gtk-common-themes": canonical_desktop,
         "gtk2-common-themes": canonical_desktop,
         "hello": canonical_snapcraft,
