@@ -39,6 +39,16 @@ from reviewtools.usn import read_usn_db
 
 email_update_required_text = """A scan of this snap shows that it was built with packages from the Ubuntu
 archive that have since received security updates. """
+email_addional_build_pkgs_text = """In addition, the following lists new USNs for affected build packages in
+each snap revision:
+%s
+"""
+email_kernel_update_required_text = """A scan of this snap shows that it was built using sources based on a kernel
+from the Ubuntu archive that has since received security updates. The
+following lists new USNs for the Ubuntu kernel that the snap is based on in
+each snap revision:
+%s
+"""
 email_thanks_and_references_text = """
 
 Thank you for your snap and for attending to this matter.
@@ -52,6 +62,10 @@ resolve this. If your snap also contains vendored code, now might be a
 good time to review it for any needed updates."""
     + email_thanks_and_references_text
 )
+
+email_rebuild_kernel_snap_text = """Updating the snap's git tree, adjusting the version in the snapcraft.yaml
+to match that of the Ubuntu kernel this snap is based on and rebuilding the
+snap should pull in the new security updates and resolve this."""
 
 email_templates = {
     "default": (
@@ -75,21 +89,28 @@ USNs for affected build packages in each snap revision:
         + """The following lists new
 USNs for affected binary packages in each snap revision:
 %s
-In addition, the following lists new USNs for affected build packages in
-each snap revision:
-%s
 """
+        + email_addional_build_pkgs_text
         + email_rebuild_snap_text
     ),
     "kernel": (
-        """A scan of this snap shows that it was built using sources based on a kernel
-from the Ubuntu archive that has since received security updates. The
-following lists new USNs for the Ubuntu kernel that the snap is based on in
-each snap revision:
+        email_kernel_update_required_text
+        + email_rebuild_kernel_snap_text
+        + email_thanks_and_references_text
+    ),
+    "kernel-build-pkgs-only": (
+        email_update_required_text
+        + """The following lists new
+USNs for affected build packages in each snap revision:
 %s
-Updating the snap's git tree, adjusting the version in the snapcraft.yaml
-to match that of the Ubuntu kernel this snap is based on and rebuilding the
-snap should pull in the new security updates and resolve this."""
+"""
+        + email_rebuild_kernel_snap_text
+        + email_thanks_and_references_text
+    ),
+    "kernel-and-build-pkgs": (
+        email_kernel_update_required_text
+        + email_addional_build_pkgs_text
+        + email_rebuild_kernel_snap_text
         + email_thanks_and_references_text
     ),
 }
@@ -190,15 +211,35 @@ def _secnot_report_for_pkg(pkg_db, seen_db):
     reference_urls.sort()
     template = "default"
     if "snap_type" in pkg_db and pkg_db["snap_type"] == "kernel":
-        # Since we are not fully supporting notifications for build-packages
-        # just yet, is the standard kernel template that omits them for now.
+        # Since we are not fully supporting notifications for
+        # build-packages just yet, is the standard kernel template that
+        # omits them for now.
         # TODO: update when fully support build-packages
-        subj = "%s built from outdated Ubuntu kernel" % pkgname
-        template = "kernel"
+        if report_contains_stage_pkgs and report_contains_build_pkgs:
+            subj = (
+                "%s built from outdated Ubuntu kernel and with outdated Ubuntu packages"
+                % pkgname
+            )
+            body = email_templates["kernel-and-build-pkgs"] % (
+                stage_pkgs_report,
+                build_pkgs_report,
+                "\n * ".join(reference_urls),
+            )
+        elif report_contains_stage_pkgs:
+            subj = "%s built from outdated Ubuntu kernel" % pkgname
+            body = email_templates["kernel"] % (
+                stage_pkgs_report,
+                "\n * ".join(reference_urls),
+            )
+        elif report_contains_build_pkgs:
+            subj = "%s was built with outdated Ubuntu packages" % pkgname
+            body = email_templates["kernel-build-pkgs-only"] % (
+                build_pkgs_report,
+                "\n * ".join(reference_urls),
+            )
         return (
             subj,
-            email_templates[template]
-            % (stage_pkgs_report, "\n * ".join(reference_urls)),
+            body,
             report_contains_stage_pkgs,
             False,
         )

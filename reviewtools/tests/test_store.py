@@ -283,7 +283,7 @@ class TestStore(TestCase):
             m["parts"] = None
             m["snapcraft-version"] = "1.1.1"
             self.store_db[0]["revisions"][i]["manifest_yaml"] = yaml.dump(m)
-        secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pgks.db")
+        secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pkgs.db")
         errors = {}
         pkg_db = store.get_pkg_revisions(self.store_db[0], secnot_db, errors)
         # empty parts has no security notices
@@ -383,7 +383,7 @@ class TestStore(TestCase):
             m["primed-stage-packages"] = None
             m["snapcraft-version"] = "1.1.1"
             self.store_db[0]["revisions"][i]["manifest_yaml"] = yaml.dump(m)
-        secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pgks.db")
+        secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pkgs.db")
         errors = {}
         pkg_db = store.get_pkg_revisions(self.store_db[0], secnot_db, errors)
         for rev in pkg_db["revisions"]:
@@ -424,7 +424,7 @@ class TestStore(TestCase):
                 else:
                     m["snapcraft-version"] = snapcraft_version
                 self.store_db[0]["revisions"][i]["manifest_yaml"] = yaml.dump(m)
-            secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pgks.db")
+            secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pkgs.db")
             errors = {}
             pkg_db = store.get_pkg_revisions(self.store_db[0], secnot_db, errors)
             # empty parts/stage-packages has no security notices
@@ -736,7 +736,7 @@ class TestStore(TestCase):
             for sec_not_for_build_packages in has_secnot_for_build_packages:
                 if sec_not_for_build_packages:
                     secnot_db = usn.read_usn_db(
-                        "./tests/test-usn-unittest-build-pgks.db"
+                        "./tests/test-usn-unittest-build-pkgs.db"
                     )
                     res = store.get_secnots_for_manifest(m, secnot_db)
                 else:
@@ -788,7 +788,7 @@ class TestStore(TestCase):
             for sec_not_for_build_packages in has_secnot_for_build_packages:
                 if sec_not_for_build_packages:
                     secnot_db = usn.read_usn_db(
-                        "./tests/test-usn-unittest-build-pgks.db"
+                        "./tests/test-usn-unittest-build-pkgs.db"
                     )
                     res = store.get_secnots_for_manifest(m, secnot_db)
                 else:
@@ -832,7 +832,7 @@ class TestStore(TestCase):
             for sec_not_for_build_packages in has_secnot_for_build_packages:
                 if sec_not_for_build_packages:
                     secnot_db = usn.read_usn_db(
-                        "./tests/test-usn-unittest-build-pgks.db"
+                        "./tests/test-usn-unittest-build-pkgs.db"
                     )
                     res = store.get_secnots_for_manifest(m, secnot_db)
                 else:
@@ -884,7 +884,7 @@ class TestStore(TestCase):
             for sec_not_for_build_packages in has_secnot_for_build_packages:
                 if sec_not_for_build_packages:
                     secnot_db = usn.read_usn_db(
-                        "./tests/test-usn-unittest-build-pgks.db"
+                        "./tests/test-usn-unittest-build-pkgs.db"
                     )
                     res = store.get_secnots_for_manifest(m, secnot_db)
                 else:
@@ -1039,7 +1039,7 @@ class TestStore(TestCase):
             for sec_not_for_build_packages in has_secnot_for_build_packages:
                 if sec_not_for_build_packages:
                     secnot_db = usn.read_usn_db(
-                        "./tests/test-usn-unittest-build-pgks.db"
+                        "./tests/test-usn-unittest-build-pkgs.db"
                     )
                     res = store.get_secnots_for_manifest(m, secnot_db)
                 else:
@@ -1086,7 +1086,7 @@ class TestStore(TestCase):
             for sec_not_for_build_packages in has_secnot_for_build_packages:
                 if sec_not_for_build_packages:
                     secnot_db = usn.read_usn_db(
-                        "./tests/test-usn-unittest-build-pgks.db"
+                        "./tests/test-usn-unittest-build-pkgs.db"
                     )
                     res = store.get_secnots_for_manifest(m, secnot_db)
                 else:
@@ -1127,7 +1127,7 @@ class TestStore(TestCase):
             for sec_not_for_build_packages in has_secnot_for_build_packages:
                 if sec_not_for_build_packages:
                     secnot_db = usn.read_usn_db(
-                        "./tests/test-usn-unittest-build-pgks.db"
+                        "./tests/test-usn-unittest-build-pkgs.db"
                     )
                     res = store.get_secnots_for_manifest(m, secnot_db)
                 else:
@@ -1166,7 +1166,7 @@ class TestStore(TestCase):
             for sec_not_for_build_packages in has_secnot_for_build_packages:
                 if sec_not_for_build_packages:
                     secnot_db = usn.read_usn_db(
-                        "./tests/test-usn-unittest-build-pgks.db"
+                        "./tests/test-usn-unittest-build-pkgs.db"
                     )
                     res = store.get_secnots_for_manifest(m, secnot_db, with_cves=True)
                 else:
@@ -1212,7 +1212,7 @@ class TestStore(TestCase):
             for sec_not_for_build_packages in has_secnot_for_build_packages:
                 if sec_not_for_build_packages:
                     secnot_db = usn.read_usn_db(
-                        "./tests/test-usn-unittest-build-pgks.db"
+                        "./tests/test-usn-unittest-build-pkgs.db"
                     )
                     res = store.get_secnots_for_manifest(m, secnot_db, with_cves=True)
                 else:
@@ -1260,7 +1260,7 @@ class TestStore(TestCase):
             for sec_not_for_build_packages in has_secnot_for_build_packages:
                 if sec_not_for_build_packages:
                     secnot_db = usn.read_usn_db(
-                        "./tests/test-usn-unittest-build-pgks.db"
+                        "./tests/test-usn-unittest-build-pkgs.db"
                     )
                     res = store.get_secnots_for_manifest(m, secnot_db, with_cves=True)
                 else:
@@ -1329,7 +1329,7 @@ class TestStore(TestCase):
             for sec_not_for_build_packages in has_secnot_for_build_packages:
                 if sec_not_for_build_packages:
                     secnot_db = usn.read_usn_db(
-                        "./tests/test-usn-unittest-build-pgks.db"
+                        "./tests/test-usn-unittest-build-pkgs.db"
                     )
                     res = store.get_secnots_for_manifest(m, secnot_db, with_cves=True)
                 else:
@@ -1395,7 +1395,7 @@ class TestStore(TestCase):
             for sec_not_for_build_packages in has_secnot_for_build_packages:
                 if sec_not_for_build_packages:
                     secnot_db = usn.read_usn_db(
-                        "./tests/test-usn-unittest-build-pgks.db"
+                        "./tests/test-usn-unittest-build-pkgs.db"
                     )
                     res = store.get_secnots_for_manifest(m, secnot_db)
                 else:
@@ -1449,7 +1449,7 @@ class TestStore(TestCase):
             for sec_not_for_build_packages in has_secnot_for_build_packages:
                 if sec_not_for_build_packages:
                     secnot_db = usn.read_usn_db(
-                        "./tests/test-usn-unittest-build-pgks.db"
+                        "./tests/test-usn-unittest-build-pkgs.db"
                     )
                     res = store.get_secnots_for_manifest(m, secnot_db)
                 else:
@@ -1504,7 +1504,7 @@ class TestStore(TestCase):
             for sec_not_for_build_packages in has_secnot_for_build_packages:
                 if sec_not_for_build_packages:
                     secnot_db = usn.read_usn_db(
-                        "./tests/test-usn-unittest-build-pgks.db"
+                        "./tests/test-usn-unittest-build-pkgs.db"
                     )
                     res = store.get_secnots_for_manifest(m, secnot_db)
                 else:

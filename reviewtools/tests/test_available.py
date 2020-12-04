@@ -46,7 +46,7 @@ class TestAvailable(TestCase):
 
     def test_check__secnot_report_for_pkg_with_build_and_stage_pkgs(self):
         """Test _secnot_report_for_pkg() - build and stage packages"""
-        secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pgks.db")
+        secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pkgs.db")
         errors = {}
         pkg_db = store.get_pkg_revisions(self.store_db[0], secnot_db, errors)
         self.assertEqual(len(errors), 0)
@@ -123,7 +123,7 @@ Revision r16 (i386; channels: edge)
 
     def test_check__secnot_report_for_pkg_with_build_pkgs_only(self):
         """Test _secnot_report_for_pkg() - only build packages"""
-        secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pgks-only.db")
+        secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pkgs-only.db")
         errors = {}
         pkg_db = store.get_pkg_revisions(self.store_db[0], secnot_db, errors)
         self.assertEqual(len(errors), 0)
@@ -413,7 +413,7 @@ Revision r12 (i386; channels: candidate, beta)
 
     def test_check__email_report_for_pkg_with_staged_and_build_pkgs(self):
         """Test _email_report_for_pkg() - with staged and build_pks"""
-        secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pgks.db")
+        secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pkgs.db")
         errors = {}
         pkg_db = store.get_pkg_revisions(self.store_db[0], secnot_db, errors)
         (to_addr, subj, body) = available._email_report_for_pkg(pkg_db, {})
@@ -423,7 +423,7 @@ Revision r12 (i386; channels: candidate, beta)
 
     def test_check__email_report_for_pkg_with_and_build_pkgs_only(self):
         """Test _email_report_for_pkg() - with staged and build_pks"""
-        secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pgks-only.db")
+        secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pkgs-only.db")
         errors = {}
         pkg_db = store.get_pkg_revisions(self.store_db[0], secnot_db, errors)
         (to_addr, subj, body) = available._email_report_for_pkg(pkg_db, {})
@@ -530,7 +530,7 @@ Revision r12 (i386; channels: candidate, beta)
 
     def test_check_scan_snap_with_cves(self):
         """Test scan_snap() with cves"""
-        secnot_fn = "./tests/test-usn-unittest-build-pgks.db"
+        secnot_fn = "./tests/test-usn-unittest-build-pkgs.db"
         snap_fn = (
             "./tests/test-snapcraft-manifest-snapcraft-version-needed_0_amd64.snap"
         )
@@ -670,6 +670,8 @@ Revision r12 (i386; channels: candidate, beta)
         for eml in ["foo@example.com"]:
             self.assertTrue(eml in to_addr)
         self.assertTrue("using sources based on a kernel" in body)
+        self.assertTrue("Updating the snap's git tree" in body)
+        self.assertFalse("Simply rebuilding the snap" in body)
         self.assertTrue("linux-image-generic" in body)
         for line in body.splitlines():
             # text width of emails should not exceed 75
@@ -677,6 +679,53 @@ Revision r12 (i386; channels: candidate, beta)
         self.assertEqual("linux-generic-bbb built from outdated Ubuntu kernel", subj)
 
         for sn in ["3848-1", "3879-1"]:
+            self.assertTrue(sn in body)
+
+    def test_check_scan_store_kernel_and_build_pkg_update_only(self):
+        """Test scan_store() - kernel snap and build pkg update"""
+        secnot_fn = "./tests/test-usn-unittest-build-pkgs-only.db"
+        store_fn = "./tests/test-store-kernel.db"
+        (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
+        self.assertEqual(len(errors), 0)
+        self.assertEqual(len(sent), 1)
+        (to_addr, subj, body) = sent[0]
+        for eml in ["foo@example.com"]:
+            self.assertTrue(eml in to_addr)
+        self.assertFalse("using sources based on a kernel" in body)
+        self.assertTrue("Updating the snap's git tree" in body)
+        self.assertFalse("Simply rebuilding the snap" in body)
+        self.assertTrue("snapcraft" in body)
+        for line in body.splitlines():
+            # text width of emails should not exceed 75
+            self.assertTrue(len(line) <= 75)
+        self.assertEqual(
+            "linux-generic-bbb was built with outdated Ubuntu packages", subj
+        )
+        self.assertTrue("USN-5501-1" in body)
+
+    def test_check_scan_store_kernel_and_build_pkg_updates(self):
+        """Test scan_store() - kernel snap and build pkg update"""
+        secnot_fn = "./tests/test-usn-kernel-and-build-pkgs.db"
+        store_fn = "./tests/test-store-kernel.db"
+        (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
+        self.assertEqual(len(errors), 0)
+        self.assertEqual(len(sent), 1)
+        (to_addr, subj, body) = sent[0]
+        for eml in ["foo@example.com"]:
+            self.assertTrue(eml in to_addr)
+        self.assertTrue("using sources based on a kernel" in body)
+        self.assertTrue("Updating the snap's git tree" in body)
+        self.assertFalse("Simply rebuilding the snap" in body)
+        self.assertTrue("snapcraft" in body)
+        self.assertTrue("linux-image-generic" in body)
+        for line in body.splitlines():
+            # text width of emails should not exceed 75
+            self.assertTrue(len(line) <= 75)
+        self.assertEqual(
+            "linux-generic-bbb built from outdated Ubuntu kernel and with outdated Ubuntu packages",
+            subj,
+        )
+        for sn in ["3848-1", "3879-1", "USN-5501-1"]:
             self.assertTrue(sn in body)
 
     def test_check_scan_store_lp1841848_allbinaries(self):

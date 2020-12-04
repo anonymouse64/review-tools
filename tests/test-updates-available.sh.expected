@@ -420,6 +420,96 @@ References:
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel.db' --store-db='./tests/test-store-kernel.db'...
 
+= Test --seen-db updated for linux-generic-bbb and build-pkgs =
+Emptying seen.db
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel-and-build-pkgs.db' --store-db='./tests/test-store-kernel.db'...
+From: Snap Store <noreply@canonical.com>
+To: foo@example.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
+Subject: linux-generic-bbb built from outdated Ubuntu kernel and with outdated Ubuntu packages
+
+A scan of this snap shows that it was built using sources based on a kernel
+from the Ubuntu archive that has since received security updates. The
+following lists new USNs for the Ubuntu kernel that the snap is based on in
+each snap revision:
+
+Revision r12 (armhf; channels: stable, beta)
+ * linux-image-generic: 3848-1, 3879-1
+
+In addition, the following lists new USNs for affected build packages in
+each snap revision:
+
+Revision r12 (armhf; channels: stable, beta)
+ * snapcraft: 5501-1
+
+Updating the snap's git tree, adjusting the version in the snapcraft.yaml
+to match that of the Ubuntu kernel this snap is based on and rebuilding the
+snap should pull in the new security updates and resolve this.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://ubuntu.com/security/notices/USN-3848-1/
+ * https://ubuntu.com/security/notices/USN-3879-1/
+ * https://ubuntu.com/security/notices/USN-5501-1/
+
+
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel-and-build-pkgs.db' --store-db='./tests/test-store-kernel.db'...
+
+= Test --seen-db updated for build-pkgs only =
+Emptying seen.db
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs-only.db' --store-db='./tests/test-store-kernel.db'...
+From: Snap Store <noreply@canonical.com>
+To: foo@example.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
+Subject: linux-generic-bbb was built with outdated Ubuntu packages
+
+A scan of this snap shows that it was built with packages from the Ubuntu
+archive that have since received security updates. The following lists new
+USNs for affected build packages in each snap revision:
+
+Revision r12 (armhf; channels: stable, beta)
+ * snapcraft: 5501-1
+
+Updating the snap's git tree, adjusting the version in the snapcraft.yaml
+to match that of the Ubuntu kernel this snap is based on and rebuilding the
+snap should pull in the new security updates and resolve this.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://ubuntu.com/security/notices/USN-5501-1/
+
+
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs-only.db' --store-db='./tests/test-store-kernel.db'...
+
+= Test --seen-db updated for build-pkgs only =
+Emptying seen.db
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-kernel.db'...
+From: Snap Store <noreply@canonical.com>
+To: foo@example.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
+Subject: linux-generic-bbb was built with outdated Ubuntu packages
+
+A scan of this snap shows that it was built with packages from the Ubuntu
+archive that have since received security updates. The following lists new
+USNs for affected build packages in each snap revision:
+
+Revision r12 (armhf; channels: stable, beta)
+ * snapcraft: 5501-1
+
+Updating the snap's git tree, adjusting the version in the snapcraft.yaml
+to match that of the Ubuntu kernel this snap is based on and rebuilding the
+snap should pull in the new security updates and resolve this.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://ubuntu.com/security/notices/USN-5501-1/
+
+
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-kernel.db'...
+
 = Test unkown release and missing usn release =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-os-release-dne.db' --store-db='./tests/test-store-os-release-dne.db'...
@@ -534,6 +624,38 @@ Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./
   }
 }
 
+Running: snap-updates-available --usn-db='./tests/test-usn-kernel-and-build-pkgs.db' --snap='./tests/gke-kernel_4.15.0-1027.28~16.04.1_amd64.snap'
+{
+  "linux-image-gke": {
+    "4489-1": [
+      "CVE-2020-14386"
+    ]
+  },
+  "snapcraft": {
+    "5501-1": [
+      "CVE-2020-9999"
+    ]
+  }
+}
+
+Running: snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs-only.db' --snap='./tests/gke-kernel_4.15.0-1027.28~16.04.1_amd64.snap'
+{
+  "snapcraft": {
+    "5501-1": [
+      "CVE-2020-9999"
+    ]
+  }
+}
+
+Running: snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs.db' --snap='./tests/gke-kernel_4.15.0-1027.28~16.04.1_amd64.snap'
+{
+  "snapcraft": {
+    "5501-1": [
+      "CVE-2020-9999"
+    ]
+  }
+}
+
 Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./tests/linux-generic-bbb_4.4.0-140-1_armhf.snap'
 {
   "linux-image-generic": {
@@ -553,6 +675,48 @@ Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./
   }
 }
 
+Running: snap-updates-available --usn-db='./tests/test-usn-kernel-and-build-pkgs.db' --snap='./tests/linux-generic-bbb_4.4.0-140-1_armhf.snap'
+{
+  "linux-image-generic": {
+    "3848-1": [
+      "CVE-2017-18174",
+      "CVE-2018-12896",
+      "CVE-2018-18690",
+      "CVE-2018-18710"
+    ],
+    "3879-1": [
+      "CVE-2018-10883",
+      "CVE-2018-16862",
+      "CVE-2018-19407",
+      "CVE-2018-19824",
+      "CVE-2018-20169"
+    ]
+  },
+  "snapcraft": {
+    "5501-1": [
+      "CVE-2020-9999"
+    ]
+  }
+}
+
+Running: snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs-only.db' --snap='./tests/linux-generic-bbb_4.4.0-140-1_armhf.snap'
+{
+  "snapcraft": {
+    "5501-1": [
+      "CVE-2020-9999"
+    ]
+  }
+}
+
+Running: snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs.db' --snap='./tests/linux-generic-bbb_4.4.0-140-1_armhf.snap'
+{
+  "snapcraft": {
+    "5501-1": [
+      "CVE-2020-9999"
+    ]
+  }
+}
+
 Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./tests/pc-kernel_4.15.0-44.46_i386.snap'
 {
   "linux-image-generic": {
@@ -566,6 +730,42 @@ Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./
   }
 }
 
+Running: snap-updates-available --usn-db='./tests/test-usn-kernel-and-build-pkgs.db' --snap='./tests/pc-kernel_4.15.0-44.46_i386.snap'
+{
+  "linux-image-generic": {
+    "3871-2": [
+      "https://launchpad.net/bugs/1813663",
+      "https://launchpad.net/bugs/1813727"
+    ],
+    "4489-1": [
+      "CVE-2020-14386"
+    ]
+  },
+  "snapcraft": {
+    "5501-1": [
+      "CVE-2020-9999"
+    ]
+  }
+}
+
+Running: snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs-only.db' --snap='./tests/pc-kernel_4.15.0-44.46_i386.snap'
+{
+  "snapcraft": {
+    "5501-1": [
+      "CVE-2020-9999"
+    ]
+  }
+}
+
+Running: snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs.db' --snap='./tests/pc-kernel_4.15.0-44.46_i386.snap'
+{
+  "snapcraft": {
+    "5501-1": [
+      "CVE-2020-9999"
+    ]
+  }
+}
+
 Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./tests/pc-kernel_4.4.0-141.167_amd64.snap'
 {
   "linux-image-generic": {
@@ -575,6 +775,42 @@ Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./
       "CVE-2018-19407",
       "CVE-2018-19824",
       "CVE-2018-20169"
+    ]
+  }
+}
+
+Running: snap-updates-available --usn-db='./tests/test-usn-kernel-and-build-pkgs.db' --snap='./tests/pc-kernel_4.4.0-141.167_amd64.snap'
+{
+  "linux-image-generic": {
+    "3879-1": [
+      "CVE-2018-10883",
+      "CVE-2018-16862",
+      "CVE-2018-19407",
+      "CVE-2018-19824",
+      "CVE-2018-20169"
+    ]
+  },
+  "snapcraft": {
+    "5501-1": [
+      "CVE-2020-9999"
+    ]
+  }
+}
+
+Running: snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs-only.db' --snap='./tests/pc-kernel_4.4.0-141.167_amd64.snap'
+{
+  "snapcraft": {
+    "5501-1": [
+      "CVE-2020-9999"
+    ]
+  }
+}
+
+Running: snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs.db' --snap='./tests/pc-kernel_4.4.0-141.167_amd64.snap'
+{
+  "snapcraft": {
+    "5501-1": [
+      "CVE-2020-9999"
     ]
   }
 }
@@ -619,7 +855,7 @@ References:
  * https://ubuntu.com/security/notices/USN-3606-1/
 
 
-Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pgks.db' --store-db='./tests/test-store-unittest-1.db'
+Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-unittest-1.db'
 From: Snap Store <noreply@canonical.com>
 To: olivier.tilloy@canonical.com
 Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
@@ -691,7 +927,7 @@ References:
  * https://ubuntu.com/security/notices/USN-5501-1/
 
 
-Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pgks.db' --store-db='./tests/test-store-unittest-2.db'
+Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-unittest-2.db'
 From: Snap Store <noreply@canonical.com>
 To: olivier.tilloy@canonical.com
 Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
@@ -737,7 +973,7 @@ References:
  * https://ubuntu.com/security/notices/USN-3606-1/
 
 
-Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pgks-only.db' --store-db='./tests/test-store-unittest-1.db'
+Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs-only.db' --store-db='./tests/test-store-unittest-1.db'
 From: Snap Store <noreply@canonical.com>
 To: olivier.tilloy@canonical.com
 Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
@@ -775,7 +1011,7 @@ References:
  * https://ubuntu.com/security/notices/USN-5501-1/
 
 
-Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pgks.db' --store-db='./tests/test-store-unittest-3.db'
+Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-unittest-3.db'
 From: Snap Store <noreply@canonical.com>
 To: olivier.tilloy@canonical.com
 Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
@@ -1012,7 +1248,7 @@ Running: USNDB='./tests/test-usn-budgie-3.db' snap-check-notices --no-fetch --wi
   }
 }
 
-Running: USNDB='./tests/test-usn-unittest-build-pgks.db' snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manifest-snapcraft-version-needed_0_amd64.snap
+Running: USNDB='./tests/test-usn-unittest-build-pkgs.db' snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manifest-snapcraft-version-needed_0_amd64.snap
 {
   "test-snapcraft-manifest-snapcraft-version-needed": {
     "0": {
@@ -1025,7 +1261,7 @@ Running: USNDB='./tests/test-usn-unittest-build-pgks.db' snap-check-notices --no
   }
 }
 
-Running: USNDB='./tests/test-usn-unittest-build-pgks.db' snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manifest-package-in-installed-snaps_0_amd64.snap
+Running: USNDB='./tests/test-usn-unittest-build-pkgs.db' snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manifest-package-in-installed-snaps_0_amd64.snap
 {
   "test-snapcraft-manifest-package-in-installed-snaps": {
     "0": {
@@ -1038,7 +1274,7 @@ Running: USNDB='./tests/test-usn-unittest-build-pgks.db' snap-check-notices --no
   }
 }
 
-Running: USNDB='./tests/test-usn-unittest-build-pgks.db' snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manifest-snapcraft-updated_0_amd64.snap
+Running: USNDB='./tests/test-usn-unittest-build-pkgs.db' snap-check-notices --no-fetch --with-cves ./tests/test-snapcraft-manifest-snapcraft-updated_0_amd64.snap
 {
   "test-snapcraft-manifest-snapcraft-updated": {
     "0": {}
@@ -1121,6 +1357,86 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/gke-kernel_4.15.0-102
   }
 }
 
+Running: USNDB='./tests/test-usn-kernel-and-build-pkgs.db' snap-check-notices --no-fetch ./tests/gke-kernel_4.15.0-1027.28~16.04.1_amd64.snap
+{
+  "gke-kernel": {
+    "4.15.0-1027.28~16.04.1": {
+      "linux-image-gke": [
+        "4489-1"
+      ],
+      "snapcraft": [
+        "5501-1"
+      ]
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-kernel-and-build-pkgs.db' snap-check-notices --no-fetch --with-cves ./tests/gke-kernel_4.15.0-1027.28~16.04.1_amd64.snap
+{
+  "gke-kernel": {
+    "4.15.0-1027.28~16.04.1": {
+      "linux-image-gke": {
+        "4489-1": [
+          "CVE-2020-14386"
+        ]
+      },
+      "snapcraft": {
+        "5501-1": [
+          "CVE-2020-9999"
+        ]
+      }
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-unittest-build-pkgs.db' snap-check-notices --no-fetch ./tests/gke-kernel_4.15.0-1027.28~16.04.1_amd64.snap
+{
+  "gke-kernel": {
+    "4.15.0-1027.28~16.04.1": {
+      "snapcraft": [
+        "5501-1"
+      ]
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-unittest-build-pkgs.db' snap-check-notices --no-fetch --with-cves ./tests/gke-kernel_4.15.0-1027.28~16.04.1_amd64.snap
+{
+  "gke-kernel": {
+    "4.15.0-1027.28~16.04.1": {
+      "snapcraft": {
+        "5501-1": [
+          "CVE-2020-9999"
+        ]
+      }
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-unittest-build-pkgs-only.db' snap-check-notices --no-fetch ./tests/gke-kernel_4.15.0-1027.28~16.04.1_amd64.snap
+{
+  "gke-kernel": {
+    "4.15.0-1027.28~16.04.1": {
+      "snapcraft": [
+        "5501-1"
+      ]
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-unittest-build-pkgs-only.db' snap-check-notices --no-fetch --with-cves ./tests/gke-kernel_4.15.0-1027.28~16.04.1_amd64.snap
+{
+  "gke-kernel": {
+    "4.15.0-1027.28~16.04.1": {
+      "snapcraft": {
+        "5501-1": [
+          "CVE-2020-9999"
+        ]
+      }
+    }
+  }
+}
+
 Running: snap-check-notices --no-fetch ./tests/linux-generic-bbb_4.4.0-140-1_armhf.snap
 {
   "linux-generic-bbb": {
@@ -1156,6 +1472,97 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/linux-generic-bbb_4.4
   }
 }
 
+Running: USNDB='./tests/test-usn-kernel-and-build-pkgs.db' snap-check-notices --no-fetch ./tests/linux-generic-bbb_4.4.0-140-1_armhf.snap
+{
+  "linux-generic-bbb": {
+    "4.4.0-140-1": {
+      "linux-image-generic": [
+        "3848-1",
+        "3879-1"
+      ],
+      "snapcraft": [
+        "5501-1"
+      ]
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-kernel-and-build-pkgs.db' snap-check-notices --no-fetch --with-cves ./tests/linux-generic-bbb_4.4.0-140-1_armhf.snap
+{
+  "linux-generic-bbb": {
+    "4.4.0-140-1": {
+      "linux-image-generic": {
+        "3848-1": [
+          "CVE-2017-18174",
+          "CVE-2018-12896",
+          "CVE-2018-18690",
+          "CVE-2018-18710"
+        ],
+        "3879-1": [
+          "CVE-2018-10883",
+          "CVE-2018-16862",
+          "CVE-2018-19407",
+          "CVE-2018-19824",
+          "CVE-2018-20169"
+        ]
+      },
+      "snapcraft": {
+        "5501-1": [
+          "CVE-2020-9999"
+        ]
+      }
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-unittest-build-pkgs.db' snap-check-notices --no-fetch ./tests/linux-generic-bbb_4.4.0-140-1_armhf.snap
+{
+  "linux-generic-bbb": {
+    "4.4.0-140-1": {
+      "snapcraft": [
+        "5501-1"
+      ]
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-unittest-build-pkgs.db' snap-check-notices --no-fetch --with-cves ./tests/linux-generic-bbb_4.4.0-140-1_armhf.snap
+{
+  "linux-generic-bbb": {
+    "4.4.0-140-1": {
+      "snapcraft": {
+        "5501-1": [
+          "CVE-2020-9999"
+        ]
+      }
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-unittest-build-pkgs-only.db' snap-check-notices --no-fetch ./tests/linux-generic-bbb_4.4.0-140-1_armhf.snap
+{
+  "linux-generic-bbb": {
+    "4.4.0-140-1": {
+      "snapcraft": [
+        "5501-1"
+      ]
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-unittest-build-pkgs-only.db' snap-check-notices --no-fetch --with-cves ./tests/linux-generic-bbb_4.4.0-140-1_armhf.snap
+{
+  "linux-generic-bbb": {
+    "4.4.0-140-1": {
+      "snapcraft": {
+        "5501-1": [
+          "CVE-2020-9999"
+        ]
+      }
+    }
+  }
+}
+
 Running: snap-check-notices --no-fetch ./tests/pc-kernel_4.15.0-44.46_i386.snap
 {
   "pc-kernel": {
@@ -1179,6 +1586,91 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/pc-kernel_4.15.0-44.4
         ],
         "4489-1": [
           "CVE-2020-14386"
+        ]
+      }
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-kernel-and-build-pkgs.db' snap-check-notices --no-fetch ./tests/pc-kernel_4.15.0-44.46_i386.snap
+{
+  "pc-kernel": {
+    "4.15.0-44.46": {
+      "linux-image-generic": [
+        "3871-2",
+        "4489-1"
+      ],
+      "snapcraft": [
+        "5501-1"
+      ]
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-kernel-and-build-pkgs.db' snap-check-notices --no-fetch --with-cves ./tests/pc-kernel_4.15.0-44.46_i386.snap
+{
+  "pc-kernel": {
+    "4.15.0-44.46": {
+      "linux-image-generic": {
+        "3871-2": [
+          "https://launchpad.net/bugs/1813663",
+          "https://launchpad.net/bugs/1813727"
+        ],
+        "4489-1": [
+          "CVE-2020-14386"
+        ]
+      },
+      "snapcraft": {
+        "5501-1": [
+          "CVE-2020-9999"
+        ]
+      }
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-unittest-build-pkgs.db' snap-check-notices --no-fetch ./tests/pc-kernel_4.15.0-44.46_i386.snap
+{
+  "pc-kernel": {
+    "4.15.0-44.46": {
+      "snapcraft": [
+        "5501-1"
+      ]
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-unittest-build-pkgs.db' snap-check-notices --no-fetch --with-cves ./tests/pc-kernel_4.15.0-44.46_i386.snap
+{
+  "pc-kernel": {
+    "4.15.0-44.46": {
+      "snapcraft": {
+        "5501-1": [
+          "CVE-2020-9999"
+        ]
+      }
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-unittest-build-pkgs-only.db' snap-check-notices --no-fetch ./tests/pc-kernel_4.15.0-44.46_i386.snap
+{
+  "pc-kernel": {
+    "4.15.0-44.46": {
+      "snapcraft": [
+        "5501-1"
+      ]
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-unittest-build-pkgs-only.db' snap-check-notices --no-fetch --with-cves ./tests/pc-kernel_4.15.0-44.46_i386.snap
+{
+  "pc-kernel": {
+    "4.15.0-44.46": {
+      "snapcraft": {
+        "5501-1": [
+          "CVE-2020-9999"
         ]
       }
     }
@@ -1213,6 +1705,90 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/pc-kernel_4.4.0-141.1
   }
 }
 
+Running: USNDB='./tests/test-usn-kernel-and-build-pkgs.db' snap-check-notices --no-fetch ./tests/pc-kernel_4.4.0-141.167_amd64.snap
+{
+  "pc-kernel": {
+    "4.4.0-141.167": {
+      "linux-image-generic": [
+        "3879-1"
+      ],
+      "snapcraft": [
+        "5501-1"
+      ]
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-kernel-and-build-pkgs.db' snap-check-notices --no-fetch --with-cves ./tests/pc-kernel_4.4.0-141.167_amd64.snap
+{
+  "pc-kernel": {
+    "4.4.0-141.167": {
+      "linux-image-generic": {
+        "3879-1": [
+          "CVE-2018-10883",
+          "CVE-2018-16862",
+          "CVE-2018-19407",
+          "CVE-2018-19824",
+          "CVE-2018-20169"
+        ]
+      },
+      "snapcraft": {
+        "5501-1": [
+          "CVE-2020-9999"
+        ]
+      }
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-unittest-build-pkgs.db' snap-check-notices --no-fetch ./tests/pc-kernel_4.4.0-141.167_amd64.snap
+{
+  "pc-kernel": {
+    "4.4.0-141.167": {
+      "snapcraft": [
+        "5501-1"
+      ]
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-unittest-build-pkgs.db' snap-check-notices --no-fetch --with-cves ./tests/pc-kernel_4.4.0-141.167_amd64.snap
+{
+  "pc-kernel": {
+    "4.4.0-141.167": {
+      "snapcraft": {
+        "5501-1": [
+          "CVE-2020-9999"
+        ]
+      }
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-unittest-build-pkgs-only.db' snap-check-notices --no-fetch ./tests/pc-kernel_4.4.0-141.167_amd64.snap
+{
+  "pc-kernel": {
+    "4.4.0-141.167": {
+      "snapcraft": [
+        "5501-1"
+      ]
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-unittest-build-pkgs-only.db' snap-check-notices --no-fetch --with-cves ./tests/pc-kernel_4.4.0-141.167_amd64.snap
+{
+  "pc-kernel": {
+    "4.4.0-141.167": {
+      "snapcraft": {
+        "5501-1": [
+          "CVE-2020-9999"
+        ]
+      }
+    }
+  }
+}
+
 Running: snap-check-notices --no-fetch ./tests/gke-kernel_4.15.0-1069.72_amd64.snap
 {
   "gke-kernel": {
@@ -1224,6 +1800,78 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/gke-kernel_4.15.0-106
 {
   "gke-kernel": {
     "4.15.0-1069.72": {}
+  }
+}
+
+Running: USNDB='./tests/test-usn-kernel-and-build-pkgs.db' snap-check-notices --no-fetch ./tests/gke-kernel_4.15.0-1069.72_amd64.snap
+{
+  "gke-kernel": {
+    "4.15.0-1069.72": {
+      "snapcraft": [
+        "5501-1"
+      ]
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-kernel-and-build-pkgs.db' snap-check-notices --no-fetch --with-cves ./tests/gke-kernel_4.15.0-1069.72_amd64.snap
+{
+  "gke-kernel": {
+    "4.15.0-1069.72": {
+      "snapcraft": {
+        "5501-1": [
+          "CVE-2020-9999"
+        ]
+      }
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-unittest-build-pkgs.db' snap-check-notices --no-fetch ./tests/gke-kernel_4.15.0-1069.72_amd64.snap
+{
+  "gke-kernel": {
+    "4.15.0-1069.72": {
+      "snapcraft": [
+        "5501-1"
+      ]
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-unittest-build-pkgs.db' snap-check-notices --no-fetch --with-cves ./tests/gke-kernel_4.15.0-1069.72_amd64.snap
+{
+  "gke-kernel": {
+    "4.15.0-1069.72": {
+      "snapcraft": {
+        "5501-1": [
+          "CVE-2020-9999"
+        ]
+      }
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-unittest-build-pkgs-only.db' snap-check-notices --no-fetch ./tests/gke-kernel_4.15.0-1069.72_amd64.snap
+{
+  "gke-kernel": {
+    "4.15.0-1069.72": {
+      "snapcraft": [
+        "5501-1"
+      ]
+    }
+  }
+}
+
+Running: USNDB='./tests/test-usn-unittest-build-pkgs-only.db' snap-check-notices --no-fetch --with-cves ./tests/gke-kernel_4.15.0-1069.72_amd64.snap
+{
+  "gke-kernel": {
+    "4.15.0-1069.72": {
+      "snapcraft": {
+        "5501-1": [
+          "CVE-2020-9999"
+        ]
+      }
+    }
   }
 }
 
