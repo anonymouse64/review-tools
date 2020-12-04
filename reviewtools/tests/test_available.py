@@ -156,8 +156,8 @@ Revision r16 (i386; channels: edge)
  * snapcraft: 5501-1
 """
         needle_for_template = """
-In addition, the following lists new USNs for affected build packages in each
-snap revision:
+In addition, the following lists new USNs for affected build packages in
+each snap revision:
 """
         self.assertTrue(needle in body)
         for line in body.splitlines():
@@ -197,8 +197,8 @@ Revision r14 (i386; channels: edge)
  * libxcursor1: 3501-1
 """
         needle_for_template = """
-In addition, the following lists new USNs for affected build packages in each
-snap revision:
+In addition, the following lists new USNs for affected build packages in
+each snap revision:
             """
         self.assertTrue(needle_for_revisions in body)
         for line in body.splitlines():
@@ -271,6 +271,222 @@ Revision r14 (i386; channels: edge)
         self.assertTrue(contains_stage_pkgs)
         self.assertFalse(contains_build_pkgs)
         self.assertEqual("0ad contains outdated Ubuntu packages", subj)
+
+    def test_check__secnot_report_for_pkg_only_build_pkg_new_secnot(self):
+        """Test _secnot_report_for_pkg() - only new secnot for build pkg"""
+        self.secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pkgs-only.db")
+        errors = {}
+        self.pkg_db = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
+
+        seen_db = {
+            "0ad": {
+                "11": ["3501-1", "3602-1"],
+                "12": ["3501-1", "3602-1"],
+                "13": ["3501-1", "3602-1"],
+                "14": ["3501-1", "3602-1"],
+            }
+        }
+        (
+            subj,
+            body,
+            contains_stage_pkgs,
+            contains_build_pkgs,
+        ) = available._secnot_report_for_pkg(self.pkg_db, seen_db)
+        needle = """
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * snapcraft: 5501-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * snapcraft: 5501-1
+
+Revision r13 (amd64; channels: edge)
+ * snapcraft: 5501-1
+
+Revision r14 (i386; channels: edge)
+ * snapcraft: 5501-1
+
+Revision r15 (amd64; channels: edge)
+ * snapcraft: 5501-1
+
+Revision r16 (i386; channels: edge)
+ * snapcraft: 5501-1
+"""
+        needle_for_template = """In addition, the following lists new USNs for affected build packages in
+each snap revision
+"""
+        self.assertTrue(needle in body)
+        self.assertFalse(needle_for_template in body)
+        self.assertFalse(contains_stage_pkgs)
+        self.assertTrue(contains_build_pkgs)
+        self.assertEqual("0ad was built with outdated Ubuntu packages", subj)
+
+    def test_check__secnot_report_for_pkg_stage_and_build_pkg_new_secnot(self):
+        """Test _secnot_report_for_pkg() - new secnot for build and
+        staged pkg"""
+        self.secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pkgs.db")
+        errors = {}
+        self.pkg_db = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
+
+        seen_db = {
+            "0ad": {
+                "11": ["3501-1", "3602-1"],
+                "12": ["3501-1", "3602-1"],
+                "13": ["3501-1", "3602-1"],
+                "14": ["3501-1", "3602-1"],
+            }
+        }
+        (
+            subj,
+            body,
+            contains_stage_pkgs,
+            contains_build_pkgs,
+        ) = available._secnot_report_for_pkg(self.pkg_db, seen_db)
+        needle = """A scan of this snap shows that it was built with packages from the Ubuntu
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
+
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * libtiff5: 3606-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * libtiff5: 3606-1
+
+Revision r13 (amd64; channels: edge)
+ * libtiff5: 3606-1
+
+Revision r14 (i386; channels: edge)
+ * libtiff5: 3606-1
+
+Revision r15 (amd64; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r16 (i386; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r17 (amd64; channels: edge)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+In addition, the following lists new USNs for affected build packages in
+each snap revision:
+
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * snapcraft: 5501-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * snapcraft: 5501-1
+
+Revision r13 (amd64; channels: edge)
+ * snapcraft: 5501-1
+
+Revision r14 (i386; channels: edge)
+ * snapcraft: 5501-1
+
+Revision r15 (amd64; channels: edge)
+ * snapcraft: 5501-1
+
+Revision r16 (i386; channels: edge)
+ * snapcraft: 5501-1
+"""
+        self.assertTrue(needle in body)
+        self.assertTrue(contains_stage_pkgs)
+        self.assertTrue(contains_build_pkgs)
+        self.assertEqual(
+            "0ad contains and was built with outdated Ubuntu packages", subj
+        )
+
+    def test_check__secnot_report_for_kernel_only_new_secnot(self):
+        """Test _secnot_report_for_pkg() - new secnot for kernel"""
+        self.secnot_db = usn.read_usn_db("./tests/test-usn-kernel.db")
+        self.store_db = read_file_as_json_dict("./tests/test-store-kernel.db")
+        errors = {}
+        self.pkg_db = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
+        seen_db = {"linux-generic-bbb": {"12": ["3848-1"],}}
+        (
+            subj,
+            body,
+            contains_stage_pkgs,
+            contains_build_pkgs,
+        ) = available._secnot_report_for_pkg(self.pkg_db, seen_db)
+        needle = """
+Revision r12 (armhf; channels: stable, beta)
+ * linux-image-generic: 3879-1
+"""
+        self.assertTrue(needle in body)
+        self.assertTrue(contains_stage_pkgs)
+        self.assertFalse(contains_build_pkgs)
+        self.assertEqual("linux-generic-bbb built from outdated Ubuntu kernel", subj)
+
+    def test_check__secnot_report_for_kernel_only_build_pkg_new_secnot(self):
+        """Test _secnot_report_for_pkg() - only new secnot for build pkg"""
+        self.secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pkgs-only.db")
+        self.store_db = read_file_as_json_dict("./tests/test-store-kernel.db")
+        errors = {}
+        self.pkg_db = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
+
+        seen_db = {"linux-generic-bbb": {"12": ["3848-1"],}}
+        (
+            subj,
+            body,
+            contains_stage_pkgs,
+            contains_build_pkgs,
+        ) = available._secnot_report_for_pkg(self.pkg_db, seen_db)
+        needle = """
+Revision r12 (armhf; channels: stable, beta)
+ * snapcraft: 5501-1
+"""
+        needle_for_template = """In addition, the following lists new
+        USNs for affected build packages in
+each snap revision
+"""
+        self.assertTrue(needle in body)
+        self.assertFalse(needle_for_template in body)
+        print(body)
+        self.assertFalse("3848-1" in body)
+        self.assertFalse(contains_stage_pkgs)
+        self.assertTrue(contains_build_pkgs)
+        self.assertEqual(
+            "linux-generic-bbb was built with outdated Ubuntu packages", subj
+        )
+
+    def test_check__secnot_report_for_kernel_stage_and_build_pkg_new_secnot(self):
+        """Test _secnot_report_for_pkg() - new secnot for build and
+            staged pkg"""
+        self.secnot_db = usn.read_usn_db("./tests/test-usn-kernel-and-build-pkgs.db")
+        self.store_db = read_file_as_json_dict("./tests/test-store-kernel.db")
+        errors = {}
+        self.pkg_db = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
+
+        seen_db = {"linux-generic-bbb": {"12": ["3848-1", "3602-1"],}}
+        (
+            subj,
+            body,
+            contains_stage_pkgs,
+            contains_build_pkgs,
+        ) = available._secnot_report_for_pkg(self.pkg_db, seen_db)
+        needle = """A scan of this snap shows that it was built using sources based on a kernel
+from the Ubuntu archive that has since received security updates. The
+following lists new USNs for the Ubuntu kernel that the snap is based on in
+each snap revision:
+
+Revision r12 (armhf; channels: stable, beta)
+ * linux-image-generic: 3879-1
+
+In addition, the following lists new USNs for affected build packages in
+each snap revision:
+
+Revision r12 (armhf; channels: stable, beta)
+ * snapcraft: 5501-1
+"""
+        self.assertTrue(needle in body)
+        self.assertTrue(contains_stage_pkgs)
+        self.assertTrue(contains_build_pkgs)
+        self.assertEqual(
+            "linux-generic-bbb built from outdated Ubuntu kernel and with outdated Ubuntu packages",
+            subj,
+        )
 
     def test_check__secnot_report_for_pkg_only_new_secnot_budgie(self):
         """Test _secnot_report_for_pkg() - only new secnot budgie"""

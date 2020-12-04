@@ -148,12 +148,6 @@ def _secnot_report_for_pkg(pkg_db, seen_db):
         shown_rev_header_for_stage_pkgs = False
         shown_rev_header_for_build_pkgs = False
 
-        if "staged" in pkg_db["revisions"][r]["secnot-report"]:
-            report_contains_stage_pkgs = True
-
-        if "build" in pkg_db["revisions"][r]["secnot-report"]:
-            report_contains_build_pkgs = True
-
         # secnot-report report has 2 sections: staged (for secnots related to
         # primed-stage-packages and stage-packages) and build (for secnots
         # related to build-packages)
@@ -174,6 +168,17 @@ def _secnot_report_for_pkg(pkg_db, seen_db):
                     ):
                         continue
                     secnots.append(secnot)
+                    # This is the fix for LP bug #1906827
+                    if (
+                        sec_note_per_pkg_type == "staged"
+                        and not report_contains_stage_pkgs
+                    ):
+                        report_contains_stage_pkgs = True
+                    elif (
+                        sec_note_per_pkg_type == "build"
+                        and not report_contains_build_pkgs
+                    ):
+                        report_contains_build_pkgs = True
                 secnots.sort()
 
                 if len(secnots) > 0:
@@ -238,7 +243,7 @@ def _secnot_report_for_pkg(pkg_db, seen_db):
             subj,
             body,
             report_contains_stage_pkgs,
-            False,
+            report_contains_build_pkgs,
         )
     elif report_contains_stage_pkgs and report_contains_build_pkgs:
         # Template text containing updates for staged and build packages
