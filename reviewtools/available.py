@@ -39,7 +39,7 @@ from reviewtools.usn import read_usn_db
 
 email_update_required_text = """A scan of this snap shows that it was built with packages from the Ubuntu
 archive that have since received security updates. """
-email_addional_build_pkgs_text = """In addition, the following lists new USNs for affected build packages in
+email_additional_build_pkgs_text = """In addition, the following lists new USNs for affected build packages in
 each snap revision:
 %s
 """
@@ -90,7 +90,7 @@ USNs for affected build packages in each snap revision:
 USNs for affected binary packages in each snap revision:
 %s
 """
-        + email_addional_build_pkgs_text
+        + email_additional_build_pkgs_text
         + email_rebuild_snap_text
     ),
     "kernel": (
@@ -109,7 +109,7 @@ USNs for affected build packages in each snap revision:
     ),
     "kernel-and-build-pkgs": (
         email_kernel_update_required_text
-        + email_addional_build_pkgs_text
+        + email_additional_build_pkgs_text
         + email_rebuild_kernel_snap_text
         + email_thanks_and_references_text
     ),
@@ -211,9 +211,6 @@ def _secnot_report_for_pkg(pkg_db, seen_db):
     reference_urls.sort()
     template = "default"
     if "snap_type" in pkg_db and pkg_db["snap_type"] == "kernel":
-        # Since we are not fully supporting notifications for
-        # build-packages just yet, is the standard kernel template that
-        # omits them for now.
         # TODO: update when fully support build-packages
         if report_contains_stage_pkgs and report_contains_build_pkgs:
             subj = (

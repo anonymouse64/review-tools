@@ -118,7 +118,7 @@ run "$tmp_seen" test-usn-unittest-build-pkgs-only.db test-store-kernel.db
 run "$tmp_seen" test-usn-unittest-build-pkgs-only.db test-store-kernel.db
 
 # should show CVE-2020-9999
-comment "= Test --seen-db updated for build-pkgs only ="
+comment "= Test --seen-db updated for build-pkgs and staged packages ="
 reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-unittest-build-pkgs.db test-store-kernel.db
 run "$tmp_seen" test-usn-unittest-build-pkgs.db test-store-kernel.db
@@ -153,19 +153,19 @@ echo "" | tee -a "$tmp"
 
 for i in gke-kernel_4.15.0-1027.28~16.04.1_amd64.snap linux-generic-bbb_4.4.0-140-1_armhf.snap pc-kernel_4.15.0-44.46_i386.snap pc-kernel_4.4.0-141.167_amd64.snap ; do
     # kernel USNs only
-    echo "Running: snap-updates-available --usn-db='./tests/test-usn-kernel.db' --snap='./tests/$i'" | tee -a "$tmp"
+    echo "Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-kernel.db' --snap='./tests/$i'" | tee -a "$tmp"
     PYTHONPATH=./ ./bin/snap-updates-available --with-cves --usn-db='./tests/test-usn-kernel.db' --snap="./tests/$i" 2>&1 | tee -a "$tmp"
     echo "" | tee -a "$tmp"
     # kernel and build-packages USNs
-    echo "Running: snap-updates-available --usn-db='./tests/test-usn-kernel-and-build-pkgs.db' --snap='./tests/$i'" | tee -a "$tmp"
+    echo "Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-kernel-and-build-pkgs.db' --snap='./tests/$i'" | tee -a "$tmp"
     PYTHONPATH=./ ./bin/snap-updates-available --with-cves --usn-db='./tests/test-usn-kernel-and-build-pkgs.db' --snap="./tests/$i" 2>&1 | tee -a "$tmp"
     echo "" | tee -a "$tmp"
     # build-packages USNs only
-    echo "Running: snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs-only.db' --snap='./tests/$i'" | tee -a "$tmp"
+    echo "Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-unittest-build-pkgs-only.db' --snap='./tests/$i'" | tee -a "$tmp"
     PYTHONPATH=./ ./bin/snap-updates-available --with-cves --usn-db='./tests/test-usn-unittest-build-pkgs-only.db' --snap="./tests/$i" 2>&1 | tee -a "$tmp"
     echo "" | tee -a "$tmp"
     # build-packages and stage-packages USNs - no kernel USN
-    echo "Running: snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs.db' --snap='./tests/$i'" | tee -a "$tmp"
+    echo "Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-unittest-build-pkgs.db' --snap='./tests/$i'" | tee -a "$tmp"
     PYTHONPATH=./ ./bin/snap-updates-available --with-cves --usn-db='./tests/test-usn-unittest-build-pkgs.db' --snap="./tests/$i" 2>&1 | tee -a "$tmp"
     echo "" | tee -a "$tmp"
 done
