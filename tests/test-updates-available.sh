@@ -106,21 +106,21 @@ reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-kernel.db test-store-kernel.db
 run "$tmp_seen" test-usn-kernel.db test-store-kernel.db
 
-# should show 3848-1, 3879-1 and CVE-2020-9999
+# should show 3848-1, 3879-1 and 5501-1
 # test-usn-kernel-and-build-pkgs.db contains USNs for kernel and build pkgs
 comment "= Test --seen-db updated for linux-generic-bbb and build-pkgs ="
 reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-kernel-and-build-pkgs.db test-store-kernel.db
 run "$tmp_seen" test-usn-kernel-and-build-pkgs.db test-store-kernel.db
 
-# should show CVE-2020-9999
+# should show 5501-1
 # test-usn-kernel-and-build-pkgs-only.db contains only USNs for build pkgs
 comment "= Test --seen-db updated for build-pkgs only ="
 reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-unittest-build-pkgs-only.db test-store-kernel.db
 run "$tmp_seen" test-usn-unittest-build-pkgs-only.db test-store-kernel.db
 
-# should show CVE-2020-9999
+# should show 5501-1
 # test-usn-unittest-build-pkgs.db contains USNs for staged and build pkgs, no
 # kernel USNs at all
 comment "= Test --seen-db updated for build-pkgs and staged packages ="
