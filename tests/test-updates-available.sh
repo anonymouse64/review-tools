@@ -47,6 +47,8 @@ reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-2.db test-store-1.db
 run "$tmp_seen" test-usn-2.db test-store-1.db
 
+# test-usn-unittest-build-pkgs.db contains all USNs in test-usn-2.db + one
+# USN for build packages.
 # first should show 3602-1, 3606-1 and 3501-1 and subject should only say
 # "contains". Second should show 5501-1 and subject should only say "was
 # built". https://bugs.launchpad.net/review-tools/+bug/1906827
@@ -55,6 +57,8 @@ reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-2.db test-store-unittest-3.db
 run "$tmp_seen" test-usn-unittest-build-pkgs.db test-store-unittest-3.db
 
+# test-usn-unittest-build-pkgs.db contains all USNs in test-usn-1.db + one
+# USN for staged-packages + one USN for build packages.
 # first should show 3602-1 and 3501-1 and subject should only say
 # "contains". Second should show 3606-1 and 5501-1 and subject should say
 # "contains and was built". https://bugs.launchpad.net/review-tools/+bug/1906827
@@ -121,19 +125,44 @@ reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-kernel.db test-store-kernel.db
 run "$tmp_seen" test-usn-kernel.db test-store-kernel.db
 
-# should show 3848-1, 3879-1 and CVE-2020-9999
+# should show 3848-1, 3879-1 and 5501-1
 comment "= Test --seen-db updated for linux-generic-bbb and build-pkgs ="
 reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-kernel-and-build-pkgs.db test-store-kernel.db
 run "$tmp_seen" test-usn-kernel-and-build-pkgs.db test-store-kernel.db
 
-# should show CVE-2020-9999
+# test-usn-kernel-and-build-pkgs.db contains all USNs in test-usn-kernel.db +
+# one USN for build packages.
+# first should show 3848-1, 3879-1 and subject should only say
+# "built from outdated". Second should show 5501-1 and subject should only
+# say "was built with". https://bugs.launchpad.net/review-tools/+bug/1906827
+comment "= Test --seen-db updated for linux-generic-bbb and only build pkgs in
+second USN ="
+reset_seen "$tmp_seen"
+run "$tmp_seen" test-usn-kernel.db test-store-kernel.db
+run "$tmp_seen" test-usn-kernel-and-build-pkgs.db test-store-kernel.db
+run "$tmp_seen" test-usn-kernel-and-build-pkgs.db test-store-kernel.db
+
+# test-usn-kernel-reduced.db is a reduced version of test-usn-kernel.db.
+# test-usn-kernel-and-build-pkgs.db contains all USNs in
+# test-usn-kernel-reduced.db + one USN for kernel + one USN for build packages.
+# first should show 3879-1 and subject should only say "built from outdated".
+# Second should show 3848-1 and 5501-1 and subject should say "built from ...
+# and with ...". https://bugs.launchpad.net/review-tools/+bug/1906827
+comment "= Test --seen-db updated for linux-generic-bbb and both kernel and
+build pkgs in second USN="
+reset_seen "$tmp_seen"
+run "$tmp_seen" test-usn-kernel-reduced.db test-store-kernel.db
+run "$tmp_seen" test-usn-kernel-and-build-pkgs.db test-store-kernel.db
+run "$tmp_seen" test-usn-kernel-and-build-pkgs.db test-store-kernel.db
+
+# should show 5501-1
 comment "= Test --seen-db updated for build-pkgs only ="
 reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-unittest-build-pkgs-only.db test-store-kernel.db
 run "$tmp_seen" test-usn-unittest-build-pkgs-only.db test-store-kernel.db
 
-# should show CVE-2020-9999
+# should show 5501-1
 comment "= Test --seen-db updated for build-pkgs and staged packages ="
 reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-unittest-build-pkgs.db test-store-kernel.db

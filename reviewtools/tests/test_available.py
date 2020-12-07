@@ -155,7 +155,7 @@ Revision r15 (amd64; channels: edge)
 Revision r16 (i386; channels: edge)
  * snapcraft: 5501-1
 """
-        needle_for_template = """
+        needle_for_template_in_addition = """
 In addition, the following lists new USNs for affected build packages in
 each snap revision:
 """
@@ -163,7 +163,7 @@ each snap revision:
         for line in body.splitlines():
             # text width of emails should not exceed 75
             self.assertTrue(len(line) <= 75)
-        self.assertFalse(needle_for_template in body)
+        self.assertFalse(needle_for_template_in_addition in body)
         self.assertFalse(contains_stage_pkgs)
         self.assertTrue(contains_build_pkgs)
         self.assertEqual("0ad was built with outdated Ubuntu packages", subj)
@@ -196,7 +196,7 @@ Revision r14 (i386; channels: edge)
  * libtiff5: 3602-1, 3606-1
  * libxcursor1: 3501-1
 """
-        needle_for_template = """
+        needle_for_template_in_addition = """
 In addition, the following lists new USNs for affected build packages in
 each snap revision:
             """
@@ -204,7 +204,7 @@ each snap revision:
         for line in body.splitlines():
             # text width of emails should not exceed 75
             self.assertTrue(len(line) <= 75)
-        self.assertFalse(needle_for_template in body)
+        self.assertFalse(needle_for_template_in_addition in body)
         self.assertTrue(contains_stage_pkgs)
         self.assertFalse(contains_build_pkgs)
         self.assertEqual("0ad contains outdated Ubuntu packages", subj)
@@ -311,11 +311,11 @@ Revision r15 (amd64; channels: edge)
 Revision r16 (i386; channels: edge)
  * snapcraft: 5501-1
 """
-        needle_for_template = """In addition, the following lists new USNs for affected build packages in
+        needle_for_template_in_addition = """In addition, the following lists new USNs for affected build packages in
 each snap revision
 """
         self.assertTrue(needle in body)
-        self.assertFalse(needle_for_template in body)
+        self.assertFalse(needle_for_template_in_addition in body)
         self.assertFalse(contains_stage_pkgs)
         self.assertTrue(contains_build_pkgs)
         self.assertEqual("0ad was built with outdated Ubuntu packages", subj)
@@ -437,12 +437,12 @@ Revision r12 (armhf; channels: stable, beta)
 Revision r12 (armhf; channels: stable, beta)
  * snapcraft: 5501-1
 """
-        needle_for_template = """In addition, the following lists new
+        needle_for_template_in_addition = """In addition, the following lists new
         USNs for affected build packages in
 each snap revision
 """
         self.assertTrue(needle in body)
-        self.assertFalse(needle_for_template in body)
+        self.assertFalse(needle_for_template_in_addition in body)
         print(body)
         self.assertFalse("3848-1" in body)
         self.assertFalse(contains_stage_pkgs)
