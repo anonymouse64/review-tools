@@ -139,6 +139,8 @@ References:
  * https://ubuntu.com/security/notices/USN-5501-1/
 
 
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-unittest-3.db'...
+
 = Test --seen-db updated new subject says contains and was built =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-1.db' --store-db='./tests/test-store-unittest-3.db'...
@@ -205,6 +207,8 @@ References:
  * https://ubuntu.com/security/notices/USN-3606-1/
  * https://ubuntu.com/security/notices/USN-5501-1/
 
+
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-unittest-3.db'...
 
 = Test previous USNs not reported with --seen-db updated =
 Emptying seen.db

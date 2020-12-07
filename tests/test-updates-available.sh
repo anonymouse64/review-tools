@@ -56,6 +56,7 @@ comment "= Test --seen-db updated, new subject says only was built ="
 reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-2.db test-store-unittest-3.db
 run "$tmp_seen" test-usn-unittest-build-pkgs.db test-store-unittest-3.db
+run "$tmp_seen" test-usn-unittest-build-pkgs.db test-store-unittest-3.db
 
 # test-usn-unittest-build-pkgs.db contains all USNs in test-usn-1.db + one
 # USN for staged-packages + one USN for build packages.
@@ -65,6 +66,7 @@ run "$tmp_seen" test-usn-unittest-build-pkgs.db test-store-unittest-3.db
 comment "= Test --seen-db updated new subject says contains and was built ="
 reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-1.db test-store-unittest-3.db
+run "$tmp_seen" test-usn-unittest-build-pkgs.db test-store-unittest-3.db
 run "$tmp_seen" test-usn-unittest-build-pkgs.db test-store-unittest-3.db
 
 # should show 3606-1
