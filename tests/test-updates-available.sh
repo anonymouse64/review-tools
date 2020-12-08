@@ -114,7 +114,7 @@ run "$tmp_seen" test-usn-kernel-and-build-pkgs.db test-store-kernel.db
 run "$tmp_seen" test-usn-kernel-and-build-pkgs.db test-store-kernel.db
 
 # should show 5501-1
-# test-usn-kernel-and-build-pkgs-only.db contains only USNs for build pkgs
+# test-usn-unittest-build-pkgs-only.db contains only USNs for build pkgs
 comment "= Test --seen-db updated for build-pkgs only ="
 reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-unittest-build-pkgs-only.db test-store-kernel.db
