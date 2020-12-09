@@ -69,6 +69,24 @@ run "$tmp_seen" test-usn-1.db test-store-unittest-3.db
 run "$tmp_seen" test-usn-unittest-build-pkgs.db test-store-unittest-3.db
 run "$tmp_seen" test-usn-unittest-build-pkgs.db test-store-unittest-3.db
 
+# first should show 5501-1 and subject should only say "was
+# built". Second should show 3602-1, 3606-1 and 3501-1 and subject should only
+# say "contains". https://bugs.launchpad.net/review-tools/+bug/1906827
+comment "= Test --seen-db updated, new subject says only contains ="
+reset_seen "$tmp_seen"
+run "$tmp_seen" test-usn-unittest-build-pkgs-only.db test-store-unittest-3.db
+run "$tmp_seen" test-usn-2.db test-store-unittest-3.db
+run "$tmp_seen" test-usn-2.db test-store-unittest-3.db
+
+# first should show 3606-1 and 5501-1 and subject should say "contains and was
+# built". Second should show 3598-1, 3610-1 and 3622-1 and subject should only
+# say "contains". https://bugs.launchpad.net/review-tools/+bug/1906827
+comment "= Test --seen-db updated, new subject says only contains ="
+reset_seen "$tmp_seen"
+run "$tmp_seen" test-usn-unittest-build-pkgs.db test-store-unittest-3.db
+run "$tmp_seen" test-usn-budgie-1.db test-store-unittest-3.db
+run "$tmp_seen" test-usn-budgie-1.db test-store-unittest-3.db
+
 # should show 3606-1
 comment "= Test previous USNs not reported with --seen-db updated ="
 reset_seen "$tmp_seen"
@@ -147,6 +165,28 @@ run "$tmp_seen" test-usn-kernel.db test-store-kernel.db
 run "$tmp_seen" test-usn-kernel-and-build-pkgs.db test-store-kernel.db
 run "$tmp_seen" test-usn-kernel-and-build-pkgs.db test-store-kernel.db
 
+# first should show 5501-1 and subject should only say "was built with".
+# Second should show 3848-1, 3879-1 and subject should only say
+# "built from outdated". https://bugs.launchpad.net/review-tools/+bug/1906827
+comment "= Test --seen-db updated for linux-generic-bbb and only kernel in
+second USN ="
+reset_seen "$tmp_seen"
+run "$tmp_seen" test-usn-unittest-build-pkgs-only.db test-store-kernel.db
+run "$tmp_seen" test-usn-kernel.db test-store-kernel.db
+run "$tmp_seen" test-usn-kernel.db test-store-kernel.db
+
+# test-usn-kernel-and-build-pkgs-1.db contains only 1 USN present in
+# test-usn-kernel.db + one USN for build packages.
+# first should show 5501-1 and 3879-1 and subject should say "built from...
+# and with outdated". Second should show 3848-1 and subject should only say
+# "built from outdated". https://bugs.launchpad.net/review-tools/+bug/1906827
+comment "= Test --seen-db updated for linux-generic-bbb and only kernel in
+second USN ="
+reset_seen "$tmp_seen"
+run "$tmp_seen" test-usn-kernel-and-build-pkgs-1.db test-store-kernel.db
+run "$tmp_seen" test-usn-kernel.db test-store-kernel.db
+run "$tmp_seen" test-usn-kernel.db test-store-kernel.db
+
 # test-usn-kernel-reduced.db is a reduced version of test-usn-kernel.db.
 # test-usn-kernel-and-build-pkgs.db contains all USNs in
 # test-usn-kernel-reduced.db + one USN for kernel + one USN for build packages.
@@ -159,6 +199,7 @@ reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-kernel-reduced.db test-store-kernel.db
 run "$tmp_seen" test-usn-kernel-and-build-pkgs.db test-store-kernel.db
 run "$tmp_seen" test-usn-kernel-and-build-pkgs.db test-store-kernel.db
+
 
 # should show 5501-1
 # test-usn-unittest-build-pkgs-only.db contains only USNs for build pkgs

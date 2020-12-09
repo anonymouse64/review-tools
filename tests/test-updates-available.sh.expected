@@ -210,6 +210,146 @@ References:
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-unittest-3.db'...
 
+= Test --seen-db updated, new subject says only contains =
+Emptying seen.db
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs-only.db' --store-db='./tests/test-store-unittest-3.db'...
+From: Snap Store <noreply@canonical.com>
+To: olivier.tilloy@canonical.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
+Subject: 0ad was built with outdated Ubuntu packages
+
+A scan of this snap shows that it was built with packages from the Ubuntu
+archive that have since received security updates. The following lists new
+USNs for affected build packages in each snap revision:
+
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * snapcraft: 5501-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * snapcraft: 5501-1
+
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://ubuntu.com/security/notices/USN-5501-1/
+
+
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-unittest-3.db'...
+From: Snap Store <noreply@canonical.com>
+To: olivier.tilloy@canonical.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
+Subject: 0ad contains outdated Ubuntu packages
+
+A scan of this snap shows that it was built with packages from the Ubuntu
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
+
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://ubuntu.com/security/notices/USN-3501-1/
+ * https://ubuntu.com/security/notices/USN-3602-1/
+ * https://ubuntu.com/security/notices/USN-3606-1/
+
+
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-unittest-3.db'...
+
+= Test --seen-db updated, new subject says only contains =
+Emptying seen.db
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-unittest-3.db'...
+From: Snap Store <noreply@canonical.com>
+To: olivier.tilloy@canonical.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
+Subject: 0ad contains and was built with outdated Ubuntu packages
+
+A scan of this snap shows that it was built with packages from the Ubuntu
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
+
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * libtiff5: 3602-1, 3606-1
+ * libxcursor1: 3501-1
+
+In addition, the following lists new USNs for affected build packages in
+each snap revision:
+
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * snapcraft: 5501-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * snapcraft: 5501-1
+
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://ubuntu.com/security/notices/USN-3501-1/
+ * https://ubuntu.com/security/notices/USN-3602-1/
+ * https://ubuntu.com/security/notices/USN-3606-1/
+ * https://ubuntu.com/security/notices/USN-5501-1/
+
+
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-budgie-1.db' --store-db='./tests/test-store-unittest-3.db'...
+From: Snap Store <noreply@canonical.com>
+To: olivier.tilloy@canonical.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
+Subject: 0ad contains outdated Ubuntu packages
+
+A scan of this snap shows that it was built with packages from the Ubuntu
+archive that have since received security updates. The following lists new
+USNs for affected binary packages in each snap revision:
+
+Revision r11 (amd64; channels: stable, candidate, beta)
+ * libcurl3-gnutls: 3598-1
+ * libicu55: 3610-1
+ * libwayland-client0: 3622-1
+ * libwayland-cursor0: 3622-1
+ * libwayland-server0: 3622-1
+
+Revision r12 (i386; channels: stable, candidate, beta)
+ * libcurl3-gnutls: 3598-1
+ * libicu55: 3610-1
+ * libwayland-client0: 3622-1
+ * libwayland-cursor0: 3622-1
+ * libwayland-server0: 3622-1
+
+Simply rebuilding the snap will pull in the new security updates and
+resolve this. If your snap also contains vendored code, now might be a
+good time to review it for any needed updates.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://ubuntu.com/security/notices/USN-3598-1/
+ * https://ubuntu.com/security/notices/USN-3610-1/
+ * https://ubuntu.com/security/notices/USN-3622-1/
+
+
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-budgie-1.db' --store-db='./tests/test-store-unittest-3.db'...
+
 = Test previous USNs not reported with --seen-db updated =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-2.db'...
@@ -637,6 +777,119 @@ References:
 
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel-and-build-pkgs.db' --store-db='./tests/test-store-kernel.db'...
+
+= Test --seen-db updated for linux-generic-bbb and only kernel in
+second USN =
+Emptying seen.db
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs-only.db' --store-db='./tests/test-store-kernel.db'...
+From: Snap Store <noreply@canonical.com>
+To: foo@example.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
+Subject: linux-generic-bbb was built with outdated Ubuntu packages
+
+A scan of this snap shows that it was built with packages from the Ubuntu
+archive that have since received security updates. The following lists new
+USNs for affected build packages in each snap revision:
+
+Revision r12 (armhf; channels: stable, beta)
+ * snapcraft: 5501-1
+
+Updating the snap's git tree, adjusting the version in the snapcraft.yaml
+to match that of the Ubuntu kernel this snap is based on and rebuilding the
+snap should pull in the new security updates and resolve this.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://ubuntu.com/security/notices/USN-5501-1/
+
+
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel.db' --store-db='./tests/test-store-kernel.db'...
+From: Snap Store <noreply@canonical.com>
+To: foo@example.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
+Subject: linux-generic-bbb built from outdated Ubuntu kernel
+
+A scan of this snap shows that it was built using sources based on a kernel
+from the Ubuntu archive that has since received security updates. The
+following lists new USNs for the Ubuntu kernel that the snap is based on in
+each snap revision:
+
+Revision r12 (armhf; channels: stable, beta)
+ * linux-image-generic: 3848-1, 3879-1
+
+Updating the snap's git tree, adjusting the version in the snapcraft.yaml
+to match that of the Ubuntu kernel this snap is based on and rebuilding the
+snap should pull in the new security updates and resolve this.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://ubuntu.com/security/notices/USN-3848-1/
+ * https://ubuntu.com/security/notices/USN-3879-1/
+
+
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel.db' --store-db='./tests/test-store-kernel.db'...
+
+= Test --seen-db updated for linux-generic-bbb and only kernel in
+second USN =
+Emptying seen.db
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel-and-build-pkgs-1.db' --store-db='./tests/test-store-kernel.db'...
+From: Snap Store <noreply@canonical.com>
+To: foo@example.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
+Subject: linux-generic-bbb built from outdated Ubuntu kernel and with outdated Ubuntu packages
+
+A scan of this snap shows that it was built using sources based on a kernel
+from the Ubuntu archive that has since received security updates. The
+following lists new USNs for the Ubuntu kernel that the snap is based on in
+each snap revision:
+
+Revision r12 (armhf; channels: stable, beta)
+ * linux-image-generic: 3879-1
+
+In addition, the following lists new USNs for affected build packages in
+each snap revision:
+
+Revision r12 (armhf; channels: stable, beta)
+ * snapcraft: 5501-1
+
+Updating the snap's git tree, adjusting the version in the snapcraft.yaml
+to match that of the Ubuntu kernel this snap is based on and rebuilding the
+snap should pull in the new security updates and resolve this.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://ubuntu.com/security/notices/USN-3879-1/
+ * https://ubuntu.com/security/notices/USN-5501-1/
+
+
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel.db' --store-db='./tests/test-store-kernel.db'...
+From: Snap Store <noreply@canonical.com>
+To: foo@example.com
+Bcc: jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com
+Subject: linux-generic-bbb built from outdated Ubuntu kernel
+
+A scan of this snap shows that it was built using sources based on a kernel
+from the Ubuntu archive that has since received security updates. The
+following lists new USNs for the Ubuntu kernel that the snap is based on in
+each snap revision:
+
+Revision r12 (armhf; channels: stable, beta)
+ * linux-image-generic: 3848-1
+
+Updating the snap's git tree, adjusting the version in the snapcraft.yaml
+to match that of the Ubuntu kernel this snap is based on and rebuilding the
+snap should pull in the new security updates and resolve this.
+
+Thank you for your snap and for attending to this matter.
+
+References:
+ * https://ubuntu.com/security/notices/USN-3848-1/
+
+
+Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel.db' --store-db='./tests/test-store-kernel.db'...
 
 = Test --seen-db updated for linux-generic-bbb and both kernel and
 build pkgs in second USN=
