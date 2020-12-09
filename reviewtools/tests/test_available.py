@@ -398,8 +398,8 @@ Revision r16 (i386; channels: edge)
         )
 
     def test_check__secnot_report_for_pkg_build_pkg_in_seen_db(self):
-        """Test _secnot_report_for_pkg() - new secnot for staged pkg,
-           build in seen-db"""
+        """Test _secnot_report_for_pkg() - new secnot for staged pkg, build in
+        seen-db"""
         self.secnot_db = usn.read_usn_db("./tests/test-usn-unittest-build-pkgs.db")
         errors = {}
         self.pkg_db = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
@@ -550,8 +550,8 @@ Revision r12 (armhf; channels: stable, beta)
         )
 
     def test_check__secnot_report_for_kernel_build_pkg_in_seen_db(self):
-        """Test _secnot_report_for_pkg() - new secnot for staged pkg,
-            build in seen-db"""
+        """Test _secnot_report_for_pkg() - new secnot for staged pkg, build in
+        seen-db"""
         self.secnot_db = usn.read_usn_db("./tests/test-usn-kernel-and-build-pkgs.db")
         self.store_db = read_file_as_json_dict("./tests/test-store-kernel.db")
         errors = {}
