@@ -81,7 +81,8 @@ References:
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-1.db'...
 
-= Test --seen-db updated, new subject says only was built =
+= Test --seen-db updated. First email subject says 'contains' and
+second email subject says 'was built' =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-unittest-3.db'...
 From: Snap Store <noreply@canonical.com>
@@ -141,7 +142,8 @@ References:
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-unittest-3.db'...
 
-= Test --seen-db updated new subject says contains and was built =
+= Test --seen-db updated. First email subject says 'contains' and
+second email subject says 'contains and was built' =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-1.db' --store-db='./tests/test-store-unittest-3.db'...
 From: Snap Store <noreply@canonical.com>
@@ -210,7 +212,8 @@ References:
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-unittest-3.db'...
 
-= Test --seen-db updated, new subject says only contains =
+= Test --seen-db updated. First email subject says 'was built' and
+second email subject says 'contains' =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs-only.db' --store-db='./tests/test-store-unittest-3.db'...
 From: Snap Store <noreply@canonical.com>
@@ -270,7 +273,8 @@ References:
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-unittest-3.db'...
 
-= Test --seen-db updated, new subject says only contains =
+= Test --seen-db updated. First email subject says 'contains and was
+built' and second email subject says 'contains' =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-unittest-3.db'...
 From: Snap Store <noreply@canonical.com>
