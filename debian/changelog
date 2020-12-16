@@ -1,3 +1,11 @@
+review-tools (0.48+20201216-1) RELEASED; urgency=medium
+
+  * available.py: properly consult seen db and set email content when creating
+    USN notifications including USNs for build packages. (LP: #1906827,
+    LP: #1906831)
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Wed, 16 Dec 2020 11:08:11 -0300
+
 review-tools (0.48+20201203-1) RELEASED; urgency=medium
 
   * available.py: initial support for build-packages USN notifications
