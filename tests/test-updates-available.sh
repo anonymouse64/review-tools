@@ -52,8 +52,7 @@ run "$tmp_seen" test-usn-2.db test-store-1.db
 # first should show 3602-1, 3606-1 and 3501-1 and subject should only say
 # "contains". Second should show 5501-1 and subject should only say "was
 # built". https://bugs.launchpad.net/review-tools/+bug/1906827
-comment "= Test --seen-db updated. First email subject says 'contains' and
-second email subject says 'was built' ="
+comment "= Test --seen-db updated. First email subject says 'contains' and second email subject says 'was built' ="
 reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-2.db test-store-unittest-3.db
 run "$tmp_seen" test-usn-unittest-build-pkgs.db test-store-unittest-3.db
@@ -64,8 +63,7 @@ run "$tmp_seen" test-usn-unittest-build-pkgs.db test-store-unittest-3.db
 # first should show 3602-1 and 3501-1 and subject should only say
 # "contains". Second should show 3606-1 and 5501-1 and subject should say
 # "contains and was built". https://bugs.launchpad.net/review-tools/+bug/1906827
-comment "= Test --seen-db updated. First email subject says 'contains' and
-second email subject says 'contains and was built' ="
+comment "= Test --seen-db updated. First email subject says 'contains' and second email subject says 'contains and was built' ="
 reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-1.db test-store-unittest-3.db
 run "$tmp_seen" test-usn-unittest-build-pkgs.db test-store-unittest-3.db
@@ -74,8 +72,7 @@ run "$tmp_seen" test-usn-unittest-build-pkgs.db test-store-unittest-3.db
 # first should show 5501-1 and subject should only say "was
 # built". Second should show 3602-1, 3606-1 and 3501-1 and subject should only
 # say "contains". https://bugs.launchpad.net/review-tools/+bug/1906827
-comment "= Test --seen-db updated. First email subject says 'was built' and
-second email subject says 'contains' ="
+comment "= Test --seen-db updated. First email subject says 'was built' and second email subject says 'contains' ="
 reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-unittest-build-pkgs-only.db test-store-unittest-3.db
 run "$tmp_seen" test-usn-2.db test-store-unittest-3.db
@@ -84,8 +81,7 @@ run "$tmp_seen" test-usn-2.db test-store-unittest-3.db
 # first should show 3606-1 and 5501-1 and subject should say "contains and was
 # built". Second should show 3598-1, 3610-1 and 3622-1 and subject should only
 # say "contains". https://bugs.launchpad.net/review-tools/+bug/1906827
-comment "= Test --seen-db updated. First email subject says 'contains and was
-built' and second email subject says 'contains' ="
+comment "= Test --seen-db updated. First email subject says 'contains and was built' and second email subject says 'contains' ="
 reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-unittest-build-pkgs.db test-store-unittest-3.db
 run "$tmp_seen" test-usn-budgie-1.db test-store-unittest-3.db
@@ -152,7 +148,7 @@ run "$tmp_seen" test-usn-kernel.db test-store-kernel.db
 
 # should show 3848-1, 3879-1 and 5501-1
 # test-usn-kernel-and-build-pkgs.db contains USNs for kernel and build pkgs
-comment "= Test --seen-db updated for linux-generic-bbb and build-pkgs ="
+comment "= Test --seen-db updated for linux-generic-bbb, kernel and snapcraft USNs ="
 reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-kernel-and-build-pkgs.db test-store-kernel.db
 run "$tmp_seen" test-usn-kernel-and-build-pkgs.db test-store-kernel.db
@@ -162,8 +158,7 @@ run "$tmp_seen" test-usn-kernel-and-build-pkgs.db test-store-kernel.db
 # first should show 3848-1, 3879-1 and subject should only say
 # "built from outdated". Second should show 5501-1 and subject should only
 # say "was built with". https://bugs.launchpad.net/review-tools/+bug/1906827
-comment "= Test --seen-db updated for linux-generic-bbb and only build pkgs in
-second USN ="
+comment "= Test --seen-db updated for linux-generic-bbb. First for kernel USNs and then for snapcraft USN ="
 reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-kernel.db test-store-kernel.db
 run "$tmp_seen" test-usn-kernel-and-build-pkgs.db test-store-kernel.db
@@ -172,8 +167,7 @@ run "$tmp_seen" test-usn-kernel-and-build-pkgs.db test-store-kernel.db
 # first should show 5501-1 and subject should only say "was built with".
 # Second should show 3848-1, 3879-1 and subject should only say
 # "built from outdated". https://bugs.launchpad.net/review-tools/+bug/1906827
-comment "= Test --seen-db updated for linux-generic-bbb and only kernel in
-second USN ="
+comment "= Test --seen-db updated for linux-generic-bbb. First for snapcraft USN and then for kernel USNs ="
 reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-unittest-build-pkgs-only.db test-store-kernel.db
 run "$tmp_seen" test-usn-kernel.db test-store-kernel.db
@@ -184,8 +178,7 @@ run "$tmp_seen" test-usn-kernel.db test-store-kernel.db
 # first should show 5501-1 and 3879-1 and subject should say "built from...
 # and with outdated". Second should show 3848-1 and subject should only say
 # "built from outdated". https://bugs.launchpad.net/review-tools/+bug/1906827
-comment "= Test --seen-db updated for linux-generic-bbb and only kernel in
-second USN ="
+comment "= Test --seen-db updated for linux-generic-bbb. First for both kernel and snapcraft USNs and then for kernel USN only ="
 reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-kernel-and-build-pkgs-1.db test-store-kernel.db
 run "$tmp_seen" test-usn-kernel.db test-store-kernel.db
@@ -197,8 +190,7 @@ run "$tmp_seen" test-usn-kernel.db test-store-kernel.db
 # first should show 3879-1 and subject should only say "built from outdated".
 # Second should show 3848-1 and 5501-1 and subject should say "built from ...
 # and with ...". https://bugs.launchpad.net/review-tools/+bug/1906827
-comment "= Test --seen-db updated for linux-generic-bbb and both kernel and
-build pkgs in second USN="
+comment "= Test --seen-db updated for linux-generic-bbb. First for kernel USN only and then for both kernel and snapcraft USNs ="
 reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-kernel-reduced.db test-store-kernel.db
 run "$tmp_seen" test-usn-kernel-and-build-pkgs.db test-store-kernel.db

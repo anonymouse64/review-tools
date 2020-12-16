@@ -81,8 +81,7 @@ References:
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-1.db'...
 
-= Test --seen-db updated. First email subject says 'contains' and
-second email subject says 'was built' =
+= Test --seen-db updated. First email subject says 'contains' and second email subject says 'was built' =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-unittest-3.db'...
 From: Snap Store <noreply@canonical.com>
@@ -142,8 +141,7 @@ References:
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-unittest-3.db'...
 
-= Test --seen-db updated. First email subject says 'contains' and
-second email subject says 'contains and was built' =
+= Test --seen-db updated. First email subject says 'contains' and second email subject says 'contains and was built' =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-1.db' --store-db='./tests/test-store-unittest-3.db'...
 From: Snap Store <noreply@canonical.com>
@@ -212,8 +210,7 @@ References:
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-unittest-3.db'...
 
-= Test --seen-db updated. First email subject says 'was built' and
-second email subject says 'contains' =
+= Test --seen-db updated. First email subject says 'was built' and second email subject says 'contains' =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs-only.db' --store-db='./tests/test-store-unittest-3.db'...
 From: Snap Store <noreply@canonical.com>
@@ -273,8 +270,7 @@ References:
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-unittest-3.db'...
 
-= Test --seen-db updated. First email subject says 'contains and was
-built' and second email subject says 'contains' =
+= Test --seen-db updated. First email subject says 'contains and was built' and second email subject says 'contains' =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-unittest-3.db'...
 From: Snap Store <noreply@canonical.com>
@@ -693,7 +689,7 @@ References:
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel.db' --store-db='./tests/test-store-kernel.db'...
 
-= Test --seen-db updated for linux-generic-bbb and build-pkgs =
+= Test --seen-db updated for linux-generic-bbb, kernel and snapcraft USNs =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel-and-build-pkgs.db' --store-db='./tests/test-store-kernel.db'...
 From: Snap Store <noreply@canonical.com>
@@ -729,8 +725,7 @@ References:
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel-and-build-pkgs.db' --store-db='./tests/test-store-kernel.db'...
 
-= Test --seen-db updated for linux-generic-bbb and only build pkgs in
-second USN =
+= Test --seen-db updated for linux-generic-bbb. First for kernel USNs and then for snapcraft USN =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel.db' --store-db='./tests/test-store-kernel.db'...
 From: Snap Store <noreply@canonical.com>
@@ -782,8 +777,7 @@ References:
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel-and-build-pkgs.db' --store-db='./tests/test-store-kernel.db'...
 
-= Test --seen-db updated for linux-generic-bbb and only kernel in
-second USN =
+= Test --seen-db updated for linux-generic-bbb. First for snapcraft USN and then for kernel USNs =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs-only.db' --store-db='./tests/test-store-kernel.db'...
 From: Snap Store <noreply@canonical.com>
@@ -835,8 +829,7 @@ References:
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel.db' --store-db='./tests/test-store-kernel.db'...
 
-= Test --seen-db updated for linux-generic-bbb and only kernel in
-second USN =
+= Test --seen-db updated for linux-generic-bbb. First for both kernel and snapcraft USNs and then for kernel USN only =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel-and-build-pkgs-1.db' --store-db='./tests/test-store-kernel.db'...
 From: Snap Store <noreply@canonical.com>
@@ -895,8 +888,7 @@ References:
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel.db' --store-db='./tests/test-store-kernel.db'...
 
-= Test --seen-db updated for linux-generic-bbb and both kernel and
-build pkgs in second USN=
+= Test --seen-db updated for linux-generic-bbb. First for kernel USN only and then for both kernel and snapcraft USNs =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel-reduced.db' --store-db='./tests/test-store-kernel.db'...
 From: Snap Store <noreply@canonical.com>
