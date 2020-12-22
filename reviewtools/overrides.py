@@ -117,6 +117,7 @@ redflagged_snap_types_overrides = {
         "test-snapd-base",
         "test-snapd-core18",
         "fedora29",  # Community base snaps
+        "freedesktop-sdk-runtime-2008",
         "godot-bare",
         "nix-base",
         "solus-runtime-gaming",
