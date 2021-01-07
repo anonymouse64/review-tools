@@ -1747,7 +1747,13 @@ class TestStore(TestCase):
                     in res["parts"]["faked-by-review-tools"]["build-packages"]
                 )
             else:
-                snapcraft_version_value = ["not_present", None, ""]
+                snapcraft_version_value = [
+                    "not_present",
+                    None,
+                    "",
+                    "'''4.2'''",
+                    "$(awk '/^version:/{print }' /snap/snapcraft/current/meta/snap.yaml)",
+                ]
                 for invalid_snapcraft_version in snapcraft_version_value:
                     if invalid_snapcraft_version != "not_present":
                         m["snapcraft-version"] = invalid_snapcraft_version
@@ -2139,7 +2145,13 @@ class TestStore(TestCase):
         """Test get_snapcraft_version_from_manifest()"""
         m = {}
         snapcraft_version_values = {
-            "invalid": ["not_present", None, ""],
+            "invalid": [
+                "not_present",
+                None,
+                "",
+                "'''4.2'''",
+                "$(awk '/^version:/{print }' /snap/snapcraft/current/meta/snap.yaml",
+            ],
             "valid": ["1", "1.1"],
         }
         for snapcraft_versions in snapcraft_version_values:
@@ -2153,7 +2165,13 @@ class TestStore(TestCase):
                     self.assertEqual(store.get_snapcraft_version_from_manifest(m), None)
             else:
                 for valid_version in snapcraft_version_values[snapcraft_versions]:
+                    from reviewtools.debversion import DebVersion, compare
+
                     m["snapcraft-version"] = valid_version
                     self.assertEqual(
-                        store.get_snapcraft_version_from_manifest(m), valid_version
+                        compare(
+                            store.get_snapcraft_version_from_manifest(m),
+                            DebVersion(valid_version),
+                        ),
+                        0,
                     )

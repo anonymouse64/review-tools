@@ -936,6 +936,18 @@ Revision r12 (i386; channels: candidate, beta)
         for sn in ["3501-1", "3602-1", "3606-1"]:
             self.assertTrue(sn in body)
 
+    def test_check_scan_store_invalid_snapcraft_version(self):
+        """Test scan_store()"""
+        secnot_fn = "./tests/test-usn-unittest-1.db"
+        store_fn = "./tests/test-store-unittest-invalid-snapcraft-version.db"
+        (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
+        self.assertEqual(len(errors), 0)
+        self.assertEqual(len(sent), 1)
+        (to_addr, subj, body) = sent[0]
+        self.assertEqual(to_addr, None)
+        self.assertEqual(subj, None)
+        self.assertEqual(body, None)
+
     def test_check_scan_store_with_seen(self):
         """Test scan_store() - with seen"""
         secnot_fn = "./tests/test-usn-unittest-1.db"
@@ -1015,6 +1027,19 @@ Revision r12 (i386; channels: candidate, beta)
             "linux-generic-bbb was built with outdated Ubuntu packages", subj
         )
         self.assertTrue("USN-5501-1" in body)
+
+    def test_check_scan_store_kernel_and_build_pkg_update_invalid_snapcraft_version(
+        self,
+    ):
+        """Test scan_store() - kernel snap and build pkg update but invalid
+           snapcraft version"""
+        secnot_fn = "./tests/test-usn-unittest-build-pkgs-only.db"
+        store_fn = "./tests/test-store-kernel-invalid-snapcraft-version.db"
+        (sent, errors) = available.scan_store(secnot_fn, store_fn, None, None)
+        (to_addr, subj, body) = sent[0]
+        self.assertEqual(to_addr, None)
+        self.assertEqual(subj, None)
+        self.assertEqual(body, None)
 
     def test_check_scan_store_kernel_and_build_pkg_updates(self):
         """Test scan_store() - kernel snap and build pkg update"""

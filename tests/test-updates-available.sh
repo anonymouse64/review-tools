@@ -284,6 +284,15 @@ echo "Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-
 PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-unittest-3.db' 2>&1 | tee -a "$tmp"
 echo "" | tee -a "$tmp"
 
+# Test bad  version for snapcraft in store db
+echo "Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-unittest-invalid-snapcraft-version.db'" | tee -a "$tmp"
+PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-unittest-invalid-snapcraft-version.db' 2>&1 | tee -a "$tmp"
+echo "" | tee -a "$tmp"
+
+# Test bad  version for snapcraft in store db - kernel
+echo "Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-kernel-invalid-snapcraft-version.db'" | tee -a "$tmp"
+PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-kernel-invalid-snapcraft-version.db' 2>&1 | tee -a "$tmp"
+echo "" | tee -a "$tmp"
 
 ## LP: #1841848
 for i in test-check-notices_0.1_amd64.snap test-check-notices-needed_0.1_amd64.snap test-check-notices-primed-stage-packages_0.1_amd64.snap test-check-notices-primed-stage-packages-needed_0.1_amd64.snap test-check-notices-primed-stage-packages-needed_0.2_amd64.snap; do

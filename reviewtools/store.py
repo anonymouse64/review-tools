@@ -616,4 +616,8 @@ def get_snapcraft_version_from_manifest(m):
         and m["snapcraft-version"] is not None
         and m["snapcraft-version"]
     ):
-        return m["snapcraft-version"]
+        try:
+            return debversion.DebVersion(m["snapcraft-version"])
+        except ValueError as e:
+            warn("Invalid Snapcraft version: %s" % e)
+            return None

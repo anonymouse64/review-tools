@@ -1542,6 +1542,12 @@ References:
  * https://ubuntu.com/security/notices/USN-5501-1/
 
 
+Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-unittest-invalid-snapcraft-version.db'
+WARN: Invalid Snapcraft version: '4.4.3' not a valid Debian version
+
+Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-kernel-invalid-snapcraft-version.db'
+WARN: Invalid Snapcraft version: '2.3' not a valid Debian version
+
 Running: snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/test-check-notices_0.1_amd64.snap'
 
 Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-unittest-lp1841848.db' --snap='./tests/test-check-notices_0.1_amd64.snap'
