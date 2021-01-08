@@ -1,3 +1,10 @@
+review-tools (0.48+20210108-1) UNRELEASED; urgency=medium
+
+  * store.py: make sure snapcraft version in snap manifest is a valid
+    Debian version.
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Fri, 08 Jan 2021 14:54:49 -0300
+
 review-tools (0.48+20201216-1) RELEASED; urgency=medium
 
   * available.py: properly consult seen db and set email content when creating
