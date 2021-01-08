@@ -1,4 +1,4 @@
-review-tools (0.48+20210108-1) UNRELEASED; urgency=medium
+review-tools (0.48+20210108-1) RELEASED; urgency=medium
 
   * store.py: make sure snapcraft version in snap manifest is a valid
     Debian version.
