@@ -922,6 +922,11 @@ lint_system_usernames_override = {"snap_docker": ["docker"]}
 # email, also send to other addresses.
 canonical_anbox = ["stephane.graber@canonical.com", "simon.fels@canonical.com"]
 
+canonical_charmcraft = [
+    "facundo.batista@canonical.com",
+    "sergio.schvezov@canonical.com",
+]
+
 canonical_commercial_systems = [
     "uros.jovanovic@canonical.com",
     "francesco.banconi@canonical.com",
@@ -996,7 +1001,7 @@ canonical_snapd = [
     "michael.vogt@canonical.com",
 ]
 
-canonical_snapcraft = ["martin.wimpress@canonical.com", "sergio.schvezov@canonical.com"]
+canonical_snapcraft = ["chris.patterson@canonical.com", "sergio.schvezov@canonical.com"]
 
 # snaps@canonical.com used to be 'snappy-canonical-storeaccount@canonical.com'
 # but it was changed a little while ago
@@ -1013,6 +1018,7 @@ update_publisher_overrides = {
         "candid": canonical_commercial_systems,
         "caracalla-kernel": canonical_hwe,
         "cascade-kernel": canonical_hwe,
+        "charmcraft": canonical_charmcraft,
         "charm": canonical_juju,
         "chromium": ["olivier.tilloy@canonical.com"] + canonical_desktop,
         "chromium-ffmpeg": ["olivier.tilloy@canonical.com"] + canonical_desktop,
@@ -1052,6 +1058,8 @@ update_publisher_overrides = {
         "gnome-3-32-1804-sdk": canonical_desktop,
         "gnome-3-34-1804": canonical_desktop,
         "gnome-3-34-1804-sdk": canonical_desktop,
+        "gnome-3-38-2004": canonical_desktop,
+        "gnome-3-38-2004-sdk": canonical_desktop,
         "gnome-calculator": canonical_desktop,
         "gnome-calendar": canonical_desktop,
         "gnome-characters": canonical_desktop,
