@@ -990,7 +990,7 @@ canonical_openstack = ["ryan.beisner@canonical.com", "james.page@canonical.com"]
 canonical_security = [
     "alex.murray@canonical.com",
     "jamie@canonical.com",
-    "mike.salvatore@canonical.com",
+    "emilia.torino@canonical.com",
 ]
 
 canonical_server = ["josh.powers@canonical.com", "robie.basak@canonical.com"]
@@ -1114,6 +1114,7 @@ update_publisher_overrides = {
         "pi3": canonical_snapd,
         "pulseaudio": canonical_enablement,
         "quadrapassel": canonical_desktop,
+        "review-tools": canonical_security,
         "se-test-tools": canonical_enablement,
         "simple-scan": canonical_desktop,
         "simplestreams": canonical_openstack,
