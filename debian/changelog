@@ -1,3 +1,9 @@
+review-tools (0.48+20210114-1) UNRELEASED; urgency=medium
+
+  * overrides.py: add/update for public snaps
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Thu, 14 Jan 2021 09:41:41 -0300
+
 review-tools (0.48+20210108-1) RELEASED; urgency=medium
 
   * store.py: make sure snapcraft version in snap manifest is a valid
