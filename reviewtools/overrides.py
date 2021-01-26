@@ -989,7 +989,6 @@ canonical_openstack = ["ryan.beisner@canonical.com", "james.page@canonical.com"]
 
 canonical_security = [
     "alex.murray@canonical.com",
-    "jamie@canonical.com",
     "emilia.torino@canonical.com",
 ]
 

@@ -301,7 +301,7 @@ def _email_report_for_pkg(pkg_db, seen_db):
     if len(pkg_db["additional"]) > 0:
         email_to_addr += ", %s" % ", ".join(pkg_db["additional"])
     # temporary
-    bcc = "jamie@canonical.com, alex.murray@canonical.com, emilia.torino@canonical.com"
+    bcc = "alex.murray@canonical.com, emilia.torino@canonical.com"
 
     email.send(email_to_addr, subj, body, bcc)
 
