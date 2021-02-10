@@ -335,6 +335,7 @@ sec_mode_overrides = {
         "./usr/lib/x86_64-linux-gnu/opera-developer/opera_sandbox": "rwsr-xr-x"
     },
     "snapd": {"./usr/lib/snapd/snap-confine": ["rwsr-sr-x", "rwsr-xr-x"]},
+    "skype": {"./usr/share/skypeforlinux/chrome-sandbox": "r-sr-xr-x"},
     "test-snapd-core18": {
         "./bin/mount": "rwsr-xr-x",
         "./bin/ping": "rwsr-xr-x",
