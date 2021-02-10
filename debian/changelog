@@ -1,8 +1,13 @@
 review-tools (0.48+20210114-1) UNRELEASED; urgency=medium
 
+  [ Ian Johnson ]
+  * overrides.py: allow eks snap to use plugs
+
+  [ Emilia Torino ]
   * overrides.py:
     - add/update for public snaps
     - remove Jamie from overrides
+    - add allowed interface reference to old snap
   * available.py: remove Jamie from notifications
 
  -- Emilia Torino <emilia.torino@canonical.com>  Thu, 14 Jan 2021 09:41:41 -0300
