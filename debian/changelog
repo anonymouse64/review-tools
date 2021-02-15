@@ -1,4 +1,4 @@
-review-tools (0.48+20210215-1) UNRELEASED; urgency=medium
+review-tools (0.48+20210215-1) RELEASED; urgency=medium
 
   [ Ian Johnson ]
   * overrides.py: allow eks snap to use plugs
@@ -11,7 +11,7 @@ review-tools (0.48+20210215-1) UNRELEASED; urgency=medium
     - adjust sec_mode_override for skype
   * available.py: remove Jamie from notifications
 
- -- Emilia Torino <emilia.torino@canonical.com>  Mon, 15 Feb 2021 10:19:55 -0300
+ -- Emilia Torino <emilia.torino@canonical.com>  Mon, 15 Feb 2021 10:24:48 -0300
 
 review-tools (0.48+20210108-1) RELEASED; urgency=medium
 
