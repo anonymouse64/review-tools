@@ -741,7 +741,7 @@ sec_browser_support_overrides = [
     # new process overrides
     "beefee-terminal-app",  # https://forum.snapcraft.io/t/problem-with-releasing-kiosk-app/14861/28
     "ozone-display",  # https://forum.snapcraft.io/t/review-request-for-ozone-display/19548/4
-    "krellian-kiosk", # https://forum.snapcraft.io/t/request-for-daemon-browser-support-for-krellian-kiosk/18873/34
+    "krellian-kiosk",  # https://forum.snapcraft.io/t/request-for-daemon-browser-support-for-krellian-kiosk/18873/34
 ]
 
 # Snaps that for some reason do not resquash properly. This is primarily used
