@@ -1105,6 +1105,7 @@ update_publisher_overrides = {
         "mysql-shell": canonical_openstack,
         "network-manager": canonical_enablement,
         "openstack": canonical_openstack,
+        "openstackclients": canonical_openstack,
         "openwrt": canonical_enablement,
         "pc": canonical_snapd,
         "pc-kernel": canonical_kernel,
