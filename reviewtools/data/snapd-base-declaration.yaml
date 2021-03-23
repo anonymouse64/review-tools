@@ -46,6 +46,9 @@
   system-files:
     allow-installation: false
     deny-auto-connection: true
+  tee:
+    allow-installation: false
+    deny-auto-connection: true
   uinput:
     allow-installation: false
     deny-auto-connection: true
@@ -63,6 +66,11 @@
         - core
     deny-auto-connection: true
   adb-support:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
+  allegro-vcu:
     allow-installation:
       slot-snap-type:
         - core
@@ -270,6 +278,11 @@
         - core
     deny-auto-connection: true
   firewall-control:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
+  fpga:
     allow-installation:
       slot-snap-type:
         - core
@@ -488,6 +501,11 @@
       slot-snap-type:
         - app
     deny-connection: true
+    deny-auto-connection: true
+  media-control:
+    allow-installation:
+      slot-snap-type:
+        - core
     deny-auto-connection: true
   media-hub:
     allow-installation:
@@ -765,6 +783,11 @@
         - core
     deny-auto-connection: true
   system-trace:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
+  tee:
     allow-installation:
       slot-snap-type:
         - core
