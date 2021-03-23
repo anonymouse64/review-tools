@@ -1,3 +1,9 @@
+review-tools (0.48+20210324-1) RELEASED; urgency=medium
+
+  * overrides.py: Add add openstackclients to update_publisher_overrides
+
+ -- Alex Murray <alex.murray@canonical.com>  Wed, 24 Mar 2021 09:29:42 +1030
+
 review-tools (0.48+20210323-1) RELEASED; urgency=medium
 
   * overrides.py: add krellian_kiosk to sec_browser_support_overrides
