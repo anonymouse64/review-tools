@@ -1,3 +1,11 @@
+review-tools (0.48+20210323-1) RELEASED; urgency=medium
+
+  * overrides.py: add krellian_kiosk to sec_browser_support_overrides
+  * data/snapd-base-declaration.yaml: update reviewtools snapd
+    base declaration for snapd 2.49.1
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Tue, 23 Mar 2021 17:17:58 -0300
+
 review-tools (0.48+20210215-1) RELEASED; urgency=medium
 
   [ Ian Johnson ]
