@@ -3,6 +3,7 @@ set -e
 
 exe=
 args=
+env=
 case "$1" in
     flake8)
         exe="$1"
@@ -14,6 +15,7 @@ case "$1" in
         ;;
     pylint3|pylint)
         exe="$1"
+        env="PYTHONPATH=."
         # for now, only errors
         args="-E --disable=no-member"
         ;;
@@ -24,6 +26,9 @@ case "$1" in
 esac
 
 echo "= $exe ="
+if [ -n "$env" ]; then
+  export "$env"
+fi
 for i in ./reviewtools/*py \
          ./reviewtools/tests/*py \
          ./bin/snap-review \
