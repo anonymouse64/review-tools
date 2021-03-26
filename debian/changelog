@@ -1,3 +1,9 @@
+review-tools (0.48+20210326-1) RELEASED; urgency=medium
+
+  * reviewtools/sr_common.py: add fde-setup to valid_hook_types
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Fri, 26 Mar 2021 12:27:15 -0300
+
 review-tools (0.48+20210324-1) RELEASED; urgency=medium
 
   * overrides.py: Add add openstackclients to update_publisher_overrides
