@@ -6575,6 +6575,29 @@ architectures: [ amd64 ]
         expected_counts = {"info": None, "warn": 0, "error": 1}
         self.check_results(r, expected_counts)
 
+    def test_check_valid_hook_fde_setup(self):
+        """Test check_valid_hook() - fde_setup"""
+        output_dir = self.mkdtemp()
+        package = utils.make_snap2(
+            output_dir=output_dir, extra_files=["meta/hooks/fde-setup?755"]
+        )
+        c = SnapReviewLint(package)
+        c.check_valid_hook()
+        r = c.review_report
+        expected_counts = {"info": 2, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_valid_hook_fde_setup_nonexecutable(self):
+        """Test check_valid_hook() - fde-setup not executable"""
+        package = utils.make_snap2(
+            output_dir=self.mkdtemp(), extra_files=["meta/hooks/fde-setup"]
+        )
+        c = SnapReviewLint(package)
+        c.check_valid_hook()
+        r = c.review_report
+        expected_counts = {"info": None, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
     def test_check_valid_hook_install(self):
         """Test check_valid_hook() - install"""
         output_dir = self.mkdtemp()

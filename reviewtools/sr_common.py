@@ -151,6 +151,7 @@ class SnapReview(Review):
         "connect-slot-",
         "disconnect-plug-",
         "disconnect-slot-",
+        "fde-setup",
         "install",
         "post-refresh",
         "pre-refresh",
