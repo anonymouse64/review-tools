@@ -105,6 +105,7 @@ class SnapReview(Review):
         "bus-name",  # May deprecate: https://forum.snapcraft.io/t/support-for-daemon-dbus/8855/11
         "daemon",
         "daemon-scope",
+        "install-mode",
         "ports",
         "post-stop-command",
         "refresh-mode",
