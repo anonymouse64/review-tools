@@ -91,6 +91,7 @@ lint-snap-v2:icon_theme_filenames|
 lint-snap-v2:icon_theme_quoting|
 lint-snap-v2:icon_theme_size|
 lint-snap-v2:iffy_files|
+lint-snap-v2:install-mode|
 lint-snap-v2:layout|
 lint-snap-v2:layout_source|
 lint-snap-v2:layout_target|
@@ -141,6 +142,7 @@ lint-snap-v2:title|
 lint-snap-v2:title_present|
 lint-snap-v2:unknown_field|
 lint-snap-v2:unknown_hook|https://forum.snapcraft.io/t/supported-snap-hooks/3795
+lint-snap-v2:unknown_install_mode|
 lint-snap-v2:unknown_refresh_mode|
 lint-snap-v2:unknown_stop_mode|
 lint-snap-v2:valid_contents_for_architecture|
