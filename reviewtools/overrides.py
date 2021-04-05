@@ -1115,6 +1115,7 @@ update_publisher_overrides = {
         "pi2": canonical_snapd,
         "pi2-kernel": canonical_kernel,
         "pi3": canonical_snapd,
+        "prometheus": canonical_server,
         "pulseaudio": canonical_enablement,
         "quadrapassel": canonical_desktop,
         "review-tools": canonical_security,
