@@ -1,3 +1,17 @@
+review-tools (0.48+20210406-1) UNRELEASED; urgency=medium
+
+  [ Emilia Torino ]
+  * overrides.py: add/update for public snaps
+
+  [ Alex Murray ]
+  * run_helper: fix pylint on groovy
+
+  [ Adam Collard ]
+  * reviewtools/sr_common.py: add install-mode to known optional fields
+    for daemons
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Tue, 06 Apr 2021 19:39:22 -0300
+
 review-tools (0.48+20210326-1) RELEASED; urgency=medium
 
   * reviewtools/sr_common.py: add fde-setup to valid_hook_types
