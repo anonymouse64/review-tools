@@ -6058,6 +6058,26 @@ class TestSnapReviewLintNoMock(TestCase):
         self.addCleanup(cleanup_unpack)
         super().setUp()
         self.maxDiff = None
+        self.valid_hook_types = [
+            "check-health",
+            "configure",
+            "connect-plug-home",
+            "connect-slot-mpris",
+            "disconnect-plug-home",
+            "disconnect-slot-mpris",
+            "fde-setup",
+            "install",
+            "install-device",
+            "post-refresh",
+            "pre-refresh",
+            "prepare-device",
+            "prepare-plug-home",
+            "prepare-slot-mpris",
+            "remove",
+            "unknown",
+            "unprepare-plug-home",
+            "unprepare-slot-mpris",
+        ]
 
     def mkdtemp(self):
         """Create a temp dir which is cleaned up after test."""
@@ -6567,120 +6587,32 @@ architectures: [ amd64 ]
         expected_counts = {"info": None, "warn": 1, "error": 0}
         self.check_results(r, expected_counts)
 
-    def test_check_valid_hook_check_health(self):
-        """Test check_valid_hook() - check_health"""
-        output_dir = self.mkdtemp()
-        package = utils.make_snap2(
-            output_dir=output_dir, extra_files=["meta/hooks/check-health?755"]
-        )
-        c = SnapReviewLint(package)
-        c.check_valid_hook()
-        r = c.review_report
-        expected_counts = {"info": 2, "warn": 0, "error": 0}
-        self.check_results(r, expected_counts)
+    def test_check_valid_hooks(self):
+        """Test check_valid_hook()"""
+        for hook in self.valid_hook_types:
+            with self.subTest():
+                output_dir = self.mkdtemp()
+                package = utils.make_snap2(
+                    output_dir=output_dir, extra_files=["meta/hooks/" + hook + "?755"]
+                )
+                c = SnapReviewLint(package)
+                c.check_valid_hook()
+                r = c.review_report
+                expected_counts = {"info": 2, "warn": 0, "error": 0}
+                self.check_results(r, expected_counts)
 
-    def test_check_valid_hook_check_health_nonexecutable(self):
-        """Test check_valid_hook() - check-health not executable"""
-        package = utils.make_snap2(
-            output_dir=self.mkdtemp(), extra_files=["meta/hooks/check-health"]
-        )
-        c = SnapReviewLint(package)
-        c.check_valid_hook()
-        r = c.review_report
-        expected_counts = {"info": None, "warn": 0, "error": 1}
-        self.check_results(r, expected_counts)
-
-    def test_check_valid_hook_configure(self):
-        """Test check_valid_hook() - configure"""
-        output_dir = self.mkdtemp()
-        package = utils.make_snap2(
-            output_dir=output_dir, extra_files=["meta/hooks/configure?755"]
-        )
-        c = SnapReviewLint(package)
-        c.check_valid_hook()
-        r = c.review_report
-        expected_counts = {"info": 2, "warn": 0, "error": 0}
-        self.check_results(r, expected_counts)
-
-    def test_check_valid_hook_configure_nonexecutable(self):
-        """Test check_valid_hook() - configure not executable"""
-        package = utils.make_snap2(
-            output_dir=self.mkdtemp(), extra_files=["meta/hooks/configure"]
-        )
-        c = SnapReviewLint(package)
-        c.check_valid_hook()
-        r = c.review_report
-        expected_counts = {"info": None, "warn": 0, "error": 1}
-        self.check_results(r, expected_counts)
-
-    def test_check_valid_hook_fde_setup(self):
-        """Test check_valid_hook() - fde_setup"""
-        output_dir = self.mkdtemp()
-        package = utils.make_snap2(
-            output_dir=output_dir, extra_files=["meta/hooks/fde-setup?755"]
-        )
-        c = SnapReviewLint(package)
-        c.check_valid_hook()
-        r = c.review_report
-        expected_counts = {"info": 2, "warn": 0, "error": 0}
-        self.check_results(r, expected_counts)
-
-    def test_check_valid_hook_fde_setup_nonexecutable(self):
-        """Test check_valid_hook() - fde-setup not executable"""
-        package = utils.make_snap2(
-            output_dir=self.mkdtemp(), extra_files=["meta/hooks/fde-setup"]
-        )
-        c = SnapReviewLint(package)
-        c.check_valid_hook()
-        r = c.review_report
-        expected_counts = {"info": None, "warn": 0, "error": 1}
-        self.check_results(r, expected_counts)
-
-    def test_check_valid_hook_install(self):
-        """Test check_valid_hook() - install"""
-        output_dir = self.mkdtemp()
-        package = utils.make_snap2(
-            output_dir=output_dir, extra_files=["meta/hooks/install?755"]
-        )
-        c = SnapReviewLint(package)
-        c.check_valid_hook()
-        r = c.review_report
-        expected_counts = {"info": 2, "warn": 0, "error": 0}
-        self.check_results(r, expected_counts)
-
-    def test_check_valid_hook_install_nonexecutable(self):
-        """Test check_valid_hook() - install not executable"""
-        package = utils.make_snap2(
-            output_dir=self.mkdtemp(), extra_files=["meta/hooks/install"]
-        )
-        c = SnapReviewLint(package)
-        c.check_valid_hook()
-        r = c.review_report
-        expected_counts = {"info": None, "warn": 0, "error": 1}
-        self.check_results(r, expected_counts)
-
-    def test_check_valid_hook_unknown(self):
-        """Test check_valid_hook() - unknown"""
-        package = utils.make_snap2(
-            output_dir=self.mkdtemp(), extra_files=["meta/hooks/unknown?755"]
-        )
-        c = SnapReviewLint(package)
-        c.check_valid_hook()
-        r = c.review_report
-        expected_counts = {"info": None, "warn": 1, "error": 0}
-        self.check_results(r, expected_counts)
-
-    def test_check_valid_hook_connect_plug_home(self):
-        """Test check_valid_hook() - connect-plug-home"""
-        output_dir = self.mkdtemp()
-        package = utils.make_snap2(
-            output_dir=output_dir, extra_files=["meta/hooks/connect-plug-home?755"]
-        )
-        c = SnapReviewLint(package)
-        c.check_valid_hook()
-        r = c.review_report
-        expected_counts = {"info": 2, "warn": 0, "error": 0}
-        self.check_results(r, expected_counts)
+    def test_check_valid_hook_nonexecutable(self):
+        """Test check_valid_hook() - hook not executable"""
+        for hook in self.valid_hook_types:
+            with self.subTest():
+                package = utils.make_snap2(
+                    output_dir=self.mkdtemp(), extra_files=["meta/hooks/" + hook]
+                )
+                c = SnapReviewLint(package)
+                c.check_valid_hook()
+                r = c.review_report
+                expected_counts = {"info": None, "warn": 0, "error": 1}
+                self.check_results(r, expected_counts)
 
     def test_check_iffy(self):
         """Test check_iffy()"""
