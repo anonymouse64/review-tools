@@ -6074,7 +6074,6 @@ class TestSnapReviewLintNoMock(TestCase):
             "prepare-plug-home",
             "prepare-slot-mpris",
             "remove",
-            "unknown",
             "unprepare-plug-home",
             "unprepare-slot-mpris",
         ]
@@ -6613,6 +6612,17 @@ architectures: [ amd64 ]
                 r = c.review_report
                 expected_counts = {"info": None, "warn": 0, "error": 1}
                 self.check_results(r, expected_counts)
+
+    def test_check_valid_hook_unknown(self):
+        """Test check_valid_hook() - unknown"""
+        package = utils.make_snap2(
+            output_dir=self.mkdtemp(), extra_files=["meta/hooks/unknown?755"]
+        )
+        c = SnapReviewLint(package)
+        c.check_valid_hook()
+        r = c.review_report
+        expected_counts = {"info": None, "warn": 1, "error": 0}
+        self.check_results(r, expected_counts)
 
     def test_check_iffy(self):
         """Test check_iffy()"""
