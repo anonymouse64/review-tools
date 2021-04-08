@@ -28,6 +28,7 @@ from reviewtools.common import (
     read_snapd_base_declaration,
     unsquashfs_lls,
     unsquashfs_lls_parse,
+    verify_type,
 )
 from reviewtools.overrides import interfaces_attribs_addons
 
@@ -530,21 +531,6 @@ class SnapReview(Review):
     def verify_snap_manifest(self, m):
         """Verify snap/manifest.yaml"""
 
-        def _verify_type(m, d, prefix=""):
-            for f in d:
-                if f in m:
-                    needed_type = type(d[f])
-                    if not isinstance(m[f], needed_type):
-                        t = "error"
-                        s = "'%s%s' is '%s', not '%s'" % (
-                            prefix,
-                            f,
-                            type(m[f]).__name__,
-                            needed_type.__name__,
-                        )
-                        return (False, t, s)
-            return (True, "info", "OK")
-
         # Only worry about missing keys and the format of known keys, not
         # unknown keys
         # https://forum.snapcraft.io/t/builds-failing-automated-review/7112
@@ -557,11 +543,11 @@ class SnapReview(Review):
             s = "missing keys in snap/manifest.yaml: %s" % ",".join(sorted(missing))
             return (False, t, s)
 
-        (valid, t, s) = _verify_type(m, self.snap_manifest_required)
+        (valid, t, s) = verify_type(m, self.snap_manifest_required)
         if not valid:
             return (valid, t, s)
 
-        (valid, t, s) = _verify_type(m, self.snap_manifest_optional)
+        (valid, t, s) = verify_type(m, self.snap_manifest_optional)
         if not valid:
             return (valid, t, s)
 
@@ -579,13 +565,13 @@ class SnapReview(Review):
                     )
                     return (False, t, s)
 
-                (valid, t, s) = _verify_type(
+                (valid, t, s) = verify_type(
                     m["parts"][p], self.snap_manifest_parts_required, "parts/%s/" % p
                 )
                 if not valid:
                     return (valid, t, s)
 
-                (valid, t, s) = _verify_type(
+                (valid, t, s) = verify_type(
                     m["parts"][p], self.snap_manifest_parts_optional, "parts/%s/" % p
                 )
                 if not valid:

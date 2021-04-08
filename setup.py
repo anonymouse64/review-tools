@@ -17,6 +17,8 @@ if os.path.exists(changelog):
 scripts = glob.glob('bin/snap-*')
 scripts.append('bin/create-snap-declaration')
 scripts.append('bin/get-base-declaration')
+scripts.append('bin/rock-updates-available')
+scripts.append('bin/rock-check-notices')
 scripts.append('bin/snap-updates-available')
 scripts.append('bin/snap-check-notices')
 scripts.append('bin/fetch-db')

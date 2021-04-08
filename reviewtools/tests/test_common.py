@@ -19,7 +19,7 @@ import os
 import shutil
 import tempfile
 
-from reviewtools.sr_common import SnapReview
+from reviewtools.sr_common import SnapReview, ReviewException
 import reviewtools.sr_tests as sr_tests
 import reviewtools.common
 from reviewtools.common import StatLLS
@@ -66,7 +66,7 @@ class TestCommon(sr_tests.TestSnapReview):
         st = reviewtools.common.init_override_state_input()
         self.assertTrue(isinstance(st, dict))
         self.assertEqual(len(st), 1)
-        self.assertTrue("format" in st)
+        self.assertIn("format", st)
         self.assertEqual(st["format"], reviewtools.common.STATE_FORMAT_VERSION)
 
     def test_verify_override_state(self):
@@ -500,3 +500,194 @@ short
                 continue
 
             raise Exception("parsed input should be invalid")
+
+    def test_check_pkg_uncompressed_size_ok(self):
+        """Test check_pkg_uncompressed_size() - rocks and snaps """
+        pkgs = [
+            "./tests/test-rock-redis_5.0-20.04.tar",
+            "./tests/test-snapcraft-manifest-unittest_0_amd64.snap",
+        ]
+        max_size = 3 * 1024 * 1024
+        size = 1 * 1024 * 1024
+        for pkg in pkgs:
+            with self.subTest(pkg=pkg):
+                valid_size, _ = reviewtools.common.is_pkg_uncompressed_size_valid(
+                    max_size, size, pkg
+                )
+                self.assertTrue(valid_size)
+
+    def test_check_pkg_uncompressed_size_max_size_error(self):
+        """Test check_pkg_uncompressed_size() - rocks and snaps """
+        pkgs = [
+            "./tests/test-rock-redis_5.0-20.04.tar",
+            "./tests/test-snapcraft-manifest-unittest_0_amd64.snap",
+        ]
+        max_size = 1024
+        size = 1 * 1024 * 1024
+        for pkg in pkgs:
+            with self.subTest(pkg=pkg):
+                valid_size, _ = reviewtools.common.is_pkg_uncompressed_size_valid(
+                    max_size, size, pkg
+                )
+                self.assertFalse(valid_size)
+
+    def test_unpack_rock_invalid_format(self):
+        """Test unpack_rock() - invalid rock format """
+        invalid_rock = "./tests/test-snapcraft-manifest-unittest_0_amd64.snap"
+        with self.assertRaises(SystemExit) as e:
+            reviewtools.common.unpack_rock(invalid_rock)
+        self.assertEqual(e.exception.code, 1)
+
+    def test_unpack_rock_valid_format(self):
+        """Test unpack_rock() - valid rock format """
+        # TODO: add further unit testing for tar unpacking functionality
+        valid_rock = "./tests/test-rock-redis_5.0-20.04.tar"
+        unpack_dir = reviewtools.common.unpack_rock(valid_rock)
+        self.assertIn("review-tools-", unpack_dir)
+
+    def test_unpack_rock_invalid_format_filename_starting_with_slash(self):
+        """Test unpack_rock() - invalid - filename starting with slash """
+        # TODO: add further unit testing for tar unpacking functionality
+        invalid_rock = "./tests/test-rock-invalid-1.tar"
+        with self.assertRaises(SystemExit) as e:
+            reviewtools.common.unpack_rock(invalid_rock)
+        self.assertEqual(e.exception.code, 1)
+
+    def test_unpack_rock_invalid_format_filename_with_two_dots(self):
+        """Test unpack_rock() - invalid - filename with two dots """
+        # TODO: add further unit testing for tar unpacking functionality
+        invalid_rock = "./tests/test-rock-invalid-2.tar"
+        with self.assertRaises(SystemExit) as e:
+            reviewtools.common.unpack_rock(invalid_rock)
+        self.assertEqual(e.exception.code, 1)
+
+    def test_get_rock_manifest(self):
+        """Test get_rock_manifest() """
+        valid_rock_fn = "./tests/test-rock-redis_5.0-20.04.tar"
+        expected_manifest_yaml = {
+            "manifest-version": "1",
+            "os-release-id": "ubuntu",
+            "os-release-version-id": "20.04",
+            "stage-packages": [
+                "adduser=3.118ubuntu2,adduser=3.118ubuntu2",
+                "apt=2.0.2ubuntu0.2,apt=2.0.2ubuntu0.2",
+                "base-files=11ubuntu5.2,base-files=11ubuntu5.2",
+                "base-passwd=3.5.47,base-passwd=3.5.47",
+                "bash=5.0-6ubuntu1.1,bash=5.0-6ubuntu1.1",
+                "bsdutils=1:2.34-0.1ubuntu9.1," "util-linux=2.34-0.1ubuntu9.1",
+                "bzip2=1.0.8-2,bzip2=1.0.8-2",
+                "coreutils=8.30-3ubuntu2," "coreutils=8.30-3ubuntu2",
+                "dash=0.5.10.2-6,dash=0.5.10.2-6",
+                "debconf=1.5.73,debconf=1.5.73",
+                "debianutils=4.9.1,debianutils=4.9.1",
+                "diffutils=1:3.7-3,diffutils=1:3.7-3",
+                "dpkg=1.19.7ubuntu3,dpkg=1.19.7ubuntu3",
+                "e2fsprogs=1.45.5-2ubuntu1," "e2fsprogs=1.45.5-2ubuntu1",
+                "fdisk=2.34-0.1ubuntu9.1," "util-linux=2.34-0.1ubuntu9.1",
+                "findutils=4.7.0-1ubuntu1," "findutils=4.7.0-1ubuntu1",
+                "gcc-10-base:amd64=10.2.0-5ubuntu1~20.04,"
+                "gcc-10=10.2.0-5ubuntu1~20.04",
+                "gpgv=2.2.19-3ubuntu2,gnupg2=2.2.19-3ubuntu2",
+                "grep=3.4-1,grep=3.4-1",
+                "gzip=1.10-0ubuntu4,gzip=1.10-0ubuntu4",
+                "hostname=3.23,hostname=3.23",
+                "init-system-helpers=1.57," "init-system-helpers=1.57",
+                "libacl1:amd64=2.2.53-6,acl=2.2.53-6",
+                "libapt-pkg6.0:amd64=2.0.2ubuntu0.2," "apt=2.0.2ubuntu0.2",
+                "libatomic1:amd64=10.2.0-5ubuntu1~20.04,"
+                "gcc-10=10.2.0-5ubuntu1~20.04",
+                "libattr1:amd64=1:2.4.48-5,attr=1:2.4.48-5",
+                "libaudit-common=1:2.8.5-2ubuntu6," "audit=1:2.8.5-2ubuntu6",
+                "libaudit1:amd64=1:2.8.5-2ubuntu6," "audit=1:2.8.5-2ubuntu6",
+                "libblkid1:amd64=2.34-0.1ubuntu9.1," "util-linux=2.34-0.1ubuntu9.1",
+                "libbz2-1.0:amd64=1.0.8-2,bzip2=1.0.8-2",
+                "libc-bin=2.31-0ubuntu9.1," "glibc=2.31-0ubuntu9.1",
+                "libc6:amd64=2.31-0ubuntu9.1," "glibc=2.31-0ubuntu9.1",
+                "libcap-ng0:amd64=0.7.9-2.1build1," "libcap-ng=0.7.9-2.1build1",
+                "libcom-err2:amd64=1.45.5-2ubuntu1," "e2fsprogs=1.45.5-2ubuntu1",
+                "libcrypt1:amd64=1:4.4.10-10ubuntu4," "libxcrypt=1:4.4.10-10ubuntu4",
+                "libdb5.3:amd64=5.3.28+dfsg1-0.6ubuntu2,"
+                "db5.3=5.3.28+dfsg1-0.6ubuntu2",
+                "libdebconfclient0:amd64=0.251ubuntu1," "cdebconf=0.251ubuntu1",
+                "libext2fs2:amd64=1.45.5-2ubuntu1," "e2fsprogs=1.45.5-2ubuntu1",
+                "libfdisk1:amd64=2.34-0.1ubuntu9.1," "util-linux=2.34-0.1ubuntu9.1",
+                "libffi7:amd64=3.3-4,libffi=3.3-4",
+                "libgcc-s1:amd64=10.2.0-5ubuntu1~20.04," "gcc-10=10.2.0-5ubuntu1~20.04",
+                "libgcrypt20:amd64=1.8.5-5ubuntu1," "libgcrypt20=1.8.5-5ubuntu1",
+                "libgmp10:amd64=2:6.2.0+dfsg-4," "gmp=2:6.2.0+dfsg-4",
+                "libgnutls30:amd64=3.6.13-2ubuntu1.3," "gnutls28=3.6.13-2ubuntu1.3",
+                "libgpg-error0:amd64=1.37-1," "libgpg-error=1.37-1",
+                "libhiredis0.14:amd64=0.14.0-6," "hiredis=0.14.0-6",
+                "libhogweed5:amd64=3.5.1+really3.5.1-2," "nettle=3.5.1+really3.5.1-2",
+                "libidn2-0:amd64=2.2.0-2,libidn2=2.2.0-2",
+                "libjemalloc2:amd64=5.2.1-1ubuntu1," "jemalloc=5.2.1-1ubuntu1",
+                "liblua5.1-0:amd64=5.1.5-8.1build4," "lua5.1=5.1.5-8.1build4",
+                "liblz4-1:amd64=1.9.2-2,lz4=1.9.2-2",
+                "liblzma5:amd64=5.2.4-1ubuntu1," "xz-utils=5.2.4-1ubuntu1",
+                "libmount1:amd64=2.34-0.1ubuntu9.1," "util-linux=2.34-0.1ubuntu9.1",
+                "libncurses6:amd64=6.2-0ubuntu2," "ncurses=6.2-0ubuntu2",
+                "libncursesw6:amd64=6.2-0ubuntu2," "ncurses=6.2-0ubuntu2",
+                "libnettle7:amd64=3.5.1+really3.5.1-2," "nettle=3.5.1+really3.5.1-2",
+                "libp11-kit0:amd64=0.23.20-1build1," "p11-kit=0.23.20-1build1",
+                "libpam-modules:amd64=1.3.1-5ubuntu4.1," "pam=1.3.1-5ubuntu4.1",
+                "libpam-modules-bin=1.3.1-5ubuntu4.1," "pam=1.3.1-5ubuntu4.1",
+                "libpam-runtime=1.3.1-5ubuntu4.1," "pam=1.3.1-5ubuntu4.1",
+                "libpam0g:amd64=1.3.1-5ubuntu4.1," "pam=1.3.1-5ubuntu4.1",
+                "libpcre2-8-0:amd64=10.34-7,pcre2=10.34-7",
+                "libpcre3:amd64=2:8.39-12build1," "pcre3=2:8.39-12build1",
+                "libprocps8:amd64=2:3.3.16-1ubuntu2," "procps=2:3.3.16-1ubuntu2",
+                "libseccomp2:amd64=2.4.3-1ubuntu3.20.04.3,"
+                "libseccomp=2.4.3-1ubuntu3.20.04.3",
+                "libselinux1:amd64=3.0-1build2,libselinux=3.0-1build2",
+                "libsemanage-common=3.0-1build2,libsemanage=3.0-1build2",
+                "libsemanage1:amd64=3.0-1build2,libsemanage=3.0-1build2",
+                "libsepol1:amd64=3.0-1,libsepol=3.0-1",
+                "libsmartcols1:amd64=2.34-0.1ubuntu9.1,util-linux=2.34-0.1ubuntu9.1",
+                "libss2:amd64=1.45.5-2ubuntu1,e2fsprogs=1.45.5-2ubuntu1",
+                "libstdc++6:amd64=10.2.0-5ubuntu1~20.04,gcc-10=10.2.0-5ubuntu1~20.04",
+                "libsystemd0:amd64=245.4-4ubuntu3.3,systemd=245.4-4ubuntu3.3",
+                "libtasn1-6:amd64=4.16.0-2,libtasn1-6=4.16.0-2",
+                "libtinfo6:amd64=6.2-0ubuntu2,ncurses=6.2-0ubuntu2",
+                "libudev1:amd64=245.4-4ubuntu3.3,systemd=245.4-4ubuntu3.3",
+                "libunistring2:amd64=0.9.10-2,libunistring=0.9.10-2",
+                "libuuid1:amd64=2.34-0.1ubuntu9.1,util-linux=2.34-0.1ubuntu9.1",
+                "libxcursor1=4.0.0-2,tiff=4.0.0-2",
+                "libzstd1:amd64=1.4.4+dfsg-3,libzstd=1.4.4+dfsg-3",
+                "login=1:4.8.1-1ubuntu5.20.04,shadow=1:4.8.1-1ubuntu5.20.04",
+                "logsave=1.45.5-2ubuntu1,e2fsprogs=1.45.5-2ubuntu1",
+                "lsb-base=11.1.0ubuntu2,lsb=11.1.0ubuntu2",
+                "lua-bitop:amd64=1.0.2-5,lua-bitop=1.0.2-5",
+                "lua-cjson:amd64=2.1.0+dfsg-2.1,lua-cjson=2.1.0+dfsg-2.1",
+                "mawk=1.3.4.20200120-2,mawk=1.3.4.20200120-2",
+                "mount=2.34-0.1ubuntu9.1,util-linux=2.34-0.1ubuntu9.1",
+                "ncurses-base=6.2-0ubuntu2,ncurses=6.2-0ubuntu2",
+                "ncurses-bin=6.2-0ubuntu2,ncurses=6.2-0ubuntu2",
+                "passwd=1:4.8.1-1ubuntu5.20.04,shadow=1:4.8.1-1ubuntu5.20.04",
+                "perl-base=5.30.0-9ubuntu0.2,perl=5.30.0-9ubuntu0.2",
+                "procps=2:3.3.16-1ubuntu2,procps=2:3.3.16-1ubuntu2",
+                "pwgen=2.08-2,pwgen=2.08-2",
+                "redis-server=5:5.0.7-2,redis=5:5.0.7-2",
+                "redis-tools=5:5.0.7-2,redis=5:5.0.7-2",
+                "sed=4.7-1,sed=4.7-1",
+                "sensible-utils=0.0.12+nmu1,sensible-utils=0.0.12+nmu1",
+                "sysvinit-utils=2.96-2.1ubuntu1,sysvinit=2.96-2.1ubuntu1",
+                "tar=1.30+dfsg-7,tar=1.30+dfsg-7",
+                "tzdata=2020d-0ubuntu0.20.04,tzdata=2020d-0ubuntu0.20.04",
+                "ubuntu-keyring=2020.02.11.2,ubuntu-keyring=2020.02.11.2",
+                "util-linux=2.34-0.1ubuntu9.1,util-linux=2.34-0.1ubuntu9.1",
+                "zlib1g:amd64=1:1.2.11.dfsg-2ubuntu1.2,zlib=1:1.2.11.dfsg-2ubuntu1.2",
+            ],
+        }
+        self.assertDictEqual(
+            expected_manifest_yaml, reviewtools.common.get_rock_manifest(valid_rock_fn)
+        )
+
+    def test_get_rock_manifest_invalid_rock(self):
+        """Test get_rock_manifest() - invalid rock tar"""
+        invalid_rock_fn = "./tests/invalid_rock_multiple_layer_tar_archives.tar"
+        with self.assertRaises(ReviewException) as e:
+            reviewtools.common.get_rock_manifest(invalid_rock_fn)
+        self.assertEqual(
+            e.exception.value,
+            "Unexpected number of layer tar archives inside layer directory: 2",
+        )

@@ -35,6 +35,7 @@ from reviewtools.overrides import (
     update_package_version,
 )
 from reviewtools.sr_common import SnapReview
+from reviewtools.rr_common import RockReview
 
 snap_to_release = {
     "base-18": "bionic",
@@ -191,7 +192,7 @@ def append_fake_packages_to_manifest(
                         ].append("%s=%s" % (pkg_name, pkg_version))
 
 
-def get_pkg_revisions(item, secnot_db, errors):
+def get_pkg_revisions(item, secnot_db, errors, pkg_type="snap"):
     for i in ["name", "publisher_email", "revisions"]:
         if i not in item:
             raise ValueError("required field '%s' not found" % i)
@@ -239,11 +240,17 @@ def get_pkg_revisions(item, secnot_db, errors):
             continue
 
         try:
-            m = yaml.load(rev["manifest_yaml"], Loader=yaml.SafeLoader)
-            if m is None:
+            manifest = yaml.load(rev["manifest_yaml"], Loader=yaml.SafeLoader)
+            if manifest is None:
                 continue
-            m = get_faked_build_and_stage_packages(m)
-            normalize_and_verify_snap_manifest(m)
+            if pkg_type == "snap":
+                manifest = get_faked_build_and_stage_packages(manifest)
+                normalize_and_verify_snap_manifest(manifest)
+            elif pkg_type == "rock":
+                normalize_and_verify_rock_manifest(manifest)
+            else:
+                raise TypeError("Unsupported pkg type: %s" % pkg_type)
+
         except Exception as e:
             _add_error(
                 pkg_db["name"],
@@ -253,7 +260,12 @@ def get_pkg_revisions(item, secnot_db, errors):
             continue
 
         try:
-            report = get_secnots_for_manifest(m, secnot_db)
+            report = get_secnots_for_manifest(
+                manifest=manifest,
+                secnot_db=secnot_db,
+                with_cves=False,
+                manifest_type=pkg_type,
+            )
         except ValueError as e:
             if "not found in security notification database" not in str(e):
                 _add_error(pkg_db["name"], errors, "(revision '%s') %s" % (r, e))
@@ -265,9 +277,19 @@ def get_pkg_revisions(item, secnot_db, errors):
         pkg_db["revisions"][r]["architectures"] = rev["architectures"]
         pkg_db["revisions"][r]["secnot-report"] = report
 
-        pkg_db["snap_type"] = "app"
-        if "type" in m:
-            pkg_db["snap_type"] = m["type"]
+        if pkg_type == "snap":
+            m_pkg_type_key = "snap_type"
+            pkg_db[m_pkg_type_key] = "app"
+
+        elif pkg_type == "rock":
+            m_pkg_type_key = "rock_type"
+            pkg_db[m_pkg_type_key] = "oci"
+
+        else:
+            raise TypeError("Unsupported pkg type: %s" % pkg_type)
+
+        if "type" in manifest and m_pkg_type_key:
+            pkg_db[m_pkg_type_key] = manifest["type"]
 
         if "uploaders" not in pkg_db:
             pkg_db["uploaders"] = []
@@ -378,6 +400,26 @@ def get_staged_and_build_packages_from_manifest(m):
     return d
 
 
+def get_staged_packages_from_rock_manifest(m):
+    """Obtain list of packages in stage-packages if section is present.
+    """
+    if "stage-packages" not in m:
+        debug("Could not find 'stage-packages' in manifest")
+        return None
+
+    if not m["stage-packages"]:
+        debug("'stage-packages' exists in manifest but it is empty")
+        return None
+
+    d = {}
+    get_packages_from_rock_manifest_section(d, m["stage-packages"], "staged")
+    if len(d) == 0:
+        return None
+
+    debug("\n" + pprint.pformat(d))
+    return d
+
+
 # package_type helps to group the pkgs based on the manifest section:
 # primed-stage-packages and stage-packages from each part are grouped
 # into the stage-packages key. build-packages are added to the build-packages
@@ -402,6 +444,46 @@ def get_packages_from_manifest_section(d, manifest_section, package_type):
             d[package_type][pkg].append(ver)
 
 
+# package_type helps to group the pkgs based on the manifest section. We keep
+# the same structure as snaps to reuse the notification functionality. The
+# initial implementation of the rock manifest only contains stage-packages
+# but the structure is ready for the future once we add further types (i.e.
+# snaps, git trees)
+def get_packages_from_rock_manifest_section(d, manifest_section, package_type):
+    """Obtain packages from a given manifest section (rock manifest v1 only
+       has staged-packages)
+    """
+    for entry in manifest_section:
+        # rock manifest v1 stage-packages section is a list of
+        # "<binpkg1>=<version>,<srcpkg1>=<src version>"
+        if "=" not in entry or "," not in entry:
+            warn("'%s' not properly formatted. Skipping" % entry)
+            continue
+        pkg_info = entry.split(",")
+        if len(pkg_info) == 2:
+            # We are only considering binary packages
+            # TODO: this could be updated based on rockcraft definitions
+            binary_pkg = pkg_info[0].split("=")
+            if len(binary_pkg) == 2:
+                binary_pkg_name = binary_pkg[0]
+                ver = binary_pkg[1]
+                if binary_pkg_name in update_binaries_ignore:
+                    debug("Skipping ignored binary: '%s'" % binary_pkg_name)
+                    continue
+                if package_type not in d:
+                    d[package_type] = {}
+                if binary_pkg_name not in d[package_type]:
+                    d[package_type][binary_pkg_name] = []
+                if ver not in d[package_type][binary_pkg_name]:
+                    d[package_type][binary_pkg_name].append(ver)
+            else:
+                warn("'%s' not properly formatted. Skipping" % pkg_info)
+                continue
+        else:
+            warn("'%s' not properly formatted. Skipping" % pkg_info)
+            continue
+
+
 def normalize_and_verify_snap_manifest(m):
     """Normalize manifest (ie, assign empty types if None for SafeLoader
        defaults) and verify snap manifest is well-formed and has everything we
@@ -423,12 +505,36 @@ def normalize_and_verify_snap_manifest(m):
         raise ValueError(msg)
 
 
-def get_secnots_for_manifest(m, secnot_db, with_cves=False):
-    """Find new security notifications for packages in the manifest"""
-    debug("snap/manifest.yaml:\n" + pprint.pformat(m))
+def normalize_and_verify_rock_manifest(m):
+    """Normalize manifest (ie, assign empty types if None for SafeLoader
+       defaults) and verify rock manifest is well-formed and has everything we
+       expect in this initial implementation.
+       TODO: Update once rock manifest is properly implemented"""
+    # normalize toplevel keys
+    assign_type_to_dict_values(m, RockReview.rock_manifest_required)
+    assign_type_to_dict_values(m, RockReview.rock_manifest_optional)
 
-    rel = get_ubuntu_release_from_manifest(m)  # can raise ValueError
-    stage_and_build_pkgs = get_staged_and_build_packages_from_manifest(m)
+    (valid, level, msg) = RockReview.verify_rock_manifest(RockReview, m)
+    if not valid:
+        raise ValueError(msg)
+
+
+def get_secnots_for_manifest(
+    manifest, secnot_db, with_cves=False, manifest_type="snap"
+):
+    """Find new security notifications for packages in the manifest"""
+    debug(manifest_type + "/manifest.yaml:\n" + pprint.pformat(manifest))
+    stage_and_build_pkgs = None
+    rel = get_ubuntu_release_from_manifest(
+        manifest, manifest_type
+    )  # can raise ValueErrors
+    if manifest_type == "snap":
+        stage_and_build_pkgs = get_staged_and_build_packages_from_manifest(manifest)
+    elif manifest_type == "rock":
+        stage_and_build_pkgs = get_staged_packages_from_rock_manifest(manifest)
+    else:
+        raise TypeError("Unsupported manifest type: %s" % manifest_type)
+
     if rel not in secnot_db:
         raise ValueError("'%s' not found in security notification database" % rel)
 
@@ -445,32 +551,34 @@ def get_secnots_for_manifest(m, secnot_db, with_cves=False):
                 for v in stage_and_build_pkgs[pkg_type][pkg]:
                     pkgversion = debversion.DebVersion(v)
                     for secnot in secnot_db[rel][pkg]:
-                        # The override for update_package_version is:
+                        # The override for update_package_version is for
+                        # snaps only:
                         #   update_package_version = {'<pkg>': {'<part-key>':
                         #   '<version>'}
                         # TODO: update when fully support installed-snaps
                         #  or further snapcraft updates
                         secnotversion = None
-                        if pkg in update_package_version:
-                            for part in m["parts"]:
-                                for key in update_package_version[pkg]:
-                                    if key in m["parts"][part]:
-                                        for entry in m["parts"][part][key]:
-                                            if "=" not in entry:
-                                                warn(
-                                                    "'%s' not properly "
-                                                    "formatted. Skipping" % entry
-                                                )
-                                                continue
-                                            if pkg == entry.split("=")[0]:
-                                                secnotversion = debversion.DebVersion(
-                                                    update_package_version[pkg][key]
-                                                )
-                                                # For this situation is enough
-                                                # to find pkg in at least one
-                                                # part and break as the version
-                                                # will come from the override
-                                                break
+                        if manifest_type == "snap":
+                            if pkg in update_package_version:
+                                for part in manifest["parts"]:
+                                    for key in update_package_version[pkg]:
+                                        if key in manifest["parts"][part]:
+                                            for entry in manifest["parts"][part][key]:
+                                                if "=" not in entry:
+                                                    warn(
+                                                        "'%s' not properly "
+                                                        "formatted. Skipping" % entry
+                                                    )
+                                                    continue
+                                                if pkg == entry.split("=")[0]:
+                                                    secnotversion = debversion.DebVersion(
+                                                        update_package_version[pkg][key]
+                                                    )
+                                                    # For this situation is enough
+                                                    # to find pkg in at least one
+                                                    # part and break as the version
+                                                    # will come from the override
+                                                    break
                         if secnotversion is None:
                             secnotversion = secnot_db[rel][pkg][secnot]["version"]
 
@@ -519,14 +627,13 @@ def get_secnots_for_manifest(m, secnot_db, with_cves=False):
     return pending_secnots
 
 
-def get_ubuntu_release_from_manifest(m):
-    """Determine the Ubuntu release from the manifest"""
+def get_ubuntu_release_from_manifest_snap(m):
+    """Determine the Ubuntu release from the snap manifest"""
+    ubuntu_release = None
     if "parts" not in m:
         raise ValueError(
             "Could not determine Ubuntu release ('parts' not in " "manifest)"
         )
-
-    ubuntu_release = None
 
     # Record any installed snaps where we know the Ubuntu release that should
     # be used
@@ -592,7 +699,8 @@ def get_ubuntu_release_from_manifest(m):
             # no installed snaps, use default
             if len(installed_snaps) == 0:
                 debug(
-                    "Could not determine Ubuntu release (non-core base with no "
+                    "Could not determine Ubuntu release (non-core base with "
+                    "no "
                     "installed snaps). Defaulting to '%s'" % default
                 )
                 ubuntu_release = default
@@ -605,6 +713,35 @@ def get_ubuntu_release_from_manifest(m):
                     "multiple installed snaps: %s)" % ",".join(installed_snaps)
                 )
 
+    return ubuntu_release
+
+
+def get_ubuntu_release_from_manifest_rock(m):
+    """Determine the Ubuntu release from the rock manifest"""
+    ubuntu_release = None
+    if "os-release-id" in m and "os-release-version-id" in m:
+        try:
+            ubuntu_release = get_os_codename(
+                m["os-release-id"], str(m["os-release-version-id"])
+            )
+            debug("Ubuntu release=%s" % ubuntu_release)
+        except ValueError:
+            pass
+    else:
+        raise ValueError(
+            "Could not determine Ubuntu release ('os-release-id' and/or "
+            "os-release-version-id not in manifest)"
+        )
+    return ubuntu_release
+
+
+def get_ubuntu_release_from_manifest(m, m_type="snap"):
+    if m_type == "snap":
+        ubuntu_release = get_ubuntu_release_from_manifest_snap(m)
+    elif m_type == "rock":
+        ubuntu_release = get_ubuntu_release_from_manifest_rock(m)
+    else:
+        raise TypeError("Unsupported manifest type %s" % m_type)
     debug("Ubuntu release=%s" % ubuntu_release)
 
     return ubuntu_release

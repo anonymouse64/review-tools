@@ -25,6 +25,7 @@ from reviewtools.common import (
     read_file_as_json_dict,
     MKDTEMP_PREFIX,
     _add_error,  # make a class
+    get_rock_manifest,
     get_snap_manifest,
 )
 import reviewtools.email as email
@@ -37,7 +38,7 @@ from reviewtools.store import (
 )
 from reviewtools.usn import read_usn_db
 
-email_update_required_text = """A scan of this snap shows that it was built with packages from the Ubuntu
+email_update_required_text = """A scan of this %s shows that it was built with packages from the Ubuntu
 archive that have since received security updates. """
 email_additional_build_pkgs_text = """In addition, the following lists new USNs for affected build packages in
 each snap revision:
@@ -51,14 +52,14 @@ each snap revision:
 """
 email_thanks_and_references_text = """
 
-Thank you for your snap and for attending to this matter.
+Thank you for your %s and for attending to this matter.
 
 References:
  * %s
 """
 email_rebuild_snap_text = (
-    """Simply rebuilding the snap will pull in the new security updates and
-resolve this. If your snap also contains vendored code, now might be a
+    """Simply rebuilding the %s will pull in the new security updates and
+resolve this. If your %s also contains vendored code, now might be a
 good time to review it for any needed updates."""
     + email_thanks_and_references_text
 )
@@ -71,7 +72,7 @@ email_templates = {
     "default": (
         email_update_required_text
         + """The following lists new
-USNs for affected binary packages in each snap revision:
+USNs for affected binary packages in each %s revision:
 %s
 """
         + email_rebuild_snap_text
@@ -79,7 +80,7 @@ USNs for affected binary packages in each snap revision:
     "build-pkgs-only": (
         email_update_required_text
         + """The following lists new
-USNs for affected build packages in each snap revision:
+USNs for affected build packages in each %s revision:
 %s
 """
         + email_rebuild_snap_text
@@ -215,6 +216,7 @@ def _secnot_report_for_pkg(pkg_db, seen_db):
 
     reference_urls.sort()
     template = "default"
+    pkg_type = "snap"
     if "snap_type" in pkg_db and pkg_db["snap_type"] == "kernel":
         # TODO: update when fully support build-packages
         if report_contains_stage_pkgs and report_contains_build_pkgs:
@@ -225,18 +227,22 @@ def _secnot_report_for_pkg(pkg_db, seen_db):
             body = email_templates["kernel-and-build-pkgs"] % (
                 stage_pkgs_report,
                 build_pkgs_report,
+                pkg_type,
                 "\n * ".join(reference_urls),
             )
         elif report_contains_stage_pkgs:
             subj = "%s built from outdated Ubuntu kernel" % pkgname
             body = email_templates["kernel"] % (
                 stage_pkgs_report,
+                pkg_type,
                 "\n * ".join(reference_urls),
             )
         elif report_contains_build_pkgs:
             subj = "%s was built with outdated Ubuntu packages" % pkgname
             body = email_templates["kernel-build-pkgs-only"] % (
+                pkg_type,
                 build_pkgs_report,
+                pkg_type,
                 "\n * ".join(reference_urls),
             )
         return (
@@ -245,6 +251,26 @@ def _secnot_report_for_pkg(pkg_db, seen_db):
             report_contains_stage_pkgs,
             report_contains_build_pkgs,
         )
+    elif "rock_type" in pkg_db and pkg_db["rock_type"] == "oci":
+        pkg_type = "rock"
+        # ROCKs v1 only contain staged packages
+        if report_contains_stage_pkgs:
+            subj = "%s contains outdated Ubuntu packages" % pkgname
+            return (
+                subj,
+                email_templates[template]
+                % (
+                    pkg_type,
+                    pkg_type,
+                    stage_pkgs_report,
+                    pkg_type,
+                    pkg_type,
+                    pkg_type,
+                    "\n * ".join(reference_urls),
+                ),
+                report_contains_stage_pkgs,
+                False,  # TODO: eventually, report_contains_build_pks
+            )
     elif report_contains_stage_pkgs and report_contains_build_pkgs:
         # Template text containing updates for staged and build packages
         subj = "%s contains and was built with outdated Ubuntu packages" % pkgname
@@ -252,7 +278,15 @@ def _secnot_report_for_pkg(pkg_db, seen_db):
         return (
             subj,
             email_templates[template]
-            % (stage_pkgs_report, build_pkgs_report, "\n * ".join(reference_urls)),
+            % (
+                pkg_type,
+                stage_pkgs_report,
+                build_pkgs_report,
+                pkg_type,
+                pkg_type,
+                pkg_type,
+                "\n * ".join(reference_urls),
+            ),
             report_contains_stage_pkgs,
             report_contains_build_pkgs,
         )
@@ -263,7 +297,15 @@ def _secnot_report_for_pkg(pkg_db, seen_db):
         return (
             subj,
             email_templates[template]
-            % (build_pkgs_report, "\n * ".join(reference_urls)),
+            % (
+                pkg_type,
+                pkg_type,
+                build_pkgs_report,
+                pkg_type,
+                pkg_type,
+                pkg_type,
+                "\n * ".join(reference_urls),
+            ),
             False,
             report_contains_build_pkgs,
         )
@@ -273,7 +315,15 @@ def _secnot_report_for_pkg(pkg_db, seen_db):
         return (
             subj,
             email_templates[template]
-            % (stage_pkgs_report, "\n * ".join(reference_urls)),
+            % (
+                pkg_type,
+                pkg_type,
+                stage_pkgs_report,
+                pkg_type,
+                pkg_type,
+                pkg_type,
+                "\n * ".join(reference_urls),
+            ),
             report_contains_stage_pkgs,
             False,  # TODO: eventually, report_contains_build_pks
         )
@@ -361,15 +411,17 @@ def _update_seen(seen_fn, seen_db, pkg_db):
     shutil.move(fn, seen_fn)
 
 
-def scan_store(secnot_db_fn, store_db_fn, seen_db_fn, pkgname):
-    """For each snap in store db, see if there are any binary packages with
-       security notices, if see report them if not in the seen db. We perform
-       these actions on each snap and do not form a queue to keep the
-       implementation simple.
+# To support ROCKs USN notifications, scan_store is extended to be able to not
+# only scan a store-db of published snaps but also a store-db of published
+# rocks
+def scan_store(secnot_db_fn, store_db_fn, seen_db_fn, pkgname, store_db_type="snap"):
+    """For each entry in store db (either snap or rock), see if there are any
+       binary packages with security notices, if see report them if not in the
+       seen db. We perform these actions on each snap and rock and do not form
+       a queue to keep the implementation simple.
     """
     secnot_db = read_usn_db(secnot_db_fn)
     store_db = read_file_as_json_dict(store_db_fn)
-
     if seen_db_fn:
         seen_db = read_seen_db(seen_db_fn)
     else:
@@ -382,7 +434,7 @@ def scan_store(secnot_db_fn, store_db_fn, seen_db_fn, pkgname):
             continue
 
         try:
-            pkg_db = get_pkg_revisions(item, secnot_db, errors)
+            pkg_db = get_pkg_revisions(item, secnot_db, errors, store_db_type)
         except ValueError as e:
             if "name" in item:
                 _add_error(item["name"], errors, "%s" % e)
@@ -436,9 +488,31 @@ def scan_snap(secnot_db_fn, snap_fn, with_cves=False):
                 )
 
     secnot_db = read_usn_db(secnot_db_fn)
-    original_report = get_secnots_for_manifest(man, secnot_db, with_cves)
+    original_report = get_secnots_for_manifest(
+        manifest=man, secnot_db=secnot_db, with_cves=with_cves
+    )
     # removing package types separation for json output to no break
     # existing API
+    report = {}
+    for pkg_type in original_report:
+        report.update(original_report[pkg_type])
+
+    if len(report) != 0:
+        # needs to be json since snap-check-notices parses this output
+        out += json.dumps(report, indent=2, sort_keys=True)
+
+    return out
+
+
+def scan_rock(secnot_db_fn, rock_fn, with_cves=False):
+    """Scan rock for packages with security notices"""
+    out = ""
+    man = get_rock_manifest(rock_fn)
+    secnot_db = read_usn_db(secnot_db_fn)
+    original_report = get_secnots_for_manifest(
+        manifest=man, secnot_db=secnot_db, with_cves=with_cves, manifest_type="rock"
+    )
+    # Keeping same interface as snaps report
     report = {}
     for pkg_type in original_report:
         report.update(original_report[pkg_type])

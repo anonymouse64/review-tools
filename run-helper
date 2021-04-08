@@ -36,10 +36,12 @@ for i in ./reviewtools/*py \
          ./bin/dump-tool \
          ./bin/get-base-declaration \
          ./bin/store-query \
+         ./bin/rock-check-notices \
+         ./bin/rock-updates-available \
          ./bin/snap-updates-available \
          ./bin/snap-check-* \
          ./bin/snap-verify-* ; do
-    if echo "$i" | grep -q 'snap-check-notices' ; then
+    if echo "$i" | grep -q 'snap-check-notices\|rock-check-notices' ; then
         continue  # shell
     fi
     echo "Checking $i"

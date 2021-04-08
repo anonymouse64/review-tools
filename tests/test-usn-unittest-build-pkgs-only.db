@@ -343,6 +343,57 @@
             }
           }
         }
+      },
+      "focal": {
+        "sources": {
+          "snapcraft": {
+            "version": "2.43.1+18.04.1",
+            "description": "Delightful packaging tool"
+          }
+        },
+        "binaries": {
+          "snapcraft": {
+            "version": "2.43.1+18.04.1"
+          }
+        },
+        "archs": {
+          "amd64": {
+            "urls": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-dbg_2.43.1+18.04.1_amd64.deb": {
+                "size": 49606,
+                "md5": "06387ded89bdea2580e8a536907d59ad"
+              },
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-dev_2.43.1+18.04.1_amd64.deb": {
+                "size": 26300,
+                "md5": "53dc59b8cccaf0256937b4b40826f39b"
+              },
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft-udeb_2.43.1+18.04.1_amd64.udeb": {
+                "size": 17048,
+                "md5": "d8d53ddb4a2f65cbd2f95e519ba7fafe"
+              },
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft_2.43.1+18.04.1_amd64.deb": {
+                "size": 20218,
+                "md5": "a491acc85b299afe25a10855fc0b6059"
+              }
+            }
+          },
+          "source": {
+            "urls": {
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft_2.43.1+18.04.1.diff.gz": {
+                "size": 19323,
+                "md5": "dbb397c5e667546a5e30aee69d0c880b"
+              },
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft_2.43.1+18.04.1.orig.tar.gz": {
+                "size": 374910,
+                "md5": "39c8423de190d64f1c52fbc00022e52c"
+              },
+              "http://security.ubuntu.com/ubuntu/pool/main/libx/snapcraft/snapcraft_2.43.1+18.04.1.dsc": {
+                "size": 2431,
+                "md5": "4217ab16e242c4afb2061d7de506a702"
+              }
+            }
+          }
+        }
       }
     },
     "title": "snapcraft vulnerability",

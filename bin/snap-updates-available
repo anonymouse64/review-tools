@@ -103,7 +103,7 @@ def main():
         except ValueError as e:
             error(e)
     elif args.store_db:
-        (reports, errors) = available.scan_store(
+        (_, errors) = available.scan_store(
             args.usn_db, args.store_db, args.seen_db, args.pkg_name
         )
         if len(errors):

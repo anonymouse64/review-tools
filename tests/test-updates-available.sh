@@ -20,8 +20,12 @@ run() {
     seen="$1"
     usn="./tests/$2"
     store="./tests/$3"
-    echo "Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='$usn' --store-db='$store'..." | tee -a "$tmp"
-    PYTHONPATH=./ ./bin/snap-updates-available --seen-db="$seen" --usn-db="$usn" --store-db="$store" 2>&1 | tee -a "$tmp"
+    cmd="$4"
+    if [ -z $4 ]; then
+       cmd=snap-updates-available
+    fi
+    echo "Running: $cmd --seen-db='<tmpfile>' --usn-db='$usn' --store-db='$store'..." | tee -a "$tmp"
+    PYTHONPATH=./ ./bin/$cmd  --seen-db="$seen" --usn-db="$usn" --store-db="$store" 2>&1 | tee -a "$tmp"
     echo "" | tee -a "$tmp"
 }
 
@@ -40,6 +44,12 @@ comment "= Test --seen-db updated ="
 reset_seen "$tmp_seen"
 run "$tmp_seen" test-usn-1.db test-store-1.db
 run "$tmp_seen" test-usn-1.db test-store-1.db
+
+# should show 3501-1
+comment "= Test rocks --seen-db updated ="
+reset_seen "$tmp_seen"
+run "$tmp_seen" test-usn-unittest-1.db test-rocks-store-unittest-1.db rock-updates-available
+run "$tmp_seen" test-usn-unittest-1.db test-rocks-store-unittest-1.db rock-updates-available
 
 # should show 3602-1, 3606-1 and 3501-1
 comment "= Test multiple USNs with --seen-db updated ="
@@ -384,6 +394,16 @@ for i in test-check-notices_0.1_amd64.snap test-check-notices-needed_0.1_amd64.s
     PYTHONPATH=./ SNAP=./ SNAP_USER_COMMON=./ USNDB='./tests/test-usn-unittest-lp1841848.db' ./bin/snap-check-notices --no-fetch --with-cves "./tests/$i" 2>&1 | tee -a "$tmp"
     echo "" | tee -a "$tmp"
 done
+
+# Test rock-updates-available
+echo "Running: ./bin/rock-updates-available --usn-db='./tests/test-usn-unittest-1.db' --store-db='./tests/test-rocks-store-unittest-1.db'" | tee -a "$tmp"
+PYTHONPATH=./ ./bin/rock-updates-available --usn-db='./tests/test-usn-unittest-1.db' --store-db='./tests/test-rocks-store-unittest-1.db' 2>&1 | tee -a "$tmp"
+echo "" | tee -a "$tmp"
+
+# Test rock-check-notices
+echo "Running: ./bin/rock-check-notices --no-fetch ./tests/test-rock-redis_5.0-20.04.tar" | tee -a "$tmp"
+PYTHONPATH=./ SNAP=./ SNAP_USER_COMMON=./ USNDB='./tests/test-usn-unittest-1.db' ./bin/rock-check-notices --no-fetch "./tests/test-rock-redis_5.0-20.04.tar" 2>&1 | tee -a "$tmp"
+echo "" | tee -a "$tmp"
 
 echo
 echo "Checking for differences in output..."

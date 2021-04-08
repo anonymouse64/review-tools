@@ -1,0 +1,126 @@
+#!/usr/bin/python3
+
+# Copyright (C) 2021 Canonical Ltd.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import argparse
+import json
+import os
+import sys
+import tarfile
+
+import reviewtools.common as common
+from reviewtools.common import (
+    cmd,
+    debug,
+    warn,
+    fetch_usn_db,
+    get_debug_info_from_environment,
+    initialize_environment_variables,
+    is_rock_valid,
+)
+
+
+def help():
+    print(
+        """Usage:
+$ %s ROCK1 ROCK2 ...
+"""
+        % os.path.basename(sys.argv[0])
+    )
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        prog="check-notices", description="Check a rock for needed security notices"
+    )
+    parser.add_argument(
+        "--no-fetch", help="use existing security db", action="store_true"
+    )
+    parser.add_argument("--with-cves", help="show referenced cves", action="store_true")
+    (args, argv) = parser.parse_known_args()
+
+    common.REPORT_OUTPUT = "console"
+
+    # initialize variables
+    initialize_environment_variables()
+
+    # fetch USN db
+    usndb = fetch_usn_db(args)
+
+    # set available cmd
+    if "SNAP" in os.environ:
+        available = "%s/bin/rock-updates-available" % os.path.abspath(
+            os.environ["SNAP"]
+        )
+        debug("Running " + available)
+    else:
+        available = "review-tools.rock-updates-available"
+        debug("SNAP not set. Defaulting to 'review-tools.*'")
+
+    reports = dict()
+    had_debug = get_debug_info_from_environment()
+
+    for pkg in argv:
+        valid_rock, warn_msg = is_rock_valid(pkg)
+        if not valid_rock:
+            warn(warn_msg)
+            continue
+
+        # The expected rock name for this initial implementation is:
+        # '<rock>|<X.Y-series>.tar' e.g.: redis_5.0-20.04.tar
+        rock = os.path.basename(pkg).split("_")[0]
+        rev = "unknown"
+        if "_" in pkg:
+            rev = os.path.splitext(os.path.basename(pkg))[0].split("_")[1]
+
+        if rock in reports and rev in reports[rock]:
+            debug("Skipping %s with revision %s" % (rock, rev))
+            continue
+
+        usndb_fn = os.path.join(os.environ["SNAP_USER_COMMON"], usndb)
+        if "USNDB" in os.environ:
+            usndb_fn = os.environ["USNDB"]
+
+        cmd_args = ["--usn-db=%s" % usndb_fn, "--rock=%s" % os.path.abspath(pkg)]
+        if args.with_cves:
+            cmd_args.append("--with-cves")
+
+        # this carries through to available
+        if had_debug is not None:
+            os.unsetenv("SNAP_DEBUG")
+        rc, out = cmd([available] + cmd_args)
+        if had_debug is not None:
+            os.environ["SNAP_DEBUG"] = had_debug
+
+        if rc != 0:
+            warn(out)
+            continue
+
+        if rock not in reports:
+            reports[rock] = dict()
+        if out == "":
+            reports[rock][rev] = dict()
+        else:
+            reports[rock][rev] = json.loads(out)
+
+    print(json.dumps(reports, indent=2, sort_keys=True))
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("Aborted.")
+        sys.exit(1)

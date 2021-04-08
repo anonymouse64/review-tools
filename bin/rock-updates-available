@@ -1,0 +1,107 @@
+#!/usr/bin/python3
+# Copyright (C) 2021 Canonical Ltd.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+#
+# NOTE: the initial implementation of this has no store integration support
+# and will look at:
+# - USN db for usn information (ie, only packages in main and restricted from
+#   Ubuntu are reported). The USN db will only move forward with USNs only
+#   being added and not removed.
+# - supported Ubuntu rocks from Docker hub. In the future, the service will
+#   fetch a store-db in the same way it does for snaps.
+#
+# The overall intent of this implementation is to inform, not nag. As such:
+# - a new rock with no previous revisions will have all USNs that affect
+#   it reported. Nothing is reported if no USNs affect it
+# - a rock that previously had USNs reported where the revision is
+#   unchanged but a new USN affects it will only have the new USN reported
+# - a rock that is reverted to an older revision (ie, this revision,
+#   though older, is new in the raw store db) with USNs that affect it will
+#   have all USNs reported
+# - Until a revision schema is defined, rocks are uniquely identified using
+#   each image short version of its digest
+#
+# The 'seen db' will be used to control when reports are sent
+#
+
+import argparse
+import os
+import sys
+import textwrap
+
+import reviewtools.available as available
+
+import reviewtools.common as common
+from reviewtools.common import error
+
+
+def main():
+    common.REPORT_OUTPUT = "console"
+    parser = argparse.ArgumentParser(
+        prog="rock-updates-available",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description="Show report of available security updates",
+        epilog=textwrap.dedent(
+            """\
+            Typical usage:
+            $ %s --usn-db=/usn/db --store-db=/store/db --seen-db=/seen/db
+        """
+            % os.path.basename(sys.argv[0])
+        ),
+    )
+    # XXX: adjust for future manifest
+    parser.add_argument("--rock", type=str, help="use dpkg.query file from rock")
+    parser.add_argument(
+        "--with-cves", help="Show referenced CVEs (with --rock)", action="store_true"
+    )
+    parser.add_argument("--usn-db", type=str, help="USN database (json)")
+    parser.add_argument("--store-db", type=str, help="Raw store db (json)")
+    parser.add_argument("--seen-db", type=str, help="Previously seen db (json)")
+    parser.add_argument("--pkg-name", type=str, help="Limit report to package name")
+    args = parser.parse_args()
+
+    # Arg validation
+    if args.rock and not args.usn_db:
+        error("Must specify --usn-db with --rock")
+    elif args.rock and args.store_db:
+        error("Must not specify --store-db with --rock")
+    elif not args.rock and not args.store_db:
+        error("Must specify --rock or --store-db")
+    elif args.with_cves and not args.rock:
+        error("--with-cves should only be used with --rock")
+
+    report = ""
+    if args.rock:
+        try:
+            report = available.scan_rock(args.usn_db, args.rock, args.with_cves)
+        except ValueError as e:
+            error(e)
+    elif args.store_db:
+        (_, errors) = available.scan_store(
+            args.usn_db, args.store_db, args.seen_db, args.pkg_name, "rock"
+        )
+        if len(errors):
+            error("Errors encountered when scanning store entries")
+
+    if report != "":
+        print(report)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("Aborted.")
+        sys.exit(1)

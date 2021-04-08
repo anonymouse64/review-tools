@@ -386,7 +386,33 @@ class TestUSN(TestCase):
                         "version": "1:1.1.14-1ubuntu0.16.04.1",
                     }
                 },
-            }
+            },
+            "focal": {
+                "libxcursor-dev": {
+                    "3501-1": {
+                        "cves": ["CVE-2017-16612"],
+                        "version": "1:1.1.14-1ubuntu0.16.04.1",
+                    }
+                },
+                "libxcursor1": {
+                    "3501-1": {
+                        "cves": ["CVE-2017-16612"],
+                        "version": "1:1.1.14-1ubuntu0.16.04.1",
+                    }
+                },
+                "libxcursor1-dbg": {
+                    "3501-1": {
+                        "cves": ["CVE-2017-16612"],
+                        "version": "1:1.1.14-1ubuntu0.16.04.1",
+                    }
+                },
+                "libxcursor1-udeb": {
+                    "3501-1": {
+                        "cves": ["CVE-2017-16612"],
+                        "version": "1:1.1.14-1ubuntu0.16.04.1",
+                    }
+                },
+            },
         }
 
         print(res)

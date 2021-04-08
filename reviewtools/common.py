@@ -32,6 +32,7 @@ import stat
 import subprocess
 import sys
 import syslog
+import tarfile
 import tempfile
 import time
 import types
@@ -682,14 +683,21 @@ def _unpack_cmd(cmd_args, d, dest):
     if dest is None:
         dest = d
     else:
-        # The original directory might have restrictive permissions, so save
-        # them off, chmod the dir, do the move and reapply
-        st_mode = os.stat(d).st_mode
-        os.chmod(d, 0o0755)
-        shutil.move(d, dest)
-        os.chmod(dest, st_mode & 0o7777)
+        # Recursively move unpacked content to original dir, keeping
+        # permissions
+        move_dir_content(d, dest)
 
     return dest
+
+
+# The original directory might have restrictive permissions, so save
+# them off, chmod the dir, do the move and reapply
+def move_dir_content(d, dest):
+    """Move content between dirs, keeping original dir permissions"""
+    st_mode = os.stat(d).st_mode
+    os.chmod(d, 0o0755)
+    shutil.move(d, dest)
+    os.chmod(dest, st_mode & 0o7777)
 
 
 def unsquashfs_lls(snap_pkg):
@@ -874,6 +882,16 @@ def _calculate_snap_unsquashfs_uncompressed_size(snap_pkg):
     return size
 
 
+def _calculate_rock_untar_uncompressed_size(rock_pkg):
+    """Calculate size of the uncompressed tar"""
+    size = 0
+    with tarfile.open(rock_pkg) as tar:
+        for tarinfo in tar:
+            size += tarinfo.size
+
+    return size
+
+
 def unsquashfs_supports_ignore_errors():
     """Detect if unsquashfs supports the -ignore-errors option"""
     (rc, out) = cmd(["unsquashfs", "-help"])
@@ -885,57 +903,104 @@ def _unpack_snap_squashfs(snap_pkg, dest, items=[]):
     """Unpack a squashfs based snap package to dest"""
     size = _calculate_snap_unsquashfs_uncompressed_size(snap_pkg)
 
-    max = MAX_UNCOMPRESSED_SIZE * 1024 * 1024 * 1024
+    snap_max_size = MAX_UNCOMPRESSED_SIZE * 1024 * 1024 * 1024
+    valid_size, error_msg = is_pkg_uncompressed_size_valid(
+        snap_max_size, size, snap_pkg
+    )
+    if valid_size:
+        global MKDTEMP_PREFIX
+        global MKDTEMP_DIR
+        d = tempfile.mkdtemp(prefix=MKDTEMP_PREFIX, dir=MKDTEMP_DIR)
+        cmd = ["unsquashfs", "-no-progress", "-f", "-d", d]
 
-    st = os.statvfs(snap_pkg)
+        # If unsquashfs supports it, pass "-ignore-errors -quiet"
+        if unsquashfs_supports_ignore_errors():
+            cmd.append("-ignore-errors")
+            cmd.append("-quiet")
+
+        cmd.append(os.path.abspath(snap_pkg))
+
+        if len(items) != 0:
+            cmd += items
+        return _unpack_cmd(cmd, d, dest)
+    else:
+        error(error_msg)
+
+
+def is_pkg_uncompressed_size_valid(pkg_max_size, size, pkg):
+    st = os.statvfs(pkg)
     avail = st.f_bsize * st.f_bavail * 0.9  # 90% of available space
-    if size > max:
-        error(
-            "uncompressed snap is too large (%dM > %dM)"
-            % (size / 1024 / 1024, max / 1024 / 1024)
+    if size > pkg_max_size:
+        return (
+            False,
+            "uncompressed %s is too large (%dM > %dM)"
+            % (pkg, size / 1024 / 1024, pkg_max_size / 1024 / 1024),
         )
     elif size > avail * 0.9:
-        error(
-            "uncompressed snap is too large for available space (%dM > %dM)"
-            % (size / 1024 / 1024, avail / 1024 / 1024)
+        return (
+            False,
+            "uncompressed %s is too large for available space (%dM > %dM)"
+            % (pkg, size / 1024 / 1024, avail / 1024 / 1024),
         )
+    else:
+        return True, ""
 
-    global MKDTEMP_PREFIX
-    global MKDTEMP_DIR
-    d = tempfile.mkdtemp(prefix=MKDTEMP_PREFIX, dir=MKDTEMP_DIR)
-    cmd = ["unsquashfs", "-no-progress", "-f", "-d", d]
 
-    # If unsquashfs supports it, pass "-ignore-errors -quiet"
-    if unsquashfs_supports_ignore_errors():
-        cmd.append("-ignore-errors")
-        cmd.append("-quiet")
+def _unpack_rock_tar(rock_pkg, dest):
+    """Unpack a tar based rock package to dest"""
+    size = _calculate_rock_untar_uncompressed_size(rock_pkg)
 
-    cmd.append(os.path.abspath(snap_pkg))
+    # Assuming MAX_UNCOMPRESSED_SIZE for rocks is same as snaps
+    # MAX_UNCOMPRESSED_SIZE
+    rock_max_size = MAX_UNCOMPRESSED_SIZE * 1024 * 1024 * 1024
 
-    if len(items) != 0:
-        cmd += items
-    return _unpack_cmd(cmd, d, dest)
+    valid_size, error_msg = is_pkg_uncompressed_size_valid(
+        rock_max_size, size, rock_pkg
+    )
+    if valid_size:
+        global MKDTEMP_PREFIX
+        global MKDTEMP_DIR
+        d = tempfile.mkdtemp(prefix=MKDTEMP_PREFIX, dir=MKDTEMP_DIR)
+
+        try:
+            with tarfile.open(rock_pkg) as tar:
+                # Inspecting members before extracting, since it is possible that
+                # files are created outside of path, e.g. members that have
+                # absolute filenames starting with "/" or filenames with two dots
+                # ".."
+                # https://docs.python.org/3/library/tarfile.html#tarfile.TarFile.extractall
+                for name in tar.getnames():
+                    if name.startswith("..") or name.startswith("/"):
+                        error(
+                            f"Bad path {name} while extracting archive at "
+                            f"{rock_pkg}"
+                        )
+
+                tar.extractall(path=d)
+        except Exception as e:
+            error(f"Unexpected exception while unpacking rock. {e}")
+            if os.path.isdir(d):
+                recursive_rm(d)
+
+        if dest is None:
+            dest = d
+        else:
+            # Recursively move extracted content to original dir,
+            # keeping permissions
+            move_dir_content(d, dest)
+
+        return dest
+    else:
+        error(error_msg)
 
 
 def unpack_pkg(fn, dest=None, items=[]):
     """Unpack package"""
-    if not os.path.isfile(fn):
-        error("Could not find '%s'" % fn)
-    pkg = fn
-    if not pkg.startswith("/"):
-        pkg = os.path.abspath(pkg)
-
-    if dest is not None and os.path.exists(dest):
-        error("'%s' exists. Aborting." % dest)
+    pkg = check_fn(fn)
+    check_dir(dest)
 
     # Limit the maximimum size of the package
-    size = os.stat(pkg)[stat.ST_SIZE]
-    max = MAX_COMPRESSED_SIZE * 1024 * 1024 * 1024
-    if size > max:
-        error(
-            "compressed file is too large (%dM > %dM)"
-            % (size / 1024 / 1024, max / 1024 / 1024)
-        )
+    check_max_pkg_size(pkg)
 
     # check if its a squashfs based snap
     if is_squashfs(pkg):
@@ -944,11 +1009,50 @@ def unpack_pkg(fn, dest=None, items=[]):
     error("Unsupported package format (not squashfs)")
 
 
+def check_dir(dest):
+    if dest is not None and os.path.exists(dest):
+        error("'%s' exists. Aborting." % dest)
+
+
+def check_fn(fn):
+    if not os.path.isfile(fn):
+        error("Could not find '%s'" % fn)
+    pkg = fn
+    if not pkg.startswith("/"):
+        pkg = os.path.abspath(pkg)
+    return pkg
+
+
+def check_max_pkg_size(pkg):
+    size = os.stat(pkg)[stat.ST_SIZE]
+    max = MAX_COMPRESSED_SIZE * 1024 * 1024 * 1024
+    if size > max:
+        error(
+            "compressed file is too large (%dM > %dM)"
+            % (size / 1024 / 1024, max / 1024 / 1024)
+        )
+
+
 def is_squashfs(filename):
     """Return true if the given filename as a squashfs header"""
     with open(filename, "rb") as f:
         header = f.read(10)
     return header.startswith(b"hsqs")
+
+
+def unpack_rock(fn, dest=None):
+    """Unpack rock"""
+    pkg = check_fn(fn)
+    check_dir(dest)
+
+    # Limit the maximimum size of the package
+    check_max_pkg_size(pkg)
+
+    # check if its a tar based rock
+    if tarfile.is_tarfile(pkg):
+        return _unpack_rock_tar(fn, dest)
+
+    error("Unsupported package format (not tar)")
 
 
 def raw_unpack_pkg(fn, dest=None):
@@ -1310,6 +1414,143 @@ def get_snap_manifest(fn):
     return (man_yaml, dpkg_list)
 
 
+def get_rock_manifest(fn):
+    if "SNAP_USER_COMMON" in os.environ and os.path.exists(
+        os.environ["SNAP_USER_COMMON"]
+    ):
+        MKDTEMP_DIR = os.environ["SNAP_USER_COMMON"]
+    else:
+        MKDTEMP_DIR = tempfile.gettempdir()
+    unpack_tmp_dir = tempfile.mktemp(prefix=MKDTEMP_PREFIX, dir=MKDTEMP_DIR)
+
+    man_fn = "/usr/share/rocks/dpkg.query"
+    unpack_rock(fn, unpack_tmp_dir)
+
+    # since ROCK manifest is not available yet, we build a manifest using the
+    # information available in /usr/share/rocks/dpkg.query present inside the
+    # rock
+    man_yaml = build_manifest_from_rock_tar(man_fn, unpack_tmp_dir)
+    recursive_rm(unpack_tmp_dir)
+
+    return man_yaml
+
+
+def list_dir(path, dirs_only=False):
+    """ List directory items """
+    results = list(map(lambda x: os.path.join(path, x), os.listdir(path)))
+    if dirs_only:
+        return [_ for _ in results if os.path.isdir(_)]
+    return results
+
+
+def get_layer_dpkg(tarfile_path):
+    """ Look for the prescence of the dpkg_query file inside the layer tar """
+    dpkg_query = ""
+    with tarfile.open(tarfile_path, "r") as tarfile_fh:
+        dpkg_query_path = next(
+            iter(
+                fn
+                for fn in tarfile_fh.getnames()
+                if os.path.basename(fn) == "dpkg.query"
+            ),
+            None,
+        )
+        if dpkg_query_path is not None:
+            with tarfile_fh.extractfile(dpkg_query_path) as dpkg_query_fh:
+                dpkg_query = dpkg_query_fh.readlines()
+    return dpkg_query
+
+
+# since rock manifest is not available yet, we build it using the interim
+# rock manifest (/usr/share/rocks/dpkg.query).
+# https://bugs.launchpad.net/ubuntu-docker-images/+bug/1905052
+# $ (echo "# os-release" && cat /etc/os-release && echo "# dpkg-query" &&
+# dpkg-query -f '${db:Status-Abbrev},${binary:Package},${Version},
+# ${source:Package},${Source:Version}\n' -W) > /usr/share/rocks/dpkg.query
+def build_manifest_from_rock_tar(man_fn, unpack_tmp_dir):
+    dpkg_query = None
+    dpkg_query = extract_dpkg_query_file_from_rock(dpkg_query, unpack_tmp_dir)
+
+    if not dpkg_query:
+        recursive_rm(unpack_tmp_dir)
+        error(f"{man_fn} not in {unpack_tmp_dir}")
+
+    return build_man_from_dpkg_query_file_content(dpkg_query)
+
+
+def _key_in_dpkg_query(key_name, line):
+    return line.startswith(key_name)
+
+
+def _get_dpkg_query_line_value(line):
+    _, _, val = line.partition("=")
+    return val.strip('"')
+
+
+def build_man_from_dpkg_query_file_content(dpkg_query):
+    man_yaml = {"manifest-version": "1", "stage-packages": []}
+    for line in dpkg_query:
+        line = line.decode().strip()
+        # os-release-id is obtained from ID key. e.g.: ID=ubuntu
+        # since we have ID and ID_LIKE, we need the equals symbol to check
+        if _key_in_dpkg_query("ID=", line):
+            os_release_id = _get_dpkg_query_line_value(line)
+            if os_release_id:
+                man_yaml["os-release-id"] = os_release_id
+        # os-release-version-id is obtained from VERSION_ID key. e.g.:
+        # VERSION_ID="20.04"
+        elif _key_in_dpkg_query("VERSION_ID=", line):
+            os_release_version_id = _get_dpkg_query_line_value(line)
+            if os_release_version_id:
+                man_yaml["os-release-version-id"] = os_release_version_id
+        # stage-packages are obtained from dpkg-query section
+        # e.g.: ii ,adduser,3.118ubuntu2,adduser,3.118ubuntu2
+        elif _key_in_dpkg_query("ii ", line):
+            tmp = line.split(",")
+            if len(tmp) == 5:
+                man_yaml["stage-packages"].append(
+                    "%s=%s,%s=%s" % (tmp[1], tmp[2], tmp[3], tmp[4].rstrip())
+                )
+    return man_yaml
+
+
+# An uncompress rock contains a directory per layer, each one containing a
+# tar archive including the layer contents. Since we don't know in which
+# layer the dpkg.file is present, we iterate all until we find it.
+# Also, since a rock main directory contains other files rather than each
+# layer directory, we only consider items of os.listdir(dir) as layers if
+# are directories
+def extract_dpkg_query_file_from_rock(dpkg_query, unpack_tmp_dir):
+    """ Extracts the dpkg_query file content from a given rock """
+    for layer_dir in list_dir(unpack_tmp_dir, dirs_only=True):
+        # Each rock layer is yet another tar archive, and we can
+        # inspect the content without extracting all.
+        layers_tar_files = [
+            layer_file
+            for layer_file in list_dir(layer_dir)
+            if tarfile.is_tarfile(layer_file)
+        ]
+
+        if not layers_tar_files:
+            continue
+
+        if len(layers_tar_files) > 1:
+            raise ReviewException(
+                "Unexpected number of layer tar archives inside layer directory: %d"
+                % len(layers_tar_files)
+            )
+        try:
+            for layer in layers_tar_files:
+                dpkg_query = get_layer_dpkg(layer)
+                if dpkg_query:
+                    return dpkg_query
+        except Exception as e:
+            error(f"Could not extract manifest. {e}")
+            recursive_rm(unpack_tmp_dir)
+
+    return dpkg_query
+
+
 def get_os_codename(os, ver):
     if os not in OS_RELEASE_MAP:
         raise ValueError("Could not find '%s' in OS_RELEASE_MAP" % os)
@@ -1388,3 +1629,81 @@ def verify_override_state(st):
         raise ValueError(
             "'format' should be a positive JSON integer <= %d" % STATE_FORMAT_VERSION
         )
+
+
+def initialize_environment_variables():
+    if "SNAP_USER_COMMON" not in os.environ:
+        os.environ["SNAP_USER_COMMON"] = (
+            "%s/snap/review-tools/common" % os.environ["HOME"]
+        )
+        debug(
+            "SNAP_USER_COMMON not set. Defaulting to %s"
+            % os.environ["SNAP_USER_COMMON"]
+        )
+        if not os.path.exists(os.environ["SNAP_USER_COMMON"]):
+            error(
+                "SNAP_USER_COMMON not set and %s does not exist"
+                % os.environ["SNAP_USER_COMMON"]
+            )
+
+
+def get_debug_info_from_environment():
+    had_debug = None
+    if "SNAP_DEBUG" in os.environ:
+        had_debug = os.environ["SNAP_DEBUG"]
+    return had_debug
+
+
+def fetch_usn_db(args):
+    usndb = "database.json"
+    if "SNAP" in os.environ:
+        fetchdb = "%s/bin/fetch-db" % os.path.abspath(os.environ["SNAP"])
+    else:
+        fetchdb = "review-tools.fetch-usn-db"
+    curdir = os.getcwd()
+    os.chdir(os.environ["SNAP_USER_COMMON"])
+    # download the usndb
+    update_interval = 60 * 60 * 24  # one day
+    if not args.no_fetch and (
+        not os.path.exists("./" + usndb)
+        or time.time() - os.path.getmtime("./" + usndb) >= update_interval
+    ):
+        rc, out = cmd([fetchdb, "%s.bz2" % usndb])
+        if rc != 0:
+            error(out)
+    else:
+        debug("Reusing %s" % usndb)
+    os.chdir(curdir)
+    return usndb
+
+
+def verify_type(m, d, prefix=""):
+    for f in d:
+        if f in m:
+            needed_type = type(d[f])
+            if not isinstance(m[f], needed_type):
+                t = "error"
+                s = "'%s%s' is '%s', not '%s'" % (
+                    prefix,
+                    f,
+                    type(m[f]).__name__,
+                    needed_type.__name__,
+                )
+                return (False, t, s)
+    return (True, "info", "OK")
+
+
+def is_rock_valid(pkg):
+    if not os.path.isfile(pkg):
+        return False, f"Skipping '{pkg}', not a regular file. "
+
+    # This initial implementation assumes tar as the rock archive format.
+    if not tarfile.is_tarfile(pkg):
+        return (
+            False,
+            f"Skipping '{pkg}', not a tar archive. You can run 'docker image "
+            f"save --output rock_name-X.Y-series.tar ROCK_NAME' to get a rock"
+            f" in a tar archive format",
+        )
+    else:
+        return True, ""

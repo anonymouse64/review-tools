@@ -1,0 +1,23 @@
+[
+  {
+    "publisher_email": "rocks@canonical.com",
+    "publisher_name": "Rocks - server team",
+    "name": "redis",
+    "revisions": [
+      {
+        "uploader_email": "rocks@canonical.com",
+        "uploader_name": "Rocks - server team",
+        "channels": [
+          "edge",
+          "beta"
+        ],
+        "manifest_yaml": "",
+        "version": "5.0-20.04",
+        "revision": "852f7702e973",
+        "architectures": [
+          "amd64"
+        ]
+      }
+    ]
+  }
+]

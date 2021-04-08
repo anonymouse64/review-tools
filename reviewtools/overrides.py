@@ -990,6 +990,9 @@ canonical_multipass = canonical_mir
 
 canonical_openstack = ["ryan.beisner@canonical.com", "james.page@canonical.com"]
 
+# TODO: Add Canonical rocks team
+canonical_rocks = []
+
 canonical_security = [
     "alex.murray@canonical.com",
     "emilia.torino@canonical.com",
@@ -1169,7 +1172,20 @@ update_publisher_overrides = {
         "wifi-ap": canonical_enablement,
         "wifi-connect": canonical_enablement,
         "wpa-supplicant": canonical_enablement,
-    }
+    },
+    "rocks@canonical.com": {
+        "redis": canonical_rocks,
+        "nginx": canonical_rocks,
+        "apache2": canonical_rocks,
+        "memcached": canonical_rocks,
+        "mysql": canonical_rocks,
+        "postgres": canonical_rocks,
+        "grafana": canonical_rocks,
+        "cortex": canonical_rocks,
+        "prometheus": canonical_rocks,
+        "telegraf": canonical_rocks,
+        "prometheus-alertmanager": canonical_rocks,
+    },
 }
 
 # For Canonical supported snaps, add to what is staged (eg, to support git,

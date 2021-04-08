@@ -31,8 +31,14 @@ apps:
   updates-available:
     command: snap-updates-available
     plugs: [ home, mount-observe, network ]
+  rock-updates-available:
+    command: rock-updates-available
+    plugs: [ home, mount-observe, network ]
   check-notices:
     command: snap-check-notices
+    plugs: [ home, mount-observe, network ]
+  rock-check-notices:
+    command: rock-check-notices
     plugs: [ home, mount-observe, network ]
   fetch-usn-db:
     command: bin/fetch-db

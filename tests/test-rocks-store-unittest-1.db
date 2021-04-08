@@ -1,0 +1,23 @@
+[
+  {
+    "publisher_email": "rocks@canonical.com",
+    "publisher_name": "Rocks - server team",
+    "name": "redis",
+    "revisions": [
+      {
+        "uploader_email": "rocks@canonical.com",
+        "uploader_name": "Rocks - server team",
+        "channels": [
+          "edge",
+          "beta"
+        ],
+        "manifest_yaml": "manifest-version: '1'\nname: redis\nos-release-id: ubuntu\nos-release-version-id: '20.04'\narchitectures: \n- amd64\nstage-packages: \n    - adduser=3.118ubuntu2,adduser=3.118ubuntu2\n    - apt=2.0.2ubuntu0.2,apt=2.0.2ubuntu0.2\n    - bsdutils=1:2.34-0.1ubuntu9.1,util-linux=2.34-0.1ubuntu9.1\n    - libxcursor1=1.0.0-2ubuntu1,tiff=1.0.0-2ubuntu1\n",
+        "version": "5.0-20.04",
+        "revision": "852f7702e973",
+        "architectures": [
+          "amd64"
+        ]
+      }
+    ]
+  }
+]

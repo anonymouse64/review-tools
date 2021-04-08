@@ -18,14 +18,15 @@ import argparse
 import json
 import os
 import sys
-import time
 
 import reviewtools.common as common
 from reviewtools.common import (
     cmd,
     debug,
     warn,
-    error,
+    fetch_usn_db,
+    initialize_environment_variables,
+    get_debug_info_from_environment,
 )
 
 
@@ -49,44 +50,23 @@ def main():
     common.REPORT_OUTPUT = "console"
 
     # initialize variables
-    if 'SNAP_USER_COMMON' not in os.environ:
-        os.environ['SNAP_USER_COMMON'] = "%s/snap/review-tools/common" % \
-            os.environ['HOME']
-        debug("SNAP_USER_COMMON not set. Defaulting to %s" %
-              os.environ['SNAP_USER_COMMON'])
-        if not os.path.exists(os.environ['SNAP_USER_COMMON']):
-            error("SNAP_USER_COMMON not set and %s does not exist" %
-                  os.environ['SNAP_USER_COMMON'])
+    initialize_environment_variables()
 
-    usndb = "database.json"
-    if 'SNAP' in os.environ:
-        fetchdb = "%s/bin/fetch-db" % os.path.abspath(os.environ['SNAP'])
-        available = "%s/bin/snap-updates-available" % os.path.abspath(os.environ['SNAP'])
+    # fetch USN db
+    usndb = fetch_usn_db(args)
+
+    # set available cmd
+    if "SNAP" in os.environ:
+        available = "%s/bin/snap-updates-available" % os.path.abspath(
+            os.environ["SNAP"]
+        )
+        debug("Running " + available)
     else:
-        fetchdb = "review-tools.fetch-usn-db"
         available = "review-tools.updates-available"
         debug("SNAP not set. Defaulting to 'review-tools.*'")
 
-    curdir = os.getcwd()
-    os.chdir(os.environ['SNAP_USER_COMMON'])
-
-    # download the usndb
-    update_interval = 60 * 60 * 24  # one day
-    if not args.no_fetch and \
-            (not os.path.exists("./" + usndb) or
-             time.time() - os.path.getmtime("./" + usndb) >= update_interval):
-        rc, out = cmd([fetchdb, "%s.bz2" % usndb])
-        if rc != 0:
-            error(out)
-    else:
-        debug("Reusing %s" % usndb)
-
-    os.chdir(curdir)
-
     reports = dict()
-    had_debug = None
-    if 'SNAP_DEBUG' in os.environ:
-        had_debug = os.environ['SNAP_DEBUG']
+    had_debug = get_debug_info_from_environment()
 
     for pkg in argv:
         if not os.path.isfile(pkg):
