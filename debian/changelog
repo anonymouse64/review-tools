@@ -1,4 +1,4 @@
-review-tools (0.48+20210406-1) UNRELEASED; urgency=medium
+review-tools (0.48+20210408-1) RELEASED; urgency=medium
 
   [ Emilia Torino ]
   * overrides.py: add/update for public snaps
@@ -10,7 +10,26 @@ review-tools (0.48+20210406-1) UNRELEASED; urgency=medium
   * reviewtools/sr_common.py: add install-mode to known optional fields
     for daemons
 
- -- Emilia Torino <emilia.torino@canonical.com>  Tue, 06 Apr 2021 19:39:22 -0300
+  [ Emilia Torino ]
+  * bin/rock-check-notices: add rock-check-notices command
+  * bin/rock-updates-available: add rock-updates-available command
+  * bin/snap-check-notices: refactor to move to common.py shared
+    functionality with rock-check-notices
+  * reviewtools/available.py:
+    - add support to build rock USN emails
+    - extend scan_store to scan a rock store dump as well
+    - add scan_rock
+  * reviewtools/overrides.py: add supported rocks to rocks@canonical.com
+  * reviewtools/rr_common.py: add RockReview
+  * reviewtools/store.py:
+    - extend get_pkg_revisions to support rocks
+    - extend get_ubuntu_release_from_manifest to support rocks manifest
+    - add get_staged_packages_from_rock_manifest
+  * run-helper: add bin/rock-updates-available and bin/rock-check-notices
+  * setup.py: add bin/rock-updates-available and bin/rock-check-notices
+  * snapcraft.yaml: add rock-updates-available and rock-check-notices apps
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Thu, 08 Apr 2021 18:23:20 -0300
 
 review-tools (0.48+20210326-1) RELEASED; urgency=medium
 
