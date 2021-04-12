@@ -1281,5 +1281,6 @@ update_binaries_ignore = ["linux-headers-generic", "linux-libc-dev"]
 # the symlink (only the target).
 common_external_symlink_override = {
     "chromium": ["usr/bin/xdg-open"],
+    "skype": ["usr/bin/xdg-open"],
     "snapd": ["usr/lib/snapd/snap-device-helper"],
 }
