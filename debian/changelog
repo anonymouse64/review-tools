@@ -1,3 +1,14 @@
+review-tools (0.48+20210413-1) RELEASED; urgency=medium
+
+  [ Alex Murray ]
+  * data/snapd-base-declaration.yaml: update snapd-base-declaration to add
+    new pwm interface
+
+  [ Emilia Torino ]
+  * overrides.py: add skype to common_external_symlink_override
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Tue, 13 Apr 2021 12:11:40 -0300
+
 review-tools (0.48+20210408-1) RELEASED; urgency=medium
 
   [ Emilia Torino ]
