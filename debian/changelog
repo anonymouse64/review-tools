@@ -1,3 +1,15 @@
+review-tools (0.48+20210414-1) RELEASED; urgency=medium
+
+  [ Emilia Torino ]
+  * reviewtools/common.py: remove use of f-strings
+  * reviewtools/sr_common.py: add install-device to valid_hook_types
+
+  [ Alex Murray ]
+  * reviewtools/sr_common.py: add checks for install-mode
+  * reviewtools/sr_lint.py: add checks for install-mode
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Wed, 14 Apr 2021 10:48:46 -0300
+
 review-tools (0.48+20210413-1) RELEASED; urgency=medium
 
   [ Alex Murray ]
