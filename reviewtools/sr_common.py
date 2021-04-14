@@ -166,6 +166,9 @@ class SnapReview(Review):
     ]
 
     # snap/validate.go
+    valid_install_modes = ["enable", "disable"]
+
+    # snap/validate.go
     valid_refresh_modes = ["endure", "restart"]
 
     # snap/info.go

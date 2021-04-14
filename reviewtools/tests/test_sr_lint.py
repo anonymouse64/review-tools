@@ -2150,6 +2150,17 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {"info": None, "warn": 0, "error": 1}
         self.check_results(r, expected_counts)
 
+    def test_check_apps_invalid_combinations_install_mode(self):
+        """Test check_apps_invalid_combinations() - install-mode"""
+        self.set_test_snap_yaml(
+            "apps", {"foo": {"command": "bin/bar", "install-mode": "enable"}}
+        )
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_invalid_combinations()
+        r = c.review_report
+        expected_counts = {"info": None, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
     def test_check_apps_invalid_combinations_refresh_mode(self):
         """Test check_apps_invalid_combinations() - refresh-mode"""
         self.set_test_snap_yaml(
@@ -5229,6 +5240,33 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         c.check_layout()
         r = c.review_report
         expected_counts = {"info": None, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_install_mode(self):
+        """Test check_apps_install_mode()"""
+        self.set_test_snap_yaml("apps", {"foo": {"install-mode": "enable"}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_install_mode()
+        r = c.review_report
+        expected_counts = {"info": 2, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_install_mode_bad(self):
+        """Test check_apps_install_mode() - bad"""
+        self.set_test_snap_yaml("apps", {"foo": {"install-mode": []}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_install_mode()
+        r = c.review_report
+        expected_counts = {"info": None, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_install_mode_unknown(self):
+        """Test check_apps_install_mode() - unknown"""
+        self.set_test_snap_yaml("apps", {"foo": {"install-mode": "nonexistent"}})
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_install_mode()
+        r = c.review_report
+        expected_counts = {"info": None, "warn": 1, "error": 0}
         self.check_results(r, expected_counts)
 
     def test_check_apps_refresh_mode(self):

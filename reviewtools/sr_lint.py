@@ -2597,6 +2597,43 @@ class SnapReviewLint(SnapReview):
 
                 self._add_result(t, n, s)
 
+    def check_apps_install_mode(self):
+        """Check apps - install-mode"""
+        if "apps" not in self.snap_yaml:
+            return
+
+        unknown = []
+        for app in self.snap_yaml["apps"]:
+            key = "install-mode"
+            if key not in self.snap_yaml["apps"][app]:
+                # We check for required elsewhere
+                continue
+
+            t = "info"
+            n = self._get_check_name("%s" % key, app=app)
+            s = "OK"
+            if not isinstance(self.snap_yaml["apps"][app][key], str):
+                t = "error"
+                s = "%s '%s' (not a str)" % (key, self.snap_yaml["apps"][app][key])
+                self._add_result(t, n, s)
+                continue
+            self._add_result(t, n, s)
+
+            install_mode = self.snap_yaml["apps"][app][key]
+            if (
+                install_mode not in self.valid_install_modes
+                and install_mode not in unknown
+            ):
+                unknown.append(install_mode)
+
+        t = "info"
+        n = self._get_check_name("unknown_install_mode")
+        s = "OK"
+        if len(unknown) > 0:
+            t = "warn"
+            s = "unknown install-mode: '%s'" % (",".join(sorted(unknown)))
+        self._add_result(t, n, s)
+
     def check_apps_refresh_mode(self):
         """Check apps - refresh-mode"""
         if "apps" not in self.snap_yaml:
