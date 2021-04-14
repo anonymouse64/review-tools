@@ -972,13 +972,13 @@ def _unpack_rock_tar(rock_pkg, dest):
                 for name in tar.getnames():
                     if name.startswith("..") or name.startswith("/"):
                         error(
-                            f"Bad path {name} while extracting archive at "
-                            f"{rock_pkg}"
+                            "Bad path %s while extracting archive at %s"
+                            % (name, rock_pkg)
                         )
 
                 tar.extractall(path=d)
         except Exception as e:
-            error(f"Unexpected exception while unpacking rock. {e}")
+            error("Unexpected exception while unpacking rock %s" % e)
             if os.path.isdir(d):
                 recursive_rm(d)
 
@@ -1473,7 +1473,7 @@ def build_manifest_from_rock_tar(man_fn, unpack_tmp_dir):
 
     if not dpkg_query:
         recursive_rm(unpack_tmp_dir)
-        error(f"{man_fn} not in {unpack_tmp_dir}")
+        error("%s not in %s" % (man_fn, unpack_tmp_dir))
 
     return build_man_from_dpkg_query_file_content(dpkg_query)
 
@@ -1545,7 +1545,7 @@ def extract_dpkg_query_file_from_rock(dpkg_query, unpack_tmp_dir):
                 if dpkg_query:
                     return dpkg_query
         except Exception as e:
-            error(f"Could not extract manifest. {e}")
+            error("Could not extract manifest %s" % e)
             recursive_rm(unpack_tmp_dir)
 
     return dpkg_query
@@ -1695,15 +1695,15 @@ def verify_type(m, d, prefix=""):
 
 def is_rock_valid(pkg):
     if not os.path.isfile(pkg):
-        return False, f"Skipping '{pkg}', not a regular file. "
+        return False, "Skipping '%s', not a regular file." % pkg
 
     # This initial implementation assumes tar as the rock archive format.
     if not tarfile.is_tarfile(pkg):
         return (
             False,
-            f"Skipping '{pkg}', not a tar archive. You can run 'docker image "
-            f"save --output rock_name-X.Y-series.tar ROCK_NAME' to get a rock"
-            f" in a tar archive format",
+            "Skipping '%s', not a tar archive. You can run 'docker image save"
+            "--output rock_name-X.Y-series.tar ROCK_NAME' to get a rock in a "
+            "tar archive format",
         )
     else:
         return True, ""
