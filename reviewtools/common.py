@@ -135,6 +135,7 @@ OS_RELEASE_MAP = {
         "20.04": "focal",
         "20.10": "groovy",
         "21.04": "hirsute",
+        "21.10": "impish",
     }
 }
 
