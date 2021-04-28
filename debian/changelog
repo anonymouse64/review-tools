@@ -1,3 +1,13 @@
+review-tools (0.48+20210428-1) RELEASED; urgency=medium
+
+  [ Emilia Torino ]
+  * overrides.py: add new kernel and gadget snaps
+
+  [ Steve Beattie ]
+  * common.py: add impish to OS_RELEASE_MAP
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Wed, 28 Apr 2021 12:55:55 -0300
+
 review-tools (0.48+20210414-1) RELEASED; urgency=medium
 
   [ Emilia Torino ]
