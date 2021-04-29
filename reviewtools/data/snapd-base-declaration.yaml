@@ -272,6 +272,12 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  dsp:
+    allow-installation:
+      slot-snap-type:
+        - gadget
+        - core
+    deny-auto-connection: true
   dvb:
     allow-installation:
       slot-snap-type:
