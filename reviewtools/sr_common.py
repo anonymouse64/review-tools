@@ -239,7 +239,7 @@ class SnapReview(Review):
             "name/plugs": "",
             "bus/plugs": "",
         },
-        "desktop": {"mount-host-font-cache": False},
+        "desktop": {"mount-host-font-cache/plugs": False},
         "docker-support": {"privileged-containers/plugs": False},
         "gpio": {"number/slots": 0},
         "greengrass-support": {"flavor/plugs": ""},
@@ -251,7 +251,7 @@ class SnapReview(Review):
         "mpris": {"name/slots": ""},
         "optical-drive": {"write/plugs": False},
         "personal-files": {"read/plugs": [], "write/plugs": []},
-        "pwd": {"chip-number/slots": 0, "channel/slots": 0},
+        "pwm": {"chip-number/slots": 0, "channel/slots": 0},
         "raw-volume": {"path/slots": ""},
         "serial-port": {
             "path/slots": "",
