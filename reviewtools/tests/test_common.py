@@ -22,7 +22,7 @@ import tempfile
 from reviewtools.sr_common import SnapReview, ReviewException
 import reviewtools.sr_tests as sr_tests
 import reviewtools.common
-from reviewtools.common import StatLLS
+from reviewtools.common import StatLLN
 from reviewtools.tests import utils
 
 
@@ -45,20 +45,20 @@ class TestCommon(sr_tests.TestSnapReview):
         self, ftype, mode, owner, size, major, minor, date, time, fname, fname_full
     ):
         item = {}
-        item[StatLLS.FILETYPE] = ftype
-        item[StatLLS.MODE] = mode
-        item[StatLLS.OWNER] = owner
-        item[StatLLS.USER], item[StatLLS.GROUP] = owner.split("/")
+        item[StatLLN.FILETYPE] = ftype
+        item[StatLLN.MODE] = mode
+        item[StatLLN.OWNER] = owner
+        item[StatLLN.UID], item[StatLLN.GID] = owner.split("/")
         if size is not None:
-            item[StatLLS.SIZE] = size
+            item[StatLLN.SIZE] = size
         if major is not None:
-            item[StatLLS.MAJOR] = major
+            item[StatLLN.MAJOR] = major
         if minor is not None:
-            item[StatLLS.MINOR] = minor
-        item[StatLLS.DATE] = date
-        item[StatLLS.TIME] = time
-        item[StatLLS.FILENAME] = fname
-        item[StatLLS.FULLNAME] = fname_full
+            item[StatLLN.MINOR] = minor
+        item[StatLLN.DATE] = date
+        item[StatLLN.TIME] = time
+        item[StatLLN.FILENAME] = fname
+        item[StatLLN.FULLNAME] = fname_full
         return copy.copy(item)
 
     def test_init_override_state_input(self):
@@ -93,22 +93,22 @@ class TestCommon(sr_tests.TestSnapReview):
                 % reviewtools.common.STATE_FORMAT_VERSION,
             )
 
-    def test_unsquashfs_lls(self):
-        """Test unsquashfs -lls"""
+    def test_unsquashfs_lln(self):
+        """Test unsquashfs -lln"""
         output_dir = self.mkdtemp()
         package = utils.make_snap2(output_dir=output_dir)
-        rc, out = reviewtools.common.unsquashfs_lls(package)
+        rc, out = reviewtools.common.unsquashfs_lln(package)
         self.assertEqual(rc, 0)
 
         for exp in [
             "squashfs-root",
-            "-rw-r--r-- root/root",
+            "-rw-r--r-- 0/0",
             "squashfs-root/meta/snap.yaml",
         ]:
             self.assertTrue(exp in out)
 
-    def test_unsquashfs_lls_fail(self):
-        """Test unsquashfs -lls - fail"""
+    def test_unsquashfs_lln_fail(self):
+        """Test unsquashfs -lln - fail"""
         output_dir = self.mkdtemp()
         package = utils.make_snap2(output_dir=output_dir)
 
@@ -128,21 +128,21 @@ exit 1
         else:
             os.environ["PATH"] = output_dir  # pragma: nocover
 
-        rc, out = reviewtools.common.unsquashfs_lls(package)
+        rc, out = reviewtools.common.unsquashfs_lln(package)
         self.assertEqual(rc, 1)
         self.assertTrue("unsquashfs failure" in out)
 
-    def test_unsquashfs_lls_parse_good(self):
-        """Test unsquashfs_lls_parse() - good"""
+    def test_unsquashfs_lln_parse_good(self):
+        """Test unsquashfs_lln_parse() - good"""
         input = """Parallel unsquashfs: Using 4 processors
 2 inodes (2 blocks) to write
 
-drwxrwxr-x root/root                27 2020-03-24 09:11 squashfs-root
-drwxr-xr-x root/root                48 2020-03-24 09:11 squashfs-root/meta
--rw-r--r-- root/root              2870 2020-03-24 09:11 squashfs-root/meta/icon.png
--rw-r--r-- root/root                99 2020-03-24 09:11 squashfs-root/meta/snap.yaml
+drwxrwxr-x 0/0                27 2020-03-24 09:11 squashfs-root
+drwxr-xr-x 0/0                48 2020-03-24 09:11 squashfs-root/meta
+-rw-r--r-- 0/0              2870 2020-03-24 09:11 squashfs-root/meta/icon.png
+-rw-r--r-- 0/0                99 2020-03-24 09:11 squashfs-root/meta/snap.yaml
 """
-        hdr, entries = reviewtools.common.unsquashfs_lls_parse(input)
+        hdr, entries = reviewtools.common.unsquashfs_lln_parse(input)
 
         for exp in [
             "Parallel unsquashfs: Using 4 processors",
@@ -156,45 +156,45 @@ drwxr-xr-x root/root                48 2020-03-24 09:11 squashfs-root/meta
             self.assertTrue("squashfs-root" in line)
             self.assertFalse(item is None)
 
-    def test_unsquashfs_lls_parse_bad(self):
-        """Test unsquashfs_lls_parse() - bad"""
+    def test_unsquashfs_lln_parse_bad(self):
+        """Test unsquashfs_lln_parse() - bad"""
         for input, exp in [
             (
                 """output
 too
 short
 """,
-                "'unsquashfs -lls ouput too short'",
+                "'unsquashfs -lln ouput too short'",
             ),
-            ("", "'unsquashfs -lls ouput too short'"),
+            ("", "'unsquashfs -lln ouput too short'"),
             (
                 """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-:rwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root/foo
+:rwxrwxr-x 0/0                38 2016-03-11 12:25 squashfs-root/foo
 """,
                 "'malformed lines in unsquashfs output: \\'\"unknown type \\':\\' for entry \\'./foo\\'\"\\''",
             ),
         ]:
             try:
-                reviewtools.common.unsquashfs_lls_parse(input)
+                reviewtools.common.unsquashfs_lln_parse(input)
             except reviewtools.common.ReviewException as e:
                 self.assertEqual(str(e), exp)
                 continue
 
             raise Exception("parsed input should be invalid")
 
-    def test_unsquashfs_lls_parse_line_good(self):
-        """Test unsquashfs_lls_parse() - good"""
+    def test_unsquashfs_lln_parse_line_good(self):
+        """Test unsquashfs_lln_parse() - good"""
 
         for input, exp in [
             # dir
             (
-                "drwxr-xr-x root/root               266 2019-06-06 08:03 squashfs-root",
+                "drwxr-xr-x 0/0               266 2019-06-06 08:03 squashfs-root",
                 self.set_item(
                     "d",
                     "rwxr-xr-x",
-                    "root/root",
+                    "0/0",
                     "266",
                     None,
                     None,
@@ -206,11 +206,11 @@ short
             ),
             # file
             (
-                "-rw-r--r-- root/root                53 2018-02-07 07:08 squashfs-root/README",
+                "-rw-r--r-- 0/0                53 2018-02-07 07:08 squashfs-root/README",
                 self.set_item(
                     "-",
                     "rw-r--r--",
-                    "root/root",
+                    "0/0",
                     "53",
                     None,
                     None,
@@ -221,11 +221,11 @@ short
                 ),
             ),
             (
-                "-rw-r--r-- root/root                53 2018-02-07 07:08 squashfs-root/name with spaces",
+                "-rw-r--r-- 0/0                53 2018-02-07 07:08 squashfs-root/name with spaces",
                 self.set_item(
                     "-",
                     "rw-r--r--",
-                    "root/root",
+                    "0/0",
                     "53",
                     None,
                     None,
@@ -236,11 +236,11 @@ short
                 ),
             ),
             (
-                "-rw-r--r-- root/root                53 2018-02-07 07:08 squashfs-root/name with two  spaces",
+                "-rw-r--r-- 0/0                53 2018-02-07 07:08 squashfs-root/name with two  spaces",
                 self.set_item(
                     "-",
                     "rw-r--r--",
-                    "root/root",
+                    "0/0",
                     "53",
                     None,
                     None,
@@ -251,11 +251,11 @@ short
                 ),
             ),
             (
-                "-rw-r--r-- root/root                53 2018-02-07 07:08 squashfs-root/name with trailing spaces   ",
+                "-rw-r--r-- 0/0                53 2018-02-07 07:08 squashfs-root/name with trailing spaces   ",
                 self.set_item(
                     "-",
                     "rw-r--r--",
-                    "root/root",
+                    "0/0",
                     "53",
                     None,
                     None,
@@ -266,11 +266,11 @@ short
                 ),
             ),
             (
-                "-rw-r--r-- root/root                53 2018-02-07 07:08 squashfs-root/ squashfs-root with leading and trailing spaces ",
+                "-rw-r--r-- 0/0                53 2018-02-07 07:08 squashfs-root/ squashfs-root with leading and trailing spaces ",
                 self.set_item(
                     "-",
                     "rw-r--r--",
-                    "root/root",
+                    "0/0",
                     "53",
                     None,
                     None,
@@ -282,11 +282,11 @@ short
             ),
             # unicode filename
             (
-                "-rw-r--r-- root/root                53 2018-02-07 07:08 squashfs-root/😃",
+                "-rw-r--r-- 0/0                53 2018-02-07 07:08 squashfs-root/😃",
                 self.set_item(
                     "-",
                     "rw-r--r--",
-                    "root/root",
+                    "0/0",
                     "53",
                     None,
                     None,
@@ -298,11 +298,11 @@ short
             ),
             # char (major/minor variant 1)
             (
-                "crw------- root/daemon           1,  3 2018-02-07 10:04 squashfs-root/dev/char",
+                "crw------- 0/1           1,  3 2018-02-07 10:04 squashfs-root/dev/char",
                 self.set_item(
                     "c",
                     "rw-------",
-                    "root/daemon",
+                    "0/1",
                     None,
                     "1",
                     "3",
@@ -314,11 +314,11 @@ short
             ),
             # block (major/minor variant 2)
             (
-                "brw------- daemon/daemon         1,249 2018-02-07 10:04 squashfs-root/dev/block",
+                "brw------- 1/1         1,249 2018-02-07 10:04 squashfs-root/dev/block",
                 self.set_item(
                     "b",
                     "rw-------",
-                    "daemon/daemon",
+                    "1/1",
                     None,
                     "1",
                     "249",
@@ -330,11 +330,11 @@ short
             ),
             # symlink
             (
-                "lrwxrwxrwx root/root                 6 2018-02-07 10:04 squashfs-root/symlink -> README",
+                "lrwxrwxrwx 0/0                 6 2018-02-07 10:04 squashfs-root/symlink -> README",
                 self.set_item(
                     "l",
                     "rwxrwxrwx",
-                    "root/root",
+                    "0/0",
                     "6",
                     None,
                     None,
@@ -346,11 +346,11 @@ short
             ),
             # pipe
             (
-                "prw-rw---- root/daemon               0 2018-02-07 10:04 squashfs-root/pipe",
+                "prw-rw---- 0/1               0 2018-02-07 10:04 squashfs-root/pipe",
                 self.set_item(
                     "p",
                     "rw-rw----",
-                    "root/daemon",
+                    "0/1",
                     "0",
                     None,
                     None,
@@ -362,11 +362,11 @@ short
             ),
             # socket
             (
-                "srw-rw-rw- root/root                 0 2018-02-07 10:04 squashfs-root/socket",
+                "srw-rw-rw- 0/0                 0 2018-02-07 10:04 squashfs-root/socket",
                 self.set_item(
                     "s",
                     "rw-rw-rw-",
-                    "root/root",
+                    "0/0",
                     "0",
                     None,
                     None,
@@ -377,124 +377,124 @@ short
                 ),
             ),
         ]:
-            item = reviewtools.common.unsquashfs_lls_parse_line(input)
+            item = reviewtools.common.unsquashfs_lln_parse_line(input)
             self.assertEqual(len(exp), len(item))
             for i in exp:
                 self.assertEqual(item[i], exp[i])
 
-    def test_unsquashfs_lls_parse_line_bad(self):
-        """Test unsquashfs_lls_parse() - bad"""
+    def test_unsquashfs_lln_parse_line_bad(self):
+        """Test unsquashfs_lln_parse() - bad"""
         for input, exp in [
             # file type
             (
-                ":rwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root/foo",
+                ":rwxrwxr-x 0/0                38 2016-03-11 12:25 squashfs-root/foo",
                 "\"unknown type ':' for entry './foo'\"",
             ),
             # unsquashfs doesn't handle these ls -l types
             (
-                "?rwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root/foo",
+                "?rwxrwxr-x 0/0                38 2016-03-11 12:25 squashfs-root/foo",
                 "\"unknown type '?' for entry './foo'\"",
             ),
             (
-                "-rwxrwxr-x root/root                38 2016-03-11",
-                "\"wrong number of fields in '-rwxrwxr-x root/root                38 2016-03-11'\"",
+                "-rwxrwxr-x 0/0                38 2016-03-11",
+                "\"wrong number of fields in '-rwxrwxr-x 0/0                38 2016-03-11'\"",
             ),
             # mode
             (
-                "-rwxrwxr-xx root/root                38 2016-03-11 12:25 squashfs-root/foo",
+                "-rwxrwxr-xx 0/0                38 2016-03-11 12:25 squashfs-root/foo",
                 "\"mode 'rwxrwxr-xx' malformed for './foo'\"",
             ),
             (
-                "-rwxrwxrTx root/root                38 2016-03-11 12:25 squashfs-root/foo",
+                "-rwxrwxrTx 0/0                38 2016-03-11 12:25 squashfs-root/foo",
                 "\"mode 'rwxrwxrTx' malformed for './foo'\"",
             ),
             # owner
             (
                 "-rw-rw-r-- bad                8 2016-03-11 12:25 squashfs-root/foo",
-                "\"user/group 'bad' malformed for './foo'\"",
+                "\"uid/gid 'bad' malformed for './foo'\"",
             ),
             # major
             (
-                "crw-rw-rw- root/root                a,  0 2016-03-11 12:25 squashfs-root/foo",
+                "crw-rw-rw- 0/0                a,  0 2016-03-11 12:25 squashfs-root/foo",
                 "\"major 'a' malformed for './foo'\"",
             ),
             (
-                "crw-rw-rw- root/root                a,120 2016-03-11 12:25 squashfs-root/foo",
+                "crw-rw-rw- 0/0                a,120 2016-03-11 12:25 squashfs-root/foo",
                 "\"major 'a' malformed for './foo'\"",
             ),
             # minor
             (
-                "brw-rw-rw- root/root                8,  a 2016-03-11 12:25 squashfs-root/foo",
+                "brw-rw-rw- 0/0                8,  a 2016-03-11 12:25 squashfs-root/foo",
                 "\"minor 'a' malformed for './foo'\"",
             ),
             (
-                "brw-rw-rw- root/root                8,12a 2016-03-11 12:25 squashfs-root/foo",
+                "brw-rw-rw- 0/0                8,12a 2016-03-11 12:25 squashfs-root/foo",
                 "\"minor '12a' malformed for './foo'\"",
             ),
             # size
             (
-                "-rw-rw-rw- root/root                a 2016-03-11 12:25 squashfs-root/foo",
+                "-rw-rw-rw- 0/0                a 2016-03-11 12:25 squashfs-root/foo",
                 "\"size 'a' malformed for './foo'\"",
             ),
             # date
             (
-                "-rw-rw-rw- root/root                8 2016-0e-11 12:25 squashfs-root/foo",
+                "-rw-rw-rw- 0/0                8 2016-0e-11 12:25 squashfs-root/foo",
                 "\"date '2016-0e-11' malformed for './foo'\"",
             ),
             # time
             (
-                "-rw-rw-rw- root/root                8 2016-03-11 z2:25 squashfs-root/foo",
+                "-rw-rw-rw- 0/0                8 2016-03-11 z2:25 squashfs-root/foo",
                 "\"time 'z2:25' malformed for './foo'\"",
             ),
             # embedded NULs
             (
-                "-rwxrwxr-x root/root    \x00           38 2016-03-11 12:25 squashfs-root/foo",
-                "'entry may not contain NUL characters: -rwxrwxr-x root/root    \\x00           38 2016-03-11 12:25 squashfs-root/foo'",
+                "-rwxrwxr-x 0/0    \x00           38 2016-03-11 12:25 squashfs-root/foo",
+                "'entry may not contain NUL characters: -rwxrwxr-x 0/0    \\x00           38 2016-03-11 12:25 squashfs-root/foo'",
             ),
             # extra fields
             (
-                "extra -rwxrwxr-x root/root               38 2016-03-11 12:25 squashfs-root/foo",
-                "'could not determine filename: extra -rwxrwxr-x root/root               38 2016-03-11 12:25 squashfs-root/foo'",
+                "extra -rwxrwxr-x 0/0               38 2016-03-11 12:25 squashfs-root/foo",
+                "'could not determine filename: extra -rwxrwxr-x 0/0               38 2016-03-11 12:25 squashfs-root/foo'",
             ),
             (
-                "-rwxrwxr-x extra root/root               38 2016-03-11 12:25 squashfs-root/foo",
-                "'could not determine filename: -rwxrwxr-x extra root/root               38 2016-03-11 12:25 squashfs-root/foo'",
+                "-rwxrwxr-x extra 0/0               38 2016-03-11 12:25 squashfs-root/foo",
+                "'could not determine filename: -rwxrwxr-x extra 0/0               38 2016-03-11 12:25 squashfs-root/foo'",
             ),
             (
-                "-rwxrwxr-x root/root    extra           38 2016-03-11 12:25 squashfs-root/foo",
-                "'could not determine filename: -rwxrwxr-x root/root    extra           38 2016-03-11 12:25 squashfs-root/foo'",
+                "-rwxrwxr-x 0/0    extra           38 2016-03-11 12:25 squashfs-root/foo",
+                "'could not determine filename: -rwxrwxr-x 0/0    extra           38 2016-03-11 12:25 squashfs-root/foo'",
             ),
             (
-                "-rwxrwxr-x root/root                    38 extra 2016-03-11 12:25 squashfs-root/foo",
-                "'could not determine filename: -rwxrwxr-x root/root                    38 extra 2016-03-11 12:25 squashfs-root/foo'",
+                "-rwxrwxr-x 0/0                    38 extra 2016-03-11 12:25 squashfs-root/foo",
+                "'could not determine filename: -rwxrwxr-x 0/0                    38 extra 2016-03-11 12:25 squashfs-root/foo'",
             ),
             (
-                "-rwxrwxr-x root/root                    38 2016-03-11 extra 12:25 squashfs-root/foo",
-                "'could not determine filename: -rwxrwxr-x root/root                    38 2016-03-11 extra 12:25 squashfs-root/foo'",
+                "-rwxrwxr-x 0/0                    38 2016-03-11 extra 12:25 squashfs-root/foo",
+                "'could not determine filename: -rwxrwxr-x 0/0                    38 2016-03-11 extra 12:25 squashfs-root/foo'",
             ),
             (
-                "-rwxrwxr-x root/root                    38 2016-03-11 12:25 extra squashfs-root/foo",
-                "'could not determine filename: -rwxrwxr-x root/root                    38 2016-03-11 12:25 extra squashfs-root/foo'",
+                "-rwxrwxr-x 0/0                    38 2016-03-11 12:25 extra squashfs-root/foo",
+                "'could not determine filename: -rwxrwxr-x 0/0                    38 2016-03-11 12:25 extra squashfs-root/foo'",
             ),
             (
-                "brw-rw-rw- root/root        extra        8, 12 2016-03-11 12:25 squashfs-root/foo",
-                "'could not determine filename: brw-rw-rw- root/root        extra        8, 12 2016-03-11 12:25 squashfs-root/foo'",
+                "brw-rw-rw- 0/0        extra        8, 12 2016-03-11 12:25 squashfs-root/foo",
+                "'could not determine filename: brw-rw-rw- 0/0        extra        8, 12 2016-03-11 12:25 squashfs-root/foo'",
             ),
             (
-                "brw-rw-rw- root/root                     8, extra 12 2016-03-11 12:25 squashfs-root/foo",
-                "'could not determine filename: brw-rw-rw- root/root                     8, extra 12 2016-03-11 12:25 squashfs-root/foo'",
+                "brw-rw-rw- 0/0                     8, extra 12 2016-03-11 12:25 squashfs-root/foo",
+                "'could not determine filename: brw-rw-rw- 0/0                     8, extra 12 2016-03-11 12:25 squashfs-root/foo'",
             ),
             (
-                "brw-rw-rw- root/root                     8, 12 extra 2016-03-11 12:25 squashfs-root/foo",
-                "'could not determine filename: brw-rw-rw- root/root                     8, 12 extra 2016-03-11 12:25 squashfs-root/foo'",
+                "brw-rw-rw- 0/0                     8, 12 extra 2016-03-11 12:25 squashfs-root/foo",
+                "'could not determine filename: brw-rw-rw- 0/0                     8, 12 extra 2016-03-11 12:25 squashfs-root/foo'",
             ),
             (
-                "brw-rw-rw- root/root                     8, 12 2016-03-11 12:25 extra squashfs-root/foo",
-                "'could not determine filename: brw-rw-rw- root/root                     8, 12 2016-03-11 12:25 extra squashfs-root/foo'",
+                "brw-rw-rw- 0/0                     8, 12 2016-03-11 12:25 extra squashfs-root/foo",
+                "'could not determine filename: brw-rw-rw- 0/0                     8, 12 2016-03-11 12:25 extra squashfs-root/foo'",
             ),
         ]:
             try:
-                reviewtools.common.unsquashfs_lls_parse_line(input)
+                reviewtools.common.unsquashfs_lln_parse_line(input)
             except reviewtools.common.ReviewException as e:
                 self.assertEqual(str(e), exp)
                 continue

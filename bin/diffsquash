@@ -5,7 +5,7 @@ usage() {
     cat <<EOM
 $(basename "$0") [-f] <squash1> <squash2>
 
-diffsquash by default diffs the output of 'unsquashfs -lls' of two squashfs
+diffsquash by default diffs the output of 'unsquashfs -lln' of two squashfs
 files. When given the '-f' option it will diff the contents of the squashfs
 files.
 EOM
@@ -53,9 +53,9 @@ if [ "$full" = "yes" ]; then
 else
     mkdir "$tmpdir/a" "$tmpdir/b"
     unsquashfs -s "$first" > "$tmpdir/a/info"
-    unsquashfs -lls "$first" >> "$tmpdir/a/info"
+    unsquashfs -lln "$first" >> "$tmpdir/a/info"
     unsquashfs -s "$second" > "$tmpdir/b/info"
-    unsquashfs -lls "$second" >> "$tmpdir/b/info"
+    unsquashfs -lln "$second" >> "$tmpdir/b/info"
 fi
 
 cd "$tmpdir"

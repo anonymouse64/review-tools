@@ -2013,65 +2013,65 @@ Running: snap-review --sdk --state-output=./not-allowed/out
   "warn": {}
 }
 
-= Test unsquashfs -lls output with weird files
+= Test unsquashfs -lln output with weird files
 Parallel unsquashfs: Using 4 processors
 19 inodes (40 blocks) to write
 
-drwxr-xr-x root/root               215 2020-03-23 14:32 squashfs-root
-drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
--rwxr-xr-x root/root             43416 2020-03-23 14:23 squashfs-root/bin/cat
--rwxr-xr-x root/root            129816 2020-03-23 14:23 squashfs-root/bin/dash
--rwxr-xr-x root/root             39256 2020-03-23 14:23 squashfs-root/bin/false
--rwxr-xr-x root/root            142144 2020-03-23 14:23 squashfs-root/bin/ls
--rwxr-xr-x root/root             39256 2020-03-23 14:23 squashfs-root/bin/true
-drwxr-xr-x root/root                 3 2019-08-27 12:30 squashfs-root/dev
-drwxr-xr-x root/root                 3 2020-03-23 14:31 squashfs-root/etc
-drwxr-xr-x root/root                 3 2018-04-24 03:34 squashfs-root/home
-drwxr-xr-x root/root                39 2020-03-23 14:16 squashfs-root/lib
-drwxr-xr-x root/root               181 2020-03-23 14:27 squashfs-root/lib/x86_64-linux-gnu
--rwxr-xr-x root/root            191472 2020-03-14 18:21 squashfs-root/lib/x86_64-linux-gnu/ld-2.31.so
--rwxr-xr-x root/root           2029224 2020-03-23 14:24 squashfs-root/lib/x86_64-linux-gnu/libc-2.31.so
-lrwxrwxrwx root/root                12 2020-03-14 18:21 squashfs-root/lib/x86_64-linux-gnu/libc.so.6 -> libc-2.31.so
--rw-r--r-- root/root             18816 2020-03-23 14:24 squashfs-root/lib/x86_64-linux-gnu/libdl-2.31.so
-lrwxrwxrwx root/root                13 2020-03-14 18:21 squashfs-root/lib/x86_64-linux-gnu/libdl.so.2 -> libdl-2.31.so
--rwxr-xr-x root/root            157224 2020-03-14 18:21 squashfs-root/lib/x86_64-linux-gnu/libpthread-2.31.so
-lrwxrwxrwx root/root                18 2020-03-14 18:21 squashfs-root/lib/x86_64-linux-gnu/libpthread.so.0 -> libpthread-2.31.so
--rw-r--r-- root/root            163200 2020-02-18 03:44 squashfs-root/lib/x86_64-linux-gnu/libselinux.so.1
-drwxr-xr-x root/root                43 2020-03-23 14:25 squashfs-root/lib64
-lrwxrwxrwx root/root                32 2020-03-14 18:21 squashfs-root/lib64/ld-linux-x86-64.so.2 -> /lib/x86_64-linux-gnu/ld-2.31.so
-drwxr-xr-x root/root                 3 2019-08-27 11:48 squashfs-root/media
-drwxr-xr-x root/root                32 2020-03-23 14:02 squashfs-root/meta
--rw-r--r-- root/root               149 2020-03-23 14:02 squashfs-root/meta/snap.yaml
-drwxr-xr-x root/root                 3 2019-08-27 11:48 squashfs-root/opt
-drwxr-xr-x root/root                 3 2018-04-24 03:34 squashfs-root/proc
-drwx------ root/root                 3 2020-03-24 13:25 squashfs-root/root
-drwxr-xr-x root/root                 3 2020-03-23 14:09 squashfs-root/run
-drwxr-xr-x root/root                 3 2018-04-24 03:34 squashfs-root/sys
-drwxrwxrwt root/root                 3 2019-08-27 12:30 squashfs-root/tmp
-drwxr-xr-x root/root                63 2020-03-23 14:35 squashfs-root/usr
-drwxr-xr-x root/root                52 2020-03-23 14:35 squashfs-root/usr/lib
-drwxr-xr-x root/root                 3 2020-03-23 14:35 squashfs-root/usr/lib/snapd
-drwxr-xr-x root/root                65 2020-03-23 14:26 squashfs-root/usr/lib/x86_64-linux-gnu
-lrwxrwxrwx root/root                19 2019-12-07 11:06 squashfs-root/usr/lib/x86_64-linux-gnu/libpcre2-8.so.0 -> libpcre2-8.so.0.9.0
--rw-r--r-- root/root            584392 2019-12-07 11:06 squashfs-root/usr/lib/x86_64-linux-gnu/libpcre2-8.so.0.9.0
-drwxr-xr-x root/root                28 2020-03-23 14:35 squashfs-root/usr/local
-drwxr-xr-x root/root                28 2020-03-23 14:35 squashfs-root/usr/local/share
-drwxr-xr-x root/root                 3 2020-03-23 14:35 squashfs-root/usr/local/share/fonts
-drwxr-xr-x root/root                40 2020-03-26 09:34 squashfs-root/usr/share
-drwxr-xr-x root/root                75 2020-03-26 09:35 squashfs-root/usr/share/data
--rw-r--r-- root/root                 0 2020-03-26 09:35 squashfs-root/usr/share/data/ file with many spaces 
--rw-r--r-- root/root                 0 2020-03-26 09:34 squashfs-root/usr/share/data/file with smiley 😃
-drwxr-xr-x root/root                 3 2020-03-23 14:35 squashfs-root/usr/share/fonts
-drwxr-xr-x root/root                 3 2020-03-23 14:35 squashfs-root/usr/src
-drwxr-xr-x root/root                73 2020-03-23 14:35 squashfs-root/var
-drwxr-xr-x root/root                33 2020-03-23 14:35 squashfs-root/var/cache
-drwxr-xr-x root/root                 3 2020-03-23 14:35 squashfs-root/var/cache/fontconfig
-drwxr-xr-x root/root                28 2020-03-23 14:10 squashfs-root/var/lib
-drwxr-xr-x root/root                 3 2020-03-23 14:10 squashfs-root/var/lib/snapd
-drwxr-xr-x root/root                 3 2019-08-27 12:30 squashfs-root/var/log
-drwxr-xr-x root/root                 3 2020-03-23 14:35 squashfs-root/var/snap
-drwxrwxrwt root/root                 3 2019-08-27 11:50 squashfs-root/var/tmp
-drwxr-xr-x root/root                 3 2019-08-27 12:30 squashfs-root/writable
+drwxr-xr-x 0/0               215 2020-03-23 14:32 squashfs-root
+drwxr-xr-x 0/0                73 2020-03-23 14:23 squashfs-root/bin
+-rwxr-xr-x 0/0             43416 2020-03-23 14:23 squashfs-root/bin/cat
+-rwxr-xr-x 0/0            129816 2020-03-23 14:23 squashfs-root/bin/dash
+-rwxr-xr-x 0/0             39256 2020-03-23 14:23 squashfs-root/bin/false
+-rwxr-xr-x 0/0            142144 2020-03-23 14:23 squashfs-root/bin/ls
+-rwxr-xr-x 0/0             39256 2020-03-23 14:23 squashfs-root/bin/true
+drwxr-xr-x 0/0                 3 2019-08-27 12:30 squashfs-root/dev
+drwxr-xr-x 0/0                 3 2020-03-23 14:31 squashfs-root/etc
+drwxr-xr-x 0/0                 3 2018-04-24 03:34 squashfs-root/home
+drwxr-xr-x 0/0                39 2020-03-23 14:16 squashfs-root/lib
+drwxr-xr-x 0/0               181 2020-03-23 14:27 squashfs-root/lib/x86_64-linux-gnu
+-rwxr-xr-x 0/0            191472 2020-03-14 18:21 squashfs-root/lib/x86_64-linux-gnu/ld-2.31.so
+-rwxr-xr-x 0/0           2029224 2020-03-23 14:24 squashfs-root/lib/x86_64-linux-gnu/libc-2.31.so
+lrwxrwxrwx 0/0                12 2020-03-14 18:21 squashfs-root/lib/x86_64-linux-gnu/libc.so.6 -> libc-2.31.so
+-rw-r--r-- 0/0             18816 2020-03-23 14:24 squashfs-root/lib/x86_64-linux-gnu/libdl-2.31.so
+lrwxrwxrwx 0/0                13 2020-03-14 18:21 squashfs-root/lib/x86_64-linux-gnu/libdl.so.2 -> libdl-2.31.so
+-rwxr-xr-x 0/0            157224 2020-03-14 18:21 squashfs-root/lib/x86_64-linux-gnu/libpthread-2.31.so
+lrwxrwxrwx 0/0                18 2020-03-14 18:21 squashfs-root/lib/x86_64-linux-gnu/libpthread.so.0 -> libpthread-2.31.so
+-rw-r--r-- 0/0            163200 2020-02-18 03:44 squashfs-root/lib/x86_64-linux-gnu/libselinux.so.1
+drwxr-xr-x 0/0                43 2020-03-23 14:25 squashfs-root/lib64
+lrwxrwxrwx 0/0                32 2020-03-14 18:21 squashfs-root/lib64/ld-linux-x86-64.so.2 -> /lib/x86_64-linux-gnu/ld-2.31.so
+drwxr-xr-x 0/0                 3 2019-08-27 11:48 squashfs-root/media
+drwxr-xr-x 0/0                32 2020-03-23 14:02 squashfs-root/meta
+-rw-r--r-- 0/0               149 2020-03-23 14:02 squashfs-root/meta/snap.yaml
+drwxr-xr-x 0/0                 3 2019-08-27 11:48 squashfs-root/opt
+drwxr-xr-x 0/0                 3 2018-04-24 03:34 squashfs-root/proc
+drwx------ 0/0                 3 2020-03-24 13:25 squashfs-0/0
+drwxr-xr-x 0/0                 3 2020-03-23 14:09 squashfs-root/run
+drwxr-xr-x 0/0                 3 2018-04-24 03:34 squashfs-root/sys
+drwxrwxrwt 0/0                 3 2019-08-27 12:30 squashfs-root/tmp
+drwxr-xr-x 0/0                63 2020-03-23 14:35 squashfs-root/usr
+drwxr-xr-x 0/0                52 2020-03-23 14:35 squashfs-root/usr/lib
+drwxr-xr-x 0/0                 3 2020-03-23 14:35 squashfs-root/usr/lib/snapd
+drwxr-xr-x 0/0                65 2020-03-23 14:26 squashfs-root/usr/lib/x86_64-linux-gnu
+lrwxrwxrwx 0/0                19 2019-12-07 11:06 squashfs-root/usr/lib/x86_64-linux-gnu/libpcre2-8.so.0 -> libpcre2-8.so.0.9.0
+-rw-r--r-- 0/0            584392 2019-12-07 11:06 squashfs-root/usr/lib/x86_64-linux-gnu/libpcre2-8.so.0.9.0
+drwxr-xr-x 0/0                28 2020-03-23 14:35 squashfs-root/usr/local
+drwxr-xr-x 0/0                28 2020-03-23 14:35 squashfs-root/usr/local/share
+drwxr-xr-x 0/0                 3 2020-03-23 14:35 squashfs-root/usr/local/share/fonts
+drwxr-xr-x 0/0                40 2020-03-26 09:34 squashfs-root/usr/share
+drwxr-xr-x 0/0                75 2020-03-26 09:35 squashfs-root/usr/share/data
+-rw-r--r-- 0/0                 0 2020-03-26 09:35 squashfs-root/usr/share/data/ file with many spaces 
+-rw-r--r-- 0/0                 0 2020-03-26 09:34 squashfs-root/usr/share/data/file with smiley 😃
+drwxr-xr-x 0/0                 3 2020-03-23 14:35 squashfs-root/usr/share/fonts
+drwxr-xr-x 0/0                 3 2020-03-23 14:35 squashfs-root/usr/src
+drwxr-xr-x 0/0                73 2020-03-23 14:35 squashfs-root/var
+drwxr-xr-x 0/0                33 2020-03-23 14:35 squashfs-root/var/cache
+drwxr-xr-x 0/0                 3 2020-03-23 14:35 squashfs-root/var/cache/fontconfig
+drwxr-xr-x 0/0                28 2020-03-23 14:10 squashfs-root/var/lib
+drwxr-xr-x 0/0                 3 2020-03-23 14:10 squashfs-root/var/lib/snapd
+drwxr-xr-x 0/0                 3 2019-08-27 12:30 squashfs-root/var/log
+drwxr-xr-x 0/0                 3 2020-03-23 14:35 squashfs-root/var/snap
+drwxrwxrwt 0/0                 3 2019-08-27 11:50 squashfs-root/var/tmp
+drwxr-xr-x 0/0                 3 2019-08-27 12:30 squashfs-root/writable
 
 = Test --state-output=base.last test-state-base_1_amd64.snap
 Running: snap-review --state-output=./base.last

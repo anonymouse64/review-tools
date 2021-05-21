@@ -31,7 +31,7 @@ from reviewtools.common import (
     unsquashfs_supports_ignore_errors,
     set_lang,
     restore_lang,
-    StatLLS,
+    StatLLN,
 )
 from reviewtools.overrides import (
     sec_browser_support_overrides,
@@ -144,8 +144,8 @@ class SnapReviewSecurity(SnapReview):
     def _debug_resquashfs(self, tmpdir, orig, resq):
         """Provide debugging information on snap and repacked snap"""
         debug_output = ""
-        orig_lls_fn = os.path.join(tmpdir, os.path.basename(orig) + ".lls")
-        resq_lls_fn = os.path.join(tmpdir, os.path.basename(resq) + ".lls")
+        orig_lln_fn = os.path.join(tmpdir, os.path.basename(orig) + ".lls")
+        resq_lln_fn = os.path.join(tmpdir, os.path.basename(resq) + ".lls")
 
         error = False
         for fn in [orig, resq]:
@@ -157,22 +157,22 @@ class SnapReviewSecurity(SnapReview):
                 continue
             debug_output += "squash fstime for %s: %s" % (os.path.basename(fn), out)
 
-            cmdline = ["unsquashfs", "-lls", fn]
+            cmdline = ["unsquashfs", "-lln", fn]
             (rc, out) = cmd(cmdline)
             if rc != 0:
                 debug_output += "'%s' failed" % " ".join(cmdline)
                 error = True
                 continue
-            debug_output += "unsquashfs -lls %s:\n%s" % (os.path.basename(fn), out)
+            debug_output += "unsquashfs -lln %s:\n%s" % (os.path.basename(fn), out)
 
-            lls_fn = orig_lls_fn
+            lls_fn = orig_lln_fn
             if fn == resq:
-                lls_fn = resq_lls_fn
+                lls_fn = resq_lln_fn
             with open_file_write(lls_fn) as f:
                 f.write(out)
 
         if not error:
-            cmdline = ["diff", "-au", orig_lls_fn, resq_lls_fn]
+            cmdline = ["diff", "-au", orig_lln_fn, resq_lln_fn]
             (rc, out) = cmd(cmdline)
             debug_output += "%s:\n%s" % (" ".join(cmdline), out)
 
@@ -513,7 +513,7 @@ class SnapReviewSecurity(SnapReview):
                     return False
             return True
 
-        if self.unsquashfs_lls_entries is None:
+        if self.unsquashfs_lln_entries is None:
             return
 
         pkgname = self.snap_yaml["name"]
@@ -525,17 +525,17 @@ class SnapReviewSecurity(SnapReview):
         readdir_pat = re.compile(r"^r.xr.xr.x")
         errors = []
 
-        for (line, item) in self.unsquashfs_lls_entries:
+        for (line, item) in self.unsquashfs_lln_entries:
             if item is None:
                 continue
 
-            fname = item[StatLLS.FILENAME]
-            fname_full = item[StatLLS.FULLNAME]
-            ftype = item[StatLLS.FILETYPE]
-            mode = item[StatLLS.MODE]
-            owner = item[StatLLS.OWNER]
-            user = item[StatLLS.USER]
-            group = item[StatLLS.GROUP]
+            fname = item[StatLLN.FILENAME]
+            fname_full = item[StatLLN.FULLNAME]
+            ftype = item[StatLLN.FILETYPE]
+            mode = item[StatLLN.MODE]
+            owner = item[StatLLN.OWNER]
+            uid = item[StatLLN.UID]
+            gid = item[StatLLN.GID]
 
             # https://forum.snapcraft.io/t/incorrect-permissions-in-meta-snap-yaml/1161/8
             if fname_full in ["squashfs-root", "squashfs-root/meta"]:
@@ -576,13 +576,9 @@ class SnapReviewSecurity(SnapReview):
                 errors.append("file type '%s' not allowed (%s)" % (ftype, fname))
                 continue
 
-            # we enforce 'root/root'
-            if (
-                snap_type != "base"
-                and snap_type != "os"
-                and (user != "root" or group != "root")
-            ):
-                errors.append("unusual user/group '%s' for '%s'" % (owner, fname))
+            # we enforce '0/0'
+            if snap_type != "base" and snap_type != "os" and (uid != "0" or gid != "0"):
+                errors.append("unusual uid/gid '%s' for '%s'" % (owner, fname))
                 continue
 
         t = "info"
