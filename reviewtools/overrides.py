@@ -133,7 +133,7 @@ desktop_file_exception = ["emoj", "ffscreencast", "pulsemixer"]
 
 # List of classic snaps that may specify slots/plugs (eg, for workaround
 # content interface methodology)
-classic_interfaces_exception = ["certbot", "juju", "microk8s", "eks"]
+classic_interfaces_exception = ["certbot", "juju", "microk8s", "eks", "xlnx-config"]
 
 # List additional attributes that a particular snap may specify with a
 # particular side of a particular interface (eg, for workaround content
