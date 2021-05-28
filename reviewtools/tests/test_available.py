@@ -568,7 +568,7 @@ each snap revision
 
     def test_check__secnot_report_for_kernel_stage_and_build_pkg_new_secnot(self):
         """Test _secnot_report_for_pkg() - new secnot for build and
-            staged pkg"""
+        staged pkg"""
         errors = {}
         self.pkg_db = store.get_pkg_revisions(
             self.kernel_store_db[0], self.secnot_kernel_and_build_pkgs_db, errors
@@ -912,6 +912,10 @@ Revision r12 (i386; channels: candidate, beta)
         snap_fn = "./tests/test-core_16-2.37.2_amd64.snap"
         res = available.scan_snap(self.secnot_core_with_dpkg_list_fn, snap_fn)
         self.assertTrue(len(res) > 0)
+        # This asserts a binary was obtained from the URLs since its not listed in the USN binaries keys
+        self.assertIn("libc-bin", res)
+        # This asserts the dpkg-query file was properly parsed and arch qualifiers were ignored LP: #1930105
+        self.assertIn("libc6", res)
         self.assertIn("3323-1", res)
 
     def test_check_scan_snap_dpkg_list_app(self):
@@ -1063,7 +1067,7 @@ Revision r12 (i386; channels: candidate, beta)
 
     def test_check_scan_store_with_pkgname_bad_publisher(self):
         """Test scan_store() - with pkgname and bad publisher - snaps and
-           rocks
+        rocks
         """
         store_dbs = {
             "snap": ["./tests/test-store-unittest-bad-1.db", "1ad"],
@@ -1128,7 +1132,7 @@ Revision r12 (i386; channels: candidate, beta)
         self,
     ):
         """Test scan_store() - kernel snap and build pkg update but invalid
-           snapcraft version"""
+        snapcraft version"""
         store_fn = "./tests/test-store-kernel-invalid-snapcraft-version.db"
         (sent, errors) = available.scan_store(
             self.secnot_build_pkgs_only_fn, store_fn, None, None

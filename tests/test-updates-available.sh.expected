@@ -1051,6 +1051,10 @@ Running: snap-updates-available --usn-db='./tests/test-usn-core-with-dpkg-list.d
     "3323-1",
     "3534-1"
   ],
+  "libc6": [
+    "3323-1",
+    "3534-1"
+  ],
   "multiarch-support": [
     "3323-1",
     "3534-1"
@@ -1060,6 +1064,69 @@ Running: snap-updates-available --usn-db='./tests/test-usn-core-with-dpkg-list.d
 Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-core-with-dpkg-list.db' --snap='./tests/test-core_16-2.37.2_amd64.snap'
 {
   "libc-bin": {
+    "3323-1": [
+      "CVE-2017-1000366"
+    ],
+    "3534-1": [
+      "CVE-2017-1000408",
+      "CVE-2017-1000409",
+      "CVE-2017-15670",
+      "CVE-2017-15804",
+      "CVE-2017-16997",
+      "CVE-2017-17426",
+      "CVE-2018-1000001"
+    ]
+  },
+  "libc6": {
+    "3323-1": [
+      "CVE-2017-1000366"
+    ],
+    "3534-1": [
+      "CVE-2017-1000408",
+      "CVE-2017-1000409",
+      "CVE-2017-15670",
+      "CVE-2017-15804",
+      "CVE-2017-16997",
+      "CVE-2017-17426",
+      "CVE-2018-1000001"
+    ]
+  },
+  "multiarch-support": {
+    "3323-1": [
+      "CVE-2017-1000366"
+    ],
+    "3534-1": [
+      "CVE-2017-1000408",
+      "CVE-2017-1000409",
+      "CVE-2017-15670",
+      "CVE-2017-15804",
+      "CVE-2017-16997",
+      "CVE-2017-17426",
+      "CVE-2018-1000001"
+    ]
+  }
+}
+
+Running: snap-updates-available --usn-db='./tests/test-usn-core-with-dpkg-list.db' --snap='./tests/test-core-with-primed-staged_16-2.37.2_amd64.snap'
+ERROR: Could not find './test-core-with-primed-staged_16-2.37.2_amd64.snap'
+
+Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-core-with-dpkg-list.db' --snap='./tests/test-core-with-primed-staged_16-2.37.2_amd64.snap'
+{
+  "libc-bin": {
+    "3323-1": [
+      "CVE-2017-1000366"
+    ],
+    "3534-1": [
+      "CVE-2017-1000408",
+      "CVE-2017-1000409",
+      "CVE-2017-15670",
+      "CVE-2017-15804",
+      "CVE-2017-16997",
+      "CVE-2017-17426",
+      "CVE-2018-1000001"
+    ]
+  },
+  "libc6": {
     "3323-1": [
       "CVE-2017-1000366"
     ],
@@ -1095,6 +1162,10 @@ Running: snap-updates-available --usn-db='./tests/test-usn-core-with-dpkg-list.d
     "3323-1",
     "3534-1"
   ],
+  "libc6": [
+    "3323-1",
+    "3534-1"
+  ],
   "multiarch-support": [
     "3323-1",
     "3534-1"
@@ -1104,6 +1175,20 @@ Running: snap-updates-available --usn-db='./tests/test-usn-core-with-dpkg-list.d
 Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-core-with-dpkg-list.db' --snap='./tests/test-dpkg-list-app_1.0_amd64.snap'
 {
   "libc-bin": {
+    "3323-1": [
+      "CVE-2017-1000366"
+    ],
+    "3534-1": [
+      "CVE-2017-1000408",
+      "CVE-2017-1000409",
+      "CVE-2017-15670",
+      "CVE-2017-15804",
+      "CVE-2017-16997",
+      "CVE-2017-17426",
+      "CVE-2018-1000001"
+    ]
+  },
+  "libc6": {
     "3323-1": [
       "CVE-2017-1000366"
     ],
@@ -1813,6 +1898,10 @@ Running: snap-check-notices --no-fetch ./tests/test-core_16-2.37.2_amd64.snap
         "3323-1",
         "3534-1"
       ],
+      "libc6": [
+        "3323-1",
+        "3534-1"
+      ],
       "multiarch-support": [
         "3323-1",
         "3534-1"
@@ -1826,6 +1915,20 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/test-core_16-2.37.2_a
   "test-core": {
     "16-2.37.2": {
       "libc-bin": {
+        "3323-1": [
+          "CVE-2017-1000366"
+        ],
+        "3534-1": [
+          "CVE-2017-1000408",
+          "CVE-2017-1000409",
+          "CVE-2017-15670",
+          "CVE-2017-15804",
+          "CVE-2017-16997",
+          "CVE-2017-17426",
+          "CVE-2018-1000001"
+        ]
+      },
+      "libc6": {
         "3323-1": [
           "CVE-2017-1000366"
         ],

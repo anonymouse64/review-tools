@@ -416,9 +416,9 @@ def _update_seen(seen_fn, seen_db, pkg_db):
 # rocks
 def scan_store(secnot_db_fn, store_db_fn, seen_db_fn, pkgname, store_db_type="snap"):
     """For each entry in store db (either snap or rock), see if there are any
-       binary packages with security notices, if see report them if not in the
-       seen db. We perform these actions on each snap and rock and do not form
-       a queue to keep the implementation simple.
+    binary packages with security notices, if see report them if not in the
+    seen db. We perform these actions on each snap and rock and do not form
+    a queue to keep the implementation simple.
     """
     secnot_db = read_usn_db(secnot_db_fn)
     store_db = read_file_as_json_dict(store_db_fn)
@@ -483,8 +483,16 @@ def scan_snap(secnot_db_fn, snap_fn, with_cves=False):
                 if not line.startswith("ii "):
                     continue
                 tmp = line.split()
+                pkg_name = tmp[1]
+                # Since dpkg 1.16.2, the binary name could include and arch qualifier: e.g liblz4-1:amd64
+                # For now we assume that if the colon is present, we are in a situation where the binary name is
+                # including the arch. We could assert valid architectures as well but that means this code should be
+                # updated as new arch are supported or even existing ones are removed.
+                arch_qualifier_parts = pkg_name.split(":")
+                if len(arch_qualifier_parts) == 2:
+                    pkg_name = arch_qualifier_parts[0]
                 man["parts"][fake_key]["stage-packages"].append(
-                    "%s=%s" % (tmp[1], tmp[2])
+                    "%s=%s" % (pkg_name, tmp[2])
                 )
 
     secnot_db = read_usn_db(secnot_db_fn)
@@ -526,7 +534,7 @@ def scan_rock(secnot_db_fn, rock_fn, with_cves=False):
 
 def scan_shared_publishers(store_fn):
     """Check store db for any snaps with a shared email that don't also have a
-       mapping.
+    mapping.
     """
     store_db = read_file_as_json_dict(store_fn)
     report = get_shared_snap_without_override(store_db)
