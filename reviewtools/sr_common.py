@@ -241,6 +241,7 @@ class SnapReview(Review):
         },
         "desktop": {"mount-host-font-cache/plugs": False},
         "docker-support": {"privileged-containers/plugs": False},
+        "dsp": {"flavor/slots": ""},
         "gpio": {"number/slots": 0},
         "greengrass-support": {"flavor/plugs": ""},
         "hidraw": {"path/slots": "", "usb-vendor/slots": 0, "usb-product/slots": 0},
