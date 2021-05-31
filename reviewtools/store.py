@@ -325,7 +325,7 @@ def get_pkg_revisions(item, secnot_db, errors, pkg_type="snap"):
 
 def get_shared_snap_without_override(store_db):
     """Report snaps that use a shared email but don't have an entry for
-       additional addresses.
+    additional addresses.
     """
     missing = {}
     for item in store_db:
@@ -351,7 +351,7 @@ def get_shared_snap_without_override(store_db):
 # TODO: support for build-packages is not fully implemented yet.
 def get_staged_and_build_packages_from_manifest(m):
     """Obtain list of packages in primed-stage-packages if section is present.
-       If not, obtain it from stage-packages for various parts instead
+    If not, obtain it from stage-packages for various parts instead
     """
     if "parts" not in m:
         debug("Could not find 'parts' in manifest")
@@ -366,14 +366,20 @@ def get_staged_and_build_packages_from_manifest(m):
     manifest_has_primed_staged_section = False
 
     if "primed-stage-packages" in m and m["primed-stage-packages"] is not None:
+        # An empty primed-stage-packages section (i.e. primed-stage-packages: [])
+        # is consider valid as well.
         manifest_has_primed_staged_section = True
         # Note, prime-stage-packages is grouped with stage-packages
         get_packages_from_manifest_section(d, m["primed-stage-packages"], "staged")
 
     for part in m["parts"]:
-        # stage-packages part is only analyzed if primed-stage-packages is not
-        # present.
-        if not manifest_has_primed_staged_section:
+        # stage-packages in each part is only analyzed if primed-stage-packages
+        # is not present. The only exception is if the snap includes the
+        # dpkg.list file (e.g. core snaps) since primed-stage-packages is always empty
+        if (
+            not manifest_has_primed_staged_section
+            or part == "faked-by-review-tools-dpkg"
+        ):
             if (
                 "stage-packages" in m["parts"][part]
                 and m["parts"][part]["stage-packages"] is not None
@@ -401,8 +407,7 @@ def get_staged_and_build_packages_from_manifest(m):
 
 
 def get_staged_packages_from_rock_manifest(m):
-    """Obtain list of packages in stage-packages if section is present.
-    """
+    """Obtain list of packages in stage-packages if section is present."""
     if "stage-packages" not in m:
         debug("Could not find 'stage-packages' in manifest")
         return None
@@ -426,7 +431,7 @@ def get_staged_packages_from_rock_manifest(m):
 # key.
 def get_packages_from_manifest_section(d, manifest_section, package_type):
     """Obtain packages from a given manifest section (primed-stage-packages
-       or stage-packages along with any build-packages for a given part)
+    or stage-packages along with any build-packages for a given part)
     """
     for entry in manifest_section:
         if "=" not in entry:
@@ -451,7 +456,7 @@ def get_packages_from_manifest_section(d, manifest_section, package_type):
 # snaps, git trees)
 def get_packages_from_rock_manifest_section(d, manifest_section, package_type):
     """Obtain packages from a given manifest section (rock manifest v1 only
-       has staged-packages)
+    has staged-packages)
     """
     for entry in manifest_section:
         # rock manifest v1 stage-packages section is a list of
@@ -486,8 +491,8 @@ def get_packages_from_rock_manifest_section(d, manifest_section, package_type):
 
 def normalize_and_verify_snap_manifest(m):
     """Normalize manifest (ie, assign empty types if None for SafeLoader
-       defaults) and verify snap manifest is well-formed and has everything we
-       expect"""
+    defaults) and verify snap manifest is well-formed and has everything we
+    expect"""
     # normalize toplevel keys
     assign_type_to_dict_values(m, SnapReview.snap_manifest_required)
     assign_type_to_dict_values(m, SnapReview.snap_manifest_optional)
@@ -507,9 +512,9 @@ def normalize_and_verify_snap_manifest(m):
 
 def normalize_and_verify_rock_manifest(m):
     """Normalize manifest (ie, assign empty types if None for SafeLoader
-       defaults) and verify rock manifest is well-formed and has everything we
-       expect in this initial implementation.
-       TODO: Update once rock manifest is properly implemented"""
+    defaults) and verify rock manifest is well-formed and has everything we
+    expect in this initial implementation.
+    TODO: Update once rock manifest is properly implemented"""
     # normalize toplevel keys
     assign_type_to_dict_values(m, RockReview.rock_manifest_required)
     assign_type_to_dict_values(m, RockReview.rock_manifest_optional)

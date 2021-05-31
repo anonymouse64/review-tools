@@ -242,6 +242,15 @@ echo "Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-cor
 PYTHONPATH=./ ./bin/snap-updates-available --with-cves --usn-db='./tests/test-usn-core-with-dpkg-list.db' --snap='./tests/test-core_16-2.37.2_amd64.snap' 2>&1 | tee -a "$tmp"
 echo "" | tee -a "$tmp"
 
+# testing core snap with manifest including primed-stage-packages: [] LP: #1930106
+echo "Running: snap-updates-available --usn-db='./tests/test-usn-core-with-dpkg-list.db' --snap='./tests/test-core-with-primed-staged_16-2.37.2_amd64.snap'" | tee -a "$tmp"
+PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-core-with-dpkg-list.db' --snap='./test-core-with-primed-staged_16-2.37.2_amd64.snap' 2>&1 | tee -a "$tmp"
+echo "" | tee -a "$tmp"
+
+echo "Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-core-with-dpkg-list.db' --snap='./tests/test-core-with-primed-staged_16-2.37.2_amd64.snap'" | tee -a "$tmp"
+PYTHONPATH=./ ./bin/snap-updates-available --with-cves --usn-db='./tests/test-usn-core-with-dpkg-list.db' --snap='./tests/test-core-with-primed-staged_16-2.37.2_amd64.snap' 2>&1 | tee -a "$tmp"
+echo "" | tee -a "$tmp"
+
 echo "Running: snap-updates-available --usn-db='./tests/test-usn-core-with-dpkg-list.db' --snap='./tests/test-dpkg-list-app_1.0_amd64.snap'" | tee -a "$tmp"
 PYTHONPATH=./ ./bin/snap-updates-available --usn-db='./tests/test-usn-core-with-dpkg-list.db' --snap='./tests/test-dpkg-list-app_1.0_amd64.snap' 2>&1 | tee -a "$tmp"
 echo "" | tee -a "$tmp"
