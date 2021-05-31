@@ -1,3 +1,18 @@
+review-tools (0.48+20210531-1) RELEASED; urgency=medium
+
+  [ Emilia Torino ]
+  * available.py: considering binary names could contain arch specifier
+    when parsing dpkg.list
+  * store.py: consider faked-by-review-tools-dpkg part when checking if
+    manifest_has_primed_staged_section
+
+  [ Alex Murray ]
+  * sr_common.py: update for dsp slot flavor property
+  * overrides.py: add xlnx-config to overrides for classic snaps with
+    slots
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Mon, 31 May 2021 10:00:33 -0300
+
 review-tools (0.48+20210430-1) RELEASED; urgency=medium
 
   * sr_common.py: add known iface attributes to interfaces_attribs
