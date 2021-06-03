@@ -144,8 +144,8 @@ class SnapReviewSecurity(SnapReview):
     def _debug_resquashfs(self, tmpdir, orig, resq):
         """Provide debugging information on snap and repacked snap"""
         debug_output = ""
-        orig_lln_fn = os.path.join(tmpdir, os.path.basename(orig) + ".lls")
-        resq_lln_fn = os.path.join(tmpdir, os.path.basename(resq) + ".lls")
+        orig_lln_fn = os.path.join(tmpdir, os.path.basename(orig) + ".lln")
+        resq_lln_fn = os.path.join(tmpdir, os.path.basename(resq) + ".lln")
 
         error = False
         for fn in [orig, resq]:
@@ -165,10 +165,10 @@ class SnapReviewSecurity(SnapReview):
                 continue
             debug_output += "unsquashfs -lln %s:\n%s" % (os.path.basename(fn), out)
 
-            lls_fn = orig_lln_fn
+            lln_fn = orig_lln_fn
             if fn == resq:
-                lls_fn = resq_lln_fn
-            with open_file_write(lls_fn) as f:
+                lln_fn = resq_lln_fn
+            with open_file_write(lln_fn) as f:
                 f.write(out)
 
         if not error:
