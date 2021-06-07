@@ -1166,6 +1166,7 @@ update_publisher_overrides = {
         "thunderbird": canonical_desktop,
         "tpm": canonical_enablement,
         "tpm2": canonical_enablement,
+        "ubuntu-desktop-installer": canonical_desktop,
         "ubuntu-image": canonical_foundations,
         "udisks2": canonical_enablement,
         "uefi-fw-tools": canonical_enablement,
