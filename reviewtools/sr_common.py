@@ -26,8 +26,8 @@ from reviewtools.common import (
     error,
     open_file_read,
     read_snapd_base_declaration,
-    unsquashfs_lls,
-    unsquashfs_lls_parse,
+    unsquashfs_lln,
+    unsquashfs_lln_parse,
     verify_type,
 )
 from reviewtools.overrides import interfaces_attribs_addons
@@ -464,8 +464,8 @@ class SnapReview(Review):
                 if self.snap_yaml[k][iface] is None:
                     self.snap_yaml[k][iface] = {}
 
-        # cache unsquashfs -lls so we can use it all over
-        self.unsquashfs_lls_hdr, self.unsquashfs_lls_entries = self._unsquashfs_lls(fn)
+        # cache unsquashfs -lln so we can use it all over
+        self.unsquashfs_lln_hdr, self.unsquashfs_lln_entries = self._unsquashfs_lln(fn)
 
     # Since coverage is looked at via the testsuite and the testsuite mocks
     # this out, don't cover this
@@ -485,12 +485,12 @@ class SnapReview(Review):
             return None
         return open_file_read(y)
 
-    def _unsquashfs_lls(self, snap_pkg):
-        """Run unsquashfs -lls on a snap package"""
-        (rc, out) = unsquashfs_lls(snap_pkg)
+    def _unsquashfs_lln(self, snap_pkg):
+        """Run unsquashfs -lln on a snap package"""
+        (rc, out) = unsquashfs_lln(snap_pkg)
         if rc != 0:
-            error("Could not unsquashfs -lls failed")
-        hdr, entries = unsquashfs_lls_parse(out)
+            error("Could not unsquashfs -lln failed")
+        hdr, entries = unsquashfs_lln_parse(out)
         return hdr, entries
 
     # Since coverage is looked at via the testsuite and the testsuite mocks

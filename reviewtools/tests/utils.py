@@ -338,7 +338,7 @@ def build_package(
         args = ["mksquashfs", path, output_path] + mksquash_opts
         # debugging
         # subprocess.check_call(args)
-        # subprocess.check_call(['unsquashfs', '-lls', output_path])
+        # subprocess.check_call(['unsquashfs', '-lln', output_path])
         fd = open(os.devnull, "w")
         subprocess.check_call(args, stdout=fd)
         fd.close()

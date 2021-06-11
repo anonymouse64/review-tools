@@ -80,8 +80,8 @@ for args in "" "--json" "--sdk" ; do
 done
 
 # snap-specific checks
-comment "= Test unsquashfs -lls output with weird files"
-unsquashfs -lls "$orig_dir/tests/test-state-base_1_amd64.snap" | tee -a "$tmp"
+comment "= Test unsquashfs -lln output with weird files"
+unsquashfs -lln "$orig_dir/tests/test-state-base_1_amd64.snap" | tee -a "$tmp"
 comment ""
 
 for args in "" "--json" "--sdk" ; do

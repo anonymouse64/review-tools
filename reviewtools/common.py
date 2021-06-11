@@ -701,12 +701,12 @@ def move_dir_content(d, dest):
     os.chmod(dest, st_mode & 0o7777)
 
 
-def unsquashfs_lls(snap_pkg):
-    """Return unsquashfs -lls output"""
-    return cmd(["unsquashfs", "-lls", snap_pkg])
+def unsquashfs_lln(snap_pkg):
+    """Return unsquashfs -lln output"""
+    return cmd(["unsquashfs", "-lln", snap_pkg])
 
 
-unsquashfs_lls_regex = {
+unsquashfs_lln_regex = {
     "fname_pat": re.compile(r"^.+? (squashfs-root)"),
     # based on squashfs-tools/unsquashfs.c
     "mode_pat": re.compile(r"^[rw-]{2}[xsS-][rw-]{2}[xsS-][rw-]{2}[xtT-]$"),
@@ -715,18 +715,17 @@ unsquashfs_lls_regex = {
     # based on squashfs-tools/unsquashfs.c
     "ftype_pat": re.compile(r"^[bcdlps-]$"),
     "mknod_pat_full": re.compile(r".,."),
-    # based on osutil/user.go from snapd
-    "owner_pat": re.compile(r"^[a-z0-9_][-a-z0-9+._]*/[a-z0-9][-a-z0-9+._]*$"),
+    "owner_pat": re.compile(r"^[0-9]+/[0-9]+$"),
 }
 
 
 # do not change the order
-class StatLLS(Enum):
+class StatLLN(Enum):
     FILETYPE = 1  # file type
     MODE = 2  # expressed as ls output, eg, rwx-r-xr-x
-    OWNER = 3  # user/group
-    USER = 4  # user
-    GROUP = 5  # group
+    OWNER = 3  # uid/gid
+    UID = 4  # uid
+    GID = 5  # gid
     SIZE = 6  # size of the entry
     MAJOR = 7  # device major
     MINOR = 8  # device minor
@@ -736,8 +735,8 @@ class StatLLS(Enum):
     FULLNAME = 12  # full filename
 
 
-def unsquashfs_lls_parse_line(line):
-    """Parse a line of unsquashfs -lls output"""
+def unsquashfs_lln_parse_line(line):
+    """Parse a line of unsquashfs -lln output"""
     item = {}  # XXX: make object to ease with comparisons, etc
 
     if "\x00" in line:
@@ -750,10 +749,10 @@ def unsquashfs_lls_parse_line(line):
     date_idx = 3
     ftype = line[0]
     if ftype == "b" or ftype == "c":
-        # Account for unsquashfs -lls doing:
-        # crw-rw-rw- root/root             1,  8 2016-08-09 ...
-        # crw-rw---- root/root            10,141 2016-08-09 ...
-        if not unsquashfs_lls_regex["mknod_pat_full"].search(tmp[2]):
+        # Account for unsquashfs -lln doing:
+        # crw-rw-rw- 0/0             1,  8 2016-08-09 ...
+        # crw-rw---- 0/0            10,141 2016-08-09 ...
+        if not unsquashfs_lln_regex["mknod_pat_full"].search(tmp[2]):
             date_idx = 4
     time_idx = date_idx + 1
     fname_idx = time_idx + 1
@@ -763,36 +762,36 @@ def unsquashfs_lls_parse_line(line):
         raise ReviewException("could not determine filename: %s" % line)
 
     # embedded NULs handled above
-    fname = unsquashfs_lls_regex["fname_pat"].sub(".", line)
-    item[StatLLS.FILENAME] = fname
+    fname = unsquashfs_lln_regex["fname_pat"].sub(".", line)
+    item[StatLLN.FILENAME] = fname
 
-    fname_full = unsquashfs_lls_regex["fname_pat"].sub("\\1", line)
-    item[StatLLS.FULLNAME] = fname_full
+    fname_full = unsquashfs_lln_regex["fname_pat"].sub("\\1", line)
+    item[StatLLN.FULLNAME] = fname_full
 
     # Also see 'info ls', but we list only the Linux ones
-    if not unsquashfs_lls_regex["ftype_pat"].search(ftype):
+    if not unsquashfs_lln_regex["ftype_pat"].search(ftype):
         raise ReviewException("unknown type '%s' for entry '%s'" % (ftype, fname))
-    item[StatLLS.FILETYPE] = ftype
+    item[StatLLN.FILETYPE] = ftype
 
     # verify mode
     mode = tmp[0][1:]
-    if not unsquashfs_lls_regex["mode_pat"].search(mode):
+    if not unsquashfs_lln_regex["mode_pat"].search(mode):
         raise ReviewException("mode '%s' malformed for '%s'" % (mode, fname))
-    item[StatLLS.MODE] = mode
+    item[StatLLN.MODE] = mode
 
     # verify ownership
     owner = tmp[1]
-    if not unsquashfs_lls_regex["owner_pat"].search(owner):
-        raise ReviewException("user/group '%s' malformed for '%s'" % (owner, fname))
-    item[StatLLS.OWNER] = owner
-    item[StatLLS.USER], item[StatLLS.GROUP] = owner.split("/")
+    if not unsquashfs_lln_regex["owner_pat"].search(owner):
+        raise ReviewException("uid/gid '%s' malformed for '%s'" % (owner, fname))
+    item[StatLLN.OWNER] = owner
+    item[StatLLN.UID], item[StatLLN.GID] = owner.split("/")
 
     if ftype == "b" or ftype == "c":
-        # Account for unsquashfs -lls doing:
-        # crw-rw-rw- root/root             1,  8 2016-08-09 ...
-        # crw-rw---- root/root            10,141 2016-08-09 ...
+        # Account for unsquashfs -lln doing:
+        # crw-rw-rw- 0/0             1,  8 2016-08-09 ...
+        # crw-rw---- 0/0            10,141 2016-08-09 ...
 
-        if unsquashfs_lls_regex["mknod_pat_full"].search(tmp[2]):
+        if unsquashfs_lln_regex["mknod_pat_full"].search(tmp[2]):
             (major, minor) = tmp[2].split(",")
         else:
             major = tmp[2][:-1]
@@ -802,42 +801,42 @@ def unsquashfs_lls_parse_line(line):
             int(major)
         except Exception:
             raise ReviewException("major '%s' malformed for '%s'" % (major, fname))
-        item[StatLLS.MAJOR] = major
+        item[StatLLN.MAJOR] = major
         try:
             int(minor)
         except Exception:
             raise ReviewException("minor '%s' malformed for '%s'" % (minor, fname))
-        item[StatLLS.MINOR] = minor
+        item[StatLLN.MINOR] = minor
     else:
         size = tmp[2]
         try:
             int(size)
         except Exception:
             raise ReviewException("size '%s' malformed for '%s'" % (size, fname))
-        item[StatLLS.SIZE] = size
+        item[StatLLN.SIZE] = size
 
     date = tmp[date_idx]
-    if not unsquashfs_lls_regex["date_pat"].search(date):
+    if not unsquashfs_lln_regex["date_pat"].search(date):
         raise ReviewException("date '%s' malformed for '%s'" % (date, fname))
-    item[StatLLS.DATE] = date
+    item[StatLLN.DATE] = date
 
     time = tmp[time_idx]
-    if not unsquashfs_lls_regex["time_pat"].search(time):
+    if not unsquashfs_lln_regex["time_pat"].search(time):
         raise ReviewException("time '%s' malformed for '%s'" % (time, fname))
-    item[StatLLS.TIME] = time
+    item[StatLLN.TIME] = time
 
     return copy.copy(item)
 
 
-def unsquashfs_lls_parse(lls_out):
-    """Parse unsquashfs -lls output"""
+def unsquashfs_lln_parse(lln_out):
+    """Parse unsquashfs -lln output"""
     hdr = []
     entries = []
 
     count = 0
     in_header = True
     errors = []
-    for line in lls_out.splitlines():
+    for line in lln_out.splitlines():
         count += 1
         if in_header:
             if len(line) < 1:
@@ -848,14 +847,14 @@ def unsquashfs_lls_parse(lls_out):
 
         item = None
         try:
-            item = unsquashfs_lls_parse_line(line)
+            item = unsquashfs_lln_parse_line(line)
             entries.append((line, item))
         except ReviewException as e:
             errors.append(str(e))
             entries.append((line, None))
 
     if count < 4:
-        raise ReviewException("unsquashfs -lls ouput too short")
+        raise ReviewException("unsquashfs -lln ouput too short")
 
     if len(errors) > 0:
         raise ReviewException(
@@ -867,9 +866,9 @@ def unsquashfs_lls_parse(lls_out):
 
 def _calculate_snap_unsquashfs_uncompressed_size(snap_pkg):
     """Calculate size of the uncompressed snap"""
-    (rc, out) = cmd(["unsquashfs", "-lls", snap_pkg])
+    (rc, out) = cmd(["unsquashfs", "-lln", snap_pkg])
     if rc != 0:
-        error("unsquashfs -lls '%s' failed: %s" % (snap_pkg, out))
+        error("unsquashfs -lln '%s' failed: %s" % (snap_pkg, out))
 
     size = 0
     for line in out.splitlines():

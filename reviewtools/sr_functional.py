@@ -16,7 +16,7 @@
 
 from __future__ import print_function
 from reviewtools.sr_common import SnapReview
-from reviewtools.common import StatLLS, cmd
+from reviewtools.common import StatLLN, cmd
 from reviewtools.overrides import (
     func_execstack_overrides,
     func_execstack_skipped_pats,
@@ -36,7 +36,7 @@ class SnapReviewFunctional(SnapReview):
         SnapReview.__init__(self, fn, "functional-snap-v2", overrides=overrides)
         self._list_all_compiled_binaries()
 
-        # State files only for base snaps, if have -lls output and
+        # State files only for base snaps, if have -lln output and
         # --state-output is specified
         self.curr_state = None
         self.prev_state = None
@@ -49,7 +49,7 @@ class SnapReviewFunctional(SnapReview):
                     and self.snap_yaml["name"] == "core"
                 )
             )
-            and self.unsquashfs_lls_entries is not None
+            and self.unsquashfs_lln_entries is not None
             and "state_output" in self.overrides
         ):
             # if the name of this changes, then this field in the last state
@@ -60,16 +60,16 @@ class SnapReviewFunctional(SnapReview):
 
             # read in current state
             self.curr_state = {}
-            for (line, item) in self.unsquashfs_lls_entries:
+            for (line, item) in self.unsquashfs_lln_entries:
                 if item is None:
                     continue
 
-                if ".so" in os.path.basename(item[StatLLS.FILENAME]):
-                    symbols = self._find_symbols(item[StatLLS.FILENAME])
+                if ".so" in os.path.basename(item[StatLLN.FILENAME]):
+                    symbols = self._find_symbols(item[StatLLN.FILENAME])
                     if symbols is not None:
                         item["symbols"] = symbols
 
-                self.curr_state[item[StatLLS.FILENAME]] = item
+                self.curr_state[item[StatLLN.FILENAME]] = item
 
             # update state_output with our current state
             self.overrides["state_output"][self.state_key] = self._serialize(
@@ -158,10 +158,10 @@ class SnapReviewFunctional(SnapReview):
 
         def item2dict(item):
             for required in [
-                StatLLS.FILENAME,
-                StatLLS.FILETYPE,
-                StatLLS.MODE,
-                StatLLS.OWNER,
+                StatLLN.FILENAME,
+                StatLLN.FILETYPE,
+                StatLLN.MODE,
+                StatLLN.OWNER,
             ]:
                 if required not in item:
                     return {}
@@ -172,16 +172,16 @@ class SnapReviewFunctional(SnapReview):
                     return {}
 
             d = {}
-            fname = item[StatLLS.FILENAME]
+            fname = item[StatLLN.FILENAME]
 
             d[fname] = {}
-            d[fname]["filetype"] = item[StatLLS.FILETYPE]
-            d[fname]["mode"] = item[StatLLS.MODE]
-            d[fname]["owner"] = item[StatLLS.OWNER]
-            if StatLLS.MAJOR in item and item[StatLLS.MAJOR] is not None:
-                d[fname]["major"] = item[StatLLS.MAJOR]
-            if StatLLS.MINOR in item and item[StatLLS.MINOR] is not None:
-                d[fname]["minor"] = item[StatLLS.MINOR]
+            d[fname]["filetype"] = item[StatLLN.FILETYPE]
+            d[fname]["mode"] = item[StatLLN.MODE]
+            d[fname]["owner"] = item[StatLLN.OWNER]
+            if StatLLN.MAJOR in item and item[StatLLN.MAJOR] is not None:
+                d[fname]["major"] = item[StatLLN.MAJOR]
+            if StatLLN.MINOR in item and item[StatLLN.MINOR] is not None:
+                d[fname]["minor"] = item[StatLLN.MINOR]
 
             # read in well-formed symbols
             if "symbols" in item and isinstance(item["symbols"], dict):
@@ -224,14 +224,14 @@ class SnapReviewFunctional(SnapReview):
                     return None
 
             item = {}
-            item[StatLLS.FILENAME] = fname
-            item[StatLLS.FILETYPE] = d[fname]["filetype"]
-            item[StatLLS.MODE] = d[fname]["mode"]
-            item[StatLLS.OWNER] = d[fname]["owner"]
+            item[StatLLN.FILENAME] = fname
+            item[StatLLN.FILETYPE] = d[fname]["filetype"]
+            item[StatLLN.MODE] = d[fname]["mode"]
+            item[StatLLN.OWNER] = d[fname]["owner"]
             if "major" in d[fname]:
-                item[StatLLS.MAJOR] = d[fname]["major"]
+                item[StatLLN.MAJOR] = d[fname]["major"]
             if "minor" in d[fname]:
-                item[StatLLS.MINOR] = d[fname]["minor"]
+                item[StatLLN.MINOR] = d[fname]["minor"]
 
             # read in well-formed symbols
             if "symbols" in d[fname] and isinstance(d[fname]["symbols"], dict):
@@ -257,7 +257,7 @@ class SnapReviewFunctional(SnapReview):
             item = dict2item({entry: serial[entry]})
             if item is None:
                 continue
-            fname = item[StatLLS.FILENAME]
+            fname = item[StatLLN.FILENAME]
             state[fname] = item
         return copy.deepcopy(state)
 

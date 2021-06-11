@@ -24,7 +24,7 @@ import yaml
 
 from reviewtools.common import cleanup_unpack
 from reviewtools.common import check_results as common_check_results
-from reviewtools.common import unsquashfs_lls_parse as common_unsquashfs_lls_parse
+from reviewtools.common import unsquashfs_lln_parse as common_unsquashfs_lln_parse
 from reviewtools.sr_security import SnapReviewSecurity
 import reviewtools.sr_tests as sr_tests
 from reviewtools.tests import utils
@@ -60,9 +60,9 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
         }
         return slots
 
-    def _set_unsquashfs_lls(self, out):
-        hdr, entries = common_unsquashfs_lls_parse(out)
-        self.set_test_unsquashfs_lls(hdr, entries)
+    def _set_unsquashfs_lln(self, out):
+        hdr, entries = common_unsquashfs_lln_parse(out)
+        self.set_test_unsquashfs_lln(hdr, entries)
 
     # The next two checks just make sure every check is run. One with the
     # default snap from the tests and one empty. We do it this way so as not
@@ -71,7 +71,7 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
     #     return
     def test_all_checks_as_v2(self):
         """Test snap v2 has checks"""
-        self.set_test_unsquashfs_lls("", None)  # these checks happen elsewhere
+        self.set_test_unsquashfs_lln("", None)  # these checks happen elsewhere
         self.set_test_pkgfmt("snap", "16.04")
 
         plugs = self._create_top_plugs()
@@ -97,7 +97,7 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
 
     def test_all_checks_as_empty_v2(self):
         """Test snap v2 has checks - (mostly) empty yaml"""
-        self.set_test_unsquashfs_lls("", None)  # these checks happen elsewhere
+        self.set_test_unsquashfs_lln("", None)  # these checks happen elsewhere
         self.set_test_pkgfmt("snap", "16.04")
         tmp = []
         for key in self.test_snap_yaml:
@@ -287,19 +287,19 @@ class TestSnapReviewSecurity(sr_tests.TestSnapReview):
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
-drwxrwxr-x root/root                88 2016-03-03 13:51 squashfs-root/bin
--rwxrwxr-x root/root                31 2016-02-12 10:07 squashfs-root/bin/echo
--rwxrwxr-x root/root                27 2016-02-12 10:07 squashfs-root/bin/env
--rwxrwxr-x root/root               274 2016-02-12 10:07 squashfs-root/bin/evil
--rwxrwxr-x root/root               209 2016-03-11 12:26 squashfs-root/bin/sh
--rwxrwxr-x root/root               436 2016-02-12 10:19 squashfs-root/bin/showdev
--rwxrwxr-x root/root               701 2016-02-12 10:19 squashfs-root/bin/usehw
-drwxrwxr-x root/root                48 2016-03-11 12:26 squashfs-root/meta
--rw-rw-r-- root/root             18267 2016-02-12 10:07 squashfs-root/meta/icon.png
--rw-rw-r-- root/root               813 2016-03-11 12:26 squashfs-root/meta/snap.yaml
+drwxrwxr-x 0/0                38 2016-03-11 12:25 squashfs-root
+drwxrwxr-x 0/0                88 2016-03-03 13:51 squashfs-root/bin
+-rwxrwxr-x 0/0                31 2016-02-12 10:07 squashfs-root/bin/echo
+-rwxrwxr-x 0/0                27 2016-02-12 10:07 squashfs-root/bin/env
+-rwxrwxr-x 0/0               274 2016-02-12 10:07 squashfs-root/bin/evil
+-rwxrwxr-x 0/0               209 2016-03-11 12:26 squashfs-root/bin/sh
+-rwxrwxr-x 0/0               436 2016-02-12 10:19 squashfs-root/bin/showdev
+-rwxrwxr-x 0/0               701 2016-02-12 10:19 squashfs-root/bin/usehw
+drwxrwxr-x 0/0                48 2016-03-11 12:26 squashfs-root/meta
+-rw-rw-r-- 0/0             18267 2016-02-12 10:07 squashfs-root/meta/icon.png
+-rw-rw-r-- 0/0               813 2016-03-11 12:26 squashfs-root/meta/snap.yaml
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -311,10 +311,10 @@ drwxrwxr-x root/root                48 2016-03-11 12:26 squashfs-root/meta
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
--rwsr-xr-x root/root                31 2016-02-12 10:07 squashfs-root/test
+drwxrwxr-x 0/0                38 2016-03-11 12:25 squashfs-root
+-rwsr-xr-x 0/0                31 2016-02-12 10:07 squashfs-root/test
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -336,10 +336,10 @@ drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
--rwsr-xr-x root/root                31 2016-02-12 10:07 squashfs-root/test
+drwxrwxr-x 0/0                38 2016-03-11 12:25 squashfs-root
+-rwsr-xr-x 0/0                31 2016-02-12 10:07 squashfs-root/test
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
 
         # update the overrides
         from reviewtools.overrides import sec_mode_overrides
@@ -358,10 +358,10 @@ drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
--rwsr-xr-x root/root                31 2016-02-12 10:07 squashfs-root/test
+drwxrwxr-x 0/0                38 2016-03-11 12:25 squashfs-root
+-rwsr-xr-x 0/0                31 2016-02-12 10:07 squashfs-root/test
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
 
         # update the overrides
         from reviewtools.overrides import sec_mode_overrides
@@ -380,11 +380,11 @@ drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
-drwxr-xr-x root/root                27 2020-03-23 08:11 squashfs-root/dev
-crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
+drwxrwxr-x 0/0                38 2016-03-11 12:25 squashfs-root
+drwxr-xr-x 0/0                27 2020-03-23 08:11 squashfs-root/dev
+crw-rw-rw- 0/0             1,  3 2020-03-20 18:53 squashfs-root/dev/null
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -406,15 +406,15 @@ crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
-drwxr-xr-x root/root                27 2020-03-23 08:11 squashfs-root/dev
-crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
+drwxrwxr-x 0/0                38 2016-03-11 12:25 squashfs-root
+drwxr-xr-x 0/0                27 2020-03-23 08:11 squashfs-root/dev
+crw-rw-rw- 0/0             1,  3 2020-03-20 18:53 squashfs-root/dev/null
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         # update the overrides
         from reviewtools.overrides import sec_mode_dev_overrides
 
-        sec_mode_dev_overrides["foo"] = {"./dev/null": ("crw-rw-rw-", "root/root")}
+        sec_mode_dev_overrides["foo"] = {"./dev/null": ("crw-rw-rw-", "0/0")}
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         # clean up
@@ -438,11 +438,11 @@ crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
-drwxr-xr-x root/root                27 2020-03-23 08:11 squashfs-root/dev
-crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
+drwxrwxr-x 0/0                38 2016-03-11 12:25 squashfs-root
+drwxr-xr-x 0/0                27 2020-03-23 08:11 squashfs-root/dev
+crw-rw-rw- 0/0             1,  3 2020-03-20 18:53 squashfs-root/dev/null
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         self.set_test_snap_yaml("type", "base")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
@@ -456,7 +456,7 @@ crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
         expected["info"] = dict()
         name = "security-snap-v2:squashfs_files"
         expected["error"][name] = {
-            "text": "found errors in file output: unapproved mode/owner 'crw-rw-rw- root/root' for entry './dev/null'"
+            "text": "found errors in file output: unapproved mode/owner 'crw-rw-rw- 0/0' for entry './dev/null'"
         }
         self.check_results(report, expected=expected)
 
@@ -465,15 +465,15 @@ crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
-drwxr-xr-x root/root                27 2020-03-23 08:11 squashfs-root/dev
-crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
+drwxrwxr-x 0/0                38 2016-03-11 12:25 squashfs-root
+drwxr-xr-x 0/0                27 2020-03-23 08:11 squashfs-root/dev
+crw-rw-rw- 0/0             1,  3 2020-03-20 18:53 squashfs-root/dev/null
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         # update the overrides
         from reviewtools.overrides import sec_mode_dev_overrides
 
-        sec_mode_dev_overrides["foo"] = {"./dev/null": ("crw-rw-rw-", "root/root")}
+        sec_mode_dev_overrides["foo"] = {"./dev/null": ("crw-rw-rw-", "0/0")}
         self.set_test_snap_yaml("type", "base")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
@@ -488,15 +488,15 @@ crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
-drwxr-xr-x root/root                27 2020-03-23 08:11 squashfs-root/dev
-crw-rw-r-- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
+drwxrwxr-x 0/0                38 2016-03-11 12:25 squashfs-root
+drwxr-xr-x 0/0                27 2020-03-23 08:11 squashfs-root/dev
+crw-rw-r-- 0/0             1,  3 2020-03-20 18:53 squashfs-root/dev/null
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         # update the overrides
         from reviewtools.overrides import sec_mode_dev_overrides
 
-        sec_mode_dev_overrides["foo"] = {"./dev/null": ("crw-rw-rw-", "root/root")}
+        sec_mode_dev_overrides["foo"] = {"./dev/null": ("crw-rw-rw-", "0/0")}
         self.set_test_snap_yaml("type", "base")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
@@ -512,7 +512,7 @@ crw-rw-r-- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
         expected["info"] = dict()
         name = "security-snap-v2:squashfs_files"
         expected["error"][name] = {
-            "text": "found errors in file output: unapproved mode/owner 'crw-rw-r-- root/root' for entry './dev/null'"
+            "text": "found errors in file output: unapproved mode/owner 'crw-rw-r-- 0/0' for entry './dev/null'"
         }
         self.check_results(report, expected=expected)
 
@@ -521,15 +521,15 @@ crw-rw-r-- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-drwxrwxr-x root/root                38 2016-03-11 12:25 squashfs-root
-drwxr-xr-x root/root                27 2020-03-23 08:11 squashfs-root/dev
-crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
+drwxrwxr-x 0/0                38 2016-03-11 12:25 squashfs-root
+drwxr-xr-x 0/0                27 2020-03-23 08:11 squashfs-root/dev
+crw-rw-rw- 0/0             1,  3 2020-03-20 18:53 squashfs-root/dev/null
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         # update the overrides
         from reviewtools.overrides import sec_mode_dev_overrides
 
-        sec_mode_dev_overrides["foo"] = {"./dev/null": [("crw-rw-rw-", "root/root")]}
+        sec_mode_dev_overrides["foo"] = {"./dev/null": [("crw-rw-rw-", "0/0")]}
         self.set_test_snap_yaml("type", "base")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
@@ -544,9 +544,9 @@ crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
--rwsrwxr-x root/root                38 2016-03-11 12:25 squashfs-root/foo
+-rwsrwxr-x 0/0                38 2016-03-11 12:25 squashfs-root/foo
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -568,9 +568,9 @@ crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
--rwsrwxr-x root/root                38 2016-03-11 12:25 squashfs-root/foo
+-rwsrwxr-x 0/0                38 2016-03-11 12:25 squashfs-root/foo
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         self.set_test_snap_yaml("name", "ubuntu-core")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
@@ -593,9 +593,9 @@ crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
--rwsr-xr-x root/root                38 2016-03-11 12:25 squashfs-root/usr/bin/sudo
+-rwsr-xr-x 0/0                38 2016-03-11 12:25 squashfs-root/usr/bin/sudo
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         self.set_test_snap_yaml("name", "ubuntu-core")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
@@ -608,9 +608,9 @@ crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
--rwsr-xr-x root/root                38 2016-03-11 12:25 squashfs-root/usr/bin/sudo
+-rwsr-xr-x 0/0                38 2016-03-11 12:25 squashfs-root/usr/bin/sudo
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         self.set_test_snap_yaml("name", "bare")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
@@ -631,9 +631,9 @@ crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
--rwsr-xr-x root/root             14528 2016-08-02 18:18 squashfs-root/opt/google/chrome/chrome-sandbox
+-rwsr-xr-x 0/0             14528 2016-08-02 18:18 squashfs-root/opt/google/chrome/chrome-sandbox
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         self.set_test_snap_yaml("name", "chrome-test")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
@@ -646,9 +646,9 @@ crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
--rwxrwxrwt root/root             14528 2016-08-02 18:18 squashfs-root/rootfs/tmp
+-rwxrwxrwt 0/0             14528 2016-08-02 18:18 squashfs-root/rootfs/tmp
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         self.set_test_snap_yaml("name", "openwrt")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
@@ -661,9 +661,9 @@ crw-rw-rw- root/root             1,  3 2020-03-20 18:53 squashfs-root/dev/null
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-drwxrwxrwt root/root                38 2016-03-11 12:25 squashfs-root/foo
+drwxrwxrwt 0/0                38 2016-03-11 12:25 squashfs-root/foo
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -675,9 +675,9 @@ drwxrwxrwt root/root                38 2016-03-11 12:25 squashfs-root/foo
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
--rwxrwxrwt root/root                38 2016-03-11 12:25 squashfs-root/foo
+-rwxrwxrwt 0/0                38 2016-03-11 12:25 squashfs-root/foo
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -699,9 +699,9 @@ drwxrwxrwt root/root                38 2016-03-11 12:25 squashfs-root/foo
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-lrwxrwxrw- root/root                38 2016-03-11 12:25 squashfs-root/foo
+lrwxrwxrw- 0/0                38 2016-03-11 12:25 squashfs-root/foo
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -731,7 +731,7 @@ lrwxrwxrw- root/root                38 2016-03-11 12:25 squashfs-root/foo
                 None,
             )
         ]
-        self.set_test_unsquashfs_lls(hdr, entries)
+        self.set_test_unsquashfs_lln(hdr, entries)
 
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
@@ -752,9 +752,9 @@ lrwxrwxrw- root/root                38 2016-03-11 12:25 squashfs-root/foo
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-brw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
+brw-rw-rw- 0/0                8,  0 2016-03-11 12:25 squashfs-root/foo
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         self.set_test_snap_yaml("type", "os")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
@@ -768,7 +768,7 @@ brw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
         expected["info"] = dict()
         name = "security-snap-v2:squashfs_files"
         expected["error"][name] = {
-            "text": "found errors in file output: unapproved mode/owner 'brw-rw-rw- root/root' for entry './foo'"
+            "text": "found errors in file output: unapproved mode/owner 'brw-rw-rw- 0/0' for entry './foo'"
         }
         self.check_results(report, expected=expected)
 
@@ -777,9 +777,9 @@ brw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-brw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
+brw-rw-rw- 0/0                8,  0 2016-03-11 12:25 squashfs-root/foo
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         self.set_test_snap_yaml("type", "base")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
@@ -793,7 +793,7 @@ brw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
         expected["info"] = dict()
         name = "security-snap-v2:squashfs_files"
         expected["error"][name] = {
-            "text": "found errors in file output: unapproved mode/owner 'brw-rw-rw- root/root' for entry './foo'"
+            "text": "found errors in file output: unapproved mode/owner 'brw-rw-rw- 0/0' for entry './foo'"
         }
         self.check_results(report, expected=expected)
 
@@ -802,9 +802,9 @@ brw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-brw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
+brw-rw-rw- 0/0                8,  0 2016-03-11 12:25 squashfs-root/foo
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -826,9 +826,9 @@ brw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-crw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
+crw-rw-rw- 0/0                8,  0 2016-03-11 12:25 squashfs-root/foo
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -850,9 +850,9 @@ crw-rw-rw- root/root                8,  0 2016-03-11 12:25 squashfs-root/foo
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-prw-rw-rw- root/root                    0 2016-03-11 12:25 squashfs-root/foo
+prw-rw-rw- 0/0                    0 2016-03-11 12:25 squashfs-root/foo
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -874,9 +874,9 @@ prw-rw-rw- root/root                    0 2016-03-11 12:25 squashfs-root/foo
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-srw-rw-rw- root/root                    0 2016-03-11 12:25 squashfs-root/foo
+srw-rw-rw- 0/0                    0 2016-03-11 12:25 squashfs-root/foo
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -898,9 +898,9 @@ srw-rw-rw- root/root                    0 2016-03-11 12:25 squashfs-root/foo
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
--rw-rw-r-- bad/root                8 2016-03-11 12:25 squashfs-root/foo
+-rw-rw-r-- 1/0                8 2016-03-11 12:25 squashfs-root/foo
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -913,7 +913,7 @@ srw-rw-rw- root/root                    0 2016-03-11 12:25 squashfs-root/foo
         expected["info"] = dict()
         name = "security-snap-v2:squashfs_files"
         expected["error"][name] = {
-            "text": "found errors in file output: unusual user/group 'bad/root' for './foo'"
+            "text": "found errors in file output: unusual uid/gid '1/0' for './foo'"
         }
         self.check_results(report, expected=expected)
 
@@ -922,9 +922,9 @@ srw-rw-rw- root/root                    0 2016-03-11 12:25 squashfs-root/foo
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
--rw-rw-r-- root/bad                8 2016-03-11 12:25 squashfs-root/foo
+-rw-rw-r-- 0/1                8 2016-03-11 12:25 squashfs-root/foo
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -937,7 +937,7 @@ srw-rw-rw- root/root                    0 2016-03-11 12:25 squashfs-root/foo
         expected["info"] = dict()
         name = "security-snap-v2:squashfs_files"
         expected["error"][name] = {
-            "text": "found errors in file output: unusual user/group 'root/bad' for './foo'"
+            "text": "found errors in file output: unusual uid/gid '0/1' for './foo'"
         }
         self.check_results(report, expected=expected)
 
@@ -946,9 +946,9 @@ srw-rw-rw- root/root                    0 2016-03-11 12:25 squashfs-root/foo
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
--rw-rw-r-- other/root                8 2016-03-11 12:25 squashfs-root/foo
+-rw-rw-r-- 65534/0                8 2016-03-11 12:25 squashfs-root/foo
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         self.set_test_snap_yaml("type", "os")
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
@@ -961,11 +961,11 @@ srw-rw-rw- root/root                    0 2016-03-11 12:25 squashfs-root/foo
         out = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-drwx------ root/root                38 2016-03-11 12:25 squashfs-root
-drwx------ root/root                48 2016-03-11 12:26 squashfs-root/meta
--rw-rw-r-- root/root               813 2016-03-11 12:26 squashfs-root/meta/snap.yaml
+drwx------ 0/0                38 2016-03-11 12:25 squashfs-root
+drwx------ 0/0                48 2016-03-11 12:26 squashfs-root/meta
+-rw-rw-r-- 0/0               813 2016-03-11 12:26 squashfs-root/meta/snap.yaml
 """
-        self._set_unsquashfs_lls(out)
+        self._set_unsquashfs_lln(out)
         c = SnapReviewSecurity(self.test_name)
         c.check_squashfs_files()
         report = c.review_report
@@ -1850,7 +1850,7 @@ exit 0
 
         r = c._debug_resquashfs(output_dir, package, repackage)
         self.assertTrue("squash fstime for test_1.0_all.snap" in r)
-        self.assertTrue("unsquashfs -lls test_1.0_all.snap:" in r)
+        self.assertTrue("unsquashfs -lln test_1.0_all.snap:" in r)
         self.assertTrue("diff -au " in r)
 
     def test_check_debug_resquashfs_bad_fstime(self):
@@ -1880,8 +1880,8 @@ exit 1
         os.environ["PATH"] = old_path
         self.assertTrue(re.search(r"unsquashfs -fstime .*\.snap' failed", r))
 
-    def test_check_debug_resquashfs_bad_lls(self):
-        """Test check_debug_resquashfs() - bad unsquashfs -lls"""
+    def test_check_debug_resquashfs_bad_lln(self):
+        """Test check_debug_resquashfs() - bad unsquashfs -lln"""
         output_dir = self.mkdtemp()
         package = utils.make_snap2(output_dir=output_dir)
         repackage = utils.make_snap2(output_dir=output_dir)
@@ -1909,7 +1909,7 @@ exit 1
 
         r = c._debug_resquashfs(output_dir, package, repackage)
         os.environ["PATH"] = old_path
-        self.assertTrue(re.search(r"unsquashfs -lls .*\.snap' failed", r))
+        self.assertTrue(re.search(r"unsquashfs -lln .*\.snap' failed", r))
 
     # run this once without mocking
     def test_check_squashfs_files(self):

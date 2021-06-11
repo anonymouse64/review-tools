@@ -26,7 +26,7 @@ from reviewtools.common import check_results as common_check_results
 from reviewtools.sr_functional import SnapReviewFunctional
 import reviewtools.sr_tests as sr_tests
 from reviewtools.tests import utils
-from reviewtools.common import STATE_FORMAT_VERSION, StatLLS, cmd, unsquashfs_lls_parse
+from reviewtools.common import STATE_FORMAT_VERSION, StatLLN, cmd, unsquashfs_lln_parse
 
 
 class TestSnapReviewFunctional(sr_tests.TestSnapReview):
@@ -44,71 +44,71 @@ class TestSnapReviewFunctional(sr_tests.TestSnapReview):
         if "SNAP_FORCE_STATE_CHECK" in os.environ:
             del os.environ["SNAP_FORCE_STATE_CHECK"]
 
-    def _set_unsquashfs_lls(self, out):
+    def _set_unsquashfs_lln(self, out):
         header = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
 """
-        hdr, entries = unsquashfs_lls_parse(header + out)
-        self.set_test_unsquashfs_lls(hdr, entries)
+        hdr, entries = unsquashfs_lln_parse(header + out)
+        self.set_test_unsquashfs_lln(hdr, entries)
 
     def _set_default_state(self):
         self.set_test_unpack_dir = "/nonexistent"
-        lls = """drwxr-xr-x root/root               215 2020-03-23 14:23 squashfs-root
-drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
--rwxr-xr-x root/root             43416 2020-03-23 14:23 squashfs-root/bin/cat
--rw-r--r-- root/root            584392 2020-03-23 14:23 squashfs-root/lib/some.so
+        lln = """drwxr-xr-x 0/0               215 2020-03-23 14:23 squashfs-root
+drwxr-xr-x 0/0                73 2020-03-23 14:23 squashfs-root/bin
+-rwxr-xr-x 0/0             43416 2020-03-23 14:23 squashfs-root/bin/cat
+-rw-r--r-- 0/0            584392 2020-03-23 14:23 squashfs-root/lib/some.so
 """
-        self._set_unsquashfs_lls(lls)
+        self._set_unsquashfs_lln(lln)
 
         exp_state = {
             ".": {
-                StatLLS.FILENAME: ".",
-                StatLLS.FULLNAME: "squashfs-root",
-                StatLLS.FILETYPE: "d",
-                StatLLS.MODE: "rwxr-xr-x",
-                StatLLS.OWNER: "root/root",
-                StatLLS.USER: "root",
-                StatLLS.GROUP: "root",
-                StatLLS.SIZE: "215",
-                StatLLS.DATE: "2020-03-23",
-                StatLLS.TIME: "14:23",
+                StatLLN.FILENAME: ".",
+                StatLLN.FULLNAME: "squashfs-root",
+                StatLLN.FILETYPE: "d",
+                StatLLN.MODE: "rwxr-xr-x",
+                StatLLN.OWNER: "0/0",
+                StatLLN.UID: "0",
+                StatLLN.GID: "0",
+                StatLLN.SIZE: "215",
+                StatLLN.DATE: "2020-03-23",
+                StatLLN.TIME: "14:23",
             },
             "./bin": {
-                StatLLS.FILENAME: "./bin",
-                StatLLS.FULLNAME: "squashfs-root/bin",
-                StatLLS.FILETYPE: "d",
-                StatLLS.MODE: "rwxr-xr-x",
-                StatLLS.OWNER: "root/root",
-                StatLLS.USER: "root",
-                StatLLS.GROUP: "root",
-                StatLLS.SIZE: "73",
-                StatLLS.DATE: "2020-03-23",
-                StatLLS.TIME: "14:23",
+                StatLLN.FILENAME: "./bin",
+                StatLLN.FULLNAME: "squashfs-root/bin",
+                StatLLN.FILETYPE: "d",
+                StatLLN.MODE: "rwxr-xr-x",
+                StatLLN.OWNER: "0/0",
+                StatLLN.UID: "0",
+                StatLLN.GID: "0",
+                StatLLN.SIZE: "73",
+                StatLLN.DATE: "2020-03-23",
+                StatLLN.TIME: "14:23",
             },
             "./bin/cat": {
-                StatLLS.FILENAME: "./bin/cat",
-                StatLLS.FULLNAME: "squashfs-root/bin/cat",
-                StatLLS.FILETYPE: "-",
-                StatLLS.MODE: "rwxr-xr-x",
-                StatLLS.OWNER: "root/root",
-                StatLLS.USER: "root",
-                StatLLS.GROUP: "root",
-                StatLLS.SIZE: "43416",
-                StatLLS.DATE: "2020-03-23",
-                StatLLS.TIME: "14:23",
+                StatLLN.FILENAME: "./bin/cat",
+                StatLLN.FULLNAME: "squashfs-root/bin/cat",
+                StatLLN.FILETYPE: "-",
+                StatLLN.MODE: "rwxr-xr-x",
+                StatLLN.OWNER: "0/0",
+                StatLLN.UID: "0",
+                StatLLN.GID: "0",
+                StatLLN.SIZE: "43416",
+                StatLLN.DATE: "2020-03-23",
+                StatLLN.TIME: "14:23",
             },
             "./lib/some.so": {
-                StatLLS.FILENAME: "./lib/some.so",
-                StatLLS.FULLNAME: "squashfs-root/lib/some.so",
-                StatLLS.FILETYPE: "-",
-                StatLLS.MODE: "rw-r--r--",
-                StatLLS.OWNER: "root/root",
-                StatLLS.USER: "root",
-                StatLLS.GROUP: "root",
-                StatLLS.SIZE: "584392",
-                StatLLS.DATE: "2020-03-23",
-                StatLLS.TIME: "14:23",
+                StatLLN.FILENAME: "./lib/some.so",
+                StatLLN.FULLNAME: "squashfs-root/lib/some.so",
+                StatLLN.FILETYPE: "-",
+                StatLLN.MODE: "rw-r--r--",
+                StatLLN.OWNER: "0/0",
+                StatLLN.UID: "0",
+                StatLLN.GID: "0",
+                StatLLN.SIZE: "584392",
+                StatLLN.DATE: "2020-03-23",
+                StatLLN.TIME: "14:23",
                 "symbols": {
                     "foo": {"type": "T", "version": "@@Base"},
                     "bar": {"type": "T", "version": "@@Base"},
@@ -120,23 +120,23 @@ drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
         # these fields aren't stored in state files
         for fname in exp_override_state:
             for k in [
-                StatLLS.FULLNAME,
-                StatLLS.USER,
-                StatLLS.GROUP,
-                StatLLS.SIZE,
-                StatLLS.DATE,
-                StatLLS.TIME,
+                StatLLN.FULLNAME,
+                StatLLN.UID,
+                StatLLN.GID,
+                StatLLN.SIZE,
+                StatLLN.DATE,
+                StatLLN.TIME,
             ]:
                 del exp_override_state[fname][k]
 
         exp_override = {
-            ".": {"filetype": "d", "mode": "rwxr-xr-x", "owner": "root/root"},
-            "./bin": {"filetype": "d", "mode": "rwxr-xr-x", "owner": "root/root"},
-            "./bin/cat": {"filetype": "-", "mode": "rwxr-xr-x", "owner": "root/root"},
+            ".": {"filetype": "d", "mode": "rwxr-xr-x", "owner": "0/0"},
+            "./bin": {"filetype": "d", "mode": "rwxr-xr-x", "owner": "0/0"},
+            "./bin/cat": {"filetype": "-", "mode": "rwxr-xr-x", "owner": "0/0"},
             "./lib/some.so": {
                 "filetype": "-",
                 "mode": "rw-r--r--",
-                "owner": "root/root",
+                "owner": "0/0",
                 "symbols": {
                     "foo": {"type": "T", "version": "@@Base"},
                     "bar": {"type": "T", "version": "@@Base"},
@@ -269,24 +269,24 @@ drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
     def test__serialize(self):
         """Test _serialize()"""
         # convenient way to get a list of items
-        lls = """Parallel unsquashfs: Using 4 processors
+        lln = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-drwxr-xr-x root/root               215 2020-03-23 14:32 squashfs-root
-drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
--rwxr-xr-x root/root             43416 2020-03-23 14:23 squashfs-root/bin/cat
-drwxr-xr-x root/root               181 2020-03-23 14:27 squashfs-root/lib/x86_64-linux-gnu
--rwxr-xr-x root/root           2029224 2020-03-23 14:24 squashfs-root/lib/x86_64-linux-gnu/libc-2.31.so
-lrwxrwxrwx root/root                12 2020-03-14 18:21 squashfs-root/lib/x86_64-linux-gnu/libc.so.6 -> libc-2.31.so
-crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
+drwxr-xr-x 0/0               215 2020-03-23 14:32 squashfs-root
+drwxr-xr-x 0/0                73 2020-03-23 14:23 squashfs-root/bin
+-rwxr-xr-x 0/0             43416 2020-03-23 14:23 squashfs-root/bin/cat
+drwxr-xr-x 0/0               181 2020-03-23 14:27 squashfs-root/lib/x86_64-linux-gnu
+-rwxr-xr-x 0/0           2029224 2020-03-23 14:24 squashfs-root/lib/x86_64-linux-gnu/libc-2.31.so
+lrwxrwxrwx 0/0                12 2020-03-14 18:21 squashfs-root/lib/x86_64-linux-gnu/libc.so.6 -> libc-2.31.so
+crw-rw-rw- 0/0             1,  3 2020-03-14 18:21 squashfs-root/dev/null
 """
-        hdr, entries = unsquashfs_lls_parse(lls)
+        hdr, entries = unsquashfs_lln_parse(lln)
 
         state = {}
         for (line, item) in entries:
-            state[item[StatLLS.FILENAME]] = item
+            state[item[StatLLN.FILENAME]] = item
             if "libc-2.31.so" in line:
-                state[item[StatLLS.FILENAME]]["symbols"] = {
+                state[item[StatLLN.FILENAME]]["symbols"] = {
                     "GLIBC_2.10": {"type": "A", "version": "@@GLIBC_2.10"},
                     "GLIBC_2.11": {"type": "A", "version": "@@GLIBC_2.10"},
                 }
@@ -297,19 +297,19 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
         self.assertEqual(len(entries), len(serial))
         self.assertEqual(len(serial), 7)
         for (idx, map) in [
-            (".", {"filetype": "d", "mode": "rwxr-xr-x", "owner": "root/root"}),
-            ("./bin", {"filetype": "d", "mode": "rwxr-xr-x", "owner": "root/root"}),
-            ("./bin/cat", {"filetype": "-", "mode": "rwxr-xr-x", "owner": "root/root"}),
+            (".", {"filetype": "d", "mode": "rwxr-xr-x", "owner": "0/0"}),
+            ("./bin", {"filetype": "d", "mode": "rwxr-xr-x", "owner": "0/0"}),
+            ("./bin/cat", {"filetype": "-", "mode": "rwxr-xr-x", "owner": "0/0"}),
             (
                 "./lib/x86_64-linux-gnu",
-                {"filetype": "d", "mode": "rwxr-xr-x", "owner": "root/root"},
+                {"filetype": "d", "mode": "rwxr-xr-x", "owner": "0/0"},
             ),
             (
                 "./lib/x86_64-linux-gnu/libc-2.31.so",
                 {
                     "filetype": "-",
                     "mode": "rwxr-xr-x",
-                    "owner": "root/root",
+                    "owner": "0/0",
                     "symbols": {
                         "GLIBC_2.10": {"type": "A", "version": "@@GLIBC_2.10"},
                         "GLIBC_2.11": {"type": "A", "version": "@@GLIBC_2.10"},
@@ -318,14 +318,14 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
             ),
             (
                 "./lib/x86_64-linux-gnu/libc.so.6 -> libc-2.31.so",
-                {"filetype": "l", "mode": "rwxrwxrwx", "owner": "root/root"},
+                {"filetype": "l", "mode": "rwxrwxrwx", "owner": "0/0"},
             ),
             (
                 "./dev/null",
                 {
                     "filetype": "c",
                     "mode": "rw-rw-rw-",
-                    "owner": "root/root",
+                    "owner": "0/0",
                     "major": "1",
                     "minor": "3",
                 },
@@ -340,33 +340,33 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
         """Test _serialize() - bad item"""
         # mock a bad entry
         entries = [
-            # one bad missing StatLLS.OWNER
+            # one bad missing StatLLN.OWNER
             (
-                "-rwxr-xr-x root/root             43416 2020-03-23 14:23 squashfs-root/bin/cat",
+                "-rwxr-xr-x 0/0             43416 2020-03-23 14:23 squashfs-root/bin/cat",
                 {
-                    StatLLS.FILENAME: "./bin/cat",
-                    StatLLS.FILETYPE: "-",
-                    StatLLS.MODE: "rwxr-xr-x",
+                    StatLLN.FILENAME: "./bin/cat",
+                    StatLLN.FILETYPE: "-",
+                    StatLLN.MODE: "rwxr-xr-x",
                 },
             ),
             # another badly formatted
             (
-                "-rwxr-xr-x root/root             43416 2020-03-23 14:23 squashfs-root/bin/cp",
+                "-rwxr-xr-x 0/0             43416 2020-03-23 14:23 squashfs-root/bin/cp",
                 {
-                    StatLLS.FILENAME: "./bin/cp",
-                    StatLLS.FILETYPE: "-",
-                    StatLLS.MODE: [],
-                    StatLLS.OWNER: "root/root",
+                    StatLLN.FILENAME: "./bin/cp",
+                    StatLLN.FILETYPE: "-",
+                    StatLLN.MODE: [],
+                    StatLLN.OWNER: "0/0",
                 },
             ),
             # one good but with one bad symbol
             (
-                "-rwxr-xr-x root/root           2029224 2020-03-23 14:24 squashfs-root/lib/x86_64-linux-gnu/libc-2.31.so",
+                "-rwxr-xr-x 0/0           2029224 2020-03-23 14:24 squashfs-root/lib/x86_64-linux-gnu/libc-2.31.so",
                 {
-                    StatLLS.FILENAME: "./lib/x86_64-linux-gnu/libc-2.31.so",
-                    StatLLS.FILETYPE: "-",
-                    StatLLS.MODE: "rwxr-xr-x",
-                    StatLLS.OWNER: "root/root",
+                    StatLLN.FILENAME: "./lib/x86_64-linux-gnu/libc-2.31.so",
+                    StatLLN.FILETYPE: "-",
+                    StatLLN.MODE: "rwxr-xr-x",
+                    StatLLN.OWNER: "0/0",
                     "symbols": {
                         "foo": {"type": "T", "version": "@@Base"},
                         "bad": {"type": [], "version": "@@Base"},
@@ -378,7 +378,7 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
 
         state = {}
         for (line, item) in entries:
-            state[item[StatLLS.FILENAME]] = item
+            state[item[StatLLN.FILENAME]] = item
 
         serial = c._serialize(state)
 
@@ -389,7 +389,7 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
         map = {
             "filetype": "-",
             "mode": "rwxr-xr-x",
-            "owner": "root/root",
+            "owner": "0/0",
             "symbols": {"foo": {"type": "T", "version": "@@Base"}},
         }
         self.assertTrue(idx in serial)
@@ -400,39 +400,39 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
     def test__deserialize(self):
         """Test _deserialize()"""
         # convenient way to get a list of items
-        lls = """Parallel unsquashfs: Using 4 processors
+        lln = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-drwxr-xr-x root/root               215 2020-03-23 14:32 squashfs-root
-drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
--rwxr-xr-x root/root             43416 2020-03-23 14:23 squashfs-root/bin/cat
-drwxr-xr-x root/root               181 2020-03-23 14:27 squashfs-root/lib/x86_64-linux-gnu
--rwxr-xr-x root/root           2029224 2020-03-23 14:24 squashfs-root/lib/x86_64-linux-gnu/libc-2.31.so
-lrwxrwxrwx root/root                12 2020-03-14 18:21 squashfs-root/lib/x86_64-linux-gnu/libc.so.6 -> libc-2.31.so
-crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
+drwxr-xr-x 0/0               215 2020-03-23 14:32 squashfs-root
+drwxr-xr-x 0/0                73 2020-03-23 14:23 squashfs-root/bin
+-rwxr-xr-x 0/0             43416 2020-03-23 14:23 squashfs-root/bin/cat
+drwxr-xr-x 0/0               181 2020-03-23 14:27 squashfs-root/lib/x86_64-linux-gnu
+-rwxr-xr-x 0/0           2029224 2020-03-23 14:24 squashfs-root/lib/x86_64-linux-gnu/libc-2.31.so
+lrwxrwxrwx 0/0                12 2020-03-14 18:21 squashfs-root/lib/x86_64-linux-gnu/libc.so.6 -> libc-2.31.so
+crw-rw-rw- 0/0             1,  3 2020-03-14 18:21 squashfs-root/dev/null
 """
-        hdr, entries = unsquashfs_lls_parse(lls)
+        hdr, entries = unsquashfs_lln_parse(lln)
 
         serial = {
-            ".": {"filetype": "d", "mode": "rwxr-xr-x", "owner": "root/root"},
-            "./bin": {"filetype": "d", "mode": "rwxr-xr-x", "owner": "root/root"},
-            "./bin/cat": {"filetype": "-", "mode": "rwxr-xr-x", "owner": "root/root"},
+            ".": {"filetype": "d", "mode": "rwxr-xr-x", "owner": "0/0"},
+            "./bin": {"filetype": "d", "mode": "rwxr-xr-x", "owner": "0/0"},
+            "./bin/cat": {"filetype": "-", "mode": "rwxr-xr-x", "owner": "0/0"},
             "./dev/null": {
                 "filetype": "c",
                 "major": "1",
                 "minor": "3",
                 "mode": "rw-rw-rw-",
-                "owner": "root/root",
+                "owner": "0/0",
             },
             "./lib/x86_64-linux-gnu": {
                 "filetype": "d",
                 "mode": "rwxr-xr-x",
-                "owner": "root/root",
+                "owner": "0/0",
             },
             "./lib/x86_64-linux-gnu/libc-2.31.so": {
                 "filetype": "-",
                 "mode": "rwxr-xr-x",
-                "owner": "root/root",
+                "owner": "0/0",
                 "symbols": {
                     "GLIBC_2.10": {"type": "A", "version": "@@GLIBC_2.10"},
                     "GLIBC_2.11": {"type": "A", "version": "@@GLIBC_2.10"},
@@ -441,7 +441,7 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
             "./lib/x86_64-linux-gnu/libc.so.6 -> libc-2.31.so": {
                 "filetype": "l",
                 "mode": "rwxrwxrwx",
-                "owner": "root/root",
+                "owner": "0/0",
             },
         }
 
@@ -454,46 +454,46 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
             (
                 ".",
                 {
-                    StatLLS.FILENAME: ".",
-                    StatLLS.FILETYPE: "d",
-                    StatLLS.MODE: "rwxr-xr-x",
-                    StatLLS.OWNER: "root/root",
+                    StatLLN.FILENAME: ".",
+                    StatLLN.FILETYPE: "d",
+                    StatLLN.MODE: "rwxr-xr-x",
+                    StatLLN.OWNER: "0/0",
                 },
             ),
             (
                 "./bin",
                 {
-                    StatLLS.FILENAME: "./bin",
-                    StatLLS.FILETYPE: "d",
-                    StatLLS.MODE: "rwxr-xr-x",
-                    StatLLS.OWNER: "root/root",
+                    StatLLN.FILENAME: "./bin",
+                    StatLLN.FILETYPE: "d",
+                    StatLLN.MODE: "rwxr-xr-x",
+                    StatLLN.OWNER: "0/0",
                 },
             ),
             (
                 "./bin/cat",
                 {
-                    StatLLS.FILENAME: "./bin/cat",
-                    StatLLS.FILETYPE: "-",
-                    StatLLS.MODE: "rwxr-xr-x",
-                    StatLLS.OWNER: "root/root",
+                    StatLLN.FILENAME: "./bin/cat",
+                    StatLLN.FILETYPE: "-",
+                    StatLLN.MODE: "rwxr-xr-x",
+                    StatLLN.OWNER: "0/0",
                 },
             ),
             (
                 "./lib/x86_64-linux-gnu",
                 {
-                    StatLLS.FILENAME: "./lib/x86_64-linux-gnu",
-                    StatLLS.FILETYPE: "d",
-                    StatLLS.MODE: "rwxr-xr-x",
-                    StatLLS.OWNER: "root/root",
+                    StatLLN.FILENAME: "./lib/x86_64-linux-gnu",
+                    StatLLN.FILETYPE: "d",
+                    StatLLN.MODE: "rwxr-xr-x",
+                    StatLLN.OWNER: "0/0",
                 },
             ),
             (
                 "./lib/x86_64-linux-gnu/libc-2.31.so",
                 {
-                    StatLLS.FILENAME: "./lib/x86_64-linux-gnu/libc-2.31.so",
-                    StatLLS.FILETYPE: "-",
-                    StatLLS.MODE: "rwxr-xr-x",
-                    StatLLS.OWNER: "root/root",
+                    StatLLN.FILENAME: "./lib/x86_64-linux-gnu/libc-2.31.so",
+                    StatLLN.FILETYPE: "-",
+                    StatLLN.MODE: "rwxr-xr-x",
+                    StatLLN.OWNER: "0/0",
                     "symbols": {
                         "GLIBC_2.10": {"type": "A", "version": "@@GLIBC_2.10"},
                         "GLIBC_2.11": {"type": "A", "version": "@@GLIBC_2.10"},
@@ -503,21 +503,21 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
             (
                 "./lib/x86_64-linux-gnu/libc.so.6 -> libc-2.31.so",
                 {
-                    StatLLS.FILENAME: "./lib/x86_64-linux-gnu/libc.so.6 -> libc-2.31.so",
-                    StatLLS.FILETYPE: "l",
-                    StatLLS.MODE: "rwxrwxrwx",
-                    StatLLS.OWNER: "root/root",
+                    StatLLN.FILENAME: "./lib/x86_64-linux-gnu/libc.so.6 -> libc-2.31.so",
+                    StatLLN.FILETYPE: "l",
+                    StatLLN.MODE: "rwxrwxrwx",
+                    StatLLN.OWNER: "0/0",
                 },
             ),
             (
                 "./dev/null",
                 {
-                    StatLLS.FILENAME: "./dev/null",
-                    StatLLS.FILETYPE: "c",
-                    StatLLS.MODE: "rw-rw-rw-",
-                    StatLLS.OWNER: "root/root",
-                    StatLLS.MAJOR: "1",
-                    StatLLS.MINOR: "3",
+                    StatLLN.FILENAME: "./dev/null",
+                    StatLLN.FILETYPE: "c",
+                    StatLLN.MODE: "rw-rw-rw-",
+                    StatLLN.OWNER: "0/0",
+                    StatLLN.MAJOR: "1",
+                    StatLLN.MINOR: "3",
                 },
             ),
         ]:
@@ -530,8 +530,8 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
         """Test _serialize() - bad entry"""
         serial = {
             "./bin": {},
-            ".": {"filetype": "d", "mode": "rwxr-xr-x", "owner": "root/root"},
-            "./bad": {"filetype": "-", "mode": [], "owner": "root/root"},
+            ".": {"filetype": "d", "mode": "rwxr-xr-x", "owner": "0/0"},
+            "./bad": {"filetype": "-", "mode": [], "owner": "0/0"},
         }
 
         c = SnapReviewFunctional(self.test_name)
@@ -543,10 +543,10 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
         fname = "."
         exp = {
             fname: {
-                StatLLS.FILENAME: fname,
-                StatLLS.FILETYPE: "d",
-                StatLLS.MODE: "rwxr-xr-x",
-                StatLLS.OWNER: "root/root",
+                StatLLN.FILENAME: fname,
+                StatLLN.FILETYPE: "d",
+                StatLLN.MODE: "rwxr-xr-x",
+                StatLLN.OWNER: "0/0",
             }
         }
         self.assertTrue(fname in state)
@@ -561,7 +561,7 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
             "./lib.so": {
                 "filetype": "-",
                 "mode": "rw-r--r--",
-                "owner": "root/root",
+                "owner": "0/0",
                 "symbols": {
                     "foo": {"type": "T", "version": []},
                     "bar": {"type": "T", "version": "@@Base"},
@@ -576,10 +576,10 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
         fname = "./lib.so"
         exp = {
             fname: {
-                StatLLS.FILENAME: fname,
-                StatLLS.FILETYPE: "-",
-                StatLLS.MODE: "rw-r--r--",
-                StatLLS.OWNER: "root/root",
+                StatLLN.FILENAME: fname,
+                StatLLN.FILETYPE: "-",
+                StatLLN.MODE: "rw-r--r--",
+                StatLLN.OWNER: "0/0",
                 "symbols": {"bar": {"type": "T", "version": "@@Base"}},
             }
         }
@@ -592,32 +592,32 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
     def test_serialize_deserialize_roundtrip(self):
         """Test serialize()/deserialize() round trip"""
         serial = {
-            ".": {"filetype": "d", "mode": "rwxr-xr-x", "owner": "root/root"},
-            "./bin": {"filetype": "d", "mode": "rwxr-xr-x", "owner": "root/root"},
-            "./bin/cat": {"filetype": "-", "mode": "rwxr-xr-x", "owner": "root/root"},
+            ".": {"filetype": "d", "mode": "rwxr-xr-x", "owner": "0/0"},
+            "./bin": {"filetype": "d", "mode": "rwxr-xr-x", "owner": "0/0"},
+            "./bin/cat": {"filetype": "-", "mode": "rwxr-xr-x", "owner": "0/0"},
             "./dev/null": {
                 "filetype": "c",
                 "major": "1",
                 "minor": "3",
                 "mode": "rw-rw-rw-",
-                "owner": "root/root",
+                "owner": "0/0",
             },
             "./lib/x86_64-linux-gnu": {
                 "filetype": "d",
                 "mode": "rwxr-xr-x",
-                "owner": "root/root",
+                "owner": "0/0",
             },
             "./lib/x86_64-linux-gnu/libc-2.31.so": {
                 "filetype": "-",
                 "mode": "rwxr-xr-x",
-                "owner": "root/root",
+                "owner": "0/0",
             },
             "./lib/x86_64-linux-gnu/libc.so.6 -> libc-2.31.so": {
                 "filetype": "l",
                 "mode": "rwxrwxrwx",
-                "owner": "root/root",
+                "owner": "0/0",
             },
-            "./😃": {"filetype": "-", "mode": "rw-r--r--", "owner": "root/root"},
+            "./😃": {"filetype": "-", "mode": "rw-r--r--", "owner": "0/0"},
         }
 
         c = SnapReviewFunctional(self.test_name)
@@ -824,7 +824,7 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
         prev_override["./bin/ls"] = {
             "filetype": "-",
             "mode": "rwxr-xr-x",
-            "owner": "root/root",
+            "owner": "0/0",
         }
 
         self.set_test_snap_yaml("type", "base")
@@ -866,16 +866,16 @@ crw-rw-rw- root/root             1,  3 2020-03-14 18:21 squashfs-root/dev/null
     def test_check_state_base_files_output_bad_item(self):
         """Test check_state_base_files() - --state-output"""
         os.environ["SNAP_FORCE_STATE_CHECK"] = "1"
-        lls = """Parallel unsquashfs: Using 4 processors
+        lln = """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
 
-drwxr-xr-x root/root               215 2020-03-23 14:23 squashfs-root
-drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
--rwxr-xr-x root/root             43416 2020-03-23 14:23 squashfs-root/bin/cat
+drwxr-xr-x 0/0               215 2020-03-23 14:23 squashfs-root
+drwxr-xr-x 0/0                73 2020-03-23 14:23 squashfs-root/bin
+-rwxr-xr-x 0/0             43416 2020-03-23 14:23 squashfs-root/bin/cat
 """
-        hdr, entries = unsquashfs_lls_parse(lls)
+        hdr, entries = unsquashfs_lln_parse(lln)
         entries.append(("bad line ./squashfs-root/bad", None))
-        self.set_test_unsquashfs_lls(hdr, entries)
+        self.set_test_unsquashfs_lln(hdr, entries)
 
         self.set_test_snap_yaml("type", "base")
         overrides = {
@@ -958,7 +958,7 @@ drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
         prev_override["./bin/ls"] = {
             "filetype": "-",
             "mode": "rwxr-xr-x",
-            "owner": "root/root",
+            "owner": "0/0",
         }
         self.set_test_snap_yaml("type", "base")
         overrides = {
@@ -1033,7 +1033,7 @@ drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
         c = SnapReviewFunctional(self.test_name, overrides=overrides)
 
         # modify one of the files
-        del c.curr_state["./bin/cat"][StatLLS.MODE]
+        del c.curr_state["./bin/cat"][StatLLN.MODE]
 
         c.check_state_base_files()
         report = c.review_report
@@ -1179,12 +1179,12 @@ drwxr-xr-x root/root                73 2020-03-23 14:23 squashfs-root/bin
         prev_override["./skipped/foo"] = {
             "filetype": "-",
             "mode": "rwxr-xr-x",
-            "owner": "root/root",
+            "owner": "0/0",
         }
         prev_override["./not-skipped/bar"] = {
             "filetype": "-",
             "mode": "rwxr-xr-x",
-            "owner": "root/root",
+            "owner": "0/0",
         }
 
         self.set_test_snap_yaml("type", "base")
