@@ -13,6 +13,9 @@
     allow-installation:
       plug-snap-type:
         - core
+  dm-crypt:
+    allow-installation: false
+    deny-auto-connection: true
   docker-support:
     allow-installation: false
     deny-auto-connection: true
@@ -259,6 +262,11 @@
         - core
     deny-auto-connection: true
   display-control:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
+  dm-crypt:
     allow-installation:
       slot-snap-type:
         - core
@@ -561,6 +569,12 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  netlink-driver:
+    allow-installation:
+      slot-snap-type:
+        - core
+        - gadget
+    deny-auto-connection: true
   network:
     allow-installation:
       slot-snap-type:
@@ -704,6 +718,11 @@
       slot-snap-type:
         - core
         - gadget
+    deny-auto-connection: true
+  raw-input:
+    allow-installation:
+      slot-snap-type:
+        - core
     deny-auto-connection: true
   raw-usb:
     allow-installation:
