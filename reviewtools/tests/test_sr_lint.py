@@ -3002,6 +3002,35 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {"info": None, "warn": None, "error": 1}
         self.check_results(r, expected_counts)
 
+    def test_check_plugs_netlink_driver(self):
+        """Test check_plugs() - netlink-driver"""
+        plugs = {
+            "test": {
+                "interface": "netlink-driver",
+                "family-name": "foo",
+            }
+        }
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewLint(self.test_name)
+        c.check_plugs()
+        r = c.review_report
+        expected_counts = {"info": 4, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_plugs_netlink_driver_missing_family_name(self):
+        """Test check_plugs() - netlink-driver"""
+        plugs = {
+            "test": {
+                "interface": "netlink-driver",
+            }
+        }
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewLint(self.test_name)
+        c.check_plugs()
+        r = c.review_report
+        expected_counts = {"info": 2, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
     def test_check_plugs_abbreviated(self):
         """Test check_plugs() - abbreviated"""
         self.set_test_snap_yaml("plugs", {"nm": "network-manager"})
@@ -3438,6 +3467,37 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             "text": "unknown attribute 'usb-vend0r' for interface 'serial-port' (slots)"
         }
         self.check_results(r, expected=expected)
+
+    def test_check_slots_netlink_driver(self):
+        """Test check_slots() - netlink-driver"""
+        slots = {
+            "test": {
+                "interface": "netlink-driver",
+                "family-name": "foo",
+                "family": 24,
+            }
+        }
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewLint(self.test_name)
+        c.check_slots()
+        r = c.review_report
+        expected_counts = {"info": 5, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_slots_netlink_driver_missing_family(self):
+        """Test check_slots() - netlink-driver"""
+        slots = {
+            "test": {
+                "interface": "netlink-driver",
+                "family-name": "foo",
+            }
+        }
+        self.set_test_snap_yaml("slots", slots)
+        c = SnapReviewLint(self.test_name)
+        c.check_slots()
+        r = c.review_report
+        expected_counts = {"info": 3, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
 
     def test_check_slots_unknown_interface(self):
         """Test check_slots() - interface (unknown)"""

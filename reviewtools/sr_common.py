@@ -250,6 +250,11 @@ class SnapReview(Review):
         "iio": {"path/slots": ""},
         "kubernetes-support": {"flavor/plugs": ""},
         "mpris": {"name/slots": ""},
+        "netlink-driver": {
+            "family-name/slots": "",
+            "family/slots": 0,
+            "family-name/plugs": "",
+        },
         "optical-drive": {"write/plugs": False},
         "personal-files": {"read/plugs": [], "write/plugs": []},
         "pwm": {"chip-number/slots": 0, "channel/slots": 0},
@@ -292,6 +297,7 @@ class SnapReview(Review):
         },
         "i2c": {"slots": ["path"]},
         "iio": {"slots": ["path"]},
+        "netlink-driver": {"slots": ["family-name/family"], "plugs": ["family-name"]},
         "serial-port": {
             "slots": ["path/!usb-vendor/!usb-product", "path/usb-vendor/usb-product"]
         },
