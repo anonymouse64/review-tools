@@ -6066,6 +6066,7 @@ class TestSnapReviewLintNoMock(TestCase):
             "disconnect-plug-home",
             "disconnect-slot-mpris",
             "fde-setup",
+            "gate-auto-refresh",
             "install",
             "install-device",
             "post-refresh",
