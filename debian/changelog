@@ -1,3 +1,16 @@
+review-tools (0.48+20210622-1) RELEASED; urgency=medium
+
+  [ Emilia Torino ]
+  * sr_common.py: add support for gate-auto-refresh hook
+
+  [ Alex Murray ]
+  * overrides.py: add ubuntu-desktop-installer to
+    update_publisher_overrides.
+  * switch to numeric user group ids. Use unsquashfs -lln instead of
+    unsquashfs -lls
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Tue, 22 Jun 2021 11:19:29 -0300
+
 review-tools (0.48+20210531-1) RELEASED; urgency=medium
 
   [ Emilia Torino ]
