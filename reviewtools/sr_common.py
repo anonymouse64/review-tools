@@ -154,7 +154,7 @@ class SnapReview(Review):
         "disconnect-plug-",
         "disconnect-slot-",
         "fde-setup",
-        "gate-auto-refresh"
+        "gate-auto-refresh",
         "install",
         "install-device",
         "post-refresh",
