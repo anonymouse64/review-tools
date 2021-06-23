@@ -5533,15 +5533,17 @@ slots:
 
         c.check_declaration()
         r = c.review_report
-        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        expected_counts = {"info": 0, "warn": 0, "error": 1}
         self.check_results(r, expected_counts)
 
         expected = dict()
         expected["error"] = dict()
         expected["warn"] = dict()
         expected["info"] = dict()
-        name = "declaration-snap-v2:plugs:iface:desktop-launch"
-        expected["info"][name] = {"text": "OK"}
+        name = "declaration-snap-v2:plugs_installation:iface:desktop-launch"
+        expected["error"][name] = {
+            "text": "human review required due to 'allow-installation' constraint (bool)"
+        }
         self.check_results(r, expected=expected)
 
     def test_check_declaration_slots_desktop_launch(self):
