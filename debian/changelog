@@ -1,3 +1,12 @@
+review-tools (0.48+20210623-1) RELEASED; urgency=medium
+
+  * data/snapd-base-declaration.yaml: update snapd-base-declaration for new
+    desktop-launch, dm-crypt, netlink-driver and raw-input interfaces
+  * sr_common.py: update for netlink-driver slot/plug properties
+  * test_sr_lint.py: add some tests for netlink-driver interface
+
+ -- Alex Murray <alex.murray@canonical.com>  Wed, 23 Jun 2021 11:01:28 +0930
+
 review-tools (0.48+20210622-1) RELEASED; urgency=medium
 
   [ Emilia Torino ]
