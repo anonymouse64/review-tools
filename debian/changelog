@@ -1,3 +1,10 @@
+review-tools (0.48+20210623-2) RELEASED; urgency=medium
+
+  * test_sr_declaration.py: update desktop-launch tests since this is now
+    super-privileged
+
+ -- Alex Murray <alex.murray@canonical.com>  Wed, 23 Jun 2021 16:00:57 +0930
+
 review-tools (0.48+20210623-1) RELEASED; urgency=medium
 
   * data/snapd-base-declaration.yaml: update snapd-base-declaration for new
