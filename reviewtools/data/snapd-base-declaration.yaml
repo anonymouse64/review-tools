@@ -13,6 +13,9 @@
     allow-installation:
       plug-snap-type:
         - core
+  desktop-launch:
+    allow-installation: false
+    deny-auto-connection: true
   dm-crypt:
     allow-installation: false
     deny-auto-connection: true
@@ -252,6 +255,11 @@
     allow-installation:
       slot-snap-type:
         - core
+  desktop-launch:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   desktop-legacy:
     allow-installation:
       slot-snap-type:
