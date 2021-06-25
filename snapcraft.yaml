@@ -1,5 +1,5 @@
 name: review-tools
-version: '0.48+git'
+adopt-info: review-tools
 summary: Review tools for snappy
 description: |
   This snap provides the snap-review command as well as well as other tools
@@ -58,6 +58,7 @@ parts:
     plugin: python
     override-build: |
       snapcraftctl build
+      snapcraftctl set-version "0.48+$(git describe --tags)"
       cd $SNAPCRAFT_PART_BUILD
       ./override-build.sh
     build-packages:
