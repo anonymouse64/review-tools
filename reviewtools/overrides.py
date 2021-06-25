@@ -941,7 +941,6 @@ canonical_commercial_systems = [
 canonical_desktop = [
     "ken.vandine@canonical.com",
     "sebastien.bacher@canonical.com",
-    "will.cooke@canonical.com",
 ]
 
 canonical_edgex = [
@@ -958,13 +957,15 @@ canonical_enablement = [
 ]
 
 canonical_foundations = [
-    "dimitri.ledkov@canonical.com",
     "michael.hudson@canonical.com",
-    "patricia.gaughen@canonical.com",
     "steve.langasek@canonical.com",
 ]
 
-canonical_kernel = ["brad.figg@canonical.com", "terry.rudd@canonical.com"]
+canonical_kernel = [
+    "brad.figg@canonical.com",
+    "terry.rudd@canonical.com",
+    "dimitri.ledkov@canonical.com",
+]
 
 canonical_hwe = [
     "anthony.wong@canonical.com",
@@ -972,9 +973,9 @@ canonical_hwe = [
     "shrirang.bagul@canonical.com",
 ]
 
-canonical_juju = ["ian.booth@canonical.com", "tim.penhey@canonical.com"]
+canonical_juju = ["ian.booth@canonical.com", "john.meinel@canonical.com"]
 
-canonical_k8s = ["adam.stokes@canonical.com", "tim.van.steenburgh@canonical.com"]
+canonical_k8s = ["chris.sanders@canonical.com", "tim.van.steenburgh@canonical.com"]
 
 canonical_lp = ["william.grant@canonical.com", "colin.watson@canonical.com"]
 
@@ -990,7 +991,7 @@ canonical_mir = [
 
 canonical_multipass = canonical_mir
 
-canonical_openstack = ["ryan.beisner@canonical.com", "james.page@canonical.com"]
+canonical_openstack = ["billy.olsen@canonical.com", "james.page@canonical.com"]
 
 # TODO: Add Canonical rocks team
 canonical_rocks = []
@@ -1000,7 +1001,7 @@ canonical_security = [
     "emilia.torino@canonical.com",
 ]
 
-canonical_server = ["josh.powers@canonical.com", "robie.basak@canonical.com"]
+canonical_server = ["rick.harding@canonical.com", "robie.basak@canonical.com"]
 
 canonical_snapd = [
     "gustavo.niemeyer@canonical.com",
