@@ -37,6 +37,9 @@ test:
 functest:
 	./tests/test.sh
 
+functest-statefulness:
+	./tests/test-statefulness.sh
+
 functest-system:
 	./tests/test.sh system
 

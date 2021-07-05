@@ -279,6 +279,10 @@ Running: snap-review --json --state-output=./out
         "manual_review": false,
         "text": "OK"
       },
+      "lint-snap-v2:unknown_install_mode": {
+        "manual_review": false,
+        "text": "OK"
+      },
       "lint-snap-v2:unknown_refresh_mode": {
         "manual_review": false,
         "text": "OK"
@@ -576,6 +580,10 @@ Running: snap-review --json --state-input=./in --state-output=./out
         "text": "OK (optional title field not specified)"
       },
       "lint-snap-v2:unknown_field": {
+        "manual_review": false,
+        "text": "OK"
+      },
+      "lint-snap-v2:unknown_install_mode": {
         "manual_review": false,
         "text": "OK"
       },
@@ -961,6 +969,10 @@ Running: snap-review --json --state-output=./not-allowed/out
         "manual_review": false,
         "text": "OK"
       },
+      "lint-snap-v2:unknown_install_mode": {
+        "manual_review": false,
+        "text": "OK"
+      },
       "lint-snap-v2:unknown_refresh_mode": {
         "manual_review": false,
         "text": "OK"
@@ -1256,6 +1268,10 @@ Running: snap-review --sdk --state-output=./out
       "text": "OK (optional title field not specified)"
     },
     "lint-snap-v2:unknown_field": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:unknown_install_mode": {
       "manual_review": false,
       "text": "OK"
     },
@@ -1558,6 +1574,10 @@ Running: snap-review --sdk --state-input=./in --state-output=./out
       "text": "OK (optional title field not specified)"
     },
     "lint-snap-v2:unknown_field": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:unknown_install_mode": {
       "manual_review": false,
       "text": "OK"
     },
@@ -1943,6 +1963,10 @@ Running: snap-review --sdk --state-output=./not-allowed/out
       "text": "OK (optional title field not specified)"
     },
     "lint-snap-v2:unknown_field": {
+      "manual_review": false,
+      "text": "OK"
+    },
+    "lint-snap-v2:unknown_install_mode": {
       "manual_review": false,
       "text": "OK"
     },
