@@ -81,7 +81,7 @@ done
 
 # snap-specific checks
 comment "= Test unsquashfs -lln output with weird files"
-unsquashfs -lln "$orig_dir/tests/test-state-base_1_amd64.snap" | tee -a "$tmp"
+TZ=US/Central unsquashfs -q -lln "$orig_dir/tests/test-state-base_1_amd64.snap" | tee -a "$tmp"
 comment ""
 
 for args in "" "--json" "--sdk" ; do
