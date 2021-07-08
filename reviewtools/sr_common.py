@@ -189,7 +189,7 @@ class SnapReview(Review):
     # IMPORTANT: anything listed here is assumed to be usable by all
     # snaps. If use of the username should be limited to specific
     # snaps, also adjust overrides.py:lint_system_usernames_override.
-    valid_system_usernames = ["snap_daemon", "snap_docker"]
+    valid_system_usernames = ["snap_daemon", "snap_microk8s"]
 
     valid_compiled_architectures = [
         "amd64",

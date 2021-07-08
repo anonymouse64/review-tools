@@ -5850,9 +5850,9 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         }
         self.check_results(r, expected=expected)
 
-    def test_check_system_usernames_unsupported_snap_docker_user_for_generic_snap(self):
+    def test_check_system_usernames_unsupported_snap_microk8s_user_for_generic_snap(self):
         """Test check_system_usernames - unsupported user"""
-        d = {"snap_docker": "shared"}
+        d = {"snap_microk8s": "shared"}
         self.set_test_snap_yaml("system-usernames", d)
         c = SnapReviewLint(self.test_name)
         c.check_system_usernames()
@@ -5861,8 +5861,8 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         self.check_results(r, expected_counts)
         expected = {
             "error": {
-                "lint-snap-v2:system-usernames:snap_docker": {
-                    "text": "unsupported system-username: snap_docker for snap foo"
+                "lint-snap-v2:system-usernames:snap_microk8s": {
+                    "text": "unsupported system-username: snap_microk8s for snap foo"
                 }
             },
             "warn": {},
@@ -5874,15 +5874,15 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         """Test check_system_usernames overrides"""
         from reviewtools.overrides import lint_system_usernames_override
 
-        lint_system_usernames_override["snap_docker"].append("foo")
+        lint_system_usernames_override["snap_microk8s"].append("foo")
 
         self.set_test_snap_yaml("name", "foo")
-        self.set_test_snap_yaml("system-usernames", {"snap_docker": "shared"})
+        self.set_test_snap_yaml("system-usernames", {"snap_microk8s": "shared"})
         c = SnapReviewLint(self.test_name)
         c.check_system_usernames()
 
         # then cleanup the overrides
-        lint_system_usernames_override["snap_docker"].remove("foo")
+        lint_system_usernames_override["snap_microk8s"].remove("foo")
 
         r = c.review_report
         expected_counts = {"info": 2, "warn": 0, "error": 0}
@@ -5893,8 +5893,8 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             "warn": {},
             "info": {
                 "lint-snap-v2:system-usernames_valid": {"text": "OK"},
-                "lint-snap-v2:system-usernames:snap_docker": {
-                    "text": "OK (override snap_docker for snap: foo)"
+                "lint-snap-v2:system-usernames:snap_microk8s": {
+                    "text": "OK (override snap_microk8s for snap: foo)"
                 },
             },
         }
