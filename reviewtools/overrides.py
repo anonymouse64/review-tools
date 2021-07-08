@@ -921,7 +921,7 @@ lint_redflagged_base_dep_override = {
 # For a given snapd_<username>, list the snaps that are allowed to
 # specify it. Note, as a special case, 'snap_daemon' may be used
 # by any snap and is not tracked here.
-lint_system_usernames_override = {"snap_docker": ["docker"]}
+lint_system_usernames_override = {"snap_microk8s": ["microk8s"]}
 
 # Some publisher_emails represent a shared account. For snaps with a shared
 # email, also send to other addresses.
