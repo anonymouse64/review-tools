@@ -1,3 +1,19 @@
+review-tools (0.48+20210623-3) RELEASED; urgency=medium
+
+  [ Paulo Flabiano Smorigo ]
+  * overrides.py: remove snap_docker and add snap_microk8s to shared
+    system-usernames instead.
+  * sr_common.py: remove snap_docker and add snap_microk8s to shared
+    system-usernames instead.
+
+  [ Alex Murray ]
+  * overrides.py:
+    - Add intel-kernel to kernel snap overrides.
+    - Update for staff historical movements.
+    - Update publisher overrides for various snaps.
+
+ -- Paulo Flabiano Smorigo <pfsmorigo@canonical.com>  Thu, 08 Jul 2021 19:34:04 +0000
+
 review-tools (0.48+20210623-2) RELEASED; urgency=medium
 
   * test_sr_declaration.py: update desktop-launch tests since this is now
