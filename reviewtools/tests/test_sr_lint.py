@@ -3004,12 +3004,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
     def test_check_plugs_netlink_driver(self):
         """Test check_plugs() - netlink-driver"""
-        plugs = {
-            "test": {
-                "interface": "netlink-driver",
-                "family-name": "foo",
-            }
-        }
+        plugs = {"test": {"interface": "netlink-driver", "family-name": "foo",}}
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewLint(self.test_name)
         c.check_plugs()
@@ -3019,11 +3014,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
     def test_check_plugs_netlink_driver_missing_family_name(self):
         """Test check_plugs() - netlink-driver"""
-        plugs = {
-            "test": {
-                "interface": "netlink-driver",
-            }
-        }
+        plugs = {"test": {"interface": "netlink-driver",}}
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewLint(self.test_name)
         c.check_plugs()
@@ -3471,11 +3462,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
     def test_check_slots_netlink_driver(self):
         """Test check_slots() - netlink-driver"""
         slots = {
-            "test": {
-                "interface": "netlink-driver",
-                "family-name": "foo",
-                "family": 24,
-            }
+            "test": {"interface": "netlink-driver", "family-name": "foo", "family": 24,}
         }
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
@@ -3486,12 +3473,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
     def test_check_slots_netlink_driver_missing_family(self):
         """Test check_slots() - netlink-driver"""
-        slots = {
-            "test": {
-                "interface": "netlink-driver",
-                "family-name": "foo",
-            }
-        }
+        slots = {"test": {"interface": "netlink-driver", "family-name": "foo",}}
         self.set_test_snap_yaml("slots", slots)
         c = SnapReviewLint(self.test_name)
         c.check_slots()
@@ -5850,7 +5832,9 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         }
         self.check_results(r, expected=expected)
 
-    def test_check_system_usernames_unsupported_snap_microk8s_user_for_generic_snap(self):
+    def test_check_system_usernames_unsupported_snap_microk8s_user_for_generic_snap(
+        self,
+    ):
         """Test check_system_usernames - unsupported user"""
         d = {"snap_microk8s": "shared"}
         self.set_test_snap_yaml("system-usernames", d)
