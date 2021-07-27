@@ -81,6 +81,7 @@ class TestAvailable(TestCase):
         self.lp1841848_store_fn = "./tests/test-store-unittest-lp1841848.db"
 
         self.rock_fn = "./tests/test-rock-redis_5.0-20.04.tar"
+        self.rock_non_lts_based_fn = "./tests/test-rock-non-lts.tar"
         self.seen_db = "seen.db"
         errors = {}
         self.pkg_db = store.get_pkg_revisions(self.store_db[0], self.secnot_db, errors)
@@ -1312,9 +1313,12 @@ Revision r12 (i386; channels: candidate, beta)
 
     def test_check_scan_rock(self):
         """Test scan_rock()"""
-        res = available.scan_rock(self.secnot_fn, self.rock_fn)
-        self.assertTrue(len(res) > 0)
-        self.assertIn("3501-1", res)
+        test_rocks = [self.rock_fn, self.rock_non_lts_based_fn]
+        for rock in test_rocks:
+            with self.subTest(rock=rock):
+                res = available.scan_rock(self.secnot_fn, rock)
+                self.assertTrue(len(res) > 0)
+                self.assertIn("3501-1", res)
 
     def test_check_scan_rock_release_not_in_secnot(self):
         """Test scan_rock() no release"""
@@ -1328,11 +1332,14 @@ Revision r12 (i386; channels: candidate, beta)
 
     def test_check_scan_rock_with_cves(self):
         """Test scan_rock() with cves"""
-        res = available.scan_rock(self.secnot_fn, self.rock_fn, True)
-        self.assertTrue(len(res), 1)
-        self.assertIn("libxcursor1", res)
-        self.assertIn("3501-1", res)
-        self.assertIn("CVE-2017-16612", res)
+        test_rocks = [self.rock_fn, self.rock_non_lts_based_fn]
+        for rock in test_rocks:
+            with self.subTest(rock=rock):
+                res = available.scan_rock(self.secnot_fn, rock, True)
+                self.assertTrue(len(res), 1)
+                self.assertIn("libxcursor1", res)
+                self.assertIn("3501-1", res)
+                self.assertIn("CVE-2017-16612", res)
 
     def test_check_scan_rock_store(self):
         """Test scan_store() - rock"""
@@ -1349,16 +1356,19 @@ Revision r12 (i386; channels: candidate, beta)
         self.assertEqual("redis contains outdated Ubuntu packages", subj)
         self.assertIn("built with packages from the Ubuntu", body)
         self.assertIn("libxcursor1", body)
+        self.assertEqual(body.count("libxcursor1"), 2)
         self.assertIn("3501-1", body)
-        self.assertIn("libxcursor1", body)
-        self.assertIn("3501-1", body)
+        # rock_store_fn contains USNs for 2 revisions but count is 3 due
+        # to the references link
+        self.assertEqual(body.count("3501-1"), 3)
 
     def test_check_secnot_report_for_rock(self):
         """Test _secnot_report_for_pkg() - rock"""
         errors = {}
         self.store_db = {}
+        secnot_db = usn.read_usn_db(self.secnot_fn, support_non_lts=True)
         pkg_db = store.get_pkg_revisions(
-            self.rock_store_db[0], self.secnot_db, errors, "rock"
+            self.rock_store_db[0], secnot_db, errors, "rock"
         )
         self.assertEqual(len(errors), 0)
         (
@@ -1372,6 +1382,9 @@ archive that have since received security updates. The following lists new
 USNs for affected binary packages in each rock revision:
 
 Revision r852f7702e973 (amd64; channels: edge, beta)
+ * libxcursor1: 3501-1
+
+Revision r852f7702e974 (amd64; channels: edge, beta)
  * libxcursor1: 3501-1
 
 Simply rebuilding the rock will pull in the new security updates and

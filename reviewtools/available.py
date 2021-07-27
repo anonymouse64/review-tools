@@ -420,7 +420,13 @@ def scan_store(secnot_db_fn, store_db_fn, seen_db_fn, pkgname, store_db_type="sn
     seen db. We perform these actions on each snap and rock and do not form
     a queue to keep the implementation simple.
     """
-    secnot_db = read_usn_db(secnot_db_fn)
+    if store_db_type == "rock":
+        # Since ROCKs can be based on non LTS Ubuntu releases, secnot_db should
+        # include them (otherwise the USN db is filtered by tracked LTS releases only
+        # since that is the requirement for snaps)
+        secnot_db = read_usn_db(secnot_db_fn, support_non_lts=True)
+    else:
+        secnot_db = read_usn_db(secnot_db_fn)
     store_db = read_file_as_json_dict(store_db_fn)
     if seen_db_fn:
         seen_db = read_seen_db(seen_db_fn)
@@ -516,7 +522,10 @@ def scan_rock(secnot_db_fn, rock_fn, with_cves=False):
     """Scan rock for packages with security notices"""
     out = ""
     man = get_rock_manifest(rock_fn)
-    secnot_db = read_usn_db(secnot_db_fn)
+    # Since ROCKs can be based on non LTS Ubuntu releases, secnot_db should
+    # include them (otherwise the USN db is filtered by tracked LTS releases only
+    # since that is the requirement for snaps)
+    secnot_db = read_usn_db(secnot_db_fn, support_non_lts=True)
     original_report = get_secnots_for_manifest(
         manifest=man, secnot_db=secnot_db, with_cves=with_cves, manifest_type="rock"
     )

@@ -20,12 +20,16 @@ import reviewtools.common as common
 import reviewtools.debversion as debversion
 
 tracked_releases = ["xenial", "bionic", "focal"]
+# This is required due to rocks built from non-lts releases.
+# All rocks in https://hub.docker.com/u/ubuntu are either built based on
+# Ubuntu 20.04 LTS or Ubuntu 21.04
+non_lts_tracked_releases = ["hirsute"]
 epoch_pat = re.compile(r"^[0-9]+:")
 
 
 # For fast checks:
 # usn_db[release][binary][usn][version]
-def read_usn_db(fn):
+def read_usn_db(fn, support_non_lts=False):
     def get_best_version(unmatched_vers, rel, bin, rawv):
         version = debversion.DebVersion(rawv)
 
@@ -77,7 +81,12 @@ def read_usn_db(fn):
     for usn in raw:
         if "releases" not in raw[usn]:
             continue
-        for rel in tracked_releases:
+
+        affected_releases = tracked_releases
+        if support_non_lts:
+            affected_releases = affected_releases + non_lts_tracked_releases
+
+        for rel in affected_releases:
             if rel not in raw[usn]["releases"]:
                 continue
 
