@@ -541,6 +541,7 @@ class SnapReviewDeclaration(SnapReview):
                             allowed.append("slot-snap-type")
                             allowed.append("plug-names")
                         elif key == "slots":
+                            allowed.append("plug-names")
                             allowed.append("plug-publisher-id")
                             allowed.append("plug-snap-id")
                             allowed.append("plug-snap-type")

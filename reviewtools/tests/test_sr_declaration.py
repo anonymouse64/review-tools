@@ -1087,6 +1087,32 @@ slots:
         }
         self.check_results(r, expected=expected)
 
+    def test__verify_declaration_valid_slots_iface_constraint_key(self):
+        """Test _verify_declaration - valid interface constraint key: plug-names
+           (slots with allow-auto-connection)"""
+        c = SnapReviewDeclaration(self.test_name)
+        decl = {
+            "slots": {
+                "foo": {
+                    "allow-auto-connection": [{"plug-names": ["foo"], "slot-names":["foo"]}]
+                }
+            }
+        }
+        c._verify_declaration(decl=decl)
+        r = c.review_report
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
+
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "declaration-snap-v2:valid_slots:foo:allow-auto-connection"
+        expected["info"][name] = {
+            "text": "OK"
+        }
+        self.check_results(r, expected=expected)
+
     def test__verify_declaration_invalid_slots_iface_constraint_none2(self):
         """Test _verify_declaration - invalid interface constraint: none
            (slots with allow-connection)"""
