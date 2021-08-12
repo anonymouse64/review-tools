@@ -1094,7 +1094,9 @@ slots:
         decl = {
             "slots": {
                 "foo": {
-                    "allow-auto-connection": [{"plug-names": ["foo"], "slot-names":["foo"]}]
+                    "allow-auto-connection": [
+                        {"plug-names": ["foo"], "slot-names": ["foo"]}
+                    ]
                 }
             }
         }
@@ -1108,9 +1110,7 @@ slots:
         expected["warn"] = dict()
         expected["info"] = dict()
         name = "declaration-snap-v2:valid_slots:foo:allow-auto-connection"
-        expected["info"][name] = {
-            "text": "OK"
-        }
+        expected["info"][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
     def test__verify_declaration_invalid_slots_iface_constraint_none2(self):
