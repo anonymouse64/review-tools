@@ -1,15 +1,17 @@
-review-tools (0.48+20210728-1) UNRELEASED; urgency=medium
+review-tools (0.48+20210812-1) RELEASED; urgency=medium
 
   [ Alex Murray ]
   * overrides.py: add degw001-kernel and joule-expansion to
     update_publisher_overrides
+  * snapcraft.yaml: include git tag name
 
   [ Emilia Torino ]
   * available.py: support reading non-LTS releases from usn db during
     scan_rock and scan_store
   * usn.py: support reading non-LTS releases during read_usn_db
+  * sr_declaration.py: add plug-names to allowed constraint keys for slots
 
- -- Emilia Torino <emilia.torino@canonical.com>  Wed, 28 Jul 2021 10:45:57 -0300
+ -- Emilia Torino <emilia.torino@canonical.com>  Thu, 12 Aug 2021 12:35:42 -0300
 
 review-tools (0.48+20210623-3) RELEASED; urgency=medium
 
