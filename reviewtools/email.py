@@ -111,12 +111,11 @@ def send(email_to_addr, subj, body, bcc=None):
         msg["To"] = email_to_addr
         if bcc is not None:
             msg["Bcc"] = bcc
-        s = smtplib.SMTP(email_server)
         if email_server_user and email_server_password:
-            smtp.ehlo()
-            smtp.starttls()
-            smtp.ehlo()
-            smtp.login(email_server_user, email_server_password)
+            s = smtplib.SMTP_SSL(email_server)
+            s.login(email_server_user, email_server_password)
+        else:
+            s = smtplib.SMTP(email_server)
         s.send_message(msg)
         s.quit()
 
