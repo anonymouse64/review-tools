@@ -20,7 +20,7 @@ import smtplib
 import sys
 
 # The From address for all emails
-email_from_addr = "Snap Store <noreply@canonical.com>"
+email_from_addr = "Snap Store <noreply+security-snap-review@canonical.com>"
 
 # Send via local SMTP server
 email_server = "localhost"
@@ -85,6 +85,8 @@ def send(email_to_addr, subj, body, bcc=None):
 
         if "RT_EMAIL_SERVER" in os.environ:
             email_server = os.environ["RT_EMAIL_SERVER"]
+        email_server_user = os.environ.get("RT_EMAIL_SERVER_USER")
+        email_server_password = os.environ.get("RT_EMAIL_SERVER_PASSWORD")
 
         if (
             "RT_EMAIL_NOPROMPT" not in os.environ
@@ -110,6 +112,11 @@ def send(email_to_addr, subj, body, bcc=None):
         if bcc is not None:
             msg["Bcc"] = bcc
         s = smtplib.SMTP(email_server)
+        if email_server_user and email_server_password:
+            smtp.ehlo()
+            smtp.starttls()
+            smtp.ehlo()
+            smtp.login(email_server_user, email_server_password)
         s.send_message(msg)
         s.quit()
 
