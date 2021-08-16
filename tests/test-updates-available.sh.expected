@@ -1,7 +1,7 @@
 = Test --seen-db updated =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-1.db' --store-db='./tests/test-store-1.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: olivier.tilloy@canonical.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
@@ -42,7 +42,7 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 = Test rocks --seen-db updated =
 Emptying seen.db
 Running: rock-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-1.db' --store-db='./tests/test-rocks-store-unittest-1.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: rocks@canonical.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: redis contains outdated Ubuntu packages
@@ -72,7 +72,7 @@ Running: rock-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 = Test multiple USNs with --seen-db updated =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-1.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: olivier.tilloy@canonical.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
@@ -114,7 +114,7 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 = Test --seen-db updated. First email subject says 'contains' and second email subject says 'was built' =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-unittest-3.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: olivier.tilloy@canonical.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
@@ -144,7 +144,7 @@ References:
 
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-unittest-3.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: olivier.tilloy@canonical.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad was built with outdated Ubuntu packages
@@ -174,7 +174,7 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 = Test --seen-db updated. First email subject says 'contains' and second email subject says 'contains and was built' =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-1.db' --store-db='./tests/test-store-unittest-3.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: olivier.tilloy@canonical.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
@@ -203,7 +203,7 @@ References:
 
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-unittest-3.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: olivier.tilloy@canonical.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains and was built with outdated Ubuntu packages
@@ -243,7 +243,7 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 = Test --seen-db updated. First email subject says 'was built' and second email subject says 'contains' =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs-only.db' --store-db='./tests/test-store-unittest-3.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: olivier.tilloy@canonical.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad was built with outdated Ubuntu packages
@@ -269,7 +269,7 @@ References:
 
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-unittest-3.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: olivier.tilloy@canonical.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
@@ -303,7 +303,7 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 = Test --seen-db updated. First email subject says 'contains and was built' and second email subject says 'contains' =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-unittest-3.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: olivier.tilloy@canonical.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains and was built with outdated Ubuntu packages
@@ -343,7 +343,7 @@ References:
 
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-budgie-1.db' --store-db='./tests/test-store-unittest-3.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: olivier.tilloy@canonical.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
@@ -383,7 +383,7 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 = Test previous USNs not reported with --seen-db updated =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-2.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: olivier.tilloy@canonical.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
@@ -426,7 +426,7 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 Emptying seen.db
 == one USN affects snap ==
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-1.db' --store-db='./tests/test-store-1.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: olivier.tilloy@canonical.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
@@ -466,7 +466,7 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 
 == two USNs affect snap ==
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-1.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: olivier.tilloy@canonical.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
@@ -506,7 +506,7 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 
 == two USNs affect snap (snap reverted) ==
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-2.db' --store-db='./tests/test-store-1.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: olivier.tilloy@canonical.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
@@ -553,7 +553,7 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 = Test --seen-db for ubuntu-budgie-welcome =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-budgie-1.db' --store-db='./tests/test-store-budgie.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: packaging@ubuntubudgie.org
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: ubuntu-budgie-welcome contains outdated Ubuntu packages
@@ -611,7 +611,7 @@ References:
 
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-budgie-2.db' --store-db='./tests/test-store-budgie.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: packaging@ubuntubudgie.org
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: ubuntu-budgie-welcome contains outdated Ubuntu packages
@@ -645,7 +645,7 @@ References:
 = Test --seen-db updated for test-xenial and test-bionic =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-os-release.db' --store-db='./tests/test-store-os-release.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: foo@example.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: test-xenial contains outdated Ubuntu packages
@@ -666,7 +666,7 @@ Thank you for your snap and for attending to this matter.
 References:
  * https://ubuntu.com/security/notices/USN-3790-1/
 
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: foo@example.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: test-bionic contains outdated Ubuntu packages
@@ -693,7 +693,7 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 = Test --seen-db updated for linux-generic-bbb =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel.db' --store-db='./tests/test-store-kernel.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: foo@example.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: linux-generic-bbb built from outdated Ubuntu kernel
@@ -722,7 +722,7 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 = Test --seen-db updated for linux-generic-bbb, kernel and snapcraft USNs =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel-and-build-pkgs.db' --store-db='./tests/test-store-kernel.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: foo@example.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: linux-generic-bbb built from outdated Ubuntu kernel and with outdated Ubuntu packages
@@ -758,7 +758,7 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 = Test --seen-db updated for linux-generic-bbb. First for kernel USNs and then for snapcraft USN =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel.db' --store-db='./tests/test-store-kernel.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: foo@example.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: linux-generic-bbb built from outdated Ubuntu kernel
@@ -783,7 +783,7 @@ References:
 
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel-and-build-pkgs.db' --store-db='./tests/test-store-kernel.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: foo@example.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: linux-generic-bbb was built with outdated Ubuntu packages
@@ -810,7 +810,7 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 = Test --seen-db updated for linux-generic-bbb. First for snapcraft USN and then for kernel USNs =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs-only.db' --store-db='./tests/test-store-kernel.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: foo@example.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: linux-generic-bbb was built with outdated Ubuntu packages
@@ -833,7 +833,7 @@ References:
 
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel.db' --store-db='./tests/test-store-kernel.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: foo@example.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: linux-generic-bbb built from outdated Ubuntu kernel
@@ -862,7 +862,7 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 = Test --seen-db updated for linux-generic-bbb. First for both kernel and snapcraft USNs and then for kernel USN only =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel-and-build-pkgs-1.db' --store-db='./tests/test-store-kernel.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: foo@example.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: linux-generic-bbb built from outdated Ubuntu kernel and with outdated Ubuntu packages
@@ -893,7 +893,7 @@ References:
 
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel.db' --store-db='./tests/test-store-kernel.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: foo@example.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: linux-generic-bbb built from outdated Ubuntu kernel
@@ -921,7 +921,7 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 = Test --seen-db updated for linux-generic-bbb. First for kernel USN only and then for both kernel and snapcraft USNs =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel-reduced.db' --store-db='./tests/test-store-kernel.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: foo@example.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: linux-generic-bbb built from outdated Ubuntu kernel
@@ -945,7 +945,7 @@ References:
 
 
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-kernel-and-build-pkgs.db' --store-db='./tests/test-store-kernel.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: foo@example.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: linux-generic-bbb built from outdated Ubuntu kernel and with outdated Ubuntu packages
@@ -980,7 +980,7 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 = Test --seen-db updated for build-pkgs only =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs-only.db' --store-db='./tests/test-store-kernel.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: foo@example.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: linux-generic-bbb was built with outdated Ubuntu packages
@@ -1007,7 +1007,7 @@ Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn
 = Test --seen-db updated for build-pkgs and staged packages =
 Emptying seen.db
 Running: snap-updates-available --seen-db='<tmpfile>' --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-kernel.db'...
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: foo@example.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: linux-generic-bbb was built with outdated Ubuntu packages
@@ -1424,7 +1424,7 @@ Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-unittest-
 Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-1.db' --store-db='./tests/test-store-unittest-bad-1.db'
 WARN: 1ad: required field 'revisions' not found
 ERROR: Errors encountered when scanning store entries
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: olivier.tilloy@canonical.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
@@ -1462,7 +1462,7 @@ References:
 
 
 Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-unittest-1.db'
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: olivier.tilloy@canonical.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains and was built with outdated Ubuntu packages
@@ -1534,7 +1534,7 @@ References:
 
 
 Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-unittest-2.db'
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: olivier.tilloy@canonical.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
@@ -1580,7 +1580,7 @@ References:
 
 
 Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs-only.db' --store-db='./tests/test-store-unittest-1.db'
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: olivier.tilloy@canonical.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad was built with outdated Ubuntu packages
@@ -1618,7 +1618,7 @@ References:
 
 
 Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-build-pkgs.db' --store-db='./tests/test-store-unittest-3.db'
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: olivier.tilloy@canonical.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains and was built with outdated Ubuntu packages
@@ -1748,7 +1748,7 @@ Running: snap-updates-available --with-cves --usn-db='./tests/test-usn-unittest-
 Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db' --store-db='./tests/test-store-unittest-lp1841848.db'
 
 Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-lp1841848.db' --store-db='./tests/test-store-unittest-lp1841848-needed.db'
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: test.me@example.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: test-snap contains outdated Ubuntu packages
@@ -1772,7 +1772,7 @@ References:
 
 
 Running: ./bin/snap-updates-available --usn-db='./tests/test-usn-unittest-1.db' --store-db='./tests/test-store-collaborators.db'
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: olivier.tilloy@canonical.com, test.collaborator@example.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: 0ad contains outdated Ubuntu packages
@@ -2632,7 +2632,7 @@ Running: snap-check-notices --no-fetch --with-cves ./tests/test-check-notices-pr
 }
 
 Running: ./bin/rock-updates-available --usn-db='./tests/test-usn-unittest-1.db' --store-db='./tests/test-rocks-store-unittest-1.db'
-From: Snap Store <noreply@canonical.com>
+From: Snap Store <noreply+security-snap-review@canonical.com>
 To: rocks@canonical.com
 Bcc: alex.murray@canonical.com, emilia.torino@canonical.com
 Subject: redis contains outdated Ubuntu packages
