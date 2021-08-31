@@ -32,7 +32,6 @@ from reviewtools.common import (
 )
 from reviewtools.overrides import interfaces_attribs_addons
 
-
 #
 # Utility classes
 #
@@ -376,6 +375,15 @@ class SnapReview(Review):
             error("Could not load snap.yaml. Is it properly formatted?")
         snap_yaml.close()
 
+        # read yaml again for duplicated keys check (py-yaml does not
+        # do that)
+        snap_yaml = self._extract_snap_yaml()
+        try:
+            self._verify_no_duplicated_yaml_keys(snap_yaml.read())
+        except Exception as e:
+            error("Found duplicated yaml keys in snap.yaml: %s" % e)
+        snap_yaml.close()
+
         self.snap_manifest_yaml = {}
         manifest_yaml = self._extract_snap_manifest_yaml()
         if manifest_yaml is not None:
@@ -599,3 +607,13 @@ class SnapReview(Review):
         if os.path.getsize(fn) <= size:
             return True
         return False
+
+    def _verify_no_duplicated_yaml_keys(self, raw_snap_yaml):
+        """Verify there are no duplicated yaml map keys"""
+        import ruamel.yaml
+        yaml = ruamel.yaml.YAML(typ='safe')
+        yaml.allow_duplicate_keys = False
+        try:
+            yaml.load(raw_snap_yaml)
+        except ruamel.yaml.constructor.DuplicateKeyError as e:
+            raise SnapReviewException(e.problem)

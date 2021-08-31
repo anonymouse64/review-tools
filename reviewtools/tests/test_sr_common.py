@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import io
+
 from reviewtools.sr_common import SnapReview
 import reviewtools.sr_tests as sr_tests
 
@@ -52,3 +54,17 @@ class TestSnapReviewCommon(sr_tests.TestSnapReview):
             "~foo$bar:",
         ]:
             self.assertFalse(self.review._verify_pkgversion(nok))
+
+    def test_no_duplicated_yaml_keys(self):
+        """Check _no_duplicated_yaml_keys"""
+        b1 = """
+map:
+ key:
+ key:
+        """
+        for ok in [
+                b1,
+        ]:
+            with self.assertRaises(Exception) as e:
+                self.review._verify_no_duplicated_yaml_keys(ok)
+            self.assertRegex(str(e.exception), r'found duplicate key "key".*')
