@@ -28,6 +28,9 @@
   greengrass-support:
     allow-installation: false
     deny-auto-connection: true
+  ion-memory-control:
+    allow-installation: false
+    deny-auto-connection: true
   kernel-module-control:
     allow-installation: false
     deny-auto-connection: true
@@ -37,6 +40,9 @@
   lxd-support:
     allow-installation: false
     deny-auto-connection: true
+  microstack-support:
+    allow-installation: false
+    deny-auto-connection: true
   multipass-support:
     allow-installation: false
     deny-auto-connection: true
@@ -44,6 +50,12 @@
     allow-installation: false
     deny-auto-connection: true
   personal-files:
+    allow-installation: false
+    deny-auto-connection: true
+  sd-control:
+    allow-installation: false
+    deny-auto-connection: true
+  snap-refresh-control:
     allow-installation: false
     deny-auto-connection: true
   snapd-control:
@@ -432,6 +444,11 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  ion-memory-control:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   jack1:
     allow-installation:
       slot-snap-type:
@@ -536,6 +553,11 @@
         - core
     deny-connection:
       on-classic: false
+  microstack-support:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   mir:
     allow-installation:
       slot-snap-type:
@@ -758,6 +780,11 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  sd-control:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   serial-port:
     allow-installation:
       slot-snap-type:
@@ -765,6 +792,11 @@
         - gadget
     deny-auto-connection: true
   shutdown:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
+  snap-refresh-control:
     allow-installation:
       slot-snap-type:
         - core
