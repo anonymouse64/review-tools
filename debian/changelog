@@ -1,3 +1,17 @@
+review-tools (0.48+20210906-1) RELEASED; urgency=medium
+
+  [ Haw Loeung ]
+  * email.py: enable support for SMTP authentication via SSL
+
+  [ Alex Murray ]
+  * tests/test-updates-available.sh.expected: update to handle cope with
+    new default From: email address for snap store emails
+  * data/snapd-base-declaration.yaml: update snapd-base-declaration for
+    new ion-memory-control, microstack-support, sd-control and
+    snap-refresh-control interfaces
+
+ -- Alex Murray <alex.murray@canonical.com>  Mon, 06 Sep 2021 13:41:38 +0930
+
 review-tools (0.48+20210812-1) RELEASED; urgency=medium
 
   [ Alex Murray ]
