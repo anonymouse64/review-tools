@@ -15,6 +15,7 @@ DEB_DEPENDENCIES := \
 	python3-coverage \
 	python3-magic \
 	python3-requests \
+	python3-ruamel.yaml \
 	python3-setuptools \
 	python3-simplejson \
 	python3-yaml \
@@ -24,7 +25,7 @@ SNAP_DEPENDENCIES := \
 	black
 
 check-deb-deps:
-	@for dep in $(DEB_DEPENDENCIES); do if ! dpkg -l $$dep 1>/dev/null 2>&1; then echo "Please apt install $$dep"; exit 1; fi; done
+	@for dep in $(DEB_DEPENDENCIES); do if ! dpkg -s $$dep 1>/dev/null 2>&1; then echo "Please apt install $$dep"; exit 1; fi; done
 
 check-snap-deps:
 	@for dep in $(SNAP_DEPENDENCIES); do if ! snap list $$dep 1>/dev/null 2>&1; then echo "Please snap install $$dep"; exit 1; fi; done
