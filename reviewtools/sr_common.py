@@ -32,6 +32,7 @@ from reviewtools.common import (
 )
 from reviewtools.overrides import interfaces_attribs_addons
 
+
 #
 # Utility classes
 #
