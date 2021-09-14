@@ -139,6 +139,9 @@ OS_RELEASE_MAP = {
     }
 }
 
+# Link categories used in snap.yaml
+LINK_TYPES = ["website", "source-code", "contact", "donation", "issues"]
+
 
 def cleanup_unpack():
     global UNPACK_DIR

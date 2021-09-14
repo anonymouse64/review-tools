@@ -67,6 +67,7 @@ class SnapReview(Review):
         "plugs",
         "slots",
         "system-usernames",
+        "links",
     ]
 
     snap_manifest_required = {"build-packages": []}

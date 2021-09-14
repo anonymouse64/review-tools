@@ -974,6 +974,78 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {"info": None, "warn": 0, "error": 1}
         self.check_results(r, expected_counts)
 
+    def test_check_link(self):
+        """Test check_link"""
+        self.set_test_snap_yaml("links", [])
+        c = SnapReviewLint(self.test_name)
+        c.check_links()
+        r = c.review_report
+        expected_counts = {"info": None, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_link_valid(self):
+        """Test check_link_valid"""
+        links = {
+            "website": "https://snapcraft.io",
+            "source-code": "https://github.com/snapcore/snapcraft",
+            "contact": ["https://forum.snapcraft.io",
+                "snapcraft@forum.snapcraft.io",
+                "mailto:snapcraft@forum.snapcraft.io"],
+            "donation": "http://donate.me",
+            "issues": "https://bugs.launchpad.net/snapcraft/+filebug"
+        }
+        self.set_test_snap_yaml("links", links)
+        c = SnapReviewLint(self.test_name)
+        c.check_links()
+        r = c.review_report
+        expected_counts = {"info": None, "warn": 0, "error": 0}
+        self.check_results(r, expected_counts)
+
+    def test_check_link_invalid_field(self):
+        """Test check_link_invalid_field"""
+        self.set_test_snap_yaml("links", {"invalid_field": ""})
+        c = SnapReviewLint(self.test_name)
+        c.check_links()
+        r = c.review_report
+        expected_counts = {"info": None, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_link_invalid_url_ot_protocol(self):
+        """Test check_link_invalid_url_no_protocol"""
+        self.set_test_snap_yaml("links", {"website": "www.snapcraft.io"})
+        c = SnapReviewLint(self.test_name)
+        c.check_links()
+        r = c.review_report
+        expected_counts = {"info": None, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_link_invalid_url_ftp(self):
+        """Test check_link_invalid_url_ftp"""
+        self.set_test_snap_yaml("links", {"website": "ftp://snapcraft.io"})
+        c = SnapReviewLint(self.test_name)
+        c.check_links()
+        r = c.review_report
+        expected_counts = {"info": None, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_link_invalid_email(self):
+        """Test check_link_invalid_email"""
+        self.set_test_snap_yaml("links", {"contact": "invalid(at)email.com"})
+        c = SnapReviewLint(self.test_name)
+        c.check_links()
+        r = c.review_report
+        expected_counts = {"info": None, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_link_email_not_in_contacts(self):
+        """Test check_link_email_not_in_contacts"""
+        self.set_test_snap_yaml("links", {"issues": "valid@email.com"})
+        c = SnapReviewLint(self.test_name)
+        c.check_links()
+        r = c.review_report
+        expected_counts = {"info": None, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
     def test_check_title(self):
         """Test check_title"""
         self.set_test_snap_yaml("title", "This is a test title")

@@ -20,6 +20,7 @@ from reviewtools.common import (
     find_external_symlinks,
     STORE_PKGNAME_SNAPV2_MAXLEN,
     STORE_PKGNAME_SNAPV2_MINLEN,
+    LINK_TYPES,
 )
 from reviewtools.overrides import (
     redflagged_snap_types_overrides,
@@ -338,6 +339,31 @@ class SnapReviewLint(SnapReview):
             t = "error"
             s = "icon entry '%s' does not exist" % self.snap_yaml["icon"]
         self._add_result(t, n, s)
+
+    def check_links(self):
+        """Check links"""
+        t = "info"
+        n = self._get_check_name("invalid_link")
+        s = "OK"
+        if "links" not in self.snap_yaml:
+            return
+
+        regex_url = re.compile("^http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+$")
+        regex_email = re.compile("^(mailto:|)[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$")
+
+        for val in self.snap_yaml["links"]:
+            if val not in LINK_TYPES:
+                t = "error"
+                s = "'unknown field for links in snap.yaml: %s" % val
+                self._add_result(t, n, s)
+                return
+
+            content = self.snap_yaml["links"][val]
+            for item in [content] if isinstance(content, str) else content:
+                if not (val == "contact" and regex_email.match(item) or regex_url.match(item)):
+                    t = "error"
+                    s = "'invalid value for %s in snap.yaml: %s" % (val, item)
+                    self._add_result(t, n, s)
 
     def check_unknown_entries(self):
         """Check for any unknown fields"""
