@@ -1,3 +1,9 @@
+review-tools (0.48+20210906-1) UNRELEASED; urgency=medium
+
+  * store.py: properly parsing arch specifier if present in rock dpkg.list
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Thu, 16 Sep 2021 22:35:36 -0300
+
 review-tools (0.48+20210906-1) RELEASED; urgency=medium
 
   [ Haw Loeung ]
