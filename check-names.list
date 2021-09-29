@@ -92,6 +92,7 @@ lint-snap-v2:icon_theme_quoting|
 lint-snap-v2:icon_theme_size|
 lint-snap-v2:iffy_files|
 lint-snap-v2:install-mode|
+lint-snap-v2:invalid_link|
 lint-snap-v2:layout|
 lint-snap-v2:layout_source|
 lint-snap-v2:layout_target|
