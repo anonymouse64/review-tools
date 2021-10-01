@@ -1054,6 +1054,7 @@ update_publisher_overrides = {
         "edgex-device-modbus": canonical_edgex,
         "edgex-device-mqtt": canonical_edgex,
         "edgex-device-rest": canonical_edgex,
+        "edgex-ui": canonical_edgex,
         "edgex-ui-go": canonical_edgex,
         "edgexfoundry": canonical_edgex,
         "eog": canonical_desktop,
