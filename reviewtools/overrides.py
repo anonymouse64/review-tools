@@ -864,8 +864,11 @@ func_execstack_overrides = [
     "checkbox-snappy",
     "checkbox-tampere",
     "checkbox-tillamook",
-    "store-checker",
     "enemy-territory",
+    "microsoft-edge",
+    "microsoft-edge-beta",
+    "microsoft-edge-dev",
+    "store-checker",
 ]
 
 # Some files from staged packages are known to have execstack, so don't flag
@@ -1294,6 +1297,9 @@ update_binaries_ignore = ["linux-headers-generic", "linux-libc-dev"]
 # the symlink (only the target).
 common_external_symlink_override = {
     "chromium": ["usr/bin/xdg-open"],
+    "microsoft-edge": ["usr/bin/xdg-open"],
+    "microsoft-edge-beta": ["usr/bin/xdg-open"],
+    "microsoft-edge-dev": ["usr/bin/xdg-open"],
     "skype": ["usr/bin/xdg-open"],
     "snapd": ["usr/lib/snapd/snap-device-helper"],
 }
