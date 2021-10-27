@@ -1478,31 +1478,98 @@ slots:
         expected["info"][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
 
-    def test__verify_declaration_invalid_slots_plug_attribs_browser_support_bad(self):
-        """Test _verify_declaration - invalid interface constraint attrib
-           value"""
+    def test__verify_declaration_valid_slots_plug_attribs_netlink_driver_int(self):
+        """Test _verify_declaration - valid interface constraint attrib
+           value for netlink-driver as string
+        """
         c = SnapReviewDeclaration(self.test_name)
         decl = {
             "slots": {
-                "browser-support": {
-                    "allow-connection": {"plug-attributes": {"allow-sandbox": {}}}
+                "netlink-driver": {
+                    "allow-auto-connection": {"slot-attributes": {"family": "24"}}
                 }
             }
         }
         c._verify_declaration(decl=decl)
         r = c.review_report
-        expected_counts = {"info": 0, "warn": 0, "error": 1}
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
         self.check_results(r, expected_counts)
 
         expected = dict()
         expected["error"] = dict()
         expected["warn"] = dict()
         expected["info"] = dict()
-        name = "declaration-snap-v2:valid_slots:browser-support:allow-connection_plug-attributes"
-        expected["error"][name] = {
-            "text": "declaration malformed (wrong type '{}' for attribute 'allow-sandbox')"
-        }
+        name = "declaration-snap-v2:valid_slots:netlink-driver:allow-auto-connection"
+        expected["info"][name] = {"text": "OK"}
         self.check_results(r, expected=expected)
+
+    def test__verify_declaration_valid_slots_plug_attribs_netlink_driver_bad(self):
+        """Test _verify_declaration - invalid interface constraint attrib
+           value for netlink-driver as string
+        """
+        invalid_attrs_values = [
+            ({}, {}),
+            ("true", True),
+            ("false", False),
+            ("foo", "foo"),
+        ]
+        for attr_value, attr_type in invalid_attrs_values:
+            with self.subTest(attr_value=attr_value, attr_type=attr_type):
+                c = SnapReviewDeclaration(self.test_name)
+                invalid_decl = {
+                    "slots": {
+                        "netlink-driver": {
+                            "allow-auto-connection": {
+                                "slot-attributes": {"family": attr_value}
+                            }
+                        }
+                    }
+                }
+                c._verify_declaration(decl=invalid_decl)
+                r = c.review_report
+                expected_counts = {"info": 0, "warn": 0, "error": 1}
+                self.check_results(r, expected_counts)
+
+                expected = dict()
+                expected["error"] = dict()
+                expected["warn"] = dict()
+                expected["info"] = dict()
+                name = "declaration-snap-v2:valid_slots:netlink-driver:allow-auto-connection_slot-attributes"
+                expected["error"][name] = {
+                    "text": f"declaration malformed (wrong type '{attr_type}' for attribute 'family')"
+                }
+                self.check_results(r, expected=expected)
+
+    def test__verify_declaration_invalid_slots_plug_attribs_browser_support_bad(self):
+        """Test _verify_declaration - invalid interface constraint attrib
+           value"""
+        invalid_attrs_values = [{}, "1", "foo"]
+        for attr_value in invalid_attrs_values:
+            with self.subTest(attr_value=attr_value):
+                c = SnapReviewDeclaration(self.test_name)
+                decl = {
+                    "slots": {
+                        "browser-support": {
+                            "allow-connection": {
+                                "plug-attributes": {"allow-sandbox": attr_value}
+                            }
+                        }
+                    }
+                }
+                c._verify_declaration(decl=decl)
+                r = c.review_report
+                expected_counts = {"info": 0, "warn": 0, "error": 1}
+                self.check_results(r, expected_counts)
+
+                expected = dict()
+                expected["error"] = dict()
+                expected["warn"] = dict()
+                expected["info"] = dict()
+                name = "declaration-snap-v2:valid_slots:browser-support:allow-connection_plug-attributes"
+                expected["error"][name] = {
+                    "text": f"declaration malformed (wrong type '{attr_value}' for attribute 'allow-sandbox')"
+                }
+                self.check_results(r, expected=expected)
 
     def test__verify_declaration_invalid_slots_plug_attribs_browser_support_nonexistent(
         self,

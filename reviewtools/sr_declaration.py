@@ -230,6 +230,21 @@ class SnapReviewDeclaration(SnapReview):
                 return False
             return s
 
+        def str2int(s):
+            try:
+                s_as_int = int(s)
+            except ValueError:
+                return s
+            return s_as_int
+
+        def str2type(s):
+            # First try if str is bool
+            s = str2bool(s)
+            # If not bool, try with int
+            if isinstance(s, str):
+                s = str2int(s)
+            return s
+
         def malformed(name, s, base=False):
             pre = ""
             if base:
@@ -336,15 +351,16 @@ class SnapReviewDeclaration(SnapReview):
                                     found_iface_attr = True
 
                                 # snap declarations from the store express
-                                # bools as strings
+                                # bools and ints as strings
+                                # See LP: #1947612.
                                 if isinstance(cstr[cstr_key][attrib], str):
-                                    cstr[cstr_key][attrib] = str2bool(
+                                    cstr[cstr_key][attrib] = str2type(
                                         cstr[cstr_key][attrib]
                                     )
                                     if has_alternates:
                                         decl[key][iface][constraint][index][cstr_key][
                                             attrib
-                                        ] = str2bool(
+                                        ] = str2type(
                                             decl[key][iface][constraint][index][
                                                 cstr_key
                                             ][attrib]
@@ -358,10 +374,13 @@ class SnapReviewDeclaration(SnapReview):
                                 # sr_common.py is a list and the decl specifies
                                 # a string (since in the decl one can specify a
                                 # string as a match/regex for something in the
-                                # list)
-                                if not isinstance(
-                                    attr_type, type(self.interfaces_attribs[iface][tmp])
-                                ) and not (
+                                # list). Since bool is a subclass of int,
+                                # isinstance(attr_type, int) is true for booleans so
+                                # checking the exact types to avoid accepting booleans
+                                # as valid attr types for ints
+                                if type(attr_type) not in [
+                                    type(self.interfaces_attribs[iface][tmp])
+                                ] and not (
                                     isinstance(
                                         self.interfaces_attribs[iface][tmp], list
                                     )
