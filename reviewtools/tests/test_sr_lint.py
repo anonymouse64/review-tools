@@ -1008,9 +1008,18 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {"info": None, "warn": 0, "error": 1}
         self.check_results(r, expected_counts)
 
-    def test_check_link_invalid_content(self):
+    def test_check_link_invalid_content_1(self):
         """Test check_link_invalid_email"""
         self.set_test_snap_yaml("links", {"contact": 123})
+        c = SnapReviewLint(self.test_name)
+        c.check_links()
+        r = c.review_report
+        expected_counts = {"info": None, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_link_invalid_content_2(self):
+        """Test check_link_invalid_email"""
+        self.set_test_snap_yaml("links", {"website": [456, 789]})
         c = SnapReviewLint(self.test_name)
         c.check_links()
         r = c.review_report
