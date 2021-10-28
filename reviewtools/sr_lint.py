@@ -355,6 +355,16 @@ class SnapReviewLint(SnapReview):
                 self._add_result(t, n, s)
                 return
 
+            content = self.snap_yaml["links"][val]
+            if not isinstance(content, str) and not (
+                isinstance(content, list)
+                and all(isinstance(item, str) for item in content)
+            ):
+                t = "error"
+                s = "'invalid value for %s in snap.yaml" % val
+                self._add_result(t, n, s)
+                return
+
     def check_unknown_entries(self):
         """Check for any unknown fields"""
         t = "info"

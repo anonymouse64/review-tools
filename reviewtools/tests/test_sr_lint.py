@@ -990,7 +990,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
             "source-code": "https://github.com/snapcore/snapcraft",
             "contact": ["https://forum.snapcraft.io", "snapcraft@forum.snapcraft.io"],
             "donation": "http://donate.me",
-            "issues": "https://bugs.launchpad.net/snapcraft/+filebug"
+            "issues": "https://bugs.launchpad.net/snapcraft/+filebug",
         }
         self.set_test_snap_yaml("links", links)
         c = SnapReviewLint(self.test_name)
@@ -1002,6 +1002,15 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
     def test_check_link_invalid_field(self):
         """Test check_link_invalid_field"""
         self.set_test_snap_yaml("links", {"invalid_field": ""})
+        c = SnapReviewLint(self.test_name)
+        c.check_links()
+        r = c.review_report
+        expected_counts = {"info": None, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_link_invalid_content(self):
+        """Test check_link_invalid_email"""
+        self.set_test_snap_yaml("links", {"contact": 123})
         c = SnapReviewLint(self.test_name)
         c.check_links()
         r = c.review_report
