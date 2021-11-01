@@ -35,7 +35,7 @@ TARBALL=$(readlink -f "$1")
 
 # TODO: share common snippets of this script with manual-lzo.sh ?
 function is_core_snap {
-    if [ "$1" = "core" ] || [ "$1" = "core18" ] || [ "$1" = "core20" ] ; then
+    if [ "$1" = "core" ] || [ "$1" = "core18" ] || [ "$1" = "core20" ]  || [ "$1" = "core22" ]; then
         return 0
     else
         return 1
