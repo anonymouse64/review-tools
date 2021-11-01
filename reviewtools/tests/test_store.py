@@ -1997,6 +1997,15 @@ class TestStore(TestCase):
         res = store.get_ubuntu_release_from_manifest(m)
         self.assertEqual(res, "focal")
 
+    def test_check_get_ubuntu_release_from_manifest_os_release_neon_bionic_core22(self):
+        """Test get_ubuntu_release_from_manifest() - neon/18.04 with base: core22"""
+        m = copy.deepcopy(self.manifest_basic)
+        m["base"] = "core22"
+        m["snapcraft-os-release-id"] = "neon"
+        m["snapcraft-os-release-version-id"] = "18.04"
+        res = store.get_ubuntu_release_from_manifest(m)
+        self.assertEqual(res, "jammy")
+
     def test_check_get_ubuntu_release_from_manifest_os_release_nonexist_os_and_ver(
         self,
     ):
