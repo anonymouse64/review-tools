@@ -613,7 +613,8 @@ class SnapReview(Review):
     def _verify_no_duplicated_yaml_keys(self, raw_snap_yaml):
         """Verify there are no duplicated yaml map keys"""
         import ruamel.yaml
-        yaml = ruamel.yaml.YAML(typ='safe')
+
+        yaml = ruamel.yaml.YAML(typ="safe")
         yaml.allow_duplicate_keys = False
         try:
             yaml.load(raw_snap_yaml)

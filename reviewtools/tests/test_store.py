@@ -767,6 +767,7 @@ class TestStore(TestCase):
             "apt": "2.0.2ubuntu0.2",
             "bsdutils": "1:2.34-0.1ubuntu9.1",
             "libxcursor1": "1.0.0-2ubuntu1",
+            "libcurl4": "7.74.0-1ubuntu2.1",
         }
         for pkg_name in expected_stage_packages:
             self.assertIn(pkg_name, res["staged"])

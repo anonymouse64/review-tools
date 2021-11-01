@@ -534,18 +534,17 @@ class SnapReviewDeclaration(SnapReview):
                             "on-classic",
                             "on-store",
                             "on-brand",
+                            "plug-names",
+                            "slot-names",
                         ]
                         if key == "plugs":
                             allowed.append("slot-publisher-id")
                             allowed.append("slot-snap-id")
                             allowed.append("slot-snap-type")
-                            allowed.append("plug-names")
                         elif key == "slots":
-                            allowed.append("plug-names")
                             allowed.append("plug-publisher-id")
                             allowed.append("plug-snap-id")
                             allowed.append("plug-snap-type")
-                            allowed.append("slot-names")
 
                         # These may be slot or plug, but not installation
                         # or deny-*. Ie, only allow-(auto-)connection

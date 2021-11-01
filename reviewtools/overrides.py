@@ -34,6 +34,7 @@ redflagged_snap_types_overrides = {
         "gke-kernel",
         "hummingboard-kernel",
         "intel-kernel",
+        "iot-kernel",
         "joule-drone-kernel",
         "joule-linux",
         "joule-linux-lool",
@@ -863,8 +864,11 @@ func_execstack_overrides = [
     "checkbox-snappy",
     "checkbox-tampere",
     "checkbox-tillamook",
-    "store-checker",
     "enemy-territory",
+    "microsoft-edge",
+    "microsoft-edge-beta",
+    "microsoft-edge-dev",
+    "store-checker",
 ]
 
 # Some files from staged packages are known to have execstack, so don't flag
@@ -1054,6 +1058,7 @@ update_publisher_overrides = {
         "edgex-device-modbus": canonical_edgex,
         "edgex-device-mqtt": canonical_edgex,
         "edgex-device-rest": canonical_edgex,
+        "edgex-ui": canonical_edgex,
         "edgex-ui-go": canonical_edgex,
         "edgexfoundry": canonical_edgex,
         "eog": canonical_desktop,
@@ -1085,6 +1090,7 @@ update_publisher_overrides = {
         "gtk2-common-themes": canonical_desktop,
         "hello": canonical_snapcraft,
         "intel-kernel": canonical_kernel,
+        "iot-kernel": canonical_kernel,
         "joule-expansion": canonical_k8s,
         "juju": canonical_juju,
         "jq": canonical_snapd,
@@ -1291,6 +1297,9 @@ update_binaries_ignore = ["linux-headers-generic", "linux-libc-dev"]
 # the symlink (only the target).
 common_external_symlink_override = {
     "chromium": ["usr/bin/xdg-open"],
+    "microsoft-edge": ["usr/bin/xdg-open"],
+    "microsoft-edge-beta": ["usr/bin/xdg-open"],
+    "microsoft-edge-dev": ["usr/bin/xdg-open"],
     "skype": ["usr/bin/xdg-open"],
     "snapd": ["usr/lib/snapd/snap-device-helper"],
 }

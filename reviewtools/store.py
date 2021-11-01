@@ -471,6 +471,13 @@ def get_packages_from_rock_manifest_section(d, manifest_section, package_type):
             binary_pkg = pkg_info[0].split("=")
             if len(binary_pkg) == 2:
                 binary_pkg_name = binary_pkg[0]
+                # Since dpkg 1.16.2, the binary name could include and arch qualifier: e.g liblz4-1:amd64
+                # For now we assume that if the colon is present, we are in a situation where the binary name is
+                # including the arch. We could assert valid architectures as well but that means this code should be
+                # updated as new arch are supported or even existing ones are removed.
+                arch_qualifier_parts = binary_pkg_name.split(":")
+                if len(arch_qualifier_parts) == 2:
+                    binary_pkg_name = arch_qualifier_parts[0]
                 ver = binary_pkg[1]
                 if binary_pkg_name in update_binaries_ignore:
                     debug("Skipping ignored binary: '%s'" % binary_pkg_name)
@@ -544,7 +551,6 @@ def get_secnots_for_manifest(
         raise ValueError("'%s' not found in security notification database" % rel)
 
     pending_secnots = {}
-
     if stage_and_build_pkgs is None:
         debug("no stage-packages found")
         return pending_secnots

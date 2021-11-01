@@ -136,6 +136,7 @@ OS_RELEASE_MAP = {
         "20.10": "groovy",
         "21.04": "hirsute",
         "21.10": "impish",
+        "22.04": "jammy",
     }
 }
 

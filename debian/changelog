@@ -1,3 +1,41 @@
+review-tools (0.48+20211101-1) UNRELEASED; urgency=medium
+
+  [ Emilia Torino ]
+  * overrides.py: add edge snaps to func_execstack_overrides and
+    common_external_symlink_override
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Mon, 01 Nov 2021 10:23:31 -0300
+
+review-tools (0.48+20211028-1) RELEASED; urgency=medium
+
+  [ Steve Beattie ]
+  * common.py: add jammy to OS_RELEASE_MAP
+
+  [ Wen-chien Jesse Sung ]
+  * overrides.py: add iot-kernel to redflagged_snap_types_overrides and
+    update_publisher_overrides
+
+ -- Alex Murray <alex.murray@canonical.com>  Fri, 29 Oct 2021 00:39:57 +1030
+
+review-tools (0.48+20211014-1) RELEASED; urgency=medium
+
+  [ Samuele Pedroni ]
+  * sr_declaration.py: connection rules support both plug/slot-names on plugs
+    or slots side
+
+  [ Emilia Torino ]
+  * store.py: properly parsing arch specifier if present in rock dpkg.list
+
+  [ Alex Murray ]
+  * Makefile: add python3-ruamel.yaml as a dependency
+  * snapcraft.yaml: add python3-ruamel.yaml to build/stage-packages
+  * overrides.py: add edgex-ui to publisher overrides
+
+  [ Michael Vogt ]
+  * sr-common: reject snaps that have duplicated yaml keys
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Thu, 14 Oct 2021 15:09:10 -0300
+
 review-tools (0.48+20210906-1) RELEASED; urgency=medium
 
   [ Haw Loeung ]
