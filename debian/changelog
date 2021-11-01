@@ -1,3 +1,11 @@
+review-tools (0.48+20211101-1) UNRELEASED; urgency=medium
+
+  [ Emilia Torino ]
+  * overrides.py: add edge snaps to func_execstack_overrides and
+    common_external_symlink_override
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Mon, 01 Nov 2021 10:23:31 -0300
+
 review-tools (0.48+20211028-1) RELEASED; urgency=medium
 
   [ Steve Beattie ]
