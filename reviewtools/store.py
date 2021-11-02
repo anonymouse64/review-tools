@@ -43,6 +43,7 @@ snap_to_release = {
     "core16": "xenial",
     "core18": "bionic",
     "core20": "focal",
+    "core22": "jammy",
 }
 
 
