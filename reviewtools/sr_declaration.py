@@ -237,7 +237,7 @@ class SnapReviewDeclaration(SnapReview):
                 return s
             return s_as_int
 
-        def str2type(s):
+        def str2typedval(s):
             # First try if str is bool
             s = str2bool(s)
             # If not bool, try with int
@@ -354,13 +354,13 @@ class SnapReviewDeclaration(SnapReview):
                                 # bools and ints as strings
                                 # See LP: #1947612.
                                 if isinstance(cstr[cstr_key][attrib], str):
-                                    cstr[cstr_key][attrib] = str2type(
+                                    cstr[cstr_key][attrib] = str2typedval(
                                         cstr[cstr_key][attrib]
                                     )
                                     if has_alternates:
                                         decl[key][iface][constraint][index][cstr_key][
                                             attrib
-                                        ] = str2type(
+                                        ] = str2typedval(
                                             decl[key][iface][constraint][index][
                                                 cstr_key
                                             ][attrib]
