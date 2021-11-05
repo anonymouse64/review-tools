@@ -1,3 +1,10 @@
+review-tools (0.48+20211105-1) RELEASED; urgency=medium
+
+  * sr_declaration.py: support ints as strings on iface attrs while
+    reviewing snap store declarations (LP: #1947612)
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Fri, 05 Nov 2021 15:24:02 -0300
+
 review-tools (0.48+20211101-1) RELEASED; urgency=medium
 
   [ Emilia Torino ]
