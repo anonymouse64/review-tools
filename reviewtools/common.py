@@ -581,11 +581,11 @@ def jsonmsg(out):
     msg(json.dumps(out, sort_keys=True, indent=2, separators=(",", ": ")))
 
 
-def cmd(command):
+def cmd(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT):
     """Try to execute the given command."""
     debug(" ".join(command))
     try:
-        sp = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        sp = subprocess.Popen(command, stdout=stdout, stderr=stderr)
     except OSError as ex:
         return [127, str(ex)]
 
