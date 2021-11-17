@@ -21,9 +21,8 @@ import reviewtools.debversion as debversion
 
 tracked_releases = ["xenial", "bionic", "focal"]
 # This is required due to rocks built from non-lts releases.
-# All rocks in https://hub.docker.com/u/ubuntu are either built based on
-# Ubuntu 20.04 LTS or Ubuntu 21.04
-non_lts_tracked_releases = ["hirsute"]
+# See rocks at https://hub.docker.com/u/ubuntu
+non_lts_tracked_releases = ["hirsute", "impish"]
 epoch_pat = re.compile(r"^[0-9]+:")
 
 
