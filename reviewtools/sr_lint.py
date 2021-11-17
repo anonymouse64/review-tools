@@ -348,22 +348,75 @@ class SnapReviewLint(SnapReview):
         if "links" not in self.snap_yaml:
             return
 
-        for val in self.snap_yaml["links"]:
-            if val not in LINK_TYPES:
+        # Check links is partially based on:
+        # https://github.com/snapcore/snapd/blob/master/snap/validate.go#L1132
+
+        valid_link = re.compile(r"^[a-zA-Z](?:-?[a-zA-Z0-9])*$")
+        valid_url = re.compile(
+            r"^http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+$"
+        )
+        valid_email = re.compile(
+            r"^(mailto:|)[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$"
+        )
+
+        for linkskey in self.snap_yaml["links"]:
+            if linkskey.strip() == "":
                 t = "error"
-                s = "'unknown field for links in snap.yaml: %s" % val
+                s = "links key cannot be empty"
                 self._add_result(t, n, s)
                 return
 
-            content = self.snap_yaml["links"][val]
-            if not isinstance(content, str) and not (
-                isinstance(content, list)
-                and all(isinstance(item, str) for item in content)
-            ):
+            if linkskey not in LINK_TYPES:
                 t = "error"
-                s = "'invalid value for %s in snap.yaml" % val
+                s = "unknown field for links: %s" % linkskey
                 self._add_result(t, n, s)
                 return
+
+            if not valid_link.match(linkskey):
+                t = "error"
+                s = "links key is invalid: %s" % linkskey
+                self._add_result(t, n, s)
+                return
+
+            linksvalues = self.snap_yaml["links"][linkskey]
+
+            if not isinstance(linksvalues, list):
+                t = "error"
+                s = "%s is not a list of strings" % linkskey
+                self._add_result(t, n, s)
+                return
+
+            if len(linksvalues) == 0:
+                t = "error"
+                s = "%s links cannot be specified and empty" % linkskey
+                self._add_result(t, n, s)
+                return
+
+            for link in linksvalues:
+                if link == "":
+                    t = "error"
+                    s = "empty %s link" % linkskey
+                    self._add_result(t, n, s)
+                    return
+
+                if not isinstance(link, str):
+                    t = "error"
+                    s = "%s is not a string" % link
+                    self._add_result(t, n, s)
+                    return
+
+                if not (
+                    linkskey == "contact"
+                    and valid_email.match(link)
+                    or valid_url.match(link)
+                ):
+                    t = "error"
+                    s = (
+                        "%s link must have one of http|https schemes or it must be an email address: %s"
+                        % (linkskey, link)
+                    )
+                    self._add_result(t, n, s)
+                    return
 
     def check_unknown_entries(self):
         """Check for any unknown fields"""
