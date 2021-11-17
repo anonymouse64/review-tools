@@ -233,7 +233,7 @@ get-base-declaration', except for the following:
   line from the end of 'snap debug get-base-declaration'
 
 In general can do on a system with the current stable release of snapd:
-* sudo snap debug get-base-declaration > /path/bd
+* sudo snap debug base-declaration > /path/bd
 * format /path/bd based on the above
 * cp /path/bd reviewtools/data/snapd-base-declaration.yaml
 * review the change with 'git diff'

@@ -58,6 +58,9 @@
   snap-refresh-control:
     allow-installation: false
     deny-auto-connection: true
+  snap-themes-control:
+    allow-installation: false
+    deny-auto-connection: true
   snapd-control:
     allow-installation: false
     deny-auto-connection: true
@@ -749,6 +752,11 @@
         - core
         - gadget
     deny-auto-connection: true
+  qualcomm-ipc-router:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   raw-input:
     allow-installation:
       slot-snap-type:
@@ -797,6 +805,11 @@
         - core
     deny-auto-connection: true
   snap-refresh-control:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
+  snap-themes-control:
     allow-installation:
       slot-snap-type:
         - core
