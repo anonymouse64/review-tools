@@ -94,7 +94,10 @@ def main():
         # this carries through to available
         if had_debug is not None:
             os.unsetenv('SNAP_DEBUG')
-        rc, out = cmd([available] + cmd_args)
+        # don't include stderr in the output since we try and parse this
+        # output as JSON below and hence including errors from stderr in
+        # the output will make the JSON malformed
+        rc, out = cmd([available] + cmd_args, stderr=None)
         if had_debug is not None:
             os.environ['SNAP_DEBUG'] = had_debug
 
