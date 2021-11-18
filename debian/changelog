@@ -1,3 +1,16 @@
+review-tools (0.48+20211118-1) UNRELEASED; urgency=medium
+
+  [ Emilia Torino ]
+  * usn.py: add impish to non_lts_tracked_releases
+
+  [ Alex Murray ]
+  * data/snapd-base-declaration.yaml: update base-declaration from snapd
+    2.53.2
+  * bin/snap-check-notices: do not include stderr in cmd output
+    (LP: #1950476)
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Thu, 18 Nov 2021 09:15:46 -0300
+
 review-tools (0.48+20211105-1) RELEASED; urgency=medium
 
   [ Emilia Torino ]
