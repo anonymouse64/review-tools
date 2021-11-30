@@ -2,6 +2,7 @@ review-tools (0.48+20211118-1) UNRELEASED; urgency=medium
 
   [ Emilia Torino ]
   * usn.py: add impish to non_lts_tracked_releases
+  * overrides.py: add public snaps
 
   [ Alex Murray ]
   * data/snapd-base-declaration.yaml: update base-declaration from snapd
