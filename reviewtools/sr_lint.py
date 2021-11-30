@@ -20,7 +20,6 @@ from reviewtools.common import (
     find_external_symlinks,
     STORE_PKGNAME_SNAPV2_MAXLEN,
     STORE_PKGNAME_SNAPV2_MINLEN,
-    LINK_TYPES,
 )
 from reviewtools.overrides import (
     redflagged_snap_types_overrides,
@@ -363,12 +362,6 @@ class SnapReviewLint(SnapReview):
             if linkskey.strip() == "":
                 t = "error"
                 s = "links key cannot be empty"
-                self._add_result(t, n, s)
-                return
-
-            if linkskey not in LINK_TYPES:
-                t = "error"
-                s = "unknown field for links: %s" % linkskey
                 self._add_result(t, n, s)
                 return
 
