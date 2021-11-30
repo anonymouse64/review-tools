@@ -408,7 +408,7 @@ class SnapReviewLint(SnapReview):
                         "%s link must have one of http|https schemes or it must be an email address: %s"
                         % (linkskey, link)
                     )
-                    self._add_result(t, n, s)
+                    self._add_result(t, n, s, manual_review=True)
                     return
 
     def check_unknown_entries(self):
