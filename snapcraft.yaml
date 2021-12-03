@@ -7,9 +7,6 @@ description: |
   and can be used to verify your snap before upload.
 confinement: strict
 base: core18
-website: https://launchpad.net/review-tools
-source-code: https://git.launchpad.net/review-tools
-issues: https://bugs.launchpad.net/review-tools
 
 environment:
   LANG: C.UTF-8
