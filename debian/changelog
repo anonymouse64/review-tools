@@ -1,4 +1,8 @@
-review-tools (0.48+20211118-1) UNRELEASED; urgency=medium
+review-tools (0.48+20211214-1) RELEASED; urgency=medium
+
+  [ Paulo Flabiano Smorigo ]
+  * sr_lint.py: do not check link types. Check links according to snapd
+    validations.
 
   [ Emilia Torino ]
   * usn.py: add impish to non_lts_tracked_releases
@@ -10,7 +14,7 @@ review-tools (0.48+20211118-1) UNRELEASED; urgency=medium
   * bin/snap-check-notices: do not include stderr in cmd output
     (LP: #1950476)
 
- -- Emilia Torino <emilia.torino@canonical.com>  Thu, 18 Nov 2021 09:15:46 -0300
+ -- Emilia Torino <emilia.torino@canonical.com>  Tue, 14 Dec 2021 16:00:01 -0300
 
 review-tools (0.48+20211105-1) RELEASED; urgency=medium
 
