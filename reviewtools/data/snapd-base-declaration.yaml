@@ -34,6 +34,9 @@
   kernel-module-control:
     allow-installation: false
     deny-auto-connection: true
+  kernel-module-load:
+    allow-installation: false
+    deny-auto-connection: true
   kubernetes-support:
     allow-installation: false
     deny-auto-connection: true
@@ -41,6 +44,9 @@
     allow-installation: false
     deny-auto-connection: true
   microstack-support:
+    allow-installation: false
+    deny-auto-connection: true
+  mount-control:
     allow-installation: false
     deny-auto-connection: true
   multipass-support:
@@ -55,6 +61,16 @@
   sd-control:
     allow-installation: false
     deny-auto-connection: true
+  shared-memory:
+    allow-installation: true
+    allow-connection:
+      slot-attributes:
+        shared-memory: $PLUG(shared-memory)
+    allow-auto-connection:
+      slot-publisher-id:
+        - $PLUG_PUBLISHER_ID
+      slot-attributes:
+        shared-memory: $PLUG(shared-memory)
   snap-refresh-control:
     allow-installation: false
     deny-auto-connection: true
@@ -477,6 +493,11 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  kernel-module-load:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-connection: true
   kernel-module-observe:
     allow-installation:
       slot-snap-type:
@@ -574,6 +595,11 @@
     deny-auto-connection: true
     deny-connection:
       on-classic: false
+  mount-control:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-connection: true
   mount-observe:
     allow-installation:
       slot-snap-type:
@@ -779,6 +805,11 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  scsi-generic:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   screen-inhibit-control:
     allow-installation:
       slot-snap-type:
@@ -798,6 +829,10 @@
       slot-snap-type:
         - core
         - gadget
+    deny-auto-connection: true
+  shared-memory:
+    allow-installation: false
+    deny-connection: true
     deny-auto-connection: true
   shutdown:
     allow-installation:
