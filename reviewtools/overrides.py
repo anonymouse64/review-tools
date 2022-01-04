@@ -1183,6 +1183,7 @@ update_publisher_overrides = {
         "tpm2": canonical_enablement,
         "ubuntu-desktop-installer": canonical_desktop,
         "ubuntu-frame": canonical_mir,
+        "ubuntu-frame-osk": canonical_mir,
         "ubuntu-image": canonical_foundations,
         "udisks2": canonical_enablement,
         "uefi-fw-tools": canonical_enablement,
