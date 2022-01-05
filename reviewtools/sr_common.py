@@ -267,6 +267,7 @@ class SnapReview(Review):
             "usb-product/slots": 0,
             "usb-interface-number/slots": 0,
         },
+        "shared-memory": {"shared-memory/slots": ""},
         "snapd-control": {"refresh-schedule/plugs": ""},
         "spi": {"path/slots": ""},
         "system-files": {"read/plugs": [], "write/plugs": []},
