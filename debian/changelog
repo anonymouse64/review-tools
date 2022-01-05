@@ -1,3 +1,15 @@
+review-tools (0.48+20220105-1) RELEASED; urgency=medium
+
+  [ Alex Murray ]
+  * sr_common.py: update for shared-memory slot attribute
+
+  [ Emilia Torino ]
+  * data/snapd-base-declaration.yaml: update reviewtools snapd
+    base declaration
+  * overrides.py: add/update for public snaps
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Wed, 05 Jan 2022 10:11:08 -0300
+
 review-tools (0.48+20211214-1) RELEASED; urgency=medium
 
   [ Paulo Flabiano Smorigo ]
