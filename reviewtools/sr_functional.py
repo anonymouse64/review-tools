@@ -22,6 +22,7 @@ from reviewtools.overrides import (
     func_execstack_skipped_pats,
     func_base_mountpoints_overrides,
     func_base_state_files_overrides,
+    func_base_state_files_snaps_overrides,
     redflagged_snap_types_overrides,
 )
 import copy
@@ -353,7 +354,7 @@ class SnapReviewFunctional(SnapReview):
     def check_state_base_files(self):
         """Verify base snap has the expected files"""
         # Don't check state if not a base snap or the "core" os snap (which
-        # historically functions as a base). Also no need to to check if
+        # historically functions as a base). Also no need to check if
         # --state-input/--state-ouput not specified (note, self.prev_state is
         # empty (ie, not None) when only --state-output is specified)
         if (
@@ -378,15 +379,20 @@ class SnapReviewFunctional(SnapReview):
         # Skip checking base snaps that we haven't yet allowed in the store. In
         # this manner, they can keep changing as needed. Allow the historic
         # core os snap.
+        # Also skip checking snaps that for certain reason we want to temporarily
+        # disable the checks (e.g. snaps that are still in development process)
         if (
             self.snap_yaml["name"] not in redflagged_snap_types_overrides["base"]
             and self.snap_yaml["name"] != "core"
-        ):
+        ) or self.snap_yaml["name"] in func_base_state_files_snaps_overrides:
             if (
                 "SNAP_FORCE_STATE_CHECK" not in os.environ
                 or os.environ["SNAP_FORCE_STATE_CHECK"] != "1"
             ):
-                s = "OK (skipped, snap type not overridden for this snap)"
+                if self.snap_yaml["name"] in func_base_state_files_snaps_overrides:
+                    s = "OK (skipped, not checking files for this snap)"
+                else:
+                    s = "OK (skipped, snap type not overridden for this snap)"
                 self._add_result(t, n, s)
                 # preserve previous state if not an approved snap
                 if (

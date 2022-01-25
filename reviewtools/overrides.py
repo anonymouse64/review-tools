@@ -914,6 +914,9 @@ func_base_state_files_overrides = {
     ]
 }
 
+# Allow skipping checks for some snaps
+func_base_state_files_snaps_overrides = ["core22"]
+
 # By default we don't regulate which snaps specify which base snaps, but some
 # base snaps are highly specialized, so we limit what can use them. Base snaps
 # whose name is not a key in this dict don't flag for review. For base snaps

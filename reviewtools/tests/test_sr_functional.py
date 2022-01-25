@@ -982,6 +982,50 @@ drwxr-xr-x 0/0                73 2020-03-23 14:23 squashfs-root/bin
         expected["warn"][name] = {"text": "missing files since last review: ./bin/ls"}
         self.check_results(report, expected=expected)
 
+    def test_check_state_base_files_input_output_missing_snap_in_override(self):
+        """Test check_state_base_files() - --state-input/--state-output
+           (missing file)
+        """
+        exp_state, exp_override, exp_override_state = self._set_default_state()
+
+        prev_override = copy.deepcopy(exp_override)
+        prev_override["./bin/ls"] = {
+            "filetype": "-",
+            "mode": "rwxr-xr-x",
+            "owner": "0/0",
+        }
+        self.set_test_snap_yaml("type", "base")
+        overrides = {
+            "state_input": {
+                "format": STATE_FORMAT_VERSION,
+                self.state_files_key: prev_override,
+            },
+            "state_output": {"format": STATE_FORMAT_VERSION},
+        }
+
+        # update overrides for our snap
+        from reviewtools.overrides import func_base_state_files_snaps_overrides
+
+        func_base_state_files_snaps_overrides.append("foo")
+
+        c = SnapReviewFunctional(self.test_name, overrides=overrides)
+        c.check_state_base_files()
+        report = c.review_report
+
+        # restore override
+        func_base_state_files_snaps_overrides.remove("foo")
+        expected_counts = {"info": 1, "warn": 0, "error": 0}
+        self.check_results(report, expected_counts)
+        expected = dict()
+        expected["error"] = dict()
+        expected["warn"] = dict()
+        expected["info"] = dict()
+        name = "functional-snap-v2:state_base_files"
+        expected["info"][name] = {
+            "text": "OK (skipped, not checking files for this snap)"
+        }
+        self.check_results(report, expected=expected)
+
     def test_check_state_base_files_input_output_different(self):
         """Test check_state_base_files() - --state-input/--state-output
            (different file)
