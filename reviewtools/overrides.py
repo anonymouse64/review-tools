@@ -982,6 +982,8 @@ canonical_juju = ["ian.booth@canonical.com", "john.meinel@canonical.com"]
 
 canonical_k8s = ["chris.sanders@canonical.com", "tim.van.steenburgh@canonical.com"]
 
+canonical_livepatch = ["benjamin.romer@canonical.com", "marcelo.cerri@canonical.com"]
+
 canonical_lp = ["william.grant@canonical.com", "colin.watson@canonical.com"]
 
 canonical_lxd = ["stephane.graber@canonical.com", "free.ekanayaka@canonical.com"]
@@ -1029,6 +1031,7 @@ update_publisher_overrides = {
         "bcc": ["colin.king@canonical.com"] + canonical_kernel,
         "bluez": canonical_enablement,
         "candid": canonical_commercial_systems,
+        "canonical-livepatch": canonical_livepatch,
         "caracalla-kernel": canonical_hwe,
         "cascade-kernel": canonical_hwe,
         "charmcraft": canonical_charmcraft,
