@@ -58,6 +58,9 @@
   personal-files:
     allow-installation: false
     deny-auto-connection: true
+  polkit:
+    allow-installation: false
+    deny-auto-connection: true
   sd-control:
     allow-installation: false
     deny-auto-connection: true
@@ -91,6 +94,9 @@
     deny-auto-connection: true
   unity8:
     allow-installation: false
+  xilinx-dma:
+    allow-installation: false
+    deny-auto-connection: true
  slots:
   account-control:
     allow-installation:
@@ -744,6 +750,11 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
+  polkit:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
   power-control:
     allow-installation:
       slot-snap-type:
@@ -805,16 +816,16 @@
       slot-snap-type:
         - core
     deny-auto-connection: true
-  scsi-generic:
-    allow-installation:
-      slot-snap-type:
-        - core
-    deny-auto-connection: true
   screen-inhibit-control:
     allow-installation:
       slot-snap-type:
         - core
   screencast-legacy:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
+  scsi-generic:
     allow-installation:
       slot-snap-type:
         - core
@@ -1022,3 +1033,8 @@
       on-classic: false
     deny-auto-connection:
       on-classic: false
+  xilinx-dma:
+    allow-installation:
+      slot-snap-type:
+        - core
+    deny-auto-connection: true
