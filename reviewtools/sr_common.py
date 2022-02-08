@@ -234,6 +234,7 @@ class SnapReview(Review):
             "content/plugs": "",
             "content/slots": "",
         },
+        "cups": {"cups-socket-directory/slots": ""},
         "dbus": {
             "name/slots": "",
             "bus/slots": "",
@@ -290,6 +291,7 @@ class SnapReview(Review):
             ],
             "plugs": ["target"],
         },
+        "cups": {"slots": ["cups-socket-directory"]},
         "dbus": {"slots": ["name/bus"], "plugs": ["name/bus"]},
         "gpio": {"slots": ["number"]},
         "hidraw": {
