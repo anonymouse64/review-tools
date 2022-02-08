@@ -2998,6 +2998,17 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         expected_counts = {"info": None, "warn": 0, "error": 1}
         self.check_results(r, expected_counts)
 
+    def test_check_plugs_mutually_exclusive_interfaces(self):
+        """Test check_plugs() - mutually exclusive interfaces"""
+        plugs = {"cups-foo": {"interface": "cups"},
+                 "cups-control": {}}
+        self.set_test_snap_yaml("plugs", plugs)
+        c = SnapReviewLint(self.test_name)
+        c.check_plugs()
+        r = c.review_report
+        expected_counts = {"info": None, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
     def test_check_plugs_unknown_attrib(self):
         """Test check_plugs() - unknown attrib"""
         plugs = {
@@ -3178,6 +3189,18 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
         """Test check_apps_plugs() - unknown"""
         plugs = self._create_top_plugs()
         apps_plugs = {"bar": {"plugs": ["nonexistent"]}}
+        self.set_test_snap_yaml("plugs", plugs)
+        self.set_test_snap_yaml("apps", apps_plugs)
+        c = SnapReviewLint(self.test_name)
+        c.check_apps_plugs()
+        r = c.review_report
+        expected_counts = {"info": None, "warn": 0, "error": 1}
+        self.check_results(r, expected_counts)
+
+    def test_check_apps_plugs_mutually_exclusive(self):
+        """Test check_apps_plugs() - mutually exclusive"""
+        plugs = self._create_top_plugs()
+        apps_plugs = {"bar": {"plugs": ["cups-control", "cups"]}}
         self.set_test_snap_yaml("plugs", plugs)
         self.set_test_snap_yaml("apps", apps_plugs)
         c = SnapReviewLint(self.test_name)

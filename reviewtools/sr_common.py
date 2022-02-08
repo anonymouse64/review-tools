@@ -334,6 +334,11 @@ class SnapReview(Review):
         "system-files",
     ]
 
+    interfaces_mutually_exclusive = {
+        "plugs": {"cups": ["cups-control"]},
+        "slots": {},
+    }
+
     # most are from cmd/snap-confine/mount-support.c:sc_populate_mount_ns()
     # Must be absolute paths
     base_required_dirs = [

@@ -1152,6 +1152,9 @@ class SnapReviewLint(SnapReview):
                     self._add_result(t, n, s)
 
     def _verify_interfaces(self, iface_type):
+        # collect the list of interfaces by iface_type
+        ifaces = list()
+
         for iface in self.snap_yaml[iface_type]:
             # If the 'interface' name is the same as the 'iface' name, then
             # 'interface' is optional since the interface name and the iface
@@ -1171,6 +1174,7 @@ class SnapReviewLint(SnapReview):
                 #     interface: <interface>
                 interface = spec["interface"]
 
+            ifaces.append(interface)
             # Validate indirect (specified via alias) interfaces:
             if interface != iface:
                 key = "interface"
@@ -1281,6 +1285,21 @@ class SnapReviewLint(SnapReview):
                     )
                 self._add_result(t, n, s)
 
+        mutex_ifaces = self.interfaces_mutually_exclusive[iface_type]
+        for iface in [iface for iface in mutex_ifaces if iface in ifaces]:
+            for _iface in mutex_ifaces[iface]:
+                if _iface in ifaces:
+                    t = "error"
+                    n = self._get_check_name(
+                        "%s_mutually_exclusive" % iface_type, app=iface,
+                    )
+                    s = (
+                        "mutually exclusive %s " % iface_type
+                        + "'%s' and " % iface
+                        + " '%s'" % _iface
+                    )
+                    self._add_result(t, n, s)
+
     def check_plugs(self):
         """Check plugs"""
         iface_type = "plugs"
@@ -1316,6 +1335,7 @@ class SnapReviewLint(SnapReview):
         # either be a known interface (when the interface name reference and
         # the interface is the same) or can reference a name in the snap's
         # toplevel 'key' (plugs/slots) mapping
+        ifaces = list()
         for ref in self.snap_yaml[topkey][val][key]:
             t = "info"
             n = self._get_check_name(
@@ -1333,6 +1353,29 @@ class SnapReviewLint(SnapReview):
             self._add_result(t, n, s)
             if t == "error":
                 continue
+
+            iface = ref
+            if iface not in self.interfaces:
+                iface = self.snap_yaml[key][ref]
+                if isinstance(iface, dict):
+                    iface = iface["interface"]
+                assert(isinstance(iface, str))
+            ifaces.append(iface)
+
+        mutex_ifaces = self.interfaces_mutually_exclusive[key]
+        for iface in [iface for iface in mutex_ifaces if iface in ifaces]:
+            for _iface in mutex_ifaces[iface]:
+                if _iface in ifaces:
+                    t = "error"
+                    n = self._get_check_name(
+                        "%s_mutually_exclusive" % key, app=iface,
+                    )
+                    s = (
+                        "mutually exclusive %s " % key
+                        + "'%s' and " % iface
+                        + " '%s'" % _iface
+                    )
+                    self._add_result(t, n, s)
 
     def check_apps_plugs(self):
         """Check apps plugs"""
