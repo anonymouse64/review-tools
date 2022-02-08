@@ -835,16 +835,19 @@ def unsquashfs_lln_parse(lln_out):
     entries = []
 
     count = 0
-    in_header = True
+    header_re = re.compile(
+        "^(Parallel unsquashfs: Using .* processor.*|[0-9]+ inodes .* to write)$"
+    )
+    seen_header = False
     errors = []
     for line in lln_out.splitlines():
         count += 1
-        if in_header:
-            if len(line) < 1:
-                in_header = False
-            else:
+        if not seen_header:
+            if len(line) < 1 or header_re.match(line):
                 hdr.append(line)
-            continue
+                continue
+            else:
+                seen_header = True
 
         item = None
         try:
@@ -853,9 +856,6 @@ def unsquashfs_lln_parse(lln_out):
         except ReviewException as e:
             errors.append(str(e))
             entries.append((line, None))
-
-    if count < 4:
-        raise ReviewException("unsquashfs -lln ouput too short")
 
     if len(errors) > 0:
         raise ReviewException(
