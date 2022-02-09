@@ -21,6 +21,7 @@ import os
 import shutil
 import tempfile
 
+from datetime import datetime, timedelta
 from reviewtools.common import cleanup_unpack
 from reviewtools.common import check_results as common_check_results
 from reviewtools.sr_functional import SnapReviewFunctional
@@ -1005,26 +1006,58 @@ drwxr-xr-x 0/0                73 2020-03-23 14:23 squashfs-root/bin
 
         # update overrides for our snap
         from reviewtools.overrides import func_base_state_files_snaps_overrides
+        from reviewtools.overrides import redflagged_snap_types_overrides
 
-        func_base_state_files_snaps_overrides.append("foo")
+        tomorrow_date_in_uct = (datetime.utcnow() + timedelta(days=1)).strftime(
+            "%Y%m%d"
+        )
+        today_date_in_uct = (datetime.utcnow()).strftime("%Y%m%d")
+        test_data = {
+            "valid_override": [
+                tomorrow_date_in_uct,
+                {"info": 1, "warn": 0, "error": 0},
+                "functional-snap-v2:state_base_files",
+                "info",
+                "OK (skipped, not checking files for this snap)",
+            ],
+            "overdue_override": [
+                today_date_in_uct,
+                {"info": 0, "warn": 1, "error": 0},
+                "functional-snap-v2:state_base_files:missing",
+                "warn",
+                "missing files since last review: ./bin/ls",
+            ],
+        }
+        # We need to also add our foo snap to redflagged_snap_types_overrides to prevent the skipping code
+        # to be executed due to this base snap not there
+        redflagged_snap_types_overrides["base"].append("foo")
+        for test in test_data:
+            (stable_date, expected_counts, name, level, text) = test_data[test]
+            with self.subTest(
+                stable_date=stable_date,
+                expected_counts=expected_counts,
+                name=name,
+                level=level,
+                text=text,
+            ):
+                func_base_state_files_snaps_overrides["foo"] = stable_date
+                c = SnapReviewFunctional(self.test_name, overrides=overrides)
+                c.check_state_base_files()
+                report = c.review_report
 
-        c = SnapReviewFunctional(self.test_name, overrides=overrides)
-        c.check_state_base_files()
-        report = c.review_report
+                # restore override
+                del func_base_state_files_snaps_overrides["foo"]
+
+                self.check_results(report, expected_counts)
+                expected = dict()
+                expected["error"] = dict()
+                expected["warn"] = dict()
+                expected["info"] = dict()
+                expected[level][name] = {"text": text}
+                self.check_results(report, expected=expected)
 
         # restore override
-        func_base_state_files_snaps_overrides.remove("foo")
-        expected_counts = {"info": 1, "warn": 0, "error": 0}
-        self.check_results(report, expected_counts)
-        expected = dict()
-        expected["error"] = dict()
-        expected["warn"] = dict()
-        expected["info"] = dict()
-        name = "functional-snap-v2:state_base_files"
-        expected["info"][name] = {
-            "text": "OK (skipped, not checking files for this snap)"
-        }
-        self.check_results(report, expected=expected)
+        redflagged_snap_types_overrides["base"].remove("foo")
 
     def test_check_state_base_files_input_output_different(self):
         """Test check_state_base_files() - --state-input/--state-output

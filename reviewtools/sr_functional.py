@@ -25,6 +25,7 @@ from reviewtools.overrides import (
     func_base_state_files_snaps_overrides,
     redflagged_snap_types_overrides,
 )
+from datetime import datetime
 import copy
 import os
 import re
@@ -384,7 +385,13 @@ class SnapReviewFunctional(SnapReview):
         if (
             self.snap_yaml["name"] not in redflagged_snap_types_overrides["base"]
             and self.snap_yaml["name"] != "core"
-        ) or self.snap_yaml["name"] in func_base_state_files_snaps_overrides:
+        ) or (
+            self.snap_yaml["name"] in func_base_state_files_snaps_overrides
+            and datetime.utcnow()
+            < datetime.strptime(
+                func_base_state_files_snaps_overrides[self.snap_yaml["name"]], "%Y%m%d"
+            )
+        ):
             if (
                 "SNAP_FORCE_STATE_CHECK" not in os.environ
                 or os.environ["SNAP_FORCE_STATE_CHECK"] != "1"
