@@ -1151,6 +1151,20 @@ class SnapReviewLint(SnapReview):
                         )
                     self._add_result(t, n, s)
 
+    def _verify_conflicting_ifaces(self, iface_type, ifaces):
+        conflicting_ifaces = self.interfaces_conflicting[iface_type]
+        for iface in [iface for iface in ifaces if iface in conflicting_ifaces]:
+            for _iface in conflicting_ifaces[iface]:
+                if _iface in ifaces:
+                    t = "error"
+                    n = self._get_check_name("%s_conflicting" % iface_type, app=iface,)
+                    s = (
+                        "conflicting %s " % iface_type
+                        + "'%s' and " % iface
+                        + " '%s'" % _iface
+                    )
+                    self._add_result(t, n, s)
+
     def _verify_interfaces(self, iface_type):
         # collect the list of interfaces by iface_type
         ifaces = list()
@@ -1174,7 +1188,6 @@ class SnapReviewLint(SnapReview):
                 #     interface: <interface>
                 interface = spec["interface"]
 
-            ifaces.append(interface)
             # Validate indirect (specified via alias) interfaces:
             if interface != iface:
                 key = "interface"
@@ -1201,6 +1214,9 @@ class SnapReviewLint(SnapReview):
             self._add_result(t, n, s)
             if t == "error":
                 continue
+
+            # collect interface as we now know it is valid
+            ifaces.append(interface)
 
             # Abbreviated interfaces don't have attributes, done checking.
             if isinstance(spec, str):
@@ -1285,20 +1301,7 @@ class SnapReviewLint(SnapReview):
                     )
                 self._add_result(t, n, s)
 
-        mutex_ifaces = self.interfaces_mutually_exclusive[iface_type]
-        for iface in [iface for iface in mutex_ifaces if iface in ifaces]:
-            for _iface in mutex_ifaces[iface]:
-                if _iface in ifaces:
-                    t = "error"
-                    n = self._get_check_name(
-                        "%s_mutually_exclusive" % iface_type, app=iface,
-                    )
-                    s = (
-                        "mutually exclusive %s " % iface_type
-                        + "'%s' and " % iface
-                        + " '%s'" % _iface
-                    )
-                    self._add_result(t, n, s)
+        self._verify_conflicting_ifaces(iface_type, ifaces)
 
     def check_plugs(self):
         """Check plugs"""
@@ -1359,23 +1362,10 @@ class SnapReviewLint(SnapReview):
                 iface = self.snap_yaml[key][ref]
                 if isinstance(iface, dict):
                     iface = iface["interface"]
-                assert(isinstance(iface, str))
+                assert isinstance(iface, str)
             ifaces.append(iface)
 
-        mutex_ifaces = self.interfaces_mutually_exclusive[key]
-        for iface in [iface for iface in mutex_ifaces if iface in ifaces]:
-            for _iface in mutex_ifaces[iface]:
-                if _iface in ifaces:
-                    t = "error"
-                    n = self._get_check_name(
-                        "%s_mutually_exclusive" % key, app=iface,
-                    )
-                    s = (
-                        "mutually exclusive %s " % key
-                        + "'%s' and " % iface
-                        + " '%s'" % _iface
-                    )
-                    self._add_result(t, n, s)
+        self._verify_conflicting_ifaces(key, ifaces)
 
     def check_apps_plugs(self):
         """Check apps plugs"""

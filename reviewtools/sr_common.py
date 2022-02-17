@@ -334,7 +334,7 @@ class SnapReview(Review):
         "system-files",
     ]
 
-    interfaces_mutually_exclusive = {
+    interfaces_conflicting = {
         "plugs": {"cups": ["cups-control"]},
         "slots": {},
     }
