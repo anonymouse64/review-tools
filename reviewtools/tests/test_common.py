@@ -143,12 +143,28 @@ drwxr-xr-x 0/0                48 2020-03-24 09:11 squashfs-root/meta
 -rw-r--r-- 0/0                99 2020-03-24 09:11 squashfs-root/meta/snap.yaml
 """
         hdr, entries = reviewtools.common.unsquashfs_lln_parse(input)
+        self.assertEqual(4, len(entries))
 
         for exp in [
             "Parallel unsquashfs: Using 4 processors",
             "2 inodes (2 blocks) to write",
+            "",
         ]:
             self.assertTrue(exp in hdr)
+
+        # individual line parsing done elsewhere
+        self.assertEqual(4, len(entries))
+        for line, item in entries:
+            self.assertTrue("squashfs-root" in line)
+            self.assertFalse(item is None)
+
+        # check we can parse without the header as well
+        for exp in hdr:
+            if len(exp) > 0:
+                input = input.replace(exp + "\n", "")
+
+        hdr, entries = reviewtools.common.unsquashfs_lln_parse(input)
+        self.assertEqual(len(hdr), 1)
 
         # individual line parsing done elsewhere
         self.assertEqual(4, len(entries))
@@ -159,14 +175,6 @@ drwxr-xr-x 0/0                48 2020-03-24 09:11 squashfs-root/meta
     def test_unsquashfs_lln_parse_bad(self):
         """Test unsquashfs_lln_parse() - bad"""
         for input, exp in [
-            (
-                """output
-too
-short
-""",
-                "'unsquashfs -lln ouput too short'",
-            ),
-            ("", "'unsquashfs -lln ouput too short'"),
             (
                 """Parallel unsquashfs: Using 4 processors
 8 inodes (8 blocks) to write
