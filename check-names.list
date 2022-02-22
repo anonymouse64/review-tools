@@ -104,6 +104,7 @@ lint-snap-v2:personal-files_path|
 lint-snap-v2:personal-files_valid|
 lint-snap-v2:plugs|
 lint-snap-v2:plugs_attributes|
+lint-snap-v2:plugs_conflicting|
 lint-snap-v2:plugs_required_attributes|
 lint-snap-v2:ports|
 lint-snap-v2:ports_ext1_format|
