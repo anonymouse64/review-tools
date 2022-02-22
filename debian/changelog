@@ -1,3 +1,23 @@
+review-tools (0.48+2022022-1) RELEASED; urgency=medium
+
+  [ Emilia Torino ]
+  * overrides.py: add new func_base_state_files_snaps_overrides to allow
+    skip checking state base files
+  * sr_common.py: add support for flavor plug attr to sd-control iface
+
+  [ Alex Murray]
+  * overrides.py: add/update for public snaps
+  * common.py: update to handle squashfs-tools 4.5
+  * data/snapd-base-declaration.yaml: update snapd-base-declaration for
+    latest snapd interfaces
+  * sr_common.py: validate cups-socket-directory slot attr
+  * sr_lint.py: check for mutually exclusive plugs
+
+  [ Dimitri John Ledkov]
+  * overrides.py: add upcoming kernel snap
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Tue, 22 Feb 2022 14:44:29 -0300
+
 review-tools (0.48+20220105-1) RELEASED; urgency=medium
 
   [ Alex Murray ]
