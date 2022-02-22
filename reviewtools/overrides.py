@@ -104,6 +104,8 @@ redflagged_snap_types_overrides = {
         "lemaker-guitar-gadget",
         "nitrogen-gadget",
         "pc-turtlebot-kyrofa",
+        "rexroth-arch01-hw",
+        "rexroth-arch02-hw",
         "rexroth-xm21",
         "screenly-gadget-pi3",
         "screenly-gadget-resin-rubus",
