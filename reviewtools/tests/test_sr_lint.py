@@ -3000,8 +3000,7 @@ class TestSnapReviewLint(sr_tests.TestSnapReview):
 
     def test_check_plugs_mutually_exclusive_interfaces(self):
         """Test check_plugs() - mutually exclusive interfaces"""
-        plugs = {"cups-foo": {"interface": "cups"},
-                 "cups-control": {}}
+        plugs = {"cups-foo": {"interface": "cups"}, "cups-control": {}}
         self.set_test_snap_yaml("plugs", plugs)
         c = SnapReviewLint(self.test_name)
         c.check_plugs()
