@@ -1,3 +1,9 @@
+review-tools (0.48+2022023-1) RELEASED; urgency=medium
+
+  * overrides.py: add rexroth snaps to redflagged_snap_types_overrides
+
+ -- Emilia Torino <emilia.torino@canonical.com>  Wed, 23 Feb 2022 09:10:22 -0300
+
 review-tools (0.48+2022022-1) RELEASED; urgency=medium
 
   [ Emilia Torino ]
