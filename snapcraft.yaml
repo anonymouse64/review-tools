@@ -19,6 +19,9 @@ apps:
     plugs: [ home, mount-observe ]
     environment:
       FAKEROOTDONTTRYCHOWN: "1"
+  unpack-package:
+    command: unpack-package
+    plugs: [ home ]
   snap-declaration:
     command: create-snap-declaration
     plugs: [ mount-observe ]

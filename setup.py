@@ -24,6 +24,7 @@ scripts.append('bin/snap-check-notices')
 scripts.append('bin/fetch-db')
 scripts.append('bin/diffsquash')
 scripts.append('bin/store-query')
+scripts.append('bin/unpack-package')
 scripts.remove('bin/snap-check-skeleton')
 setup(
     name='review-tools',
