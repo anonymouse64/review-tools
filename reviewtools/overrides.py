@@ -1156,6 +1156,7 @@ update_publisher_overrides = {
         "snap-store": canonical_desktop,
         "snapcraft": canonical_snapcraft,
         "snapd": canonical_snapd,
+        "snapd-desktop-integration": canonical_desktop,
         "snappy-debug": canonical_security,
         "snapweb": canonical_enablement,
         "nats": canonical_anbox,
